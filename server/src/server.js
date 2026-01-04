@@ -1,4 +1,5 @@
 import express from "express";
+import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -21,6 +22,7 @@ const corsOptions = {
   credentials: true,
 };
 app.use(cors(corsOptions));
+app.use(cookieParser());
 
 // Body parser
 app.use(express.json({ limit: "5mb" }));

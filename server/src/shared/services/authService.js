@@ -104,16 +104,39 @@ const login = async (user_name, user_password) => {
   }
   console.log("User found and password is valid:", user.user_name);
 
-  const token = jwt.sign(
+  const accessToken = jwt.sign(
     { user_id: user.user_id, role: user.role },
     process.env.JWT_SECRET,
-    { expiresIn: "7h" }
+    { expiresIn: "1h" }
+  );
+  const refreshToken = jwt.sign(
+    { user_id: user.user_id },
+    process.env.JWT_REFRESH_SECRET,
+    { expiresIn: "7d" }
   );
   return {
     success: true,
     message: "Login successful",
     user,
-    token,
+    accessToken,
+    refreshToken,
   };
 };
-export { register, login };
+
+const refreshToken = async (refreshToken) => {
+  if (!refreshToken) {
+    return { success: false, message: "No refresh token provided" };
+  }
+  try {
+    const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+    const newAccessToken = jwt.sign(
+      { user_id: decoded.user_id },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
+    return { success: true, accessToken: newAccessToken };
+  } catch {
+    return { success: false, message: "Invalid or expired refresh token" };
+  }
+};
+export { register, login, refreshToken };
