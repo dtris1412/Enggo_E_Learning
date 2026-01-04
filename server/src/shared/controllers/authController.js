@@ -3,7 +3,42 @@ import {
   login as loginService,
   refreshToken as refreshTokenService,
   logout as logoutService,
+  forgotPassword as forgotPasswordService,
+  resetPassword as resetPasswordService,
 } from "../services/authService.js";
+
+const forgotPassword = async (req, res) => {
+  try {
+    const { user_email } = req.body;
+    const result = await forgotPasswordService(user_email);
+    if (!result.success) {
+      return res.status(400).json(result);
+    }
+    res.status(200).json(result);
+  } catch (err) {
+    console.error("Error in forgot password controller:", err);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+const resetPassword = async (req, res) => {
+  try {
+    const { user_name, user_email, otp, new_password } = req.body;
+    const result = await resetPasswordService(
+      user_name,
+      user_email,
+      otp,
+      new_password
+    );
+    if (!result.success) {
+      return res.status(400).json(result);
+    }
+    res.status(200).json(result);
+  } catch (err) {
+    console.error("Error in reset password controller:", err);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
 
 const refreshToken = async (req, res) => {
   try {
@@ -74,4 +109,4 @@ const logout = async (req, res) => {
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
-export { register, login, refreshToken, logout };
+export { register, login, refreshToken, logout, forgotPassword, resetPassword };

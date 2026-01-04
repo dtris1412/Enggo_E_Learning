@@ -2,11 +2,61 @@ import db from "../../models/index.js";
 import { Op } from "sequelize";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
+import nodemailer from "nodemailer";
+import dotenv from "dotenv";
+dotenv.config();
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const phoneRegex = /^\d{9,11}$/;
 const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{6,}$/;
 const SALT_ROUDS = 10;
+
+const otpStore = {};
+const forgotPassword = async (user_email) => {
+  try {
+    //Kiểm tra email có tồn tại không
+    //Tạo OTP ngẫu nhiên
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    //Lưu OTP vào bộ nhớ tạm thời với thời hạn 5 phút
+    otpStore[user_email] = { otp, expiresAt: Date.now() + 5 * 60 * 1000 };
+    //Gửi OTP qua email
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: user_email,
+      subject: "Your OTP Code",
+      text: `Your OTP code is: ${otp}. It will expire in 10 minutes.`,
+    });
+    return { success: true, message: "OTP sent successfully" };
+  } catch (err) {
+    console.error("Error in forgot password service:", err);
+    return { success: false, message: "Internal server error" };
+  }
+};
+const resetPassword = async (user_name, user_email, otp, new_password) => {
+  //Kiểm tra OTP
+  const record = otpStore[user_email];
+  if (!record || record.otp !== otp || record.expiresAt < Date.now()) {
+    return { success: false, message: "Invalid or expired OTP" };
+  }
+  //Mã hóa mật khẩu mới
+  const hashedPassword = await bcrypt.hash(new_password, SALT_ROUDS);
+  //Cập nhật mật khẩu trong DB
+  await db.User.update(
+    { user_password: hashedPassword },
+    { where: { user_name, user_email } }
+  );
+
+  delete otpStore[user_email]; //Xoá OTP sau khi sử dụng
+
+  return { success: true, message: "Password reset successfully" };
+};
 
 const register = async (
   user_name,
@@ -143,4 +193,4 @@ const refreshToken = async (refreshToken) => {
 const logout = async () => {
   return { success: true, message: "Logout successful" };
 };
-export { register, login, refreshToken, logout };
+export { register, login, refreshToken, logout, forgotPassword, resetPassword };
