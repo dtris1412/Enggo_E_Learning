@@ -6,9 +6,10 @@ dotenv.config();
 
 const basename = path.basename(new URL(import.meta.url).pathname);
 const env = process.env.NODE_ENV || "development";
-const config = JSON.parse(
-  fs.readFileSync(new URL("../config/config.js", import.meta.url))
-)[env];
+import configFile from "../config/config.js";
+
+const config = configFile[env];
+
 const db = {};
 
 let sequelize;
