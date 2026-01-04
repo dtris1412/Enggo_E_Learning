@@ -6,6 +6,7 @@ import { fileURLToPath } from "url";
 import initSharedRoutes from "./shared/routes/sharedRoute.js";
 import connectDB from "./config/connectDB.js";
 import cors from "cors";
+import passport from "./shared/services/passportService.js";
 
 dotenv.config();
 

@@ -21,6 +21,8 @@ export default (sequelize, DataTypes) => {
       role: { type: DataTypes.INTEGER, allowNull: false },
       user_level: DataTypes.STRING,
       user_status: { type: DataTypes.BOOLEAN, allowNull: false },
+      google_id: DataTypes.STRING,
+      facebook_id: DataTypes.STRING,
       created_at: { type: DataTypes.DATE, allowNull: false },
       updated_at: { type: DataTypes.DATE, allowNull: false },
     },

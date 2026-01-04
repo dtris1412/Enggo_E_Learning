@@ -6,7 +6,7 @@ import {
   forgotPassword as forgotPasswordService,
   resetPassword as resetPasswordService,
 } from "../services/authService.js";
-
+import jwt from "jsonwebtoken";
 const forgotPassword = async (req, res) => {
   try {
     const { user_email } = req.body;
@@ -109,4 +109,33 @@ const logout = async (req, res) => {
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
-export { register, login, refreshToken, logout, forgotPassword, resetPassword };
+
+const socialLoginCallBack = (req, res) => {
+  try {
+    const user = req.user;
+    const accessToken = jwt.sign(
+      { user_id: user.user_id, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
+    const refreshToken = jwt.sign(
+      { user_id: user.user_id },
+      process.env.JWT_REFRESH_SECRET,
+      { expiresIn: "7d" }
+    );
+    res.status(200).json({ success: true, accessToken, refreshToken });
+  } catch (err) {
+    console.error("Error in social login callback controller:", err);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+export {
+  register,
+  login,
+  refreshToken,
+  logout,
+  forgotPassword,
+  resetPassword,
+  socialLoginCallBack,
+};
