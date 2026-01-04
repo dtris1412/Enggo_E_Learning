@@ -139,4 +139,8 @@ const refreshToken = async (refreshToken) => {
     return { success: false, message: "Invalid or expired refresh token" };
   }
 };
-export { register, login, refreshToken };
+
+const logout = async () => {
+  return { success: true, message: "Logout successful" };
+};
+export { register, login, refreshToken, logout };

@@ -2,6 +2,7 @@ import {
   register as registerService,
   login as loginService,
   refreshToken as refreshTokenService,
+  logout as logoutService,
 } from "../services/authService.js";
 
 const refreshToken = async (req, res) => {
@@ -62,4 +63,15 @@ const login = async (req, res) => {
   }
 };
 
-export { register, login, refreshToken };
+const logout = async (req, res) => {
+  try {
+    //xóa cookie refresh token ở client
+    res.clearCookie("refreshToken");
+    const result = await logoutService();
+    res.status(200).json(result);
+  } catch (err) {
+    console.error("Error in logout controller:", err);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+export { register, login, refreshToken, logout };

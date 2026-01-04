@@ -5,6 +5,7 @@ import {
   register,
   login,
   refreshToken,
+  logout,
 } from "../controllers/authController.js";
 
 const router = express.Router();
@@ -14,6 +15,7 @@ const initSharedRoutes = (app) => {
   router.post("/api/register", register);
   router.post("/api/login", login);
   router.post("/api/refresh-token", refreshToken);
+  router.post("/api/logout", logout);
   app.use("/", router);
 };
 
