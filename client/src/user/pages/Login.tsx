@@ -2,14 +2,15 @@ import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../../shared/contexts/authContext";
+import { useToast } from "../../shared/components/Toast/Toast";
 
 const Login = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { login, loginWithGoogle, loginWithFacebook } = useAuth();
+  const { showToast } = useToast();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [formData, setFormData] = useState({
     username: "",
@@ -20,34 +21,35 @@ const Login = () => {
     // Check for social login error
     const errorParam = searchParams.get("error");
     if (errorParam) {
+      let errorMessage = "Có lỗi xảy ra. Vui lòng thử lại!";
+
       switch (errorParam) {
         case "social_login_failed":
-          setError("Đăng nhập bằng mạng xã hội thất bại. Vui lòng thử lại!");
+          errorMessage =
+            "Đăng nhập bằng mạng xã hội thất bại. Vui lòng thử lại!";
           break;
         case "invalid_callback_data":
-          setError("Dữ liệu xác thực không hợp lệ. Vui lòng thử lại!");
+          errorMessage = "Dữ liệu xác thực không hợp lệ. Vui lòng thử lại!";
           break;
         case "missing_auth_data":
-          setError("Thiếu dữ liệu xác thực. Vui lòng thử lại!");
+          errorMessage = "Thiếu dữ liệu xác thực. Vui lòng thử lại!";
           break;
-        default:
-          setError("Có lỗi xảy ra. Vui lòng thử lại!");
       }
+
+      showToast("error", errorMessage);
     }
-  }, [searchParams]);
+  }, [searchParams, showToast]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     });
-    setError("");
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setError("");
 
     try {
       const result = await login(
@@ -57,13 +59,14 @@ const Login = () => {
       );
 
       if (result.success) {
+        showToast("success", result.message);
         // Navigate based on user role or to home page
         navigate("/");
       } else {
-        setError(result.message);
+        showToast("error", result.message);
       }
     } catch (err) {
-      setError("Có lỗi xảy ra. Vui lòng thử lại!");
+      showToast("error", "Có lỗi xảy ra. Vui lòng thử lại!");
     } finally {
       setIsLoading(false);
     }
@@ -97,12 +100,6 @@ const Login = () => {
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 rounded-lg shadow-lg sm:px-10 animate-fade-in">
           <form className="space-y-6" onSubmit={handleSubmit}>
-            {error && (
-              <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm">
-                {error}
-              </div>
-            )}
-
             <div>
               <label
                 htmlFor="username"

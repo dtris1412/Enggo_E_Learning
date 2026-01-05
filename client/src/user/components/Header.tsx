@@ -1,12 +1,15 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { BookOpen, Menu, X, LogOut, User } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "../../shared/contexts/authContext";
+import { useToast } from "../../shared/components/Toast/Toast";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const { user, logout } = useAuth();
+  const { showToast } = useToast();
 
   const navItems = [
     { path: "/", label: "Trang chủ" },
@@ -58,7 +61,11 @@ const Header = () => {
                   <span>{user.user_name}</span>
                 </div>
                 <button
-                  onClick={logout}
+                  onClick={async () => {
+                    await logout();
+                    showToast("success", "Đăng xuất thành công!");
+                    navigate("/");
+                  }}
                   className="flex items-center space-x-2 bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-red-700 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5"
                 >
                   <LogOut className="h-4 w-4" />
@@ -122,9 +129,11 @@ const Header = () => {
                       <span>{user.user_name}</span>
                     </div>
                     <button
-                      onClick={() => {
-                        logout();
+                      onClick={async () => {
+                        await logout();
+                        showToast("success", "Đăng xuất thành công!");
                         setIsMenuOpen(false);
+                        navigate("/");
                       }}
                       className="flex items-center space-x-2 bg-red-600 text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-red-700 mx-3 transition-all duration-200 hover:shadow-md"
                     >

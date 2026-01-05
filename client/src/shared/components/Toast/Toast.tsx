@@ -38,7 +38,12 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
 
   const showToast = useCallback((type: ToastType, message: string) => {
     const id = Date.now();
-    setToasts((prev) => [...prev, { id, type, message }]);
+    console.log("Toast triggered:", { id, type, message });
+    setToasts((prev) => {
+      const newToasts = [...prev, { id, type, message }];
+      console.log("Current toasts:", newToasts);
+      return newToasts;
+    });
 
     // Auto remove after 5 seconds
     setTimeout(() => {

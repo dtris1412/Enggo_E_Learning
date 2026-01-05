@@ -2,6 +2,7 @@ import { Mail, Lock, User, Eye, EyeOff, Phone } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../shared/contexts/authContext";
+import { useToast } from "../../shared/components/Toast/Toast";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -10,11 +11,10 @@ const Register = () => {
     loginWithGoogle,
     loginWithFacebook,
   } = useAuth();
+  const { showToast } = useToast();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
   const [formData, setFormData] = useState({
     username: "",
     fullName: "",
@@ -31,25 +31,21 @@ const Register = () => {
       ...formData,
       [name]: type === "checkbox" ? checked : value,
     });
-    setError("");
-    setSuccess("");
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setError("");
-    setSuccess("");
 
     // Validation
     if (formData.password !== formData.confirmPassword) {
-      setError("Mật khẩu xác nhận không khớp!");
+      showToast("error", "Mật khẩu xác nhận không khớp!");
       setIsLoading(false);
       return;
     }
 
     if (!formData.agreeTerms) {
-      setError("Vui lòng đồng ý với điều khoản sử dụng!");
+      showToast("error", "Vui lòng đồng ý với điều khoản sử dụng!");
       setIsLoading(false);
       return;
     }
@@ -64,16 +60,16 @@ const Register = () => {
       );
 
       if (result.success) {
-        setSuccess(result.message);
+        showToast("success", result.message);
         // Navigate to login page after 2 seconds
         setTimeout(() => {
           navigate("/login");
         }, 2000);
       } else {
-        setError(result.message);
+        showToast("error", result.message);
       }
     } catch (err) {
-      setError("Có lỗi xảy ra. Vui lòng thử lại!");
+      showToast("error", "Có lỗi xảy ra. Vui lòng thử lại!");
     } finally {
       setIsLoading(false);
     }
@@ -107,17 +103,7 @@ const Register = () => {
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow-lg sm:px-10">
           <form className="space-y-6" onSubmit={handleSubmit}>
-            {error && (
-              <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm">
-                {error}
-              </div>
-            )}
-            {success && (
-              <div className="bg-green-50 border border-green-200 text-green-600 px-4 py-3 rounded-lg text-sm">
-                {success}
-              </div>
-            )}
-
+            {/* Username */}{" "}
             <div>
               <label
                 htmlFor="username"
@@ -139,7 +125,6 @@ const Register = () => {
                 <User className="h-5 w-5 text-gray-400 absolute left-3 top-3.5" />
               </div>
             </div>
-
             <div>
               <label
                 htmlFor="fullName"
@@ -161,7 +146,6 @@ const Register = () => {
                 <User className="h-5 w-5 text-gray-400 absolute left-3 top-3.5" />
               </div>
             </div>
-
             <div>
               <label
                 htmlFor="email"
@@ -183,7 +167,6 @@ const Register = () => {
                 <Mail className="h-5 w-5 text-gray-400 absolute left-3 top-3.5" />
               </div>
             </div>
-
             <div>
               <label
                 htmlFor="phone"
@@ -205,7 +188,6 @@ const Register = () => {
                 <Phone className="h-5 w-5 text-gray-400 absolute left-3 top-3.5" />
               </div>
             </div>
-
             <div>
               <label
                 htmlFor="password"
@@ -238,7 +220,6 @@ const Register = () => {
                 </button>
               </div>
             </div>
-
             <div>
               <label
                 htmlFor="confirmPassword"
@@ -271,7 +252,6 @@ const Register = () => {
                 </button>
               </div>
             </div>
-
             <div className="flex items-center">
               <input
                 id="agreeTerms"
@@ -296,7 +276,6 @@ const Register = () => {
                 </a>
               </label>
             </div>
-
             <div>
               <button
                 type="submit"

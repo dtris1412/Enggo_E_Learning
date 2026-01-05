@@ -1,11 +1,13 @@
 import { useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../contexts/authContext";
+import { useToast } from "../components/Toast/Toast";
 
 const AuthCallback = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { setAuthData } = useAuth();
+  const { showToast } = useToast();
   const hasProcessed = useRef(false);
 
   useEffect(() => {
@@ -36,6 +38,9 @@ const AuthCallback = () => {
           setAuthData(user, token);
         }
 
+        // Show success toast
+        showToast("success", "Đăng nhập thành công!");
+
         // Get redirect path from sessionStorage or default to home
         let redirectPath = sessionStorage.getItem("redirectAfterLogin") || "/";
         sessionStorage.removeItem("redirectAfterLogin");
@@ -63,7 +68,7 @@ const AuthCallback = () => {
       // Missing required params
       navigate("/login?error=missing_auth_data");
     }
-  }, [searchParams, navigate, setAuthData]);
+  }, [searchParams, navigate, setAuthData, showToast]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
