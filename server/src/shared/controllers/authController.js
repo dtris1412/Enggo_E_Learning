@@ -5,6 +5,7 @@ import {
   logout as logoutService,
   forgotPassword as forgotPasswordService,
   resetPassword as resetPasswordService,
+  verifyOTP as verifyOTPService,
 } from "../services/authService.js";
 import jwt from "jsonwebtoken";
 const forgotPassword = async (req, res) => {
@@ -17,6 +18,20 @@ const forgotPassword = async (req, res) => {
     res.status(200).json(result);
   } catch (err) {
     console.error("Error in forgot password controller:", err);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+const verifyOTP = async (req, res) => {
+  try {
+    const { user_email, otp } = req.body;
+    const result = await verifyOTPService(user_email, otp);
+    if (!result.success) {
+      return res.status(400).json(result);
+    }
+    res.status(200).json(result);
+  } catch (err) {
+    console.error("Error in verify OTP controller:", err);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
@@ -123,10 +138,32 @@ const socialLoginCallBack = (req, res) => {
       process.env.JWT_REFRESH_SECRET,
       { expiresIn: "7d" }
     );
-    res.status(200).json({ success: true, accessToken, refreshToken });
+
+    // Set refresh token in cookie
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
+
+    // Redirect to frontend callback with token and user data
+    const frontendUrl =
+      process.env.NODE_ENV === "production"
+        ? process.env.FRONTEND_URL || "http://localhost:8080"
+        : "http://localhost:5173";
+
+    const userData = encodeURIComponent(JSON.stringify(user));
+    res.redirect(
+      `${frontendUrl}/auth/callback?token=${accessToken}&user=${userData}`
+    );
   } catch (err) {
     console.error("Error in social login callback controller:", err);
-    res.status(500).json({ success: false, message: "Internal server error" });
+    const frontendUrl =
+      process.env.NODE_ENV === "production"
+        ? process.env.FRONTEND_URL || "http://localhost:8080"
+        : "http://localhost:5173";
+    res.redirect(`${frontendUrl}/login?error=social_login_failed`);
   }
 };
 
@@ -136,6 +173,7 @@ export {
   refreshToken,
   logout,
   forgotPassword,
+  verifyOTP,
   resetPassword,
   socialLoginCallBack,
 };

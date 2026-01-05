@@ -40,22 +40,57 @@ const forgotPassword = async (user_email) => {
   }
 };
 const resetPassword = async (user_name, user_email, otp, new_password) => {
-  //Kiểm tra OTP
-  const record = otpStore[user_email];
-  if (!record || record.otp !== otp || record.expiresAt < Date.now()) {
-    return { success: false, message: "Invalid or expired OTP" };
+  try {
+    //Kiểm tra OTP
+    const record = otpStore[user_email];
+    if (!record || record.otp !== otp || record.expiresAt < Date.now()) {
+      return { success: false, message: "Invalid or expired OTP" };
+    }
+
+    //Mã hóa mật khẩu mới
+    const hashedPassword = await bcrypt.hash(new_password, SALT_ROUDS);
+
+    //Cập nhật mật khẩu trong DB chỉ dựa vào email (không cần user_name)
+    const result = await db.User.update(
+      { user_password: hashedPassword },
+      { where: { user_email } }
+    );
+
+    if (result[0] === 0) {
+      return { success: false, message: "User not found" };
+    }
+
+    delete otpStore[user_email]; //Xoá OTP sau khi sử dụng
+
+    return { success: true, message: "Password reset successfully" };
+  } catch (err) {
+    console.error("Error in reset password service:", err);
+    return { success: false, message: "Internal server error" };
   }
-  //Mã hóa mật khẩu mới
-  const hashedPassword = await bcrypt.hash(new_password, SALT_ROUDS);
-  //Cập nhật mật khẩu trong DB
-  await db.User.update(
-    { user_password: hashedPassword },
-    { where: { user_name, user_email } }
-  );
+};
 
-  delete otpStore[user_email]; //Xoá OTP sau khi sử dụng
+const verifyOTP = async (user_email, otp) => {
+  try {
+    const record = otpStore[user_email];
 
-  return { success: true, message: "Password reset successfully" };
+    if (!record) {
+      return { success: false, message: "No OTP found for this email" };
+    }
+
+    if (record.expiresAt < Date.now()) {
+      delete otpStore[user_email];
+      return { success: false, message: "OTP has expired" };
+    }
+
+    if (record.otp !== otp) {
+      return { success: false, message: "Invalid OTP" };
+    }
+
+    return { success: true, message: "OTP verified successfully" };
+  } catch (err) {
+    console.error("Error in verify OTP service:", err);
+    return { success: false, message: "Internal server error" };
+  }
 };
 
 const register = async (
@@ -96,6 +131,7 @@ const register = async (
       [Op.or]: [{ user_name }, { user_email }],
     },
   });
+
   if (existingUser) {
     return {
       success: false,
@@ -193,4 +229,12 @@ const refreshToken = async (refreshToken) => {
 const logout = async () => {
   return { success: true, message: "Logout successful" };
 };
-export { register, login, refreshToken, logout, forgotPassword, resetPassword };
+export {
+  register,
+  login,
+  refreshToken,
+  logout,
+  forgotPassword,
+  resetPassword,
+  verifyOTP,
+};

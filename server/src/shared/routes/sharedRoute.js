@@ -8,6 +8,7 @@ import {
   refreshToken,
   logout,
   forgotPassword,
+  verifyOTP,
   resetPassword,
   socialLoginCallBack,
 } from "../controllers/authController.js";
@@ -21,6 +22,7 @@ const initSharedRoutes = (app) => {
   router.post("/api/auth/refresh-token", refreshToken);
   router.post("/api/auth/logout", logout);
   router.post("/api/auth/forgot-password", forgotPassword);
+  router.post("/api/auth/verify-otp", verifyOTP);
   router.post("/api/auth/reset-password", resetPassword);
   // Social Auth Routes - Google
   router.get(
