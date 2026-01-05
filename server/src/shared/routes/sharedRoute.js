@@ -1,5 +1,11 @@
 import express from "express";
-import { verifyToken } from "../../middleware/authMiddleware.js";
+import {
+  verifyToken,
+  requireAdmin,
+  requireAuth,
+  requireUser,
+  requireRole,
+} from "../../middleware/authMiddleware.js";
 import passport from "../services/passportService.js";
 // ===========Auth Controllers===========
 import {
