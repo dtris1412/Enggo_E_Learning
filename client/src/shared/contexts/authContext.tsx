@@ -3,6 +3,7 @@ import React, {
   useContext,
   useState,
   useEffect,
+  useCallback,
   ReactNode,
 } from "react";
 
@@ -27,7 +28,8 @@ interface AuthContextType {
   isLoading: boolean;
   login: (
     user_name: string,
-    user_password: string
+    user_password: string,
+    remember?: boolean
   ) => Promise<{ success: boolean; message: string }>;
   register: (
     user_name: string,
@@ -86,7 +88,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const login = async (
     user_name: string,
-    user_password: string
+    user_password: string,
+    remember: boolean = false
   ): Promise<{ success: boolean; message: string }> => {
     try {
       const response = await fetch(`${apiUrl}/auth/login`, {
@@ -95,7 +98,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           "Content-Type": "application/json",
         },
         credentials: "include", // Include cookies
-        body: JSON.stringify({ user_name, user_password }),
+        body: JSON.stringify({ user_name, user_password, remember }),
       });
 
       const data = await response.json();
@@ -247,22 +250,46 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const loginWithGoogle = () => {
-    // Save current location for redirect after login
-    sessionStorage.setItem("redirectAfterLogin", window.location.pathname);
+    // Save current location for redirect after login (except login/register pages)
+    const currentPath = window.location.pathname;
+    const authPages = [
+      "/login",
+      "/register",
+      "/forgot-password",
+      "/verify-otp",
+      "/reset-password",
+    ];
+
+    if (!authPages.includes(currentPath)) {
+      sessionStorage.setItem("redirectAfterLogin", currentPath);
+    }
+
     window.location.href = `${apiUrl}/auth/google`;
   };
 
   const loginWithFacebook = () => {
-    // Save current location for redirect after login
-    sessionStorage.setItem("redirectAfterLogin", window.location.pathname);
+    // Save current location for redirect after login (except login/register pages)
+    const currentPath = window.location.pathname;
+    const authPages = [
+      "/login",
+      "/register",
+      "/forgot-password",
+      "/verify-otp",
+      "/reset-password",
+    ];
+
+    if (!authPages.includes(currentPath)) {
+      sessionStorage.setItem("redirectAfterLogin", currentPath);
+    }
+
     window.location.href = `${apiUrl}/auth/facebook`;
   };
 
-  const setAuthData = (userData: User, token: string) => {
+  const setAuthData = useCallback((userData: User, token: string) => {
     setUser(userData);
     localStorage.setItem("user", JSON.stringify(userData));
     localStorage.setItem("accessToken", token);
-  };
+  }, []);
 
   const value: AuthContextType = {
     user,

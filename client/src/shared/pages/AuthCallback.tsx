@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../contexts/authContext";
 
@@ -6,8 +6,13 @@ const AuthCallback = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { setAuthData } = useAuth();
+  const hasProcessed = useRef(false);
 
   useEffect(() => {
+    // Prevent processing multiple times
+    if (hasProcessed.current) return;
+    hasProcessed.current = true;
+
     const token = searchParams.get("token");
     const userParam = searchParams.get("user");
     const error = searchParams.get("error");
@@ -32,9 +37,21 @@ const AuthCallback = () => {
         }
 
         // Get redirect path from sessionStorage or default to home
-        const redirectPath =
-          sessionStorage.getItem("redirectAfterLogin") || "/";
+        let redirectPath = sessionStorage.getItem("redirectAfterLogin") || "/";
         sessionStorage.removeItem("redirectAfterLogin");
+
+        // Prevent redirecting back to auth pages
+        const authPages = [
+          "/login",
+          "/register",
+          "/forgot-password",
+          "/verify-otp",
+          "/reset-password",
+          "/auth/callback",
+        ];
+        if (authPages.includes(redirectPath)) {
+          redirectPath = "/";
+        }
 
         // Redirect to previous page or home
         navigate(redirectPath, { replace: true });

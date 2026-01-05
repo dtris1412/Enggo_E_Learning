@@ -10,6 +10,7 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
   const [formData, setFormData] = useState({
     username: "",
     password: "",
@@ -49,7 +50,11 @@ const Login = () => {
     setError("");
 
     try {
-      const result = await login(formData.username, formData.password);
+      const result = await login(
+        formData.username,
+        formData.password,
+        rememberMe
+      );
 
       if (result.success) {
         // Navigate based on user role or to home page
@@ -159,7 +164,9 @@ const Login = () => {
                   id="remember-me"
                   name="remember-me"
                   type="checkbox"
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                 />
                 <label
                   htmlFor="remember-me"

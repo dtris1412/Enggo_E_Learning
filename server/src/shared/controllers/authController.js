@@ -87,18 +87,24 @@ const register = async (req, res) => {
 const login = async (req, res) => {
   try {
     console.log("Login request body:", req.body);
-    const { user_name, user_password } = req.body;
+    const { user_name, user_password, remember } = req.body;
     const result = await loginService(user_name, user_password);
     if (!result.success) {
       return res.status(401).json(result);
     }
     //Set refresh token vào cookie http-Only
-    res.cookie("refreshToken", result.refreshToken, {
+    //Nếu remember = true, cookie tồn tại 7 ngày. Nếu không, cookie chỉ tồn tại trong session (xóa khi đóng browser)
+    const cookieOptions = {
       httpOnly: true,
       secure: true,
       sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    });
+    };
+
+    if (remember) {
+      cookieOptions.maxAge = 7 * 24 * 60 * 60 * 1000; // 7 days
+    }
+
+    res.cookie("refreshToken", result.refreshToken, cookieOptions);
     //trả access token và user về client
 
     res.status(200).json({
@@ -146,7 +152,6 @@ const socialLoginCallBack = (req, res) => {
       sameSite: "strict",
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
-
     // Redirect to frontend callback with token and user data
     const frontendUrl =
       process.env.NODE_ENV === "production"
