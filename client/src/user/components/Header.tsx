@@ -20,6 +20,12 @@ const Header = () => {
     { path: "/tests", label: "Thi thử online" },
   ];
 
+  // Add Admin link if user is admin (role = 1)
+  const allNavItems =
+    user?.role === 1
+      ? [...navItems, { path: "/admin/dashboard", label: "Quản trị" }]
+      : navItems;
+
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-50 backdrop-blur-sm bg-white/95">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -37,7 +43,7 @@ const Header = () => {
 
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex space-x-8">
-            {navItems.map((item) => (
+            {allNavItems.map((item) => (
               <Link
                 key={item.path}
                 to={item.path}
@@ -107,7 +113,7 @@ const Header = () => {
         {isMenuOpen && (
           <div className="lg:hidden border-t border-gray-200 py-4 animate-fade-in">
             <nav className="flex flex-col space-y-2">
-              {navItems.map((item) => (
+              {allNavItems.map((item) => (
                 <Link
                   key={item.path}
                   to={item.path}

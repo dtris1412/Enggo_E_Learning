@@ -60,8 +60,14 @@ const Login = () => {
 
       if (result.success) {
         showToast("success", result.message);
-        // Navigate based on user role or to home page
-        navigate("/");
+        // Navigate based on user role
+        if (result.role === 1) {
+          // Admin
+          navigate("/admin/dashboard");
+        } else {
+          // User - redirect to home
+          navigate("/");
+        }
       } else {
         showToast("error", result.message);
       }

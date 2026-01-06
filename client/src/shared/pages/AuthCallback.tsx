@@ -41,21 +41,36 @@ const AuthCallback = () => {
         // Show success toast
         showToast("success", "Đăng nhập thành công!");
 
-        // Get redirect path from sessionStorage or default to home
-        let redirectPath = sessionStorage.getItem("redirectAfterLogin") || "/";
-        sessionStorage.removeItem("redirectAfterLogin");
+        // Redirect based on role
+        let redirectPath = "/";
 
-        // Prevent redirecting back to auth pages
-        const authPages = [
-          "/login",
-          "/register",
-          "/forgot-password",
-          "/verify-otp",
-          "/reset-password",
-          "/auth/callback",
-        ];
-        if (authPages.includes(redirectPath)) {
-          redirectPath = "/";
+        if (user.role === 1) {
+          // Admin - always go to admin dashboard
+          redirectPath = "/admin/dashboard";
+        } else if (user.role === 2) {
+          // User - check if there's a saved redirect path
+          const savedPath = sessionStorage.getItem("redirectAfterLogin");
+          sessionStorage.removeItem("redirectAfterLogin");
+
+          const authPages = [
+            "/login",
+            "/register",
+            "/forgot-password",
+            "/verify-otp",
+            "/reset-password",
+            "/auth/callback",
+          ];
+
+          // Don't redirect to auth pages or admin pages
+          if (
+            savedPath &&
+            !authPages.includes(savedPath) &&
+            !savedPath.startsWith("/admin")
+          ) {
+            redirectPath = savedPath;
+          } else {
+            redirectPath = "/";
+          }
         }
 
         // Redirect to previous page or home

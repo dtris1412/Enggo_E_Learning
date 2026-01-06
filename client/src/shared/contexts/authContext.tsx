@@ -30,7 +30,7 @@ interface AuthContextType {
     user_name: string,
     user_password: string,
     remember?: boolean
-  ) => Promise<{ success: boolean; message: string }>;
+  ) => Promise<{ success: boolean; message: string; role?: number }>;
   register: (
     user_name: string,
     user_email: string,
@@ -110,6 +110,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         return {
           success: true,
           message: data.message || "Đăng nhập thành công!",
+          role: data.user.role,
         };
       } else {
         return {

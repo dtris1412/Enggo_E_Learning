@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
 import initSharedRoutes from "./shared/routes/sharedRoute.js";
+import initAdminRoutes from "./admin/routes/adminRoutes.js";
 import connectDB from "./config/connectDB.js";
 import cors from "cors";
 // import passport from "./shared/services/passportService.js";
@@ -36,6 +37,7 @@ app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 // API ROUTES - Phải đặt TRƯỚC static files
 // ============================================
 initSharedRoutes(app); // /api/*
+initAdminRoutes(app); // /api/admin/*
 
 // ============================================
 // SERVE REACT STATIC FILES (như Nginx)
