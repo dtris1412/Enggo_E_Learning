@@ -90,7 +90,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     user_name: string,
     user_password: string,
     remember: boolean = false
-  ): Promise<{ success: boolean; message: string }> => {
+  ): Promise<{ success: boolean; message: string; role?: number }> => {
     try {
       const response = await fetch(`${apiUrl}/auth/login`, {
         method: "POST",
