@@ -5,6 +5,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import initSharedRoutes from "./shared/routes/sharedRoute.js";
 import initAdminRoutes from "./admin/routes/adminRoutes.js";
+import uploadRoutes from "./shared/routes/uploadRoute.js";
 import connectDB from "./config/connectDB.js";
 import cors from "cors";
 // import passport from "./shared/services/passportService.js";
@@ -31,7 +32,7 @@ app.use(express.json({ limit: "5mb" }));
 app.use(express.urlencoded({ limit: "5mb", extended: true }));
 
 // Serve uploaded files
-app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
+app.use("/api/upload", uploadRoutes);
 
 // ============================================
 // API ROUTES - Phải đặt TRƯỚC static files

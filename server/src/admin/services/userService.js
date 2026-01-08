@@ -61,6 +61,14 @@ const updateUserById = async (user_id, full_name, user_phone, user_address) => {
   const user = await db.User.findByPk(user_id);
   if (!user) return { success: false, message: "User not found" };
 
+  // Kiểm tra xem tài khoản có bị khóa không
+  if (user.user_status === 0 || user.user_status === false) {
+    return {
+      success: false,
+      message: "Cannot update locked account. Please unlock the account first.",
+    };
+  }
+
   const updateData = {
     full_name: full_name || user.full_name,
     user_phone: user_phone || user.user_phone,
@@ -155,6 +163,9 @@ const lockUser = async (user_id) => {
   //Kiem tra user da bi khoa chua
   if (user.user_status === 0 || user.user_status === false) {
     return { success: false, message: "User is already locked" };
+  }
+  if (user.role === 1) {
+    return { success: false, message: "Cannot lock an admin user" };
   }
   await db.User.update(
     { user_status: 0, updated_at: new Date() },

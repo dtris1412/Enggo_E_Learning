@@ -4,6 +4,8 @@ import { useUserContext } from "../contexts/userContext";
 import { useToast } from "../../shared/components/Toast/Toast";
 import AddUserModal from "../components/UserManagement/AddUserModal";
 import EditUserModal from "../components/UserManagement/EditUserModal";
+import ViewUserModal from "../components/UserManagement/ViewUserModal";
+// import ViewUserModal from "../components/UserManagement/ViewUserModal";
 
 interface User {
   user_id: number;
@@ -27,6 +29,7 @@ const AccountManagement = () => {
   const [limit] = useState(10);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
   const {
@@ -95,6 +98,11 @@ const AccountManagement = () => {
     } else {
       showToast("error", result.message || "Mở khóa tài khoản thất bại!");
     }
+  };
+
+  const openViewModal = (user: User) => {
+    setSelectedUser(user);
+    setIsViewModalOpen(true);
   };
 
   const openEditModal = (user: User) => {
@@ -234,7 +242,11 @@ const AccountManagement = () => {
                 {users.map((user) => (
                   <tr
                     key={user.user_id}
-                    className="hover:bg-gray-50 transition-colors duration-200"
+                    onClick={() => openViewModal(user)}
+                    className={`hover:bg-gray-50 transition-colors duration-200 cursor-pointer ${
+                      !user.user_status ? "opacity-60 bg-gray-50" : ""
+                    }`}
+                    title={!user.user_status ? "Tài khoản đã bị khóa" : ""}
                   >
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
@@ -290,15 +302,32 @@ const AccountManagement = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex justify-end gap-2">
                         <button
-                          onClick={() => openEditModal(user)}
-                          className="text-blue-600 hover:text-blue-900 transition-colors"
-                          title="Chỉnh sửa"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (user.user_status) {
+                              openEditModal(user);
+                            }
+                          }}
+                          disabled={!user.user_status}
+                          className={`transition-colors ${
+                            user.user_status
+                              ? "text-blue-600 hover:text-blue-900 cursor-pointer"
+                              : "text-gray-400 cursor-not-allowed"
+                          }`}
+                          title={
+                            user.user_status
+                              ? "Chỉnh sửa"
+                              : "Tài khoản đã bị khóa"
+                          }
                         >
                           <Edit2 className="h-4 w-4" />
                         </button>
                         {user.user_status ? (
                           <button
-                            onClick={() => handleLockUser(user.user_id)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleLockUser(user.user_id);
+                            }}
                             className="text-red-600 hover:text-red-900 transition-colors"
                             title="Khóa tài khoản"
                           >
@@ -306,7 +335,10 @@ const AccountManagement = () => {
                           </button>
                         ) : (
                           <button
-                            onClick={() => handleUnlockUser(user.user_id)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleUnlockUser(user.user_id);
+                            }}
                             className="text-green-600 hover:text-green-900 transition-colors"
                             title="Mở khóa tài khoản"
                           >
@@ -370,6 +402,21 @@ const AccountManagement = () => {
       )}
 
       {/* Modals */}
+      <ViewUserModal
+        isOpen={isViewModalOpen}
+        onClose={() => {
+          setIsViewModalOpen(false);
+          setSelectedUser(null);
+        }}
+        user={selectedUser}
+        onEdit={(user) => {
+          setIsViewModalOpen(false);
+          openEditModal(user);
+        }}
+        onLock={handleLockUser}
+        onUnlock={handleUnlockUser}
+      />
+
       <AddUserModal
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
