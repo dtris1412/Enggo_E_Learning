@@ -4,13 +4,18 @@ import {
   handleMulterError,
 } from "../../middleware/multerMiddleware.js";
 import uploadController from "../controllers/uploadController.js";
-import { requireAuth, requireAdmin } from "../../middleware/authMiddleware.js";
+import {
+  requireAuth,
+  requireAdmin,
+  verifyToken,
+} from "../../middleware/authMiddleware.js";
 
 const router = express.Router();
 
 // Upload avatar (user và admin đều được phép)
 router.post(
   "/avatar",
+  verifyToken,
   requireAuth, // Cho phép cả user (role=2) và admin (role=1)
   upload.single("avatar"),
   handleMulterError,

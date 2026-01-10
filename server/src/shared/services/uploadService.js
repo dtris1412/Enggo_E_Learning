@@ -7,21 +7,23 @@ class UploadService {
    * @param {Buffer} fileBuffer - File buffer từ multer
    * @param {string} folder - Thư mục lưu trên Cloudinary
    * @param {string} resourceType - 'image' | 'video' | 'raw' | 'auto'
+   * @param {Object} options - Tùy chọn upload
    */
   async uploadToCloudinary(
     fileBuffer,
     folder = "uploads",
-    resourceType = "auto"
+    resourceType = "auto",
+    options = {}
   ) {
     return new Promise((resolve, reject) => {
       const uploadStream = cloudinary.uploader.upload_stream(
         {
           folder: `enggo/${folder}`,
           resource_type: resourceType,
-          transformation:
-            resourceType === "image"
-              ? [{ quality: "auto", fetch_format: "auto" }]
-              : undefined,
+          // Tối ưu cho tốc độ
+          chunk_size: 6000000, // 6MB chunks (tăng tốc upload file lớn)
+          timeout: 60000, // 60s timeout
+          ...options,
         },
         (error, result) => {
           if (error) {
@@ -42,7 +44,19 @@ class UploadService {
     const result = await this.uploadToCloudinary(
       file.buffer,
       "avatars",
-      "image"
+      "image",
+      {
+        // Tối ưu cho avatar
+        transformation: [
+          { width: 400, height: 400, crop: "fill", gravity: "face" }, // Crop về 400x400
+          { quality: "auto:good" }, // Tự động chọn quality tốt
+          { fetch_format: "auto" }, // Tự động chọn format tốt nhất (webp)
+        ],
+        eager: [
+          { width: 200, height: 200, crop: "fill" }, // Tạo thumbnail 200x200 ngay
+        ],
+        eager_async: true, // Xử lý eager transformations ở background
+      }
     );
     return {
       url: result.secure_url,
@@ -57,7 +71,10 @@ class UploadService {
     const result = await this.uploadToCloudinary(
       file.buffer,
       "lessons/images",
-      "image"
+      "image",
+      {
+        transformation: [{ quality: "auto:good" }, { fetch_format: "auto" }],
+      }
     );
     return {
       url: result.secure_url,

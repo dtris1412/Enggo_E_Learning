@@ -39,6 +39,7 @@ const AccountManagement = () => {
     getUsersPaginated,
     createUser,
     updateUser,
+    uploadAvatar,
     lockUser,
     unlockUser,
   } = useUserContext();
@@ -431,6 +432,7 @@ const AccountManagement = () => {
         }}
         user={selectedUser}
         onSubmit={handleEditUser}
+        onUploadAvatar={uploadAvatar}
       />
     </div>
   );

@@ -54,8 +54,14 @@ interface UserContextType {
       full_name?: string;
       user_phone?: string;
       user_address?: string;
+      avatar?: string;
     }
   ) => Promise<{ success: boolean; message?: string }>;
+  uploadAvatar: (file: File) => Promise<{
+    success: boolean;
+    data?: { url: string; publicId: string };
+    message?: string;
+  }>;
   lockUser: (
     user_id: number
   ) => Promise<{ success: boolean; message?: string }>;
@@ -259,6 +265,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
         full_name?: string;
         user_phone?: string;
         user_address?: string;
+        avatar?: string;
       }
     ) => {
       try {
@@ -283,6 +290,49 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     },
     []
   );
+
+  const uploadAvatar = useCallback(async (file: File) => {
+    try {
+      const formData = new FormData();
+      formData.append("avatar", file);
+
+      const token = localStorage.getItem("accessToken");
+      const response = await fetch(`${apiUrl}/upload/avatar`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        credentials: "include",
+        body: formData,
+      });
+
+      // Kiểm tra unauthorized
+      if (response.status === 401) {
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("user");
+        window.location.href = "/login";
+        return { success: false, message: "Phiên đăng nhập đã hết hạn" };
+      }
+
+      const data = await response.json();
+
+      if (data.success) {
+        return {
+          success: true,
+          data: {
+            url: data.data.url,
+            publicId: data.data.publicId,
+          },
+          message: data.message,
+        };
+      } else {
+        return { success: false, message: data.message };
+      }
+    } catch (error) {
+      console.error("Upload avatar error:", error);
+      return { success: false, message: "Có lỗi xảy ra khi upload ảnh!" };
+    }
+  }, []);
 
   const lockUser = useCallback(async (user_id: number) => {
     try {
@@ -335,6 +385,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     getUserById,
     createUser,
     updateUser,
+    uploadAvatar,
     lockUser,
     unlockUser,
   };

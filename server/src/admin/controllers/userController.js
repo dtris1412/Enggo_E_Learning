@@ -70,12 +70,13 @@ const createUser = async (req, res) => {
 const updateUserById = async (req, res) => {
   try {
     const { user_id } = req.params;
-    const { full_name, user_phone, user_address } = req.body;
+    const { full_name, user_phone, user_address, avatar } = req.body;
     const updatedUser = await updateUserByIdService(
       user_id,
       full_name,
       user_phone,
-      user_address
+      user_address,
+      avatar
     );
     if (!updatedUser.success) {
       return res.status(400).json(updatedUser);

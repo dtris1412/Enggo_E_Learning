@@ -54,7 +54,13 @@ const createUser = async (
   });
   return { success: true, message: "User created successfully", data: newUser };
 };
-const updateUserById = async (user_id, full_name, user_phone, user_address) => {
+const updateUserById = async (
+  user_id,
+  full_name,
+  user_phone,
+  user_address,
+  avatar
+) => {
   if (!user_id) {
     return { success: false, message: "User ID is required" };
   }
@@ -75,6 +81,12 @@ const updateUserById = async (user_id, full_name, user_phone, user_address) => {
     user_address: user_address || user.user_address,
     updated_at: new Date(),
   };
+
+  // Chỉ cập nhật avatar nếu có giá trị mới
+  if (avatar !== undefined) {
+    updateData.avatar = avatar;
+  }
+
   await db.User.update(updateData, { where: { user_id } });
   const updateUser = await db.User.findByPk(user_id);
   return {
