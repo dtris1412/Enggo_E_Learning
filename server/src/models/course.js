@@ -1,0 +1,39 @@
+import { Model } from "sequelize";
+
+export default (sequelize, DataTypes) => {
+  class Course extends Model {
+    static associate(models) {
+      Course.belongsTo(models.Certificate, {
+        foreignKey: "certificate_id",
+        as: "certificate",
+      });
+    }
+  }
+  Course.init(
+    {
+      course_id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+      },
+      course_title: { type: DataTypes.STRING, allowNull: false },
+      description: { type: DataTypes.TEXT, allowNull: false },
+      course_level: { type: DataTypes.STRING, allowNull: false },
+      certificate_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: { model: "certificates", key: "certificate_id" },
+      },
+      created_at: DataTypes.DATE,
+      updated_at: DataTypes.DATE,
+    },
+    {
+      sequelize,
+      modelName: "Course",
+      tableName: "courses",
+      freezeTableName: true,
+      timestamps: false,
+    }
+  );
+  return Course;
+};

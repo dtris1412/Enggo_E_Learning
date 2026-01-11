@@ -17,6 +17,26 @@ import {
   unlockUser,
   getUsersPaginated,
 } from "../controllers/userController.js";
+
+// ===========Certificate Controllers===========
+import {
+  createCertificate,
+  updateCertificateById,
+  lockCertificate,
+  unlockCertificate,
+  getCertificatesPaginated,
+  getCertificateById,
+} from "../controllers/certificateController.js";
+
+// ===========Course Controllers===========
+import {
+  createCourse,
+  updateCourseById,
+  deleteCourse,
+  getCoursesByCertificateId,
+  getCourseById,
+} from "../controllers/courseController.js";
+
 const router = express.Router();
 
 const initAdminRoutes = (app) => {
@@ -61,6 +81,72 @@ const initAdminRoutes = (app) => {
   //     requireAdmin,
   //     updateUserStatusById
   //   );
+
+  //===========Certificate Management Routes===========
+  router.get(
+    "/api/admin/certificates/paginated",
+    verifyToken,
+    requireAdmin,
+    getCertificatesPaginated
+  );
+  router.get(
+    "/api/admin/certificates/:certificate_id",
+    verifyToken,
+    requireAdmin,
+    getCertificateById
+  );
+  router.post(
+    "/api/admin/certificates",
+    verifyToken,
+    requireAdmin,
+    createCertificate
+  );
+  router.put(
+    "/api/admin/certificates/:certificate_id",
+    verifyToken,
+    requireAdmin,
+    updateCertificateById
+  );
+  router.patch(
+    "/api/admin/certificates/:certificate_id/lock",
+    verifyToken,
+    requireAdmin,
+    lockCertificate
+  );
+  router.patch(
+    "/api/admin/certificates/:certificate_id/unlock",
+    verifyToken,
+    requireAdmin,
+    unlockCertificate
+  );
+
+  //===========Course Management Routes===========
+  router.get(
+    "/api/admin/certificates/:certificate_id/courses",
+    verifyToken,
+    requireAdmin,
+    getCoursesByCertificateId
+  );
+  router.get(
+    "/api/admin/courses/:course_id",
+    verifyToken,
+    requireAdmin,
+    getCourseById
+  );
+  router.post("/api/admin/courses", verifyToken, requireAdmin, createCourse);
+  router.put(
+    "/api/admin/courses/:course_id",
+    verifyToken,
+    requireAdmin,
+    updateCourseById
+  );
+  router.delete(
+    "/api/admin/courses/:course_id",
+    verifyToken,
+    requireAdmin,
+    deleteCourse
+  );
+
   app.use("/", router);
 };
 
