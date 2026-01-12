@@ -54,6 +54,17 @@ const CourseManagement = () => {
     fetchCertificates("", 100, 1);
   }, [fetchCertificates]);
 
+  useEffect(() => {
+    // Debounce search
+    const timer = setTimeout(() => {
+      if (!selectedCertificate) {
+        fetchCertificates(searchTerm, 100, 1);
+      }
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm, selectedCertificate, fetchCertificates]);
+
   const handleSelectCertificate = (
     certificateId: number,
     certificateName: string
@@ -153,10 +164,6 @@ const CourseManagement = () => {
     }
   };
 
-  const filteredCertificates = certificates.filter((cert) =>
-    cert.certificate_name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
   const getLevelColor = (level: string) => {
     switch (level) {
       case "Beginner":
@@ -245,12 +252,12 @@ const CourseManagement = () => {
             <div className="col-span-3 text-center py-12">
               <p className="text-gray-500">Đang tải...</p>
             </div>
-          ) : filteredCertificates.length === 0 ? (
+          ) : certificates.length === 0 ? (
             <div className="col-span-3 text-center py-12">
               <p className="text-gray-500">Không có chứng chỉ nào</p>
             </div>
           ) : (
-            filteredCertificates.map((cert) => (
+            certificates.map((cert) => (
               <div
                 key={cert.certificate_id}
                 className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-200"
