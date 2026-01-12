@@ -4,17 +4,28 @@ import {
   deleteCourse as deleteCourseService,
   getCoursesByCertificateId as getCoursesByCertificateIdService,
   getCourseById as getCourseByIdService,
+  getCoursePaginated as getCoursePaginatedService,
 } from "../services/courseService.js";
 
 const createCourse = async (req, res) => {
   try {
-    const { course_title, description, course_level, certificate_id } =
-      req.body;
+    const {
+      course_title,
+      description,
+      course_level,
+      certificate_id,
+      course_aim,
+      estimate_duration,
+      course_status,
+    } = req.body;
     const newCourse = await createCourseService(
       course_title,
       description,
       course_level,
-      certificate_id
+      certificate_id,
+      course_aim,
+      estimate_duration,
+      course_status
     );
     if (!newCourse.success) {
       return res.status(400).json(newCourse);
@@ -29,12 +40,22 @@ const createCourse = async (req, res) => {
 const updateCourseById = async (req, res) => {
   try {
     const { course_id } = req.params;
-    const { course_title, description, course_level } = req.body;
+    const {
+      course_title,
+      description,
+      course_level,
+      course_aim,
+      estimate_duration,
+      course_status,
+    } = req.body;
     const updatedCourse = await updateCourseByIdService(
       course_id,
       course_title,
       description,
-      course_level
+      course_level,
+      course_aim,
+      estimate_duration,
+      course_status
     );
     if (!updatedCourse.success) {
       return res.status(400).json(updatedCourse);
@@ -88,10 +109,29 @@ const getCourseById = async (req, res) => {
   }
 };
 
+const getCoursePaginated = async (req, res) => {
+  try {
+    const { search, limit, page, course_status } = req.query;
+    const result = await getCoursePaginatedService(
+      search,
+      limit,
+      page,
+      course_status
+    );
+    if (!result.success) {
+      return res.status(400).json(result);
+    }
+    res.status(200).json(result);
+  } catch (err) {
+    console.error("Error in getCoursePaginated:", err);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
 export {
   createCourse,
   updateCourseById,
   deleteCourse,
   getCoursesByCertificateId,
   getCourseById,
+  getCoursePaginated,
 };

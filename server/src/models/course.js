@@ -24,6 +24,13 @@ export default (sequelize, DataTypes) => {
         allowNull: false,
         references: { model: "certificates", key: "certificate_id" },
       },
+      course_aim: { type: DataTypes.FLOAT, allowNull: false },
+      estimate_duration: { type: DataTypes.INTEGER, allowNull: false },
+      course_status: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: true,
+      },
       created_at: DataTypes.DATE,
       updated_at: DataTypes.DATE,
     },

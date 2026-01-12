@@ -8,6 +8,8 @@ interface AddCourseModalProps {
     course_title: string;
     description: string;
     course_level: string;
+    course_aim: string;
+    estimate_duration: string;
   }) => Promise<void>;
 }
 
@@ -20,6 +22,8 @@ const AddCourseModal: React.FC<AddCourseModalProps> = ({
     course_title: "",
     description: "",
     course_level: "Beginner",
+    course_aim: "",
+    estimate_duration: "",
   });
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -32,6 +36,12 @@ const AddCourseModal: React.FC<AddCourseModalProps> = ({
     }
     if (!formData.description.trim()) {
       newErrors.description = "Mô tả không được để trống";
+    }
+    if (!formData.course_aim.trim()) {
+      newErrors.course_aim = "Mục tiêu khóa học không được để trống";
+    }
+    if (!formData.estimate_duration.trim()) {
+      newErrors.estimate_duration = "Thời lượng ước tính không được để trống";
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -49,6 +59,8 @@ const AddCourseModal: React.FC<AddCourseModalProps> = ({
         course_title: "",
         description: "",
         course_level: "Beginner",
+        course_aim: "",
+        estimate_duration: "",
       });
       setErrors({});
     } catch (error) {
@@ -129,6 +141,48 @@ const AddCourseModal: React.FC<AddCourseModalProps> = ({
               <option value="Intermediate">Trung cấp</option>
               <option value="Advanced">Nâng cao</option>
             </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Mục tiêu khóa học <span className="text-red-500">*</span>
+            </label>
+            <textarea
+              value={formData.course_aim}
+              onChange={(e) =>
+                setFormData({ ...formData, course_aim: e.target.value })
+              }
+              rows={3}
+              className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                errors.course_aim ? "border-red-500" : "border-gray-300"
+              }`}
+              placeholder="Mô tả mục tiêu đạt được sau khóa học..."
+            />
+            {errors.course_aim && (
+              <p className="text-red-500 text-sm mt-1">{errors.course_aim}</p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Thời lượng ước tính <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              value={formData.estimate_duration}
+              onChange={(e) =>
+                setFormData({ ...formData, estimate_duration: e.target.value })
+              }
+              className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                errors.estimate_duration ? "border-red-500" : "border-gray-300"
+              }`}
+              placeholder="VD: 3 tháng, 40 giờ..."
+            />
+            {errors.estimate_duration && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.estimate_duration}
+              </p>
+            )}
           </div>
 
           <div className="flex justify-end space-x-3 pt-4">

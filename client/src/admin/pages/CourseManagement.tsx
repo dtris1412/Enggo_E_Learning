@@ -128,7 +128,9 @@ const CourseManagement = () => {
         data.course_title,
         data.description,
         data.course_level,
-        selectedCertificate
+        selectedCertificate,
+        data.course_aim,
+        data.estimate_duration
       );
       if (success) {
         setShowAddCourseModal(false);
@@ -142,7 +144,9 @@ const CourseManagement = () => {
         editingCourse.course_id,
         data.course_title,
         data.description,
-        data.course_level
+        data.course_level,
+        data.course_aim,
+        data.estimate_duration
       );
       if (success) {
         setShowEditCourseModal(false);
@@ -456,6 +460,8 @@ const CourseManagement = () => {
             course_title: "",
             description: "",
             course_level: "Beginner",
+            course_aim: "",
+            estimate_duration: "",
           }
         }
       />

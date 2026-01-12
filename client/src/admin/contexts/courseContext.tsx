@@ -14,26 +14,40 @@ interface Course {
   description: string;
   course_level: string;
   certificate_id: number;
+  course_aim: string;
+  estimate_duration: string;
+  course_status: boolean;
   created_at: string;
   updated_at: string;
 }
 
 interface CourseContextType {
   courses: Course[];
+  totalCourses: number;
   loading: boolean;
   error: string | null;
   fetchCoursesByCertificate: (certificate_id: number) => Promise<void>;
+  fetchCoursesPaginated: (
+    search?: string,
+    limit?: number,
+    page?: number,
+    course_status?: boolean
+  ) => Promise<void>;
   createCourse: (
     course_title: string,
     description: string,
     course_level: string,
-    certificate_id: number
+    certificate_id: number,
+    course_aim: string,
+    estimate_duration: string
   ) => Promise<boolean>;
   updateCourse: (
     course_id: number,
     course_title: string,
     description: string,
-    course_level: string
+    course_level: string,
+    course_aim: string,
+    estimate_duration: string
   ) => Promise<boolean>;
   deleteCourse: (course_id: number) => Promise<boolean>;
 }
@@ -54,6 +68,7 @@ interface CourseProviderProps {
 
 export const CourseProvider: React.FC<CourseProviderProps> = ({ children }) => {
   const [courses, setCourses] = useState<Course[]>([]);
+  const [totalCourses, setTotalCourses] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -94,6 +109,62 @@ export const CourseProvider: React.FC<CourseProviderProps> = ({ children }) => {
 
         if (data.success) {
           setCourses(data.data);
+          setTotalCourses(data.data.length);
+        } else {
+          setError(data.message || "Failed to fetch courses");
+        }
+      } catch (err: any) {
+        setError(err.message || "Failed to fetch courses");
+        console.error("Fetch courses error:", err);
+      } finally {
+        setLoading(false);
+      }
+    },
+    []
+  );
+
+  const fetchCoursesPaginated = useCallback(
+    async (
+      search: string = "",
+      limit: number = 10,
+      page: number = 1,
+      course_status?: boolean
+    ) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const params = new URLSearchParams({
+          search,
+          limit: limit.toString(),
+          page: page.toString(),
+        });
+
+        if (course_status !== undefined) {
+          params.append("course_status", course_status.toString());
+        }
+
+        const response = await fetch(
+          `${apiUrl}/admin/courses/paginated?${params.toString()}`,
+          {
+            method: "GET",
+            headers: getAuthHeaders(),
+            credentials: "include",
+          }
+        );
+
+        // Kiểm tra unauthorized
+        if (response.status === 401) {
+          localStorage.removeItem("accessToken");
+          localStorage.removeItem("user");
+          window.location.href = "/login";
+          return;
+        }
+
+        const data = await response.json();
+
+        if (data.success) {
+          setCourses(data.data);
+          setTotalCourses(data.total);
         } else {
           setError(data.message || "Failed to fetch courses");
         }
@@ -112,7 +183,9 @@ export const CourseProvider: React.FC<CourseProviderProps> = ({ children }) => {
       course_title: string,
       description: string,
       course_level: string,
-      certificate_id: number
+      certificate_id: number,
+      course_aim: string,
+      estimate_duration: string
     ): Promise<boolean> => {
       try {
         const response = await fetch(`${apiUrl}/admin/courses`, {
@@ -124,6 +197,9 @@ export const CourseProvider: React.FC<CourseProviderProps> = ({ children }) => {
             description,
             course_level,
             certificate_id,
+            course_aim,
+            estimate_duration,
+            course_status: true,
           }),
         });
 
@@ -157,7 +233,9 @@ export const CourseProvider: React.FC<CourseProviderProps> = ({ children }) => {
       course_id: number,
       course_title: string,
       description: string,
-      course_level: string
+      course_level: string,
+      course_aim: string,
+      estimate_duration: string
     ): Promise<boolean> => {
       try {
         const response = await fetch(`${apiUrl}/admin/courses/${course_id}`, {
@@ -168,6 +246,8 @@ export const CourseProvider: React.FC<CourseProviderProps> = ({ children }) => {
             course_title,
             description,
             course_level,
+            course_aim,
+            estimate_duration,
           }),
         });
 
@@ -242,9 +322,11 @@ export const CourseProvider: React.FC<CourseProviderProps> = ({ children }) => {
     <CourseContext.Provider
       value={{
         courses,
+        totalCourses,
         loading,
         error,
         fetchCoursesByCertificate,
+        fetchCoursesPaginated,
         createCourse,
         updateCourse,
         deleteCourse,

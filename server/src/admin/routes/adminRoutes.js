@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Router } from "express";
 import {
   requireAdmin,
   requireAuth,
@@ -35,6 +35,7 @@ import {
   deleteCourse,
   getCoursesByCertificateId,
   getCourseById,
+  getCoursePaginated,
 } from "../controllers/courseController.js";
 
 const router = express.Router();
@@ -121,6 +122,12 @@ const initAdminRoutes = (app) => {
   );
 
   //===========Course Management Routes===========
+  router.get(
+    "/api/admin/courses/paginated",
+    verifyToken,
+    requireAdmin,
+    getCoursePaginated
+  );
   router.get(
     "/api/admin/certificates/:certificate_id/courses",
     verifyToken,
