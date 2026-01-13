@@ -10,6 +10,8 @@ interface AddCourseModalProps {
     course_level: string;
     course_aim: string;
     estimate_duration: string;
+    course_status: boolean;
+    tag: string;
   }) => Promise<void>;
 }
 
@@ -24,6 +26,8 @@ const AddCourseModal: React.FC<AddCourseModalProps> = ({
     course_level: "Beginner",
     course_aim: "",
     estimate_duration: "",
+    course_status: true,
+    tag: "",
   });
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -43,6 +47,9 @@ const AddCourseModal: React.FC<AddCourseModalProps> = ({
     if (!formData.estimate_duration.trim()) {
       newErrors.estimate_duration = "Thời lượng ước tính không được để trống";
     }
+    if (!formData.tag.trim()) {
+      newErrors.tag = "Tag không được để trống";
+    }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -61,6 +68,8 @@ const AddCourseModal: React.FC<AddCourseModalProps> = ({
         course_level: "Beginner",
         course_aim: "",
         estimate_duration: "",
+        course_status: true,
+        tag: "",
       });
       setErrors({});
     } catch (error) {
@@ -74,7 +83,7 @@ const AddCourseModal: React.FC<AddCourseModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg w-full max-w-2xl p-6">
+      <div className="bg-white rounded-lg w-full max-w-2xl p-6 max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold text-gray-900">Tạo khóa học mới</h2>
           <button
@@ -165,24 +174,75 @@ const AddCourseModal: React.FC<AddCourseModalProps> = ({
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Thời lượng ước tính <span className="text-red-500">*</span>
+              Thời lượng ước tính (tuần) <span className="text-red-500">*</span>
             </label>
-            <input
-              type="text"
-              value={formData.estimate_duration}
-              onChange={(e) =>
-                setFormData({ ...formData, estimate_duration: e.target.value })
-              }
-              className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                errors.estimate_duration ? "border-red-500" : "border-gray-300"
-              }`}
-              placeholder="VD: 3 tháng, 40 giờ..."
-            />
+            <div className="relative">
+              <input
+                type="number"
+                min="1"
+                value={formData.estimate_duration}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    estimate_duration: e.target.value,
+                  })
+                }
+                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                  errors.estimate_duration
+                    ? "border-red-500"
+                    : "border-gray-300"
+                }`}
+                placeholder="VD: 12"
+              />
+              <span className="absolute right-4 top-2.5 text-gray-500">
+                tuần
+              </span>
+            </div>
             {errors.estimate_duration && (
               <p className="text-red-500 text-sm mt-1">
                 {errors.estimate_duration}
               </p>
             )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Tag/Danh mục <span className="text-red-500">*</span>
+            </label>
+            <select
+              value={formData.tag}
+              onChange={(e) =>
+                setFormData({ ...formData, tag: e.target.value })
+              }
+              className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                errors.tag ? "border-red-500" : "border-gray-300"
+              }`}
+            >
+              <option value="">-- Chọn danh mục --</option>
+              <option value="TOEIC">TOEIC</option>
+              <option value="IELTS">IELTS</option>
+            </select>
+            {errors.tag && (
+              <p className="text-red-500 text-sm mt-1">{errors.tag}</p>
+            )}
+          </div>
+
+          <div className="flex items-center">
+            <input
+              type="checkbox"
+              id="course_status"
+              checked={formData.course_status}
+              onChange={(e) =>
+                setFormData({ ...formData, course_status: e.target.checked })
+              }
+              className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+            />
+            <label
+              htmlFor="course_status"
+              className="ml-2 text-sm font-medium text-gray-700"
+            >
+              Kích hoạt khóa học ngay
+            </label>
           </div>
 
           <div className="flex justify-end space-x-3 pt-4">

@@ -1,42 +1,34 @@
-import certificate from "../../models/certificate.js";
-import course from "../../models/course.js";
 import db from "../../models/index.js";
 
 const createCourse = async (
   course_title,
   description,
   course_level,
-  certificate_id,
   course_aim,
   estimate_duration,
-  course_status
+  course_status,
+  tag
 ) => {
   if (
     !course_title ||
     !description ||
     !course_level ||
-    !certificate_id ||
     !course_aim ||
     !estimate_duration ||
-    !course_status
+    !course_status ||
+    !tag
   ) {
     return { success: false, message: "All fields are required." };
-  }
-
-  // Kiểm tra certificate có tồn tại không
-  const certificate = await db.Certificate.findByPk(certificate_id);
-  if (!certificate) {
-    return { success: false, message: "Certificate not found." };
   }
 
   const newCourse = await db.Course.create({
     course_title,
     description,
     course_level,
-    certificate_id,
     course_aim,
     estimate_duration,
     course_status,
+    tag,
     created_at: new Date(),
     updated_at: new Date(),
   });
@@ -55,7 +47,8 @@ const updateCourseById = async (
   course_level,
   course_aim,
   estimate_duration,
-  course_status
+  course_status,
+  tag
 ) => {
   if (!course_id) {
     return { success: false, message: "Course ID is required." };
@@ -73,6 +66,7 @@ const updateCourseById = async (
   course.estimate_duration = estimate_duration || course.estimate_duration;
   course.course_status =
     course_status !== undefined ? course_status : course.course_status;
+  course.tag = tag || course.tag;
   course.updated_at = new Date();
 
   await course.save();
@@ -81,41 +75,6 @@ const updateCourseById = async (
     success: true,
     message: "Course updated successfully",
     data: course,
-  };
-};
-
-const deleteCourse = async (course_id) => {
-  if (!course_id) {
-    return { success: false, message: "Course ID is required." };
-  }
-
-  const course = await db.Course.findByPk(course_id);
-  if (!course) {
-    return { success: false, message: "Course not found." };
-  }
-
-  await course.destroy();
-
-  return {
-    success: true,
-    message: "Course deleted successfully",
-  };
-};
-
-const getCoursesByCertificateId = async (certificate_id) => {
-  if (!certificate_id) {
-    return { success: false, message: "Certificate ID is required." };
-  }
-
-  const courses = await db.Course.findAll({
-    where: { certificate_id },
-    order: [["course_id", "ASC"]],
-  });
-
-  return {
-    success: true,
-    message: "Courses retrieved successfully",
-    data: courses,
   };
 };
 
@@ -140,7 +99,8 @@ const getCoursePaginated = async (
   search = "",
   limit = 10,
   page = 1,
-  course_status
+  course_status,
+  tag
 ) => {
   const Op = db.Sequelize.Op;
   const offset = (Number(page) - 1) * Number(limit);
@@ -157,7 +117,9 @@ const getCoursePaginated = async (
     whereConditions.course_status =
       course_status === "true" || course_status === true;
   }
-
+  if (tag) {
+    whereConditions.tag = { [Op.substring]: tag };
+  }
   //Đếm tổng số course
   const totalCourses = await db.Course.count({
     where: whereConditions,
@@ -179,11 +141,59 @@ const getCoursePaginated = async (
   };
 };
 
+const lockCourseById = async (course_id) => {
+  if (!course_id) {
+    return { success: false, message: "Course ID is required." };
+  }
+  const course = await db.Course.findByPk(course_id);
+  if (!course) {
+    return { success: false, message: "Course not found." };
+  }
+  if (course.course_status === false) {
+    return { success: false, message: "Course is already locked." };
+  }
+
+  await course.update({
+    course_status: false,
+    updated_at: new Date(),
+  });
+
+  return {
+    success: true,
+    message: "Course locked successfully",
+    data: course,
+  };
+};
+
+const unlockCourseById = async (course_id) => {
+  if (!course_id) {
+    return { success: false, message: "Course ID is required." };
+  }
+  const course = await db.Course.findByPk(course_id);
+  if (!course) {
+    return { success: false, message: "Course not found." };
+  }
+  if (course.course_status === true) {
+    return { success: false, message: "Course is already unlocked." };
+  }
+
+  await course.update({
+    course_status: true,
+    updated_at: new Date(),
+  });
+
+  return {
+    success: true,
+    message: "Course unlocked successfully",
+    data: course,
+  };
+};
+
 export {
   createCourse,
   updateCourseById,
-  deleteCourse,
-  getCoursesByCertificateId,
   getCourseById,
   getCoursePaginated,
+  lockCourseById,
+  unlockCourseById,
 };

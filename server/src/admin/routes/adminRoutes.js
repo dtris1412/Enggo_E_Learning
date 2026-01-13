@@ -32,10 +32,10 @@ import {
 import {
   createCourse,
   updateCourseById,
-  deleteCourse,
-  getCoursesByCertificateId,
   getCourseById,
   getCoursePaginated,
+  lockCourseById,
+  unlockCourseById,
 } from "../controllers/courseController.js";
 
 const router = express.Router();
@@ -129,12 +129,6 @@ const initAdminRoutes = (app) => {
     getCoursePaginated
   );
   router.get(
-    "/api/admin/certificates/:certificate_id/courses",
-    verifyToken,
-    requireAdmin,
-    getCoursesByCertificateId
-  );
-  router.get(
     "/api/admin/courses/:course_id",
     verifyToken,
     requireAdmin,
@@ -147,11 +141,17 @@ const initAdminRoutes = (app) => {
     requireAdmin,
     updateCourseById
   );
-  router.delete(
-    "/api/admin/courses/:course_id",
+  router.patch(
+    "/api/admin/courses/:course_id/lock",
     verifyToken,
     requireAdmin,
-    deleteCourse
+    lockCourseById
+  );
+  router.patch(
+    "/api/admin/courses/:course_id/unlock",
+    verifyToken,
+    requireAdmin,
+    unlockCourseById
   );
 
   app.use("/", router);

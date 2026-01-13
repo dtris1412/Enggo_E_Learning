@@ -2,12 +2,7 @@ import { Model } from "sequelize";
 
 export default (sequelize, DataTypes) => {
   class Course extends Model {
-    static associate(models) {
-      Course.belongsTo(models.Phase, {
-        foreignKey: "phase_id",
-        as: "phase",
-      });
-    }
+    static associate(models) {}
   }
   Course.init(
     {
@@ -19,11 +14,6 @@ export default (sequelize, DataTypes) => {
       course_title: { type: DataTypes.STRING, allowNull: false },
       description: { type: DataTypes.TEXT, allowNull: false },
       course_level: { type: DataTypes.STRING, allowNull: false },
-      certificate_id: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        references: { model: "certificates", key: "certificate_id" },
-      },
       course_aim: { type: DataTypes.FLOAT, allowNull: false },
       estimate_duration: { type: DataTypes.INTEGER, allowNull: false },
       course_status: {
@@ -31,11 +21,7 @@ export default (sequelize, DataTypes) => {
         allowNull: false,
         defaultValue: true,
       },
-      phase_id: {
-        type: DataTypes.INTEGER,
-        allowNull: true,
-        references: { model: "phases", key: "phase_id" },
-      },
+      tag: { type: DataTypes.STRING, allowNull: false },
       created_at: DataTypes.DATE,
       updated_at: DataTypes.DATE,
     },

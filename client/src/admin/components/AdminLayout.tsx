@@ -3,22 +3,24 @@ import {
   LayoutDashboard,
   Users,
   BookOpen,
-  FileText,
   ClipboardList,
   Newspaper,
   MessageSquare,
   BarChart3,
-  TrendingUp,
   Map,
   LogOut,
   Menu,
   X,
+  ChevronDown,
+  ChevronRight,
 } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "../../shared/contexts/authContext";
 
 const AdminLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [courseMenuOpen, setCourseMenuOpen] = useState(false);
+  const [pathwayMenuOpen, setPathwayMenuOpen] = useState(false);
   const { logout, user } = useAuth();
   const navigate = useNavigate();
 
@@ -40,13 +42,20 @@ const AdminLayout = () => {
     },
     {
       name: "Quản lý khóa học",
-      path: "/admin/courses",
       icon: BookOpen,
-    },
-    {
-      name: "Quản lý bài học",
-      path: "/admin/lessons",
-      icon: FileText,
+      hasDropdown: true,
+      isOpen: courseMenuOpen,
+      toggle: () => setCourseMenuOpen(!courseMenuOpen),
+      children: [
+        {
+          name: "Quản lý khóa học",
+          path: "/admin/courses",
+        },
+        {
+          name: "Quản lý bài học",
+          path: "/admin/lessons",
+        },
+      ],
     },
     {
       name: "Quản lý bài kiểm tra",
@@ -69,14 +78,21 @@ const AdminLayout = () => {
       icon: BarChart3,
     },
     {
-      name: "Theo dõi tiến độ",
-      path: "/admin/progress",
-      icon: TrendingUp,
-    },
-    {
-      name: "Lộ trình học tập",
-      path: "/admin/roadmap",
+      name: "Quản lý lộ trình",
       icon: Map,
+      hasDropdown: true,
+      isOpen: pathwayMenuOpen,
+      toggle: () => setPathwayMenuOpen(!pathwayMenuOpen),
+      children: [
+        {
+          name: "Quản lý chứng chỉ",
+          path: "/admin/certificates",
+        },
+        {
+          name: "Quản lý lộ trình",
+          path: "/admin/pathways",
+        },
+      ],
     },
   ];
 
@@ -108,23 +124,70 @@ const AdminLayout = () => {
         {/* Navigation */}
         <nav className="flex-1 overflow-y-auto py-4">
           <ul className="space-y-1 px-2">
-            {menuItems.map((item) => (
-              <li key={item.path}>
-                <NavLink
-                  to={item.path}
-                  className={({ isActive }) =>
-                    `flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${
-                      isActive
-                        ? "bg-blue-50 text-blue-600"
-                        : "text-gray-700 hover:bg-gray-50"
-                    }`
-                  }
-                >
-                  <item.icon className="h-5 w-5 flex-shrink-0" />
-                  {sidebarOpen && (
-                    <span className="text-sm font-medium">{item.name}</span>
-                  )}
-                </NavLink>
+            {menuItems.map((item, index) => (
+              <li key={item.path || index}>
+                {item.hasDropdown ? (
+                  <>
+                    {/* Dropdown Parent Item */}
+                    <button
+                      onClick={item.toggle}
+                      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors text-gray-700 hover:bg-gray-50"
+                    >
+                      <item.icon className="h-5 w-5 flex-shrink-0" />
+                      {sidebarOpen && (
+                        <>
+                          <span className="flex-1 text-left text-sm font-medium">
+                            {item.name}
+                          </span>
+                          {item.isOpen ? (
+                            <ChevronDown className="h-4 w-4" />
+                          ) : (
+                            <ChevronRight className="h-4 w-4" />
+                          )}
+                        </>
+                      )}
+                    </button>
+
+                    {/* Dropdown Children */}
+                    {sidebarOpen && item.isOpen && (
+                      <ul className="mt-1 ml-8 space-y-1">
+                        {item.children?.map((child) => (
+                          <li key={child.path}>
+                            <NavLink
+                              to={child.path}
+                              className={({ isActive }) =>
+                                `flex items-center gap-3 px-3 py-2 rounded-lg transition-colors text-sm ${
+                                  isActive
+                                    ? "bg-blue-50 text-blue-600 font-medium"
+                                    : "text-gray-600 hover:bg-gray-50"
+                                }`
+                              }
+                            >
+                              {child.name}
+                            </NavLink>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </>
+                ) : (
+                  /* Regular Menu Item */
+                  <NavLink
+                    to={item.path!}
+                    className={({ isActive }) =>
+                      `flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${
+                        isActive
+                          ? "bg-blue-50 text-blue-600"
+                          : "text-gray-700 hover:bg-gray-50"
+                      }`
+                    }
+                  >
+                    <item.icon className="h-5 w-5 flex-shrink-0" />
+                    {sidebarOpen && (
+                      <span className="text-sm font-medium">{item.name}</span>
+                    )}
+                  </NavLink>
+                )}
               </li>
             ))}
           </ul>

@@ -2,12 +2,7 @@ import { Model } from "sequelize";
 
 export default (sequelize, DataTypes) => {
   class Certificate extends Model {
-    static associate(models) {
-      Certificate.hasMany(models.Course, {
-        foreignKey: "certificate_id",
-        as: "courses",
-      });
-    }
+    static associate(models) {}
   }
   Certificate.init(
     {

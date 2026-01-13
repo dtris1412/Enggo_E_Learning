@@ -11,8 +11,8 @@ import TestManagement from "../pages/TestManagement";
 import NewsManagement from "../pages/NewsManagement";
 import FeedbackManagement from "../pages/FeedbackManagement";
 import ReportManagement from "../pages/ReportManagement";
-import ProgressTracking from "../pages/ProgressTracking";
-import RoadmapManagement from "../pages/RoadmapManagement";
+import CertificateManagement from "../pages/CertificateManagement";
+import PathwayManagement from "../pages/PathwayManagement";
 
 export const AdminRoutes = () => {
   return (
@@ -33,10 +33,8 @@ export const AdminRoutes = () => {
         {/* Account Management */}
         <Route path="accounts" element={<AccountManagement />} />
 
-        {/* Course Management */}
+        {/* Course Management Group */}
         <Route path="courses" element={<CourseManagement />} />
-
-        {/* Lesson Management */}
         <Route path="lessons" element={<LessonManagement />} />
 
         {/* Test Management */}
@@ -51,11 +49,9 @@ export const AdminRoutes = () => {
         {/* Report Management */}
         <Route path="reports" element={<ReportManagement />} />
 
-        {/* Progress Tracking */}
-        <Route path="progress" element={<ProgressTracking />} />
-
-        {/* Roadmap Management */}
-        <Route path="roadmap" element={<RoadmapManagement />} />
+        {/* Pathway Management Group */}
+        <Route path="certificates" element={<CertificateManagement />} />
+        <Route path="pathways" element={<PathwayManagement />} />
       </Route>
     </>
   );

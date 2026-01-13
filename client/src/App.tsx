@@ -4,6 +4,8 @@ import { ToastProvider } from "./shared/components/Toast/Toast";
 import { UserProvider } from "./admin/contexts/userContext";
 import { CertificateProvider } from "./admin/contexts/certificateContext";
 import { CourseProvider } from "./admin/contexts/courseContext";
+import { LessonProvider } from "./admin/contexts/lessonContext.tsx";
+import { PathwayProvider } from "./admin/contexts/pathwayContext.tsx";
 import { AdminRoutes } from "./admin/routes/AdminRoutes";
 import { UserRoutes } from "./user/routes/UserRoutes";
 import AuthCallback from "./shared/pages/AuthCallback";
@@ -27,56 +29,72 @@ function App() {
       <UserProvider>
         <CertificateProvider>
           <CourseProvider>
-            <ToastProvider>
-              <Router>
-                <Routes>
-                  {/* Admin Routes - No Header/Footer */}
-                  {AdminRoutes()}
+            <LessonProvider>
+              <PathwayProvider>
+                <ToastProvider>
+                  <Router>
+                    <Routes>
+                      {/* Admin Routes - No Header/Footer */}
+                      {AdminRoutes()}
 
-                  {/* Public & User Routes - With Header/Footer */}
-                  <Route
-                    path="*"
-                    element={
-                      <div className="min-h-screen bg-white text-gray-900 flex flex-col">
-                        <Header />
-                        <main className="flex-grow">
-                          <Routes>
-                            {/* Public Routes */}
-                            <Route path="/" element={<Home />} />
-                            <Route path="/about" element={<About />} />
-                            <Route path="/courses" element={<Courses />} />
-                            <Route path="/resources" element={<Resources />} />
-                            <Route path="/blog" element={<Blog />} />
-                            <Route path="/tests" element={<OnlineTests />} />
+                      {/* Public & User Routes - With Header/Footer */}
+                      <Route
+                        path="*"
+                        element={
+                          <div className="min-h-screen bg-white text-gray-900 flex flex-col">
+                            <Header />
+                            <main className="flex-grow">
+                              <Routes>
+                                {/* Public Routes */}
+                                <Route path="/" element={<Home />} />
+                                <Route path="/about" element={<About />} />
+                                <Route path="/courses" element={<Courses />} />
+                                <Route
+                                  path="/resources"
+                                  element={<Resources />}
+                                />
+                                <Route path="/blog" element={<Blog />} />
+                                <Route
+                                  path="/tests"
+                                  element={<OnlineTests />}
+                                />
 
-                            {/* Auth Routes */}
-                            <Route path="/login" element={<Login />} />
-                            <Route path="/register" element={<Register />} />
-                            <Route
-                              path="/forgot-password"
-                              element={<ForgotPassword />}
-                            />
-                            <Route path="/verify-otp" element={<VerifyOTP />} />
-                            <Route
-                              path="/reset-password"
-                              element={<ResetPassword />}
-                            />
-                            <Route
-                              path="/auth/callback"
-                              element={<AuthCallback />}
-                            />
+                                {/* Auth Routes */}
+                                <Route path="/login" element={<Login />} />
+                                <Route
+                                  path="/register"
+                                  element={<Register />}
+                                />
+                                <Route
+                                  path="/forgot-password"
+                                  element={<ForgotPassword />}
+                                />
+                                <Route
+                                  path="/verify-otp"
+                                  element={<VerifyOTP />}
+                                />
+                                <Route
+                                  path="/reset-password"
+                                  element={<ResetPassword />}
+                                />
+                                <Route
+                                  path="/auth/callback"
+                                  element={<AuthCallback />}
+                                />
 
-                            {/* User Routes - Protected */}
-                            {UserRoutes()}
-                          </Routes>
-                        </main>
-                        <Footer />
-                      </div>
-                    }
-                  />
-                </Routes>
-              </Router>
-            </ToastProvider>
+                                {/* User Routes - Protected */}
+                                {UserRoutes()}
+                              </Routes>
+                            </main>
+                            <Footer />
+                          </div>
+                        }
+                      />
+                    </Routes>
+                  </Router>
+                </ToastProvider>
+              </PathwayProvider>
+            </LessonProvider>
           </CourseProvider>
         </CertificateProvider>
       </UserProvider>
