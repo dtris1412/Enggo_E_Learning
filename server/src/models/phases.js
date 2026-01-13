@@ -2,12 +2,7 @@ import { Model } from "sequelize";
 
 export default (sequelize, DataTypes) => {
   class Course extends Model {
-    static associate(models) {
-      Course.belongsTo(models.Phase, {
-        foreignKey: "phase_id",
-        as: "phase",
-      });
-    }
+    static associate(models) {}
   }
   Course.init(
     {
@@ -31,11 +26,7 @@ export default (sequelize, DataTypes) => {
         allowNull: false,
         defaultValue: true,
       },
-      phase_id: {
-        type: DataTypes.INTEGER,
-        allowNull: true,
-        references: { model: "phases", key: "phase_id" },
-      },
+
       created_at: DataTypes.DATE,
       updated_at: DataTypes.DATE,
     },
