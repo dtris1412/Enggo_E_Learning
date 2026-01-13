@@ -15,7 +15,7 @@ const createCourse = async (
     !course_level ||
     !course_aim ||
     !estimate_duration ||
-    !course_status ||
+    course_status === undefined ||
     !tag
   ) {
     return { success: false, message: "All fields are required." };
@@ -59,17 +59,16 @@ const updateCourseById = async (
     return { success: false, message: "Course not found." };
   }
 
-  course.course_title = course_title || course.course_title;
-  course.description = description || course.description;
-  course.course_level = course_level || course.course_level;
-  course.course_aim = course_aim || course.course_aim;
-  course.estimate_duration = estimate_duration || course.estimate_duration;
-  course.course_status =
-    course_status !== undefined ? course_status : course.course_status;
-  course.tag = tag || course.tag;
-  course.updated_at = new Date();
-
-  await course.save();
+  await course.update({
+    course_title,
+    description,
+    course_level,
+    course_aim,
+    estimate_duration,
+    course_status,
+    tag,
+    updated_at: new Date(),
+  });
 
   return {
     success: true,

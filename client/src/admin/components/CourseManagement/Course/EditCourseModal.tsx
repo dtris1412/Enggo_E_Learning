@@ -68,11 +68,14 @@ const EditCourseModal: React.FC<EditCourseModalProps> = ({
     if (!formData.course_aim.trim()) {
       newErrors.course_aim = "Mục tiêu khóa học không được để trống";
     }
-    if (!formData.estimate_duration.trim()) {
-      newErrors.estimate_duration = "Thời lượng ước tính không được để trống";
+    if (
+      !formData.estimate_duration ||
+      Number(formData.estimate_duration) <= 0
+    ) {
+      newErrors.estimate_duration = "Thời lượng ước tính phải lớn hơn 0";
     }
-    if (!formData.tag.trim()) {
-      newErrors.tag = "Tag không được để trống";
+    if (!formData.tag || !formData.tag.trim()) {
+      newErrors.tag = "Vui lòng chọn danh mục";
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -84,7 +87,11 @@ const EditCourseModal: React.FC<EditCourseModalProps> = ({
 
     setIsSubmitting(true);
     try {
-      await onSubmit(formData);
+      // Convert estimate_duration to string before submitting
+      await onSubmit({
+        ...formData,
+        estimate_duration: formData.estimate_duration.toString(),
+      });
       onClose();
       setErrors({});
     } catch (error) {

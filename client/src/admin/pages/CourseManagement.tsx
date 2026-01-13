@@ -167,45 +167,57 @@ const CourseManagement = () => {
         </div>
       </div>
 
-      {/* Courses Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {/* Courses List */}
+      <div className="bg-white rounded-lg border border-gray-200">
         {loading ? (
-          <div className="col-span-3 text-center py-12">
+          <div className="text-center py-12">
             <p className="text-gray-500">Đang tải dữ liệu...</p>
           </div>
         ) : courses.length === 0 ? (
-          <div className="col-span-3 text-center py-12">
+          <div className="text-center py-12">
             <p className="text-gray-500">Không tìm thấy khóa học nào</p>
           </div>
         ) : (
-          courses.map((course) => (
-            <div
-              key={course.course_id}
-              className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow duration-200"
-            >
-              <div className="p-6">
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex items-center gap-3 flex-1">
-                    <div className="p-2 bg-blue-100 rounded-lg">
+          <div className="divide-y divide-gray-200">
+            {courses.map((course) => (
+              <div
+                key={course.course_id}
+                className="p-6 hover:bg-gray-50 transition-colors duration-200"
+              >
+                <div className="flex items-start justify-between gap-6">
+                  {/* Left: Icon & Title */}
+                  <div className="flex items-start gap-4 flex-1 min-w-0">
+                    <div className="p-3 bg-blue-100 rounded-lg flex-shrink-0">
                       <BookOpen className="h-6 w-6 text-blue-600" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-gray-900 text-lg truncate">
+                      <h3 className="font-semibold text-gray-900 text-lg mb-2">
                         {course.course_title}
                       </h3>
-                      <div className="flex items-center gap-2 mt-1 flex-wrap">
+                      <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+                        {course.description}
+                      </p>
+                      <p className="text-gray-600 text-sm mb-3">
+                        <span className="font-medium text-gray-700">
+                          Mục tiêu:
+                        </span>{" "}
+                        {course.course_aim}
+                      </p>
+
+                      {/* Tags & Status */}
+                      <div className="flex items-center gap-2 flex-wrap">
                         <span
-                          className={`px-2 py-0.5 rounded-full text-xs font-medium ${getLevelColor(
+                          className={`px-3 py-1 rounded-full text-xs font-medium ${getLevelColor(
                             course.course_level
                           )}`}
                         >
                           {getLevelText(course.course_level)}
                         </span>
-                        <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                        <span className="px-3 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
                           {course.tag}
                         </span>
                         <span
-                          className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                          className={`px-3 py-1 rounded-full text-xs font-medium ${
                             course.course_status
                               ? "bg-green-100 text-green-800"
                               : "bg-red-100 text-red-800"
@@ -213,71 +225,51 @@ const CourseManagement = () => {
                         >
                           {course.course_status ? "Hoạt động" : "Khóa"}
                         </span>
+                        <span className="px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
+                          {course.estimate_duration} tuần
+                        </span>
+                        <span className="text-xs text-gray-500 flex items-center gap-1">
+                          <Calendar className="h-3 w-3" />
+                          {formatDate(course.created_at)}
+                        </span>
                       </div>
                     </div>
                   </div>
-                </div>
 
-                <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-                  {course.description}
-                </p>
-
-                <div className="space-y-2 mb-4">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-500">Mục tiêu:</span>
-                    <span className="text-gray-700 text-right truncate ml-2">
-                      {course.course_aim}
-                    </span>
+                  {/* Right: Actions */}
+                  <div className="flex gap-2 flex-shrink-0">
+                    <button
+                      onClick={() => handleEditCourse(course)}
+                      className="flex items-center gap-2 px-4 py-2 text-sm bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors"
+                    >
+                      <Edit className="h-4 w-4" />
+                      Sửa
+                    </button>
+                    <button
+                      onClick={() => handleToggleCourseStatus(course)}
+                      className={`flex items-center gap-2 px-4 py-2 text-sm rounded-lg transition-colors ${
+                        course.course_status
+                          ? "bg-red-50 text-red-600 hover:bg-red-100"
+                          : "bg-green-50 text-green-600 hover:bg-green-100"
+                      }`}
+                    >
+                      {course.course_status ? (
+                        <>
+                          <Lock className="h-4 w-4" />
+                          Khóa
+                        </>
+                      ) : (
+                        <>
+                          <Unlock className="h-4 w-4" />
+                          Mở khóa
+                        </>
+                      )}
+                    </button>
                   </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-500">Thời lượng:</span>
-                    <span className="font-medium text-gray-900">
-                      {course.estimate_duration} tuần
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-500 flex items-center gap-1">
-                      <Calendar className="h-4 w-4" />
-                      Ngày tạo:
-                    </span>
-                    <span className="text-gray-700">
-                      {formatDate(course.created_at)}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="flex gap-2 pt-4 border-t border-gray-200">
-                  <button
-                    onClick={() => handleEditCourse(course)}
-                    className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors"
-                  >
-                    <Edit className="h-4 w-4" />
-                    Sửa
-                  </button>
-                  <button
-                    onClick={() => handleToggleCourseStatus(course)}
-                    className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm rounded-lg transition-colors ${
-                      course.course_status
-                        ? "bg-red-50 text-red-600 hover:bg-red-100"
-                        : "bg-green-50 text-green-600 hover:bg-green-100"
-                    }`}
-                  >
-                    {course.course_status ? (
-                      <>
-                        <Lock className="h-4 w-4" />
-                        Khóa
-                      </>
-                    ) : (
-                      <>
-                        <Unlock className="h-4 w-4" />
-                        Mở khóa
-                      </>
-                    )}
-                  </button>
                 </div>
               </div>
-            </div>
-          ))
+            ))}
+          </div>
         )}
       </div>
 

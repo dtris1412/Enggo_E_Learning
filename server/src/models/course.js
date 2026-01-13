@@ -14,7 +14,7 @@ export default (sequelize, DataTypes) => {
       course_title: { type: DataTypes.STRING, allowNull: false },
       description: { type: DataTypes.TEXT, allowNull: false },
       course_level: { type: DataTypes.STRING, allowNull: false },
-      course_aim: { type: DataTypes.FLOAT, allowNull: false },
+      course_aim: { type: DataTypes.STRING, allowNull: false },
       estimate_duration: { type: DataTypes.INTEGER, allowNull: false },
       course_status: {
         type: DataTypes.BOOLEAN,
