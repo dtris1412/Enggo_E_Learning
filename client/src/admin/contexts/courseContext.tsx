@@ -17,6 +17,8 @@ interface Course {
   estimate_duration: string;
   course_status: boolean;
   tag: string;
+  price: number;
+  is_free: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -43,7 +45,9 @@ interface CourseContextType {
     course_aim: string,
     estimate_duration: string,
     course_status: boolean,
-    tag: string
+    tag: string,
+    price: number,
+    is_free: boolean
   ) => Promise<boolean>;
   updateCourse: (
     course_id: number,
@@ -53,7 +57,9 @@ interface CourseContextType {
     course_aim: string,
     estimate_duration: string,
     course_status: boolean,
-    tag: string
+    tag: string,
+    price: number,
+    is_free: boolean
   ) => Promise<boolean>;
   lockCourse: (course_id: number) => Promise<boolean>;
   unlockCourse: (course_id: number) => Promise<boolean>;
@@ -167,7 +173,9 @@ export const CourseProvider: React.FC<CourseProviderProps> = ({ children }) => {
       course_aim: string,
       estimate_duration: string,
       course_status: boolean,
-      tag: string
+      tag: string,
+      price: number,
+      is_free: boolean
     ): Promise<boolean> => {
       try {
         const response = await fetch(`${apiUrl}/admin/courses`, {
@@ -182,6 +190,8 @@ export const CourseProvider: React.FC<CourseProviderProps> = ({ children }) => {
             estimate_duration,
             course_status,
             tag,
+            price,
+            is_free,
           }),
         });
 
@@ -219,7 +229,9 @@ export const CourseProvider: React.FC<CourseProviderProps> = ({ children }) => {
       course_aim: string,
       estimate_duration: string,
       course_status: boolean,
-      tag: string
+      tag: string,
+      price: number,
+      is_free: boolean
     ): Promise<boolean> => {
       try {
         const response = await fetch(`${apiUrl}/admin/courses/${course_id}`, {
@@ -234,6 +246,8 @@ export const CourseProvider: React.FC<CourseProviderProps> = ({ children }) => {
             estimate_duration,
             course_status,
             tag,
+            price,
+            is_free,
           }),
         });
 

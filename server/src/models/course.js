@@ -2,7 +2,11 @@ import { Model } from "sequelize";
 
 export default (sequelize, DataTypes) => {
   class Course extends Model {
-    static associate(models) {}
+    static associate(models) {
+      Course.hasMany(models.Lesson, {
+        foreignKey: "course_id",
+      });
+    }
   }
   Course.init(
     {
@@ -22,6 +26,12 @@ export default (sequelize, DataTypes) => {
         defaultValue: true,
       },
       tag: { type: DataTypes.STRING, allowNull: false },
+      price: { type: DataTypes.DECIMAL(10, 2), allowNull: false },
+      is_free: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
       created_at: DataTypes.DATE,
       updated_at: DataTypes.DATE,
     },

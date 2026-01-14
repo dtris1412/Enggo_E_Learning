@@ -18,6 +18,8 @@ const createCourse = async (req, res) => {
       estimate_duration,
       course_status,
       tag,
+      price,
+      is_free,
     } = req.body;
     const newCourse = await createCourseService(
       course_title,
@@ -27,7 +29,9 @@ const createCourse = async (req, res) => {
       course_aim,
       estimate_duration,
       course_status,
-      tag
+      tag,
+      price,
+      is_free
     );
     if (!newCourse.success) {
       return res.status(400).json(newCourse);
@@ -50,6 +54,8 @@ const updateCourseById = async (req, res) => {
       estimate_duration,
       course_status,
       tag,
+      price,
+      is_free,
     } = req.body;
     const updatedCourse = await updateCourseByIdService(
       course_id,
@@ -59,7 +65,9 @@ const updateCourseById = async (req, res) => {
       course_aim,
       estimate_duration,
       course_status,
-      tag
+      tag,
+      price,
+      is_free
     );
     if (!updatedCourse.success) {
       return res.status(400).json(updatedCourse);

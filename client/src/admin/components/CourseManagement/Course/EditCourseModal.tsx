@@ -12,6 +12,8 @@ interface EditCourseModalProps {
     estimate_duration: string;
     course_status: boolean;
     tag: string;
+    price: number;
+    is_free: boolean;
   }) => Promise<void>;
   initialData: {
     course_title: string;
@@ -21,6 +23,8 @@ interface EditCourseModalProps {
     estimate_duration: string;
     course_status: boolean;
     tag: string;
+    price: number;
+    is_free: boolean;
   };
 }
 
@@ -38,6 +42,8 @@ const EditCourseModal: React.FC<EditCourseModalProps> = ({
     estimate_duration: initialData.estimate_duration,
     course_status: initialData.course_status,
     tag: initialData.tag,
+    price: initialData.price,
+    is_free: initialData.is_free,
   });
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -53,6 +59,8 @@ const EditCourseModal: React.FC<EditCourseModalProps> = ({
         estimate_duration: initialData.estimate_duration,
         course_status: initialData.course_status,
         tag: initialData.tag,
+        price: initialData.price,
+        is_free: initialData.is_free,
       });
     }
   }, [initialData]);
@@ -76,6 +84,9 @@ const EditCourseModal: React.FC<EditCourseModalProps> = ({
     }
     if (!formData.tag || !formData.tag.trim()) {
       newErrors.tag = "Vui lòng chọn danh mục";
+    }
+    if (!formData.is_free && (!formData.price || formData.price <= 0)) {
+      newErrors.price = "Giá khóa học phải lớn hơn 0 nếu không miễn phí";
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -250,6 +261,56 @@ const EditCourseModal: React.FC<EditCourseModalProps> = ({
               <p className="text-red-500 text-sm mt-1">{errors.tag}</p>
             )}
           </div>
+
+          <div className="flex items-center">
+            <input
+              type="checkbox"
+              id="is_free"
+              checked={formData.is_free}
+              onChange={(e) => {
+                const isFree = e.target.checked;
+                setFormData({
+                  ...formData,
+                  is_free: isFree,
+                  price: isFree ? 0 : formData.price,
+                });
+              }}
+              className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+            />
+            <label
+              htmlFor="is_free"
+              className="ml-2 text-sm font-medium text-gray-700"
+            >
+              Khóa học miễn phí
+            </label>
+          </div>
+
+          {!formData.is_free && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Giá khóa học (VND) <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="number"
+                min="0"
+                step="1000"
+                value={formData.price}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    price: Number(e.target.value),
+                  })
+                }
+                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                  errors.price ? "border-red-500" : "border-gray-300"
+                }`}
+                placeholder="VD: 500000"
+              />
+              {errors.price && (
+                <p className="text-red-500 text-sm mt-1">{errors.price}</p>
+              )}
+            </div>
+          )}
 
           <div className="flex items-center">
             <input

@@ -76,7 +76,9 @@ const CourseManagement = () => {
       data.course_aim,
       data.estimate_duration,
       data.course_status,
-      data.tag
+      data.tag,
+      data.price,
+      data.is_free
     );
     if (success) {
       setShowAddModal(false);
@@ -93,7 +95,9 @@ const CourseManagement = () => {
         data.course_aim,
         data.estimate_duration,
         data.course_status,
-        data.tag
+        data.tag,
+        data.price,
+        data.is_free
       );
       if (success) {
         setShowEditModal(false);
@@ -240,9 +244,27 @@ const CourseManagement = () => {
                       <BookOpen className="h-6 w-6 text-blue-600" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-gray-900 text-lg mb-2">
-                        {course.course_title}
-                      </h3>
+                      <div className="flex items-start justify-between gap-4 mb-2">
+                        <h3 className="font-semibold text-gray-900 text-lg">
+                          {course.course_title}
+                        </h3>
+                        <div className="flex-shrink-0">
+                          {course.is_free ? (
+                            <span className="text-lg font-bold text-green-600">
+                              MIỄN PHÍ
+                            </span>
+                          ) : (
+                            <div className="text-right">
+                              <div className="text-xl font-bold text-blue-600">
+                                {new Intl.NumberFormat("vi-VN").format(
+                                  course.price
+                                )}{" "}
+                                <span className="text-sm">VND</span>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
                       <p className="text-gray-600 text-sm mb-3 line-clamp-2">
                         {course.description}
                       </p>
@@ -342,6 +364,8 @@ const CourseManagement = () => {
             estimate_duration: "",
             course_status: true,
             tag: "",
+            price: 0,
+            is_free: false,
           }
         }
       />

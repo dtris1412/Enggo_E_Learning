@@ -7,7 +7,9 @@ const createCourse = async (
   course_aim,
   estimate_duration,
   course_status,
-  tag
+  tag,
+  price,
+  is_free
 ) => {
   if (
     !course_title ||
@@ -16,7 +18,9 @@ const createCourse = async (
     !course_aim ||
     !estimate_duration ||
     course_status === undefined ||
-    !tag
+    !tag ||
+    !price ||
+    is_free === undefined
   ) {
     return { success: false, message: "All fields are required." };
   }
@@ -31,6 +35,8 @@ const createCourse = async (
     tag,
     created_at: new Date(),
     updated_at: new Date(),
+    price,
+    is_free,
   });
 
   return {
@@ -48,7 +54,9 @@ const updateCourseById = async (
   course_aim,
   estimate_duration,
   course_status,
-  tag
+  tag,
+  price,
+  is_free
 ) => {
   if (!course_id) {
     return { success: false, message: "Course ID is required." };
@@ -67,6 +75,8 @@ const updateCourseById = async (
     estimate_duration,
     course_status,
     tag,
+    price,
+    is_free,
     updated_at: new Date(),
   });
 
