@@ -33,6 +33,7 @@ interface CourseContextType {
     limit?: number,
     page?: number,
     course_status?: boolean,
+    course_level?: string,
     tag?: string
   ) => Promise<void>;
   createCourse: (
@@ -97,6 +98,7 @@ export const CourseProvider: React.FC<CourseProviderProps> = ({ children }) => {
       limit: number = 10,
       page: number = 1,
       course_status?: boolean,
+      course_level?: string,
       tag?: string
     ) => {
       setLoading(true);
@@ -110,6 +112,10 @@ export const CourseProvider: React.FC<CourseProviderProps> = ({ children }) => {
 
         if (course_status !== undefined) {
           params.append("course_status", course_status.toString());
+        }
+
+        if (course_level) {
+          params.append("course_level", course_level);
         }
 
         if (tag) {

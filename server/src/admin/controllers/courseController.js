@@ -87,12 +87,13 @@ const getCourseById = async (req, res) => {
 
 const getCoursePaginated = async (req, res) => {
   try {
-    const { search, limit, page, course_status, tag } = req.query;
+    const { search, limit, page, course_status, course_level, tag } = req.query;
     const result = await getCoursePaginatedService(
       search,
       limit,
       page,
       course_status,
+      course_level,
       tag
     );
     if (!result.success) {

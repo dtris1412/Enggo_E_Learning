@@ -99,6 +99,7 @@ const getCoursePaginated = async (
   limit = 10,
   page = 1,
   course_status,
+  course_level,
   tag
 ) => {
   const Op = db.Sequelize.Op;
@@ -118,6 +119,9 @@ const getCoursePaginated = async (
   }
   if (tag) {
     whereConditions.tag = { [Op.substring]: tag };
+  }
+  if (course_level) {
+    whereConditions.course_level = course_level;
   }
   //Đếm tổng số course
   const totalCourses = await db.Course.count({

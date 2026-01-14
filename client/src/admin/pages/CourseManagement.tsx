@@ -25,7 +25,9 @@ const CourseManagement = () => {
   } = useCourse();
 
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedTag, setSelectedTag] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState<string>("");
+  const [selectedLevel, setSelectedLevel] = useState<string>("");
+  const [selectedTag, setSelectedTag] = useState<string>("");
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingCourse, setEditingCourse] = useState<any>(null);
@@ -36,11 +38,26 @@ const CourseManagement = () => {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      fetchCoursesPaginated(searchTerm, 100, 1, undefined, selectedTag);
+      const statusFilter =
+        selectedStatus === "" ? undefined : selectedStatus === "active";
+      fetchCoursesPaginated(
+        searchTerm,
+        100,
+        1,
+        statusFilter,
+        selectedLevel || undefined,
+        selectedTag || undefined
+      );
     }, 300);
 
     return () => clearTimeout(timer);
-  }, [searchTerm, selectedTag, fetchCoursesPaginated]);
+  }, [
+    searchTerm,
+    selectedStatus,
+    selectedLevel,
+    selectedTag,
+    fetchCoursesPaginated,
+  ]);
 
   const handleCreateCourse = () => {
     setShowAddModal(true);
@@ -143,7 +160,7 @@ const CourseManagement = () => {
 
       {/* Search and Filter Bar */}
       <div className="bg-white p-6 rounded-lg border border-gray-200">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="relative">
             <Search className="h-5 w-5 text-gray-400 absolute left-3 top-3" />
             <input
@@ -154,15 +171,47 @@ const CourseManagement = () => {
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
+
           <div className="relative">
             <Filter className="h-5 w-5 text-gray-400 absolute left-3 top-3" />
-            <input
-              type="text"
-              placeholder="Lọc theo tag (IELTS, TOEIC, ...)"
+            <select
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none bg-white"
+            >
+              <option value="">Tất cả trạng thái</option>
+              <option value="active">Hoạt động</option>
+              <option value="locked">Khóa</option>
+            </select>
+          </div>
+
+          <div className="relative">
+            <Filter className="h-5 w-5 text-gray-400 absolute left-3 top-3" />
+            <select
+              value={selectedLevel}
+              onChange={(e) => setSelectedLevel(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none bg-white"
+            >
+              <option value="">Tất cả cấp độ</option>
+              <option value="Beginner">Cơ bản</option>
+              <option value="Intermediate">Trung cấp</option>
+              <option value="Advanced">Nâng cao</option>
+            </select>
+          </div>
+
+          <div className="relative">
+            <Filter className="h-5 w-5 text-gray-400 absolute left-3 top-3" />
+            <select
               value={selectedTag}
               onChange={(e) => setSelectedTag(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none bg-white"
+            >
+              <option value="">Tất cả tag</option>
+              <option value="IELTS">IELTS</option>
+              <option value="TOEIC">TOEIC</option>
+              <option value="General English">General English</option>
+              <option value="Business English">Business English</option>
+            </select>
           </div>
         </div>
       </div>
