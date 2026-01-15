@@ -6,47 +6,63 @@ import {
   useCallback,
 } from "react";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080/api";
 
 interface Lesson {
   lesson_id: number;
-  lesson_name: string;
-  course_id: number;
-  lesson_order: number;
-  lesson_content: string;
+  lesson_title: string;
   lesson_type: string;
-  duration: string;
+  difficulty_level: string;
+  lesson_content: string | null;
+  is_exam_format: boolean;
+  estimated_time: number | null;
+  skill_id: number;
+  lesson_status: boolean;
   created_at: string;
-  updated_at: string;
+  updated_at?: string;
+  Skill?: {
+    skill_id: number;
+    skill_name: string;
+  };
 }
 
 interface LessonContextType {
   lessons: Lesson[];
+  totalLessons: number;
   loading: boolean;
   error: string | null;
-  fetchLessonsByCourse: (course_id: number) => Promise<void>;
   fetchLessonsPaginated: (
     search?: string,
     limit?: number,
-    page?: number
+    page?: number,
+    lesson_type?: string,
+    difficulty_level?: string,
+    is_exam_format?: boolean,
+    lesson_status?: boolean
   ) => Promise<void>;
+  getLessonById: (lesson_id: number) => Promise<Lesson | null>;
   createLesson: (
-    lesson_name: string,
-    course_id: number,
-    lesson_order: number,
-    lesson_content: string,
+    lesson_title: string,
     lesson_type: string,
-    duration: string
+    difficulty_level: string,
+    lesson_content: string,
+    is_exam_format: boolean,
+    estimated_time: number,
+    skill_id: number,
+    lesson_status?: boolean
   ) => Promise<boolean>;
   updateLesson: (
     lesson_id: number,
-    lesson_name: string,
-    lesson_order: number,
-    lesson_content: string,
+    lesson_title: string,
     lesson_type: string,
-    duration: string
+    difficulty_level: string,
+    lesson_content: string,
+    is_exam_format: boolean,
+    estimated_time: number,
+    skill_id: number
   ) => Promise<boolean>;
-  deleteLesson: (lesson_id: number) => Promise<boolean>;
+  lockLesson: (lesson_id: number) => Promise<boolean>;
+  unlockLesson: (lesson_id: number) => Promise<boolean>;
 }
 
 const LessonContext = createContext<LessonContextType | undefined>(undefined);
@@ -61,6 +77,7 @@ export const useLesson = () => {
 
 export const LessonProvider = ({ children }: { children: ReactNode }) => {
   const [lessons, setLessons] = useState<Lesson[]>([]);
+  const [totalLessons, setTotalLessons] = useState(0);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -72,63 +89,48 @@ export const LessonProvider = ({ children }: { children: ReactNode }) => {
     };
   };
 
-  const fetchLessonsByCourse = useCallback(async (course_id: number) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await fetch(
-        `${API_URL}/admin/lessons/course/${course_id}`,
-        {
-          method: "GET",
-          headers: getAuthHeaders(),
-          credentials: "include",
-        }
-      );
-
-      if (response.status === 401) {
-        localStorage.removeItem("accessToken");
-        window.location.href = "/login";
-        return;
-      }
-
-      const data = await response.json();
-      setLessons(data || []);
-    } catch (err: any) {
-      setError(err.message || "Failed to fetch lessons");
-      console.error("Error fetching lessons:", err);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
   const fetchLessonsPaginated = useCallback(
-    async (search = "", limit = 100, page = 1) => {
+    async (
+      search = "",
+      limit = 10,
+      page = 1,
+      lesson_type?: string,
+      difficulty_level?: string,
+      is_exam_format?: boolean,
+      lesson_status?: boolean
+    ) => {
       setLoading(true);
       setError(null);
       try {
-        const params = new URLSearchParams({
-          search,
-          limit: limit.toString(),
-          page: page.toString(),
-        });
+        const params = new URLSearchParams();
+        if (search) params.append("search", search);
+        params.append("limit", limit.toString());
+        params.append("page", page.toString());
+        if (lesson_type) params.append("lesson_type", lesson_type);
+        if (difficulty_level)
+          params.append("difficulty_level", difficulty_level);
+        if (is_exam_format !== undefined)
+          params.append("is_exam_format", is_exam_format.toString());
+        if (lesson_status !== undefined)
+          params.append("lesson_status", lesson_status.toString());
 
         const response = await fetch(
           `${API_URL}/admin/lessons/paginated?${params.toString()}`,
           {
             method: "GET",
             headers: getAuthHeaders(),
-            credentials: "include",
           }
         );
 
-        if (response.status === 401) {
-          localStorage.removeItem("accessToken");
-          window.location.href = "/login";
-          return;
+        if (!response.ok) {
+          throw new Error("Failed to fetch lessons");
         }
 
-        const data = await response.json();
-        setLessons(data.lessons || []);
+        const result = await response.json();
+        if (result.success) {
+          setLessons(result.lessons || []);
+          setTotalLessons(result.totalLessons || 0);
+        }
       } catch (err: any) {
         setError(err.message || "Failed to fetch lessons");
         console.error("Error fetching lessons:", err);
@@ -139,13 +141,42 @@ export const LessonProvider = ({ children }: { children: ReactNode }) => {
     []
   );
 
+  const getLessonById = useCallback(async (lesson_id: number) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch(`${API_URL}/admin/lessons/${lesson_id}`, {
+        method: "GET",
+        headers: getAuthHeaders(),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch lesson");
+      }
+
+      const result = await response.json();
+      if (result.success) {
+        return result.data;
+      }
+      return null;
+    } catch (err: any) {
+      setError(err.message || "Failed to fetch lesson");
+      console.error("Error fetching lesson:", err);
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   const createLesson = async (
-    lesson_name: string,
-    course_id: number,
-    lesson_order: number,
-    lesson_content: string,
+    lesson_title: string,
     lesson_type: string,
-    duration: string
+    difficulty_level: string,
+    lesson_content: string,
+    is_exam_format: boolean,
+    estimated_time: number,
+    skill_id: number,
+    lesson_status = true
   ): Promise<boolean> => {
     setLoading(true);
     setError(null);
@@ -153,28 +184,25 @@ export const LessonProvider = ({ children }: { children: ReactNode }) => {
       const response = await fetch(`${API_URL}/admin/lessons`, {
         method: "POST",
         headers: getAuthHeaders(),
-        credentials: "include",
         body: JSON.stringify({
-          lesson_name,
-          course_id,
-          lesson_order,
-          lesson_content,
+          lesson_title,
           lesson_type,
-          duration,
+          difficulty_level,
+          lesson_content,
+          is_exam_format,
+          estimated_time,
+          skill_id,
+          lesson_status,
         }),
       });
 
-      if (response.status === 401) {
-        localStorage.removeItem("accessToken");
-        window.location.href = "/login";
+      const result = await response.json();
+      if (result.success) {
+        return true;
+      } else {
+        setError(result.message);
         return false;
       }
-
-      if (response.status === 201) {
-        await fetchLessonsPaginated();
-        return true;
-      }
-      return false;
     } catch (err: any) {
       setError(err.message || "Failed to create lesson");
       console.error("Error creating lesson:", err);
@@ -186,11 +214,13 @@ export const LessonProvider = ({ children }: { children: ReactNode }) => {
 
   const updateLesson = async (
     lesson_id: number,
-    lesson_name: string,
-    lesson_order: number,
-    lesson_content: string,
+    lesson_title: string,
     lesson_type: string,
-    duration: string
+    difficulty_level: string,
+    lesson_content: string,
+    is_exam_format: boolean,
+    estimated_time: number,
+    skill_id: number
   ): Promise<boolean> => {
     setLoading(true);
     setError(null);
@@ -198,27 +228,24 @@ export const LessonProvider = ({ children }: { children: ReactNode }) => {
       const response = await fetch(`${API_URL}/admin/lessons/${lesson_id}`, {
         method: "PUT",
         headers: getAuthHeaders(),
-        credentials: "include",
         body: JSON.stringify({
-          lesson_name,
-          lesson_order,
-          lesson_content,
+          lesson_title,
           lesson_type,
-          duration,
+          difficulty_level,
+          lesson_content,
+          is_exam_format,
+          estimated_time,
+          skill_id,
         }),
       });
 
-      if (response.status === 401) {
-        localStorage.removeItem("accessToken");
-        window.location.href = "/login";
+      const result = await response.json();
+      if (result.success) {
+        return true;
+      } else {
+        setError(result.message);
         return false;
       }
-
-      if (response.status === 200) {
-        await fetchLessonsPaginated();
-        return true;
-      }
-      return false;
     } catch (err: any) {
       setError(err.message || "Failed to update lesson");
       console.error("Error updating lesson:", err);
@@ -228,30 +255,56 @@ export const LessonProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const deleteLesson = async (lesson_id: number): Promise<boolean> => {
+  const lockLesson = async (lesson_id: number): Promise<boolean> => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(`${API_URL}/admin/lessons/${lesson_id}`, {
-        method: "DELETE",
-        headers: getAuthHeaders(),
-        credentials: "include",
-      });
+      const response = await fetch(
+        `${API_URL}/admin/lessons/${lesson_id}/lock`,
+        {
+          method: "PATCH",
+          headers: getAuthHeaders(),
+        }
+      );
 
-      if (response.status === 401) {
-        localStorage.removeItem("accessToken");
-        window.location.href = "/login";
+      const result = await response.json();
+      if (result.success) {
+        return true;
+      } else {
+        setError(result.message);
         return false;
       }
-
-      if (response.status === 200) {
-        await fetchLessonsPaginated();
-        return true;
-      }
-      return false;
     } catch (err: any) {
-      setError(err.message || "Failed to delete lesson");
-      console.error("Error deleting lesson:", err);
+      setError(err.message || "Failed to lock lesson");
+      console.error("Error locking lesson:", err);
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const unlockLesson = async (lesson_id: number): Promise<boolean> => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch(
+        `${API_URL}/admin/lessons/${lesson_id}/unlock`,
+        {
+          method: "PATCH",
+          headers: getAuthHeaders(),
+        }
+      );
+
+      const result = await response.json();
+      if (result.success) {
+        return true;
+      } else {
+        setError(result.message);
+        return false;
+      }
+    } catch (err: any) {
+      setError(err.message || "Failed to unlock lesson");
+      console.error("Error unlocking lesson:", err);
       return false;
     } finally {
       setLoading(false);
@@ -262,13 +315,15 @@ export const LessonProvider = ({ children }: { children: ReactNode }) => {
     <LessonContext.Provider
       value={{
         lessons,
+        totalLessons,
         loading,
         error,
-        fetchLessonsByCourse,
         fetchLessonsPaginated,
+        getLessonById,
         createLesson,
         updateLesson,
-        deleteLesson,
+        lockLesson,
+        unlockLesson,
       }}
     >
       {children}

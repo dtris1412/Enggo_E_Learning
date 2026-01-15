@@ -13,6 +13,7 @@ import {
   X,
   ChevronDown,
   ChevronRight,
+  Target,
 } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "../../shared/contexts/authContext";
@@ -76,6 +77,11 @@ const AdminLayout = () => {
       name: "Quản lý báo cáo",
       path: "/admin/reports",
       icon: BarChart3,
+    },
+    {
+      name: "Quản lý kỹ năng",
+      path: "/admin/skills",
+      icon: Target,
     },
     {
       name: "Quản lý lộ trình",

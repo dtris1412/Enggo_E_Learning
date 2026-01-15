@@ -6,9 +6,6 @@ export default (sequelize, DataTypes) => {
       Part.belongsTo(models.Certificate, {
         foreignKey: "certificate_id",
       });
-      Part.belongsTo(models.Skill, {
-        foreignKey: "skill_id",
-      });
     }
   }
   Part.init(
@@ -27,14 +24,6 @@ export default (sequelize, DataTypes) => {
         references: {
           model: "certificates",
           key: "certificate_id",
-        },
-      },
-      skill_id: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        references: {
-          model: "skills",
-          key: "skill_id",
         },
       },
       created_at: DataTypes.DATE,

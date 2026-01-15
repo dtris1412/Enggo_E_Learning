@@ -3,7 +3,7 @@ import { Model } from "sequelize";
 export default (sequelize, DataTypes) => {
   class Course extends Model {
     static associate(models) {
-      Course.hasMany(models.Lesson, {
+      Course.hasMany(models.Module, {
         foreignKey: "course_id",
       });
     }

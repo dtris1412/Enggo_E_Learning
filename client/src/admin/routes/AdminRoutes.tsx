@@ -14,6 +14,7 @@ import FeedbackManagement from "../pages/FeedbackManagement";
 import ReportManagement from "../pages/ReportManagement";
 import CertificateManagement from "../pages/CertificateManagement";
 import PathwayManagement from "../pages/PathwayManagement";
+import SkillManagement from "../pages/SkillManagement";
 
 export const AdminRoutes = () => {
   return (
@@ -54,6 +55,9 @@ export const AdminRoutes = () => {
         {/* Pathway Management Group */}
         <Route path="certificates" element={<CertificateManagement />} />
         <Route path="pathways" element={<PathwayManagement />} />
+
+        {/* Skill Management */}
+        <Route path="skills" element={<SkillManagement />} />
       </Route>
     </>
   );

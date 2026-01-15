@@ -46,6 +46,33 @@ import {
   getModuleById,
   getModulesPaginated,
 } from "../controllers/moduleController.js";
+
+// ===========Skill Controllers===========
+import {
+  createSkill,
+  updateSkill,
+  getSkillsPaginated,
+  getSkillById,
+} from "../controllers/skillController.js";
+
+// ===========Certificate-Skill Controllers===========
+import {
+  createCertificateSkill,
+  updateCertificateSkill,
+  getCertificateSkillsPaginated,
+  getCertificateSkillById,
+  deleteCertificateSkill,
+} from "../controllers/certificateSkillController.js";
+
+// ===========Lesson Controllers===========
+import {
+  createLesson,
+  updateLessonById,
+  getLessonById,
+  getLessonsPaginated,
+  lockLesson,
+  unlockLesson,
+} from "../controllers/lessonController.js";
 const router = express.Router();
 
 const initAdminRoutes = (app) => {
@@ -193,6 +220,92 @@ const initAdminRoutes = (app) => {
     verifyToken,
     requireAdmin,
     getModulesPaginated
+  );
+
+  //===========Skill Management Routes===========
+  router.get(
+    "/api/admin/skills/paginated",
+    verifyToken,
+    requireAdmin,
+    getSkillsPaginated
+  );
+  router.get(
+    "/api/admin/skills/:skill_id",
+    verifyToken,
+    requireAdmin,
+    getSkillById
+  );
+  router.post("/api/admin/skills", verifyToken, requireAdmin, createSkill);
+  router.put(
+    "/api/admin/skills/:skill_id",
+    verifyToken,
+    requireAdmin,
+    updateSkill
+  );
+
+  //===========Certificate-Skill Management Routes===========
+  router.get(
+    "/api/admin/certificate-skills/paginated",
+    verifyToken,
+    requireAdmin,
+    getCertificateSkillsPaginated
+  );
+  router.get(
+    "/api/admin/certificate-skills/:certificate_skill_id",
+    verifyToken,
+    requireAdmin,
+    getCertificateSkillById
+  );
+  router.post(
+    "/api/admin/certificate-skills",
+    verifyToken,
+    requireAdmin,
+    createCertificateSkill
+  );
+  router.put(
+    "/api/admin/certificate-skills/:certificate_skill_id",
+    verifyToken,
+    requireAdmin,
+    updateCertificateSkill
+  );
+  router.delete(
+    "/api/admin/certificate-skills/:certificate_skill_id",
+    verifyToken,
+    requireAdmin,
+    deleteCertificateSkill
+  );
+
+  //===========Lesson Management Routes===========
+  router.get(
+    "/api/admin/lessons/paginated",
+    verifyToken,
+    requireAdmin,
+    getLessonsPaginated
+  );
+  router.get(
+    "/api/admin/lessons/:lesson_id",
+    verifyToken,
+    requireAdmin,
+    getLessonById
+  );
+  router.post("/api/admin/lessons", verifyToken, requireAdmin, createLesson);
+  router.put(
+    "/api/admin/lessons/:lesson_id",
+    verifyToken,
+    requireAdmin,
+    updateLessonById
+  );
+  router.patch(
+    "/api/admin/lessons/:lesson_id/lock",
+    verifyToken,
+    requireAdmin,
+    lockLesson
+  );
+  router.patch(
+    "/api/admin/lessons/:lesson_id/unlock",
+    verifyToken,
+    requireAdmin,
+    unlockLesson
   );
   app.use("/", router);
 };

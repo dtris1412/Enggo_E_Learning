@@ -107,6 +107,24 @@ const getCertificatesPaginated = async (
   //Lấy danh sách certificate với phân trang
   const certificates = await db.Certificate.findAll({
     where: whereConditions,
+    include: [
+      {
+        model: db.Certificate_Skill,
+        as: "Certificate_Skills",
+        attributes: [
+          "certificate_skill_id",
+          "skill_id",
+          "weight",
+          "description",
+        ],
+        include: [
+          {
+            model: db.Skill,
+            attributes: ["skill_id", "skill_name"],
+          },
+        ],
+      },
+    ],
     limit: Number(limit),
     offset,
     order: [["certificate_id", "ASC"]],
@@ -125,7 +143,26 @@ const getCertificateById = async (certificate_id) => {
   if (!certificate_id) {
     return { success: false, message: "Certificate ID is required." };
   }
-  const certificate = await db.Certificate.findByPk(certificate_id);
+  const certificate = await db.Certificate.findByPk(certificate_id, {
+    include: [
+      {
+        model: db.Certificate_Skill,
+        as: "Certificate_Skills",
+        attributes: [
+          "certificate_skill_id",
+          "skill_id",
+          "weight",
+          "description",
+        ],
+        include: [
+          {
+            model: db.Skill,
+            attributes: ["skill_id", "skill_name"],
+          },
+        ],
+      },
+    ],
+  });
   if (!certificate) {
     return { success: false, message: "Certificate not found." };
   }

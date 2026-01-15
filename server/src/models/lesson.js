@@ -6,9 +6,6 @@ export default (sequelize, DataTypes) => {
       Lesson.belongsTo(models.Skill, {
         foreignKey: "skill_id",
       });
-      Lesson.belongsTo(models.Course, {
-        foreignKey: "course_id",
-      });
     }
   }
   Lesson.init(
@@ -18,10 +15,11 @@ export default (sequelize, DataTypes) => {
         primaryKey: true,
         autoIncrement: true,
       },
+      lesson_title: { type: DataTypes.STRING, allowNull: false },
       lesson_type: { type: DataTypes.STRING, allowNull: false },
       difficulty_level: { type: DataTypes.STRING, allowNull: false },
       lesson_content: { type: DataTypes.TEXT, allowNull: false },
-      order_index: { type: DataTypes.INTEGER, allowNull: false },
+
       is_exam_format: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
@@ -36,13 +34,11 @@ export default (sequelize, DataTypes) => {
           key: "skill_id",
         },
       },
-      course_id: {
-        type: DataTypes.INTEGER,
+
+      lesson_status: {
+        type: DataTypes.BOOLEAN,
         allowNull: false,
-        references: {
-          model: "courses",
-          key: "course_id",
-        },
+        defaultValue: true,
       },
       created_at: DataTypes.DATE,
       updated_at: DataTypes.DATE,
