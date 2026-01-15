@@ -38,6 +38,14 @@ import {
   unlockCourseById,
 } from "../controllers/courseController.js";
 
+// ===========Module Controllers===========
+
+import {
+  createModule,
+  updateModuleById,
+  getModuleById,
+  getModulesPaginated,
+} from "../controllers/moduleController.js";
 const router = express.Router();
 
 const initAdminRoutes = (app) => {
@@ -154,6 +162,38 @@ const initAdminRoutes = (app) => {
     unlockCourseById
   );
 
+  //===========Module Management Routes===========
+
+  router.get(
+    "/api/admin/modules/paginated",
+    verifyToken,
+    requireAdmin,
+    getModulesPaginated
+  );
+  router.get(
+    "/api/admin/modules/:module_id",
+    verifyToken,
+    requireAdmin,
+    getModuleById
+  );
+  router.post(
+    "/api/admin/courses/:course_id/modules",
+    verifyToken,
+    requireAdmin,
+    createModule
+  );
+  router.put(
+    "/api/admin/modules/:module_id",
+    verifyToken,
+    requireAdmin,
+    updateModuleById
+  );
+  router.get(
+    "/api/admin/courses/:course_id/modules",
+    verifyToken,
+    requireAdmin,
+    getModulesPaginated
+  );
   app.use("/", router);
 };
 

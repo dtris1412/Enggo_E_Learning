@@ -6,6 +6,7 @@ import AdminLayout from "../components/AdminLayout.tsx";
 import Dashboard from "../pages/Dashboard";
 import AccountManagement from "../pages/AccountManagement";
 import CourseManagement from "../pages/CourseManagement";
+import CourseDetail from "../pages/CourseDetail";
 import LessonManagement from "../pages/LessonManagement";
 import TestManagement from "../pages/TestManagement";
 import NewsManagement from "../pages/NewsManagement";
@@ -35,6 +36,7 @@ export const AdminRoutes = () => {
 
         {/* Course Management Group */}
         <Route path="courses" element={<CourseManagement />} />
+        <Route path="courses/:course_id" element={<CourseDetail />} />
         <Route path="lessons" element={<LessonManagement />} />
 
         {/* Test Management */}

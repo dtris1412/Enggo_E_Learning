@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Search,
   Plus,
@@ -8,12 +9,14 @@ import {
   BookOpen,
   Filter,
   Calendar,
+  Eye,
 } from "lucide-react";
 import { useCourse } from "../contexts/courseContext";
 import AddCourseModal from "../components/CourseManagement/Course/AddCourseModal";
 import EditCourseModal from "../components/CourseManagement/Course/EditCourseModal";
 
 const CourseManagement = () => {
+  const navigate = useNavigate();
   const {
     courses,
     loading,
@@ -309,6 +312,15 @@ const CourseManagement = () => {
 
                   {/* Right: Actions */}
                   <div className="flex gap-2 flex-shrink-0">
+                    <button
+                      onClick={() =>
+                        navigate(`/admin/courses/${course.course_id}`)
+                      }
+                      className="flex items-center gap-2 px-4 py-2 text-sm bg-green-50 text-green-600 rounded-lg hover:bg-green-100 transition-colors"
+                    >
+                      <Eye className="h-4 w-4" />
+                      Chi tiết
+                    </button>
                     <button
                       onClick={() => handleEditCourse(course)}
                       className="flex items-center gap-2 px-4 py-2 text-sm bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors"
