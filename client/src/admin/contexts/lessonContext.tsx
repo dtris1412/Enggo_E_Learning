@@ -38,7 +38,7 @@ interface LessonContextType {
     lesson_type?: string,
     difficulty_level?: string,
     is_exam_format?: boolean,
-    lesson_status?: boolean
+    lesson_status?: boolean,
   ) => Promise<void>;
   getLessonById: (lesson_id: number) => Promise<Lesson | null>;
   createLesson: (
@@ -49,7 +49,7 @@ interface LessonContextType {
     is_exam_format: boolean,
     estimated_time: number,
     skill_id: number,
-    lesson_status?: boolean
+    lesson_status?: boolean,
   ) => Promise<boolean>;
   updateLesson: (
     lesson_id: number,
@@ -59,7 +59,7 @@ interface LessonContextType {
     lesson_content: string,
     is_exam_format: boolean,
     estimated_time: number,
-    skill_id: number
+    skill_id: number,
   ) => Promise<boolean>;
   lockLesson: (lesson_id: number) => Promise<boolean>;
   unlockLesson: (lesson_id: number) => Promise<boolean>;
@@ -97,7 +97,7 @@ export const LessonProvider = ({ children }: { children: ReactNode }) => {
       lesson_type?: string,
       difficulty_level?: string,
       is_exam_format?: boolean,
-      lesson_status?: boolean
+      lesson_status?: boolean,
     ) => {
       setLoading(true);
       setError(null);
@@ -119,7 +119,7 @@ export const LessonProvider = ({ children }: { children: ReactNode }) => {
           {
             method: "GET",
             headers: getAuthHeaders(),
-          }
+          },
         );
 
         if (!response.ok) {
@@ -138,7 +138,7 @@ export const LessonProvider = ({ children }: { children: ReactNode }) => {
         setLoading(false);
       }
     },
-    []
+    [],
   );
 
   const getLessonById = useCallback(async (lesson_id: number) => {
@@ -176,7 +176,7 @@ export const LessonProvider = ({ children }: { children: ReactNode }) => {
     is_exam_format: boolean,
     estimated_time: number,
     skill_id: number,
-    lesson_status = true
+    lesson_status = true,
   ): Promise<boolean> => {
     setLoading(true);
     setError(null);
@@ -220,7 +220,7 @@ export const LessonProvider = ({ children }: { children: ReactNode }) => {
     lesson_content: string,
     is_exam_format: boolean,
     estimated_time: number,
-    skill_id: number
+    skill_id: number,
   ): Promise<boolean> => {
     setLoading(true);
     setError(null);
@@ -264,7 +264,7 @@ export const LessonProvider = ({ children }: { children: ReactNode }) => {
         {
           method: "PATCH",
           headers: getAuthHeaders(),
-        }
+        },
       );
 
       const result = await response.json();
@@ -292,7 +292,7 @@ export const LessonProvider = ({ children }: { children: ReactNode }) => {
         {
           method: "PATCH",
           headers: getAuthHeaders(),
-        }
+        },
       );
 
       const result = await response.json();

@@ -6,6 +6,12 @@ export default (sequelize, DataTypes) => {
       Lesson.belongsTo(models.Skill, {
         foreignKey: "skill_id",
       });
+      Lesson.hasMany(models.Lesson_Media, {
+        foreignKey: "lesson_id",
+      });
+      Lesson.hasMany(models.Lesson_Questions, {
+        foreignKey: "lesson_id",
+      });
     }
   }
   Lesson.init(
@@ -49,7 +55,7 @@ export default (sequelize, DataTypes) => {
       tableName: "lessons",
       freezeTableName: true,
       timestamps: false,
-    }
+    },
   );
   return Lesson;
 };

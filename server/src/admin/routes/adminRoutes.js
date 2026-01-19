@@ -73,6 +73,17 @@ import {
   lockLesson,
   unlockLesson,
 } from "../controllers/lessonController.js";
+
+// ===========Lesson Media Controllers===========
+import {
+  createMedia,
+  updateMediaById,
+  getMediasPaginated,
+  getMediaById,
+  getMediasByLessonId,
+  deleteMedia,
+} from "../controllers/lesson_mediaController.js";
+
 const router = express.Router();
 
 const initAdminRoutes = (app) => {
@@ -81,7 +92,7 @@ const initAdminRoutes = (app) => {
     "/api/admin/users/paginated",
     verifyToken,
     requireAdmin,
-    getUsersPaginated
+    getUsersPaginated,
   );
   router.get("/api/admin/users", verifyToken, requireAdmin, getAllUsers);
 
@@ -89,7 +100,7 @@ const initAdminRoutes = (app) => {
     "/api/admin/users/:user_id",
     verifyToken,
     requireAdmin,
-    getUserById
+    getUserById,
   );
 
   router.post("/api/admin/users", verifyToken, requireAdmin, createUser);
@@ -97,19 +108,19 @@ const initAdminRoutes = (app) => {
     "/api/admin/users/:user_id",
     verifyToken,
     requireAdmin,
-    updateUserById
+    updateUserById,
   );
   router.patch(
     "/api/admin/users/:user_id/lock",
     verifyToken,
     requireAdmin,
-    lockUser
+    lockUser,
   );
   router.patch(
     "/api/admin/users/:user_id/unlock",
     verifyToken,
     requireAdmin,
-    unlockUser
+    unlockUser,
   );
   //   router.patch(
   //     "/api/admin/users/:user_id/user_status",
@@ -123,37 +134,37 @@ const initAdminRoutes = (app) => {
     "/api/admin/certificates/paginated",
     verifyToken,
     requireAdmin,
-    getCertificatesPaginated
+    getCertificatesPaginated,
   );
   router.get(
     "/api/admin/certificates/:certificate_id",
     verifyToken,
     requireAdmin,
-    getCertificateById
+    getCertificateById,
   );
   router.post(
     "/api/admin/certificates",
     verifyToken,
     requireAdmin,
-    createCertificate
+    createCertificate,
   );
   router.put(
     "/api/admin/certificates/:certificate_id",
     verifyToken,
     requireAdmin,
-    updateCertificateById
+    updateCertificateById,
   );
   router.patch(
     "/api/admin/certificates/:certificate_id/lock",
     verifyToken,
     requireAdmin,
-    lockCertificate
+    lockCertificate,
   );
   router.patch(
     "/api/admin/certificates/:certificate_id/unlock",
     verifyToken,
     requireAdmin,
-    unlockCertificate
+    unlockCertificate,
   );
 
   //===========Course Management Routes===========
@@ -161,32 +172,32 @@ const initAdminRoutes = (app) => {
     "/api/admin/courses/paginated",
     verifyToken,
     requireAdmin,
-    getCoursePaginated
+    getCoursePaginated,
   );
   router.get(
     "/api/admin/courses/:course_id",
     verifyToken,
     requireAdmin,
-    getCourseById
+    getCourseById,
   );
   router.post("/api/admin/courses", verifyToken, requireAdmin, createCourse);
   router.put(
     "/api/admin/courses/:course_id",
     verifyToken,
     requireAdmin,
-    updateCourseById
+    updateCourseById,
   );
   router.patch(
     "/api/admin/courses/:course_id/lock",
     verifyToken,
     requireAdmin,
-    lockCourseById
+    lockCourseById,
   );
   router.patch(
     "/api/admin/courses/:course_id/unlock",
     verifyToken,
     requireAdmin,
-    unlockCourseById
+    unlockCourseById,
   );
 
   //===========Module Management Routes===========
@@ -195,31 +206,31 @@ const initAdminRoutes = (app) => {
     "/api/admin/modules/paginated",
     verifyToken,
     requireAdmin,
-    getModulesPaginated
+    getModulesPaginated,
   );
   router.get(
     "/api/admin/modules/:module_id",
     verifyToken,
     requireAdmin,
-    getModuleById
+    getModuleById,
   );
   router.post(
     "/api/admin/courses/:course_id/modules",
     verifyToken,
     requireAdmin,
-    createModule
+    createModule,
   );
   router.put(
     "/api/admin/modules/:module_id",
     verifyToken,
     requireAdmin,
-    updateModuleById
+    updateModuleById,
   );
   router.get(
     "/api/admin/courses/:course_id/modules",
     verifyToken,
     requireAdmin,
-    getModulesPaginated
+    getModulesPaginated,
   );
 
   //===========Skill Management Routes===========
@@ -227,20 +238,20 @@ const initAdminRoutes = (app) => {
     "/api/admin/skills/paginated",
     verifyToken,
     requireAdmin,
-    getSkillsPaginated
+    getSkillsPaginated,
   );
   router.get(
     "/api/admin/skills/:skill_id",
     verifyToken,
     requireAdmin,
-    getSkillById
+    getSkillById,
   );
   router.post("/api/admin/skills", verifyToken, requireAdmin, createSkill);
   router.put(
     "/api/admin/skills/:skill_id",
     verifyToken,
     requireAdmin,
-    updateSkill
+    updateSkill,
   );
 
   //===========Certificate-Skill Management Routes===========
@@ -248,31 +259,31 @@ const initAdminRoutes = (app) => {
     "/api/admin/certificate-skills/paginated",
     verifyToken,
     requireAdmin,
-    getCertificateSkillsPaginated
+    getCertificateSkillsPaginated,
   );
   router.get(
     "/api/admin/certificate-skills/:certificate_skill_id",
     verifyToken,
     requireAdmin,
-    getCertificateSkillById
+    getCertificateSkillById,
   );
   router.post(
     "/api/admin/certificate-skills",
     verifyToken,
     requireAdmin,
-    createCertificateSkill
+    createCertificateSkill,
   );
   router.put(
     "/api/admin/certificate-skills/:certificate_skill_id",
     verifyToken,
     requireAdmin,
-    updateCertificateSkill
+    updateCertificateSkill,
   );
   router.delete(
     "/api/admin/certificate-skills/:certificate_skill_id",
     verifyToken,
     requireAdmin,
-    deleteCertificateSkill
+    deleteCertificateSkill,
   );
 
   //===========Lesson Management Routes===========
@@ -280,32 +291,70 @@ const initAdminRoutes = (app) => {
     "/api/admin/lessons/paginated",
     verifyToken,
     requireAdmin,
-    getLessonsPaginated
+    getLessonsPaginated,
   );
   router.get(
     "/api/admin/lessons/:lesson_id",
     verifyToken,
     requireAdmin,
-    getLessonById
+    getLessonById,
   );
   router.post("/api/admin/lessons", verifyToken, requireAdmin, createLesson);
   router.put(
     "/api/admin/lessons/:lesson_id",
     verifyToken,
     requireAdmin,
-    updateLessonById
+    updateLessonById,
   );
   router.patch(
     "/api/admin/lessons/:lesson_id/lock",
     verifyToken,
     requireAdmin,
-    lockLesson
+    lockLesson,
   );
   router.patch(
     "/api/admin/lessons/:lesson_id/unlock",
     verifyToken,
     requireAdmin,
-    unlockLesson
+    unlockLesson,
+  );
+
+  //===========Lesson Media Management Routes===========
+  router.get(
+    "/api/admin/lesson-medias/paginated",
+    verifyToken,
+    requireAdmin,
+    getMediasPaginated,
+  );
+  router.get(
+    "/api/admin/lesson-medias/:media_id",
+    verifyToken,
+    requireAdmin,
+    getMediaById,
+  );
+  router.get(
+    "/api/admin/lessons/:lesson_id/medias",
+    verifyToken,
+    requireAdmin,
+    getMediasByLessonId,
+  );
+  router.post(
+    "/api/admin/lesson-medias/:lesson_id",
+    verifyToken,
+    requireAdmin,
+    createMedia,
+  );
+  router.put(
+    "/api/admin/lesson-medias/:media_id",
+    verifyToken,
+    requireAdmin,
+    updateMediaById,
+  );
+  router.delete(
+    "/api/admin/lesson-medias/:media_id",
+    verifyToken,
+    requireAdmin,
+    deleteMedia,
   );
   app.use("/", router);
 };

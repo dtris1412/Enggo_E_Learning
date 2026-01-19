@@ -2,7 +2,11 @@ import { Model } from "sequelize";
 
 export default (sequelize, DataTypes) => {
   class Lesson_Questions extends Model {
-    static associate(models) {}
+    static associate(models) {
+      Lesson_Questions.belongsTo(models.Lesson, {
+        foreignKey: "lesson_id",
+      });
+    }
   }
   Lesson_Questions.init(
     {
@@ -11,42 +15,55 @@ export default (sequelize, DataTypes) => {
         primaryKey: true,
         autoIncrement: true,
       },
-      Lesson_Questions_type: { type: DataTypes.STRING, allowNull: false },
+      order_index: { type: DataTypes.INTEGER, allowNull: true },
+      lesson_question_type: { type: DataTypes.STRING, allowNull: false },
+      content: { type: DataTypes.TEXT, allowNull: false },
+      correct_answer: { type: DataTypes.STRING, allowNull: false },
+      explaination: { type: DataTypes.TEXT, allowNull: true },
       difficulty_level: { type: DataTypes.STRING, allowNull: false },
-      Lesson_Questions_content: { type: DataTypes.TEXT, allowNull: false },
-      order_index: { type: DataTypes.INTEGER, allowNull: false },
-      is_exam_format: {
+      generate_by_ai: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
         defaultValue: false,
       },
-      estimated_time: { type: DataTypes.INTEGER, allowNull: false },
-      skill_id: {
+      lesson_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-          model: "skills",
-          key: "skill_id",
+          model: "lessons",
+          key: "lesson_id",
         },
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE",
       },
-      course_id: {
-        type: DataTypes.INTEGER,
+      options: {
+        type: DataTypes.JSON,
+        allowNull: true,
+      },
+      ai_model: { type: DataTypes.STRING, allowNull: true },
+      status: {
+        type: DataTypes.BOOLEAN,
         allowNull: false,
-        references: {
-          model: "courses",
-          key: "course_id",
-        },
+        defaultValue: true,
       },
-      created_at: DataTypes.DATE,
-      updated_at: DataTypes.DATE,
+      created_at: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: DataTypes.NOW,
+      },
+      updated_at: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: DataTypes.NOW,
+      },
     },
     {
       sequelize,
       modelName: "Lesson_Questions",
-      tableName: "Lesson_Questionss",
+      tableName: "lesson_questions",
       freezeTableName: true,
       timestamps: false,
-    }
+    },
   );
   return Lesson_Questions;
 };

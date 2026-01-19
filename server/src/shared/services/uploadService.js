@@ -1,5 +1,6 @@
 import cloudinary from "../../config/cloudinary.js";
 import streamifier from "streamifier";
+import mammoth from "mammoth";
 
 class UploadService {
   /**
@@ -13,7 +14,7 @@ class UploadService {
     fileBuffer,
     folder = "uploads",
     resourceType = "auto",
-    options = {}
+    options = {},
   ) {
     return new Promise((resolve, reject) => {
       const uploadStream = cloudinary.uploader.upload_stream(
@@ -32,7 +33,7 @@ class UploadService {
           } else {
             resolve(result);
           }
-        }
+        },
       );
 
       streamifier.createReadStream(fileBuffer).pipe(uploadStream);
@@ -56,7 +57,7 @@ class UploadService {
           { width: 200, height: 200, crop: "fill" }, // Tạo thumbnail 200x200 ngay
         ],
         eager_async: true, // Xử lý eager transformations ở background
-      }
+      },
     );
     return {
       url: result.secure_url,
@@ -74,7 +75,7 @@ class UploadService {
       "image",
       {
         transformation: [{ quality: "auto:good" }, { fetch_format: "auto" }],
-      }
+      },
     );
     return {
       url: result.secure_url,
@@ -87,7 +88,7 @@ class UploadService {
     const result = await this.uploadToCloudinary(
       file.buffer,
       "lessons/audios",
-      "video"
+      "video",
     );
     return {
       url: result.secure_url,
@@ -102,13 +103,57 @@ class UploadService {
     const result = await this.uploadToCloudinary(
       file.buffer,
       "lessons/videos",
-      "video"
+      "video",
     );
     return {
       url: result.secure_url,
       publicId: result.public_id,
       duration: result.duration,
       format: result.format,
+    };
+  }
+
+  // Upload text file (.txt, .doc, .docx)
+  async uploadTextFile(file) {
+    let textContent = "";
+
+    // Extract text content based on file type
+    if (file.mimetype === "text/plain") {
+      // Plain text file
+      textContent = file.buffer.toString("utf-8");
+    } else if (
+      file.mimetype ===
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
+      file.mimetype === "application/msword"
+    ) {
+      // .docx or .doc file - convert to HTML
+      try {
+        const result = await mammoth.convertToHtml({ buffer: file.buffer });
+        textContent = result.value; // HTML content
+      } catch (error) {
+        console.error("Error converting document:", error);
+        throw new Error("Failed to convert document to HTML");
+      }
+    } else {
+      throw new Error("Unsupported file type");
+    }
+
+    // Upload the extracted text/HTML as a text file to Cloudinary
+    const textBuffer = Buffer.from(textContent, "utf-8");
+    const result = await this.uploadToCloudinary(
+      textBuffer,
+      "lessons/texts",
+      "raw",
+      {
+        format: "txt", // Save as .txt
+      },
+    );
+
+    return {
+      url: result.secure_url,
+      publicId: result.public_id,
+      format: result.format,
+      bytes: result.bytes,
     };
   }
 

@@ -19,46 +19,65 @@ router.post(
   requireAuth, // Cho phép cả user (role=2) và admin (role=1)
   upload.single("avatar"),
   handleMulterError,
-  uploadController.uploadAvatar
+  uploadController.uploadAvatar,
 );
 
 // Upload ảnh bài học (chỉ admin)
 router.post(
   "/lesson/images",
+  verifyToken,
   requireAdmin, // Chỉ admin (role=1)
   upload.array("images", 10),
   handleMulterError,
-  uploadController.uploadLessonImages
+  uploadController.uploadLessonImages,
 );
 
 // Upload audio (chỉ admin)
 router.post(
   "/lesson/audio",
+  verifyToken,
   requireAdmin,
   upload.single("audio"),
   handleMulterError,
-  uploadController.uploadAudio
+  uploadController.uploadAudio,
 );
 
 // Upload video (chỉ admin)
 router.post(
   "/lesson/video",
+  verifyToken,
   requireAdmin,
   upload.single("video"),
   handleMulterError,
-  uploadController.uploadVideo
+  uploadController.uploadVideo,
+);
+
+// Upload text file (chỉ admin)
+router.post(
+  "/lesson/text",
+  verifyToken,
+  requireAdmin,
+  upload.single("textFile"),
+  handleMulterError,
+  uploadController.uploadTextFile,
 );
 
 // Upload file bài kiểm tra (chỉ admin)
 router.post(
   "/exam/file",
+  verifyToken,
   requireAdmin,
   upload.single("file"),
   handleMulterError,
-  uploadController.uploadExamFile
+  uploadController.uploadExamFile,
 );
 
 // Xóa file (chỉ admin)
-router.delete("/:publicId", requireAdmin, uploadController.deleteFile);
+router.delete(
+  "/:publicId",
+  verifyToken,
+  requireAdmin,
+  uploadController.deleteFile,
+);
 
 export default router;

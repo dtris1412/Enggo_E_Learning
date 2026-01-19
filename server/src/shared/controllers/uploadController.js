@@ -41,7 +41,7 @@ class UploadController {
       }
 
       const uploadPromises = files.map((file) =>
-        uploadService.uploadLessonImage(file)
+        uploadService.uploadLessonImage(file),
       );
 
       const results = await Promise.all(uploadPromises);
@@ -107,6 +107,33 @@ class UploadController {
       });
     } catch (error) {
       console.error("Upload video error:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Upload failed",
+        error: error.message,
+      });
+    }
+  }
+
+  // Upload text file (.txt, .doc, .docx)
+  async uploadTextFile(req, res) {
+    try {
+      if (!req.file) {
+        return res.status(400).json({
+          success: false,
+          message: "No text file uploaded",
+        });
+      }
+
+      const result = await uploadService.uploadTextFile(req.file);
+
+      return res.status(200).json({
+        success: true,
+        message: "Text file uploaded successfully",
+        data: result,
+      });
+    } catch (error) {
+      console.error("Upload text file error:", error);
       return res.status(500).json({
         success: false,
         message: "Upload failed",

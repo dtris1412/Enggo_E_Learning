@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLesson } from "../contexts/lessonContext";
 import { useSkill } from "../contexts/skillContext";
+import { useNavigate } from "react-router-dom";
 import {
   Search,
   Plus,
@@ -12,11 +13,13 @@ import {
   Target,
   Clock,
   Award,
+  Eye,
 } from "lucide-react";
 import AddLessonModal from "../components/LessonManagement/AddLessonModal.tsx";
 import EditLessonModal from "../components/LessonManagement/EditLessonModal.tsx";
 
 const LessonManagement = () => {
+  const navigate = useNavigate();
   const {
     lessons,
     totalLessons,
@@ -34,7 +37,7 @@ const LessonManagement = () => {
   const [filterType, setFilterType] = useState("");
   const [filterDifficulty, setFilterDifficulty] = useState("");
   const [filterStatus, setFilterStatus] = useState<boolean | undefined>(
-    undefined
+    undefined,
   );
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -54,7 +57,7 @@ const LessonManagement = () => {
         filterType,
         filterDifficulty,
         undefined,
-        filterStatus
+        filterStatus,
       );
     }, 300);
 
@@ -85,7 +88,7 @@ const LessonManagement = () => {
       data.is_exam_format,
       data.estimated_time,
       data.skill_id,
-      data.lesson_status
+      data.lesson_status,
     );
     if (success) {
       setShowAddModal(false);
@@ -96,7 +99,7 @@ const LessonManagement = () => {
         filterType,
         filterDifficulty,
         undefined,
-        filterStatus
+        filterStatus,
       );
     }
   };
@@ -111,7 +114,7 @@ const LessonManagement = () => {
         data.lesson_content,
         data.is_exam_format,
         data.estimated_time,
-        data.skill_id
+        data.skill_id,
       );
       if (success) {
         setShowEditModal(false);
@@ -122,7 +125,7 @@ const LessonManagement = () => {
           filterType,
           filterDifficulty,
           undefined,
-          filterStatus
+          filterStatus,
         );
       }
     }
@@ -141,7 +144,7 @@ const LessonManagement = () => {
       filterType,
       filterDifficulty,
       undefined,
-      filterStatus
+      filterStatus,
     );
   };
 
@@ -241,7 +244,7 @@ const LessonManagement = () => {
             }
             onChange={(e) =>
               setFilterStatus(
-                e.target.value === "" ? undefined : e.target.value === "true"
+                e.target.value === "" ? undefined : e.target.value === "true",
               )
             }
             className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -312,7 +315,7 @@ const LessonManagement = () => {
                       <div className="flex items-center">
                         <BookOpen
                           className={`h-5 w-5 ${getTypeColor(
-                            lesson.lesson_type
+                            lesson.lesson_type,
                           )} mr-2`}
                         />
                         <div>
@@ -336,7 +339,7 @@ const LessonManagement = () => {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span
                         className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getDifficultyColor(
-                          lesson.difficulty_level
+                          lesson.difficulty_level,
                         )}`}
                       >
                         {lesson.difficulty_level}
@@ -375,6 +378,15 @@ const LessonManagement = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
                       <div className="flex items-center space-x-2">
+                        <button
+                          onClick={() =>
+                            navigate(`/admin/lessons/${lesson.lesson_id}`)
+                          }
+                          className="text-green-600 hover:text-green-800 p-2 rounded-lg hover:bg-green-50"
+                          title="Xem chi tiết"
+                        >
+                          <Eye className="h-4 w-4" />
+                        </button>
                         <button
                           onClick={() => handleEditLesson(lesson)}
                           className="text-blue-600 hover:text-blue-800 p-2 rounded-lg hover:bg-blue-50"
