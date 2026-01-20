@@ -9,6 +9,7 @@ import CourseManagement from "../pages/CourseManagement";
 import CourseDetail from "../pages/CourseDetail";
 import LessonManagement from "../pages/LessonManagement";
 import LessonDetail from "../pages/LessonDetail";
+import QuestionManagement from "../pages/QuestionManagement";
 import TestManagement from "../pages/TestManagement";
 import NewsManagement from "../pages/NewsManagement";
 import FeedbackManagement from "../pages/FeedbackManagement";
@@ -41,6 +42,7 @@ export const AdminRoutes = () => {
         <Route path="courses/:course_id" element={<CourseDetail />} />
         <Route path="lessons" element={<LessonManagement />} />
         <Route path="lessons/:lesson_id" element={<LessonDetail />} />
+        <Route path="questions" element={<QuestionManagement />} />
 
         {/* Test Management */}
         <Route path="tests" element={<TestManagement />} />

@@ -9,7 +9,7 @@ export default (sequelize, DataTypes) => {
       Lesson.hasMany(models.Lesson_Media, {
         foreignKey: "lesson_id",
       });
-      Lesson.hasMany(models.Lesson_Questions, {
+      Lesson.hasMany(models.Lesson_Question, {
         foreignKey: "lesson_id",
       });
     }

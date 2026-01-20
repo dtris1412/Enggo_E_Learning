@@ -84,6 +84,16 @@ import {
   deleteMedia,
 } from "../controllers/lesson_mediaController.js";
 
+// ===========Lesson Question Controllers===========
+import {
+  createQuestion,
+  updateQuestion,
+  getQuestionsByLessonIdPaginated,
+  getQuestionsPaginated,
+  getQuestionById,
+  lockQuestion,
+  unlockQuestion,
+} from "../controllers/lesson_questionController.js";
 const router = express.Router();
 
 const initAdminRoutes = (app) => {
@@ -355,6 +365,50 @@ const initAdminRoutes = (app) => {
     verifyToken,
     requireAdmin,
     deleteMedia,
+  );
+
+  //===========Lesson Question Management Routes===========
+  router.get(
+    "/api/admin/lesson-questions/paginated",
+    verifyToken,
+    requireAdmin,
+    getQuestionsPaginated,
+  );
+  router.get(
+    "/api/admin/lessons/:lesson_id/questions",
+    verifyToken,
+    requireAdmin,
+    getQuestionsByLessonIdPaginated,
+  );
+  router.get(
+    "/api/admin/lesson-questions/:lesson_question_id",
+    verifyToken,
+    requireAdmin,
+    getQuestionById,
+  );
+  router.post(
+    "/api/admin/lesson-questions",
+    verifyToken,
+    requireAdmin,
+    createQuestion,
+  );
+  router.put(
+    "/api/admin/lesson-questions/:lesson_question_id",
+    verifyToken,
+    requireAdmin,
+    updateQuestion,
+  );
+  router.patch(
+    "/api/admin/lesson-questions/:lesson_question_id/lock",
+    verifyToken,
+    requireAdmin,
+    lockQuestion,
+  );
+  router.patch(
+    "/api/admin/lesson-questions/:lesson_question_id/unlock",
+    verifyToken,
+    requireAdmin,
+    unlockQuestion,
   );
   app.use("/", router);
 };

@@ -18,6 +18,8 @@ import {
   Eye,
 } from "lucide-react";
 import LessonMediaManager from "../components/LessonManagement/LessonMediaManager";
+import LessonQuestionManager from "../components/LessonManagement/LessonQuestionManager";
+import { LessonQuestionProvider } from "../contexts/lessonQuestionContext";
 
 const LessonDetail = () => {
   const { lesson_id } = useParams<{ lesson_id: string }>();
@@ -336,12 +338,23 @@ const LessonDetail = () => {
 
       {/* Lesson Media Manager */}
       {!previewMode ? (
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold mb-4">Quản lý Media bài học</h2>
-          <LessonMediaProvider>
-            <LessonMediaManager lessonId={parseInt(lesson_id!)} />
-          </LessonMediaProvider>
-        </div>
+        <>
+          <div className="bg-white rounded-lg shadow p-6">
+            <h2 className="text-xl font-semibold mb-4">
+              Quản lý Media bài học
+            </h2>
+            <LessonMediaProvider>
+              <LessonMediaManager lessonId={parseInt(lesson_id!)} />
+            </LessonMediaProvider>
+          </div>
+
+          {/* Lesson Question Manager */}
+          <div className="bg-white rounded-lg shadow p-6">
+            <LessonQuestionProvider>
+              <LessonQuestionManager lessonId={parseInt(lesson_id!)} />
+            </LessonQuestionProvider>
+          </div>
+        </>
       ) : (
         <div className="bg-white rounded-lg shadow p-6">
           <h2 className="text-xl font-semibold mb-4 text-center">

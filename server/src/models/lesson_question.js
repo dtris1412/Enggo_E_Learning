@@ -1,14 +1,14 @@
 import { Model } from "sequelize";
 
 export default (sequelize, DataTypes) => {
-  class Lesson_Questions extends Model {
+  class Lesson_Question extends Model {
     static associate(models) {
-      Lesson_Questions.belongsTo(models.Lesson, {
+      Lesson_Question.belongsTo(models.Lesson, {
         foreignKey: "lesson_id",
       });
     }
   }
-  Lesson_Questions.init(
+  Lesson_Question.init(
     {
       lesson_question_id: {
         type: DataTypes.INTEGER,
@@ -16,12 +16,12 @@ export default (sequelize, DataTypes) => {
         autoIncrement: true,
       },
       order_index: { type: DataTypes.INTEGER, allowNull: true },
-      lesson_question_type: { type: DataTypes.STRING, allowNull: false },
+      question_type: { type: DataTypes.STRING, allowNull: false },
       content: { type: DataTypes.TEXT, allowNull: false },
       correct_answer: { type: DataTypes.STRING, allowNull: false },
       explaination: { type: DataTypes.TEXT, allowNull: true },
       difficulty_level: { type: DataTypes.STRING, allowNull: false },
-      generate_by_ai: {
+      generated_by_ai: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
         defaultValue: false,
@@ -59,11 +59,11 @@ export default (sequelize, DataTypes) => {
     },
     {
       sequelize,
-      modelName: "Lesson_Questions",
+      modelName: "Lesson_Question",
       tableName: "lesson_questions",
       freezeTableName: true,
       timestamps: false,
     },
   );
-  return Lesson_Questions;
+  return Lesson_Question;
 };
