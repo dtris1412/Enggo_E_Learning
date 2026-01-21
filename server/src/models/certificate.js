@@ -10,6 +10,9 @@ export default (sequelize, DataTypes) => {
         foreignKey: "certificate_id",
         as: "Certificate_Skills",
       });
+      Certificate.hasMany(models.Roadmap, {
+        foreignKey: "certificate_id",
+      });
     }
   }
   Certificate.init(
@@ -31,7 +34,7 @@ export default (sequelize, DataTypes) => {
       tableName: "certificates",
       freezeTableName: true,
       timestamps: false,
-    }
+    },
   );
   return Certificate;
 };

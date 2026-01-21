@@ -1,100 +1,126 @@
 import {
   Search,
   Plus,
-  CreditCard as Edit,
-  Trash2,
-  Eye,
+  Edit,
+  Lock,
+  Unlock,
   Route,
   Target,
   Clock,
+  Award,
+  Calendar,
+  Eye,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useRoadmap } from "../contexts/roadmapContext";
+import { useCertificate } from "../contexts/certificateContext";
+import AddRoadmapModal from "../components/RoadmapManagement/AddRoadmapModal.tsx";
+import EditRoadmapModal from "../components/RoadmapManagement/EditRoadmapModal.tsx";
 
 const RoadmapManagement = () => {
+  const navigate = useNavigate();
+  const {
+    roadmaps,
+    loading,
+    fetchRoadmapsPaginated,
+    createRoadmap,
+    updateRoadmap,
+    lockRoadmap,
+    unlockRoadmap,
+  } = useRoadmap();
+
+  const { certificates, fetchCertificates } = useCertificate();
+
   const [searchTerm, setSearchTerm] = useState("");
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingRoadmap, setEditingRoadmap] = useState<any>(null);
+  const [levelFilter, setLevelFilter] = useState("");
 
-  const roadmaps = [
-    {
-      id: 1,
-      title: "Lộ trình IELTS từ 0 đến 7.0+",
-      description: "Lộ trình học IELTS hoàn chỉnh cho người mới bắt đầu",
-      target: "IELTS 7.0+",
-      duration: "6 tháng",
-      courses: 4,
-      students: 850,
-      status: "active",
-      difficulty: "Trung cấp",
-      createdDate: "2023-12-01",
-    },
-    {
-      id: 2,
-      title: "Lộ trình TOEIC 990 điểm",
-      description: "Chinh phục điểm số tối đa trong kỳ thi TOEIC",
-      target: "TOEIC 990",
-      duration: "4 tháng",
-      courses: 3,
-      students: 620,
-      status: "active",
-      difficulty: "Nâng cao",
-      createdDate: "2023-11-15",
-    },
-    {
-      id: 3,
-      title: "Lộ trình Business English chuyên nghiệp",
-      description: "Phát triển kỹ năng tiếng Anh trong môi trường doanh nghiệp",
-      target: "Business Fluency",
-      duration: "8 tháng",
-      courses: 5,
-      students: 420,
-      status: "draft",
-      difficulty: "Nâng cao",
-      createdDate: "2024-01-10",
-    },
-    {
-      id: 4,
-      title: "Lộ trình giao tiếp cơ bản đến thành thạo",
-      description: "Từ người mới bắt đầu đến giao tiếp thành thạo",
-      target: "Conversational Fluency",
-      duration: "12 tháng",
-      courses: 6,
-      students: 1200,
-      status: "active",
-      difficulty: "Cơ bản",
-      createdDate: "2023-10-01",
-    },
-  ];
+  useEffect(() => {
+    fetchRoadmapsPaginated("", 1, 100);
+    fetchCertificates("", 100, 1);
+  }, [fetchRoadmapsPaginated, fetchCertificates]);
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "active":
-        return "bg-green-100 text-green-800";
-      case "draft":
-        return "bg-yellow-100 text-yellow-800";
-      case "inactive":
-        return "bg-red-100 text-red-800";
-      default:
-        return "bg-gray-100 text-gray-800";
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fetchRoadmapsPaginated(searchTerm, 1, 100, levelFilter || undefined);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm, levelFilter, fetchRoadmapsPaginated]);
+
+  const handleCreateRoadmap = () => {
+    setShowAddModal(true);
+  };
+
+  const handleEditRoadmap = (roadmap: any) => {
+    setEditingRoadmap(roadmap);
+    setShowEditModal(true);
+  };
+
+  const handleSubmitAddRoadmap = async (data: any) => {
+    const success = await createRoadmap(
+      data.roadmap_title,
+      data.roadmap_description,
+      data.roadmap_aim,
+      data.roadmap_level,
+      data.estimated_duration,
+      data.roadmap_status,
+      data.certificate_id,
+      data.discount_percent,
+      data.roadmap_price,
+    );
+    if (success) {
+      setShowAddModal(false);
     }
   };
 
-  const getDifficultyColor = (difficulty: string) => {
-    switch (difficulty) {
-      case "Cơ bản":
-        return "bg-blue-100 text-blue-800";
-      case "Trung cấp":
-        return "bg-orange-100 text-orange-800";
-      case "Nâng cao":
-        return "bg-red-100 text-red-800";
-      default:
-        return "bg-gray-100 text-gray-800";
+  const handleSubmitEditRoadmap = async (data: any) => {
+    if (editingRoadmap) {
+      const success = await updateRoadmap(
+        editingRoadmap.roadmap_id,
+        data.roadmap_title,
+        data.roadmap_description,
+        data.roadmap_aim,
+        data.roadmap_level,
+        data.estimated_duration,
+        data.roadmap_status,
+        data.certificate_id,
+        data.discount_percent,
+      );
+      if (success) {
+        setShowEditModal(false);
+      }
     }
   };
 
-  const filteredRoadmaps = roadmaps.filter(
-    (roadmap) =>
-      roadmap.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      roadmap.description.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const handleToggleRoadmapStatus = async (roadmap: any) => {
+    if (roadmap.roadmap_status) {
+      await lockRoadmap(roadmap.roadmap_id);
+    } else {
+      await unlockRoadmap(roadmap.roadmap_id);
+    }
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString("vi-VN");
+  };
+
+  const getLevelLabel = (level: string) => {
+    const labels: { [key: string]: string } = {
+      beginner: "Cơ bản",
+      intermediate: "Trung cấp",
+      advanced: "Nâng cao",
+    };
+    return labels[level] || level;
+  };
+
+  const getCertificateName = (certificate_id: number) => {
+    const cert = certificates.find((c) => c.certificate_id === certificate_id);
+    return cert ? cert.certificate_name : "N/A";
+  };
 
   return (
     <div className="space-y-6">
@@ -102,177 +128,204 @@ const RoadmapManagement = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Quản lý lộ trình</h1>
-          <p className="text-gray-600">
+          <p className="text-gray-600 mt-1">
             Tạo và quản lý các lộ trình học tập có hệ thống
           </p>
         </div>
-        <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center">
+        <button
+          onClick={handleCreateRoadmap}
+          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center"
+        >
           <Plus className="h-4 w-4 mr-2" />
           Tạo lộ trình mới
         </button>
       </div>
 
-      {/* Search */}
+      {/* Search and Filters */}
       <div className="bg-white p-6 rounded-lg border border-gray-200">
-        <div className="relative">
-          <Search className="h-5 w-5 text-gray-400 absolute left-3 top-3" />
-          <input
-            type="text"
-            placeholder="Tìm kiếm lộ trình..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="relative">
+            <Search className="h-5 w-5 text-gray-400 absolute left-3 top-3" />
+            <input
+              type="text"
+              placeholder="Tìm kiếm lộ trình..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+          <div>
+            <select
+              value={levelFilter}
+              onChange={(e) => setLevelFilter(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            >
+              <option value="">Tất cả cấp độ</option>
+              <option value="beginner">Cơ bản</option>
+              <option value="intermediate">Trung cấp</option>
+              <option value="advanced">Nâng cao</option>
+            </select>
+          </div>
         </div>
       </div>
 
       {/* Roadmaps Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {filteredRoadmaps.map((roadmap) => (
-          <div
-            key={roadmap.id}
-            className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-200"
-          >
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex items-center">
-                <div className="p-3 bg-blue-100 rounded-lg mr-4">
-                  <Route className="h-6 w-6 text-blue-600" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-1">
-                    {roadmap.title}
-                  </h3>
-                  <p className="text-sm text-gray-600">{roadmap.description}</p>
-                </div>
-              </div>
-              <span
-                className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(
-                  roadmap.status
-                )}`}
-              >
-                {roadmap.status === "active"
-                  ? "Hoạt động"
-                  : roadmap.status === "draft"
-                  ? "Bản nháp"
-                  : "Không hoạt động"}
-              </span>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4 mb-4">
-              <div className="flex items-center">
-                <Target className="h-4 w-4 text-gray-400 mr-2" />
-                <span className="text-sm text-gray-600">
-                  Mục tiêu: {roadmap.target}
-                </span>
-              </div>
-              <div className="flex items-center">
-                <Clock className="h-4 w-4 text-gray-400 mr-2" />
-                <span className="text-sm text-gray-600">
-                  Thời gian: {roadmap.duration}
-                </span>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex space-x-4">
-                <span className="text-sm text-gray-600">
-                  <span className="font-medium">{roadmap.courses}</span> khóa
-                  học
-                </span>
-                <span className="text-sm text-gray-600">
-                  <span className="font-medium">{roadmap.students}</span> học
-                  viên
-                </span>
-              </div>
-              <span
-                className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getDifficultyColor(
-                  roadmap.difficulty
-                )}`}
-              >
-                {roadmap.difficulty}
-              </span>
-            </div>
-
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-500">
-                Tạo ngày: {roadmap.createdDate}
-              </span>
-              <div className="flex space-x-2">
-                <button className="text-blue-600 hover:text-blue-900 p-2 rounded hover:bg-blue-50 transition-colors duration-200">
-                  <Eye className="h-4 w-4" />
-                </button>
-                <button className="text-green-600 hover:text-green-900 p-2 rounded hover:bg-green-50 transition-colors duration-200">
-                  <Edit className="h-4 w-4" />
-                </button>
-                <button className="text-red-600 hover:text-red-900 p-2 rounded hover:bg-red-50 transition-colors duration-200">
-                  <Trash2 className="h-4 w-4" />
-                </button>
-              </div>
-            </div>
+        {loading ? (
+          <div className="col-span-2 text-center py-12">
+            <p className="text-gray-500">Đang tải dữ liệu...</p>
           </div>
-        ))}
+        ) : roadmaps.length === 0 ? (
+          <div className="col-span-2 text-center py-12">
+            <p className="text-gray-500">Không tìm thấy lộ trình nào</p>
+          </div>
+        ) : (
+          roadmaps.map((roadmap) => (
+            <div
+              key={roadmap.roadmap_id}
+              className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-200"
+            >
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex items-start gap-3">
+                  <div className="p-3 bg-blue-100 rounded-lg">
+                    <Route className="h-6 w-6 text-blue-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                      {roadmap.roadmap_title}
+                    </h3>
+                    <p className="text-sm text-gray-600 line-clamp-2">
+                      {roadmap.roadmap_description}
+                    </p>
+                  </div>
+                </div>
+                <span
+                  className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                    roadmap.roadmap_status
+                      ? "bg-green-100 text-green-800"
+                      : "bg-red-100 text-red-800"
+                  }`}
+                >
+                  {roadmap.roadmap_status ? "Hoạt động" : "Khóa"}
+                </span>
+              </div>
+
+              <div className="space-y-2 mb-4">
+                <div className="flex items-center gap-2 text-sm">
+                  <Target className="h-4 w-4 text-gray-400" />
+                  <span className="text-gray-600">Mục tiêu:</span>
+                  <span className="font-medium text-gray-900">
+                    {roadmap.roadmap_aim}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 text-sm">
+                  <Clock className="h-4 w-4 text-gray-400" />
+                  <span className="text-gray-600">Thời gian:</span>
+                  <span className="font-medium text-gray-900">
+                    {roadmap.estimated_duration} tháng
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 text-sm">
+                  <Award className="h-4 w-4 text-gray-400" />
+                  <span className="text-gray-600">Chứng chỉ:</span>
+                  <span className="font-medium text-gray-900">
+                    {getCertificateName(roadmap.certificate_id)}
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between mb-4 pb-4 border-b border-gray-200">
+                <div className="flex items-center gap-2">
+                  <span
+                    className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                      roadmap.roadmap_level === "beginner"
+                        ? "bg-blue-100 text-blue-800"
+                        : roadmap.roadmap_level === "intermediate"
+                          ? "bg-orange-100 text-orange-800"
+                          : "bg-red-100 text-red-800"
+                    }`}
+                  >
+                    {getLevelLabel(roadmap.roadmap_level)}
+                  </span>
+                </div>
+                <div className="text-sm text-gray-600">
+                  {roadmap.discount_percent > 0 && (
+                    <span className="text-green-600 font-medium mr-2">
+                      -{roadmap.discount_percent}%
+                    </span>
+                  )}
+                  <span className="font-semibold text-gray-900">
+                    {roadmap.roadmap_price?.toLocaleString("vi-VN")} VNĐ
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-500 flex items-center gap-1">
+                  <Calendar className="h-4 w-4" />
+                  {formatDate(roadmap.created_at)}
+                </span>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() =>
+                      navigate(`/admin/roadmaps/${roadmap.roadmap_id}`)
+                    }
+                    className="flex items-center gap-1 px-3 py-2 text-sm bg-purple-50 text-purple-600 rounded-lg hover:bg-purple-100 transition-colors"
+                  >
+                    <Eye className="h-4 w-4" />
+                    Chi tiết
+                  </button>
+                  <button
+                    onClick={() => handleEditRoadmap(roadmap)}
+                    className="flex items-center gap-1 px-3 py-2 text-sm bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors"
+                  >
+                    <Edit className="h-4 w-4" />
+                    Sửa
+                  </button>
+                  <button
+                    onClick={() => handleToggleRoadmapStatus(roadmap)}
+                    className={`flex items-center gap-1 px-3 py-2 text-sm rounded-lg transition-colors ${
+                      roadmap.roadmap_status
+                        ? "bg-red-50 text-red-600 hover:bg-red-100"
+                        : "bg-green-50 text-green-600 hover:bg-green-100"
+                    }`}
+                  >
+                    {roadmap.roadmap_status ? (
+                      <>
+                        <Lock className="h-4 w-4" />
+                        Khóa
+                      </>
+                    ) : (
+                      <>
+                        <Unlock className="h-4 w-4" />
+                        Mở
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))
+        )}
       </div>
 
-      {/* Statistics */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-white p-6 rounded-lg border border-gray-200">
-          <div className="flex items-center">
-            <div className="p-3 bg-blue-100 rounded-lg">
-              <Route className="h-6 w-6 text-blue-600" />
-            </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Tổng lộ trình</p>
-              <p className="text-2xl font-bold text-gray-900">
-                {roadmaps.length}
-              </p>
-            </div>
-          </div>
-        </div>
+      {/* Modals */}
+      {showAddModal && (
+        <AddRoadmapModal
+          onClose={() => setShowAddModal(false)}
+          onSubmit={handleSubmitAddRoadmap}
+          certificates={certificates}
+        />
+      )}
 
-        <div className="bg-white p-6 rounded-lg border border-gray-200">
-          <div className="flex items-center">
-            <div className="p-3 bg-green-100 rounded-lg">
-              <Target className="h-6 w-6 text-green-600" />
-            </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">
-                Đang hoạt động
-              </p>
-              <p className="text-2xl font-bold text-gray-900">
-                {roadmaps.filter((r) => r.status === "active").length}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white p-6 rounded-lg border border-gray-200">
-          <div className="flex items-center">
-            <div className="p-3 bg-yellow-100 rounded-lg">
-              <Edit className="h-6 w-6 text-yellow-600" />
-            </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Bản nháp</p>
-              <p className="text-2xl font-bold text-gray-900">
-                {roadmaps.filter((r) => r.status === "draft").length}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white p-6 rounded-lg border border-gray-200">
-          <div className="flex items-center">
-            <div className="p-3 bg-purple-100 rounded-lg">
-              <Target className="h-6 w-6 text-purple-600" />
-            </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Tổng học viên</p>
-              <p className="text-2xl font-bold text-gray-900">
-                {roadmaps.reduce((sum, r) => sum + r.students, 0)}
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
+      {showEditModal && editingRoadmap && (
+        <EditRoadmapModal
+          roadmap={editingRoadmap}
+          onClose={() => setShowEditModal(false)}
+          onSubmit={handleSubmitEditRoadmap}
+          certificates={certificates}
+        />
+      )}
     </div>
   );
 };

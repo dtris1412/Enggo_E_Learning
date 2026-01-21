@@ -36,7 +36,7 @@ export default (sequelize, DataTypes) => {
       tableName: "part_skills",
       freezeTableName: true,
       timestamps: false,
-    }
+    },
   );
   return Part_Skill;
 };

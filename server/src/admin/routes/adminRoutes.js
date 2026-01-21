@@ -94,6 +94,32 @@ import {
   lockQuestion,
   unlockQuestion,
 } from "../controllers/lesson_questionController.js";
+
+// ===========Roadmap Controllers===========
+import {
+  getRoadmapsPaginated,
+  getRoadmapById,
+  createRoadmap,
+  updateRoadmap,
+  lockRoadmap,
+  unlockRoadmap,
+} from "../controllers/roadmapController.js";
+
+// ===========Phase Controllers===========
+import {
+  createPhase,
+  updatePhase,
+  getPhasesByRoadmapId,
+  getPhaseById,
+} from "../controllers/phaseController.js";
+
+// ===========Phase Course Controllers===========
+import {
+  createPhaseCourse,
+  updatePhaseCourse,
+  getPhaseCoursesByPhaseId,
+  removeCourseFromPhase,
+} from "../controllers/phase_courseController.js";
 const router = express.Router();
 
 const initAdminRoutes = (app) => {
@@ -409,6 +435,91 @@ const initAdminRoutes = (app) => {
     verifyToken,
     requireAdmin,
     unlockQuestion,
+  );
+
+  //===========Roadmap Management Routes===========
+  router.get(
+    "/api/admin/roadmaps/paginated",
+    verifyToken,
+    requireAdmin,
+    getRoadmapsPaginated,
+  );
+  router.get(
+    "/api/admin/roadmaps/:roadmap_id",
+    verifyToken,
+    requireAdmin,
+    getRoadmapById,
+  );
+  router.post("/api/admin/roadmaps", verifyToken, requireAdmin, createRoadmap);
+  router.put(
+    "/api/admin/roadmaps/:roadmap_id",
+    verifyToken,
+    requireAdmin,
+    updateRoadmap,
+  );
+  router.patch(
+    "/api/admin/roadmaps/:roadmap_id/lock",
+    verifyToken,
+    requireAdmin,
+    lockRoadmap,
+  );
+  router.patch(
+    "/api/admin/roadmaps/:roadmap_id/unlock",
+    verifyToken,
+    requireAdmin,
+    unlockRoadmap,
+  );
+
+  //===========Phase Management Routes===========
+  router.get(
+    "/api/admin/roadmaps/:roadmap_id/phases",
+    verifyToken,
+    requireAdmin,
+    getPhasesByRoadmapId,
+  );
+  router.get(
+    "/api/admin/phases/:phase_id",
+    verifyToken,
+    requireAdmin,
+    getPhaseById,
+  );
+  router.post(
+    "/api/admin/roadmaps/:roadmap_id/phases",
+    verifyToken,
+    requireAdmin,
+    createPhase,
+  );
+  router.put(
+    "/api/admin/phases/:phase_id",
+    verifyToken,
+    requireAdmin,
+    updatePhase,
+  );
+
+  //===========Phase Course Management Routes===========
+  router.get(
+    "/api/admin/phases/:phase_id/phase-courses",
+    verifyToken,
+    requireAdmin,
+    getPhaseCoursesByPhaseId,
+  );
+  router.post(
+    "/api/admin/phases/:phase_id/phase-courses",
+    verifyToken,
+    requireAdmin,
+    createPhaseCourse,
+  );
+  router.put(
+    "/api/admin/phase-courses/:phase_course_id",
+    verifyToken,
+    requireAdmin,
+    updatePhaseCourse,
+  );
+  router.delete(
+    "/api/admin/phase-courses/:phase_course_id",
+    verifyToken,
+    requireAdmin,
+    removeCourseFromPhase,
   );
   app.use("/", router);
 };

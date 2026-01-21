@@ -21,7 +21,7 @@ import { useAuth } from "../../shared/contexts/authContext";
 const AdminLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [courseMenuOpen, setCourseMenuOpen] = useState(false);
-  const [pathwayMenuOpen, setPathwayMenuOpen] = useState(false);
+  const [roadmapMenuOpen, setRoadmapMenuOpen] = useState(false);
   const { logout, user } = useAuth();
   const navigate = useNavigate();
 
@@ -87,8 +87,8 @@ const AdminLayout = () => {
       name: "Quản lý lộ trình",
       icon: Map,
       hasDropdown: true,
-      isOpen: pathwayMenuOpen,
-      toggle: () => setPathwayMenuOpen(!pathwayMenuOpen),
+      isOpen: roadmapMenuOpen,
+      toggle: () => setRoadmapMenuOpen(!roadmapMenuOpen),
       children: [
         {
           name: "Quản lý chứng chỉ",
@@ -96,7 +96,7 @@ const AdminLayout = () => {
         },
         {
           name: "Quản lý lộ trình",
-          path: "/admin/pathways",
+          path: "/admin/roadmaps",
         },
       ],
     },

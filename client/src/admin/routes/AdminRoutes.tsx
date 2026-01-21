@@ -15,7 +15,8 @@ import NewsManagement from "../pages/NewsManagement";
 import FeedbackManagement from "../pages/FeedbackManagement";
 import ReportManagement from "../pages/ReportManagement";
 import CertificateManagement from "../pages/CertificateManagement";
-import PathwayManagement from "../pages/PathwayManagement";
+import RoadmapManagement from "../pages/RoadmapManagement";
+import RoadmapDetail from "../pages/RoadmapDetail";
 import SkillManagement from "../pages/SkillManagement";
 
 export const AdminRoutes = () => {
@@ -56,9 +57,10 @@ export const AdminRoutes = () => {
         {/* Report Management */}
         <Route path="reports" element={<ReportManagement />} />
 
-        {/* Pathway Management Group */}
+        {/* Certificate & Roadmap Management */}
         <Route path="certificates" element={<CertificateManagement />} />
-        <Route path="pathways" element={<PathwayManagement />} />
+        <Route path="roadmaps" element={<RoadmapManagement />} />
+        <Route path="roadmaps/:roadmap_id" element={<RoadmapDetail />} />
 
         {/* Skill Management */}
         <Route path="skills" element={<SkillManagement />} />
