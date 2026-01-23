@@ -6,6 +6,9 @@ export default (sequelize, DataTypes) => {
       Module.belongsTo(models.Course, {
         foreignKey: "course_id",
       });
+      Module.hasMany(models.Module_Lesson, {
+        foreignKey: "module_id",
+      });
     }
   }
   Module.init(
@@ -36,7 +39,7 @@ export default (sequelize, DataTypes) => {
       tableName: "modules",
       freezeTableName: true,
       timestamps: false,
-    }
+    },
   );
   return Module;
 };

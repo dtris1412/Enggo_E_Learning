@@ -19,19 +19,33 @@ import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useCourse } from "../contexts/courseContext";
 import { useModule } from "../contexts/moduleContext";
+import { useModuleLesson } from "../contexts/moduleLessonContext";
 import AddModuleModal from "../components/CourseManagement/Module/AddModuleModal";
 import EditModuleModal from "../components/CourseManagement/Module/EditModuleModal";
+import AddModuleLessonModal from "../components/CourseManagement/AddModuleLessonModal";
+import EditModuleLessonModal from "../components/CourseManagement/EditModuleLessonModal";
 
 const CourseDetail = () => {
   const { course_id } = useParams<{ course_id: string }>();
   const { courses } = useCourse();
   const { modules, loading, fetchModulesByCourse, createModule, updateModule } =
     useModule();
+  const {
+    moduleLessons,
+    loading: loadingLessons,
+    fetchModuleLessonsByModuleId,
+    addLessonToModule,
+    updateModuleLesson,
+    removeLessonFromModule,
+  } = useModuleLesson();
 
   const [activeModule, setActiveModule] = useState(0);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingModule, setEditingModule] = useState<any>(null);
+  const [showAddLessonModal, setShowAddLessonModal] = useState(false);
+  const [showEditLessonModal, setShowEditLessonModal] = useState(false);
+  const [editingModuleLesson, setEditingModuleLesson] = useState<any>(null);
 
   // Get course data from context
   const course = courses.find((c) => c.course_id === Number(course_id));
@@ -41,6 +55,14 @@ const CourseDetail = () => {
       fetchModulesByCourse(Number(course_id));
     }
   }, [course_id, fetchModulesByCourse]);
+
+  // Fetch lessons when active module changes
+  useEffect(() => {
+    if (modules.length > 0 && modules[activeModule]) {
+      fetchModuleLessonsByModuleId(modules[activeModule].module_id);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeModule, modules.length]);
 
   const handleAddModule = () => {
     setShowAddModal(true);
@@ -58,7 +80,7 @@ const CourseDetail = () => {
       data.module_title,
       data.module_description,
       data.order_index,
-      data.estimated_time
+      data.estimated_time,
     );
     if (success) {
       setShowAddModal(false);
@@ -72,14 +94,70 @@ const CourseDetail = () => {
         data.module_title,
         data.module_description,
         data.order_index,
-        data.estimated_time
+        data.estimated_time,
       );
       if (success) {
         setShowEditModal(false);
       }
     }
   };
+  // Module Lesson Handlers
+  const handleAddLesson = () => {
+    if (modules.length > 0 && modules[activeModule]) {
+      setShowAddLessonModal(true);
+    }
+  };
 
+  const handleEditLesson = (moduleLesson: any) => {
+    setEditingModuleLesson(moduleLesson);
+    setShowEditLessonModal(true);
+  };
+
+  const handleRemoveLesson = async (moduleLessonId: number) => {
+    if (window.confirm("Bạn có chắc muốn xóa bài học này khỏi module?")) {
+      await removeLessonFromModule(moduleLessonId);
+      if (modules.length > 0 && modules[activeModule]) {
+        fetchModuleLessonsByModuleId(modules[activeModule].module_id);
+      }
+    }
+  };
+
+  const handleSubmitAddLesson = async (data: {
+    lesson_id: number;
+    description: string;
+    order_index: number;
+    status: boolean;
+  }) => {
+    if (modules.length > 0 && modules[activeModule]) {
+      await addLessonToModule(
+        modules[activeModule].module_id,
+        data.lesson_id,
+        data.description,
+        data.order_index,
+        data.status,
+      );
+      setShowAddLessonModal(false);
+      fetchModuleLessonsByModuleId(modules[activeModule].module_id);
+    }
+  };
+
+  const handleSubmitEditLesson = async (
+    orderIndex: number,
+    status: boolean,
+  ) => {
+    if (editingModuleLesson) {
+      await updateModuleLesson(
+        editingModuleLesson.module_lesson_id,
+        orderIndex,
+        status,
+      );
+      setShowEditLessonModal(false);
+      setEditingModuleLesson(null);
+      if (modules.length > 0 && modules[activeModule]) {
+        fetchModuleLessonsByModuleId(modules[activeModule].module_id);
+      }
+    }
+  };
   if (!course) {
     return (
       <div className="flex items-center justify-center h-96">
@@ -303,22 +381,104 @@ const CourseDetail = () => {
                         <h4 className="text-lg font-medium text-gray-900">
                           Bài học trong module
                         </h4>
-                        <button className="flex items-center gap-2 px-3 py-2 text-sm bg-green-50 text-green-600 rounded-lg hover:bg-green-100 transition-colors">
+                        <button
+                          onClick={handleAddLesson}
+                          className="flex items-center gap-2 px-3 py-2 text-sm bg-green-50 text-green-600 rounded-lg hover:bg-green-100 transition-colors"
+                        >
                           <Plus className="h-4 w-4" />
                           Thêm bài học
                         </button>
                       </div>
 
-                      {/* Placeholder for lessons - will be replaced with actual lesson data */}
-                      <div className="text-center py-8 border-2 border-dashed border-gray-300 rounded-lg">
-                        <FileText className="h-10 w-10 text-gray-400 mx-auto mb-3" />
-                        <p className="text-gray-500 mb-2">
-                          Chưa có bài học nào trong module này
-                        </p>
-                        <button className="text-blue-600 hover:text-blue-700 text-sm font-medium">
-                          Thêm bài học đầu tiên
-                        </button>
-                      </div>
+                      {loadingLessons ? (
+                        <div className="text-center py-8">
+                          <p className="text-gray-500">Đang tải bài học...</p>
+                        </div>
+                      ) : moduleLessons.length === 0 ? (
+                        <div className="text-center py-8 border-2 border-dashed border-gray-300 rounded-lg">
+                          <FileText className="h-10 w-10 text-gray-400 mx-auto mb-3" />
+                          <p className="text-gray-500 mb-2">
+                            Chưa có bài học nào trong module này
+                          </p>
+                          <button
+                            onClick={handleAddLesson}
+                            className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                          >
+                            Thêm bài học đầu tiên
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="space-y-3">
+                          {moduleLessons
+                            .sort((a, b) => a.order_index - b.order_index)
+                            .map((moduleLesson) => (
+                              <div
+                                key={moduleLesson.module_lesson_id}
+                                className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200 hover:border-blue-300 transition-colors"
+                              >
+                                <div className="flex items-center gap-4 flex-1">
+                                  <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                                    <span className="text-sm font-semibold text-blue-600">
+                                      {moduleLesson.order_index}
+                                    </span>
+                                  </div>
+                                  <div className="flex-1">
+                                    <h5 className="font-medium text-gray-900">
+                                      {moduleLesson.Lesson?.lesson_title ||
+                                        "N/A"}
+                                    </h5>
+                                    {moduleLesson.description && (
+                                      <p className="text-sm text-gray-600 mt-1">
+                                        {moduleLesson.description}
+                                      </p>
+                                    )}
+                                    <div className="flex items-center gap-2 mt-2">
+                                      <span className="text-xs text-gray-500">
+                                        Thời lượng:{" "}
+                                        {moduleLesson.Lesson?.estimated_time ||
+                                          0}{" "}
+                                        phút
+                                      </span>
+                                      <span
+                                        className={`inline-flex px-2 py-0.5 text-xs font-semibold rounded-full ${
+                                          moduleLesson.status
+                                            ? "bg-green-100 text-green-800"
+                                            : "bg-gray-100 text-gray-800"
+                                        }`}
+                                      >
+                                        {moduleLesson.status
+                                          ? "Hoạt động"
+                                          : "Ẩn"}
+                                      </span>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <button
+                                    onClick={() =>
+                                      handleEditLesson(moduleLesson)
+                                    }
+                                    className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                    title="Chỉnh sửa"
+                                  >
+                                    <Edit className="h-4 w-4" />
+                                  </button>
+                                  <button
+                                    onClick={() =>
+                                      handleRemoveLesson(
+                                        moduleLesson.module_lesson_id,
+                                      )
+                                    }
+                                    className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                    title="Xóa"
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </button>
+                                </div>
+                              </div>
+                            ))}
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -402,6 +562,28 @@ const CourseDetail = () => {
           }
         }
       />
+
+      {showAddLessonModal && modules.length > 0 && modules[activeModule] && (
+        <AddModuleLessonModal
+          isOpen={showAddLessonModal}
+          onClose={() => setShowAddLessonModal(false)}
+          onSubmit={handleSubmitAddLesson}
+          moduleId={modules[activeModule].module_id}
+          existingLessonIds={moduleLessons.map((ml) => ml.lesson_id)}
+        />
+      )}
+
+      {showEditLessonModal && editingModuleLesson && (
+        <EditModuleLessonModal
+          isOpen={showEditLessonModal}
+          onClose={() => {
+            setShowEditLessonModal(false);
+            setEditingModuleLesson(null);
+          }}
+          onSubmit={handleSubmitEditLesson}
+          moduleLesson={editingModuleLesson}
+        />
+      )}
     </div>
   );
 };

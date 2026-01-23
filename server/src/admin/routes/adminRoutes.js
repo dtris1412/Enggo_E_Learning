@@ -138,6 +138,14 @@ import {
   getDocumentPhases,
 } from "../controllers/document_phaseController.js";
 
+// ===========Module Lesson Controllers===========
+import {
+  createModuleLesson,
+  updateModuleLesson,
+  deleteModuleLesson,
+  getModuleLessons,
+} from "../controllers/module_lessonController.js";
+
 const router = express.Router();
 
 const initAdminRoutes = (app) => {
@@ -597,6 +605,33 @@ const initAdminRoutes = (app) => {
     requireAdmin,
     deleteDocumentPhase,
   );
+
+  //===========Module Lesson Management Routes===========
+  router.get(
+    "/api/admin/modules/:module_id/module-lessons",
+    verifyToken,
+    requireAdmin,
+    getModuleLessons,
+  );
+  router.post(
+    "/api/admin/modules/:module_id/module-lessons",
+    verifyToken,
+    requireAdmin,
+    createModuleLesson,
+  );
+  router.put(
+    "/api/admin/module-lessons/:module_lesson_id",
+    verifyToken,
+    requireAdmin,
+    updateModuleLesson,
+  );
+  router.delete(
+    "/api/admin/module-lessons/:module_lesson_id",
+    verifyToken,
+    requireAdmin,
+    deleteModuleLesson,
+  );
+
   app.use("/", router);
 };
 

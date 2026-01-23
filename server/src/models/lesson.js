@@ -12,6 +12,9 @@ export default (sequelize, DataTypes) => {
       Lesson.hasMany(models.Lesson_Question, {
         foreignKey: "lesson_id",
       });
+      Lesson.hasMany(models.Module_Lesson, {
+        foreignKey: "lesson_id",
+      });
     }
   }
   Lesson.init(

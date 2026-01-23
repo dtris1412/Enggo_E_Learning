@@ -5,6 +5,7 @@ import { UserProvider } from "./admin/contexts/userContext";
 import { CertificateProvider } from "./admin/contexts/certificateContext";
 import { CourseProvider } from "./admin/contexts/courseContext";
 import { ModuleProvider } from "./admin/contexts/moduleContext";
+import { ModuleLessonProvider } from "./admin/contexts/moduleLessonContext.tsx";
 import { LessonProvider } from "./admin/contexts/lessonContext.tsx";
 import { LessonMediaProvider } from "./admin/contexts/lessonMediaContext.tsx";
 import { LessonQuestionProvider } from "./admin/contexts/lessonQuestionContext.tsx";
@@ -38,101 +39,103 @@ function App() {
         <CertificateProvider>
           <CourseProvider>
             <ModuleProvider>
-              <LessonProvider>
-                <LessonMediaProvider>
-                  <LessonQuestionProvider>
-                    <SkillProvider>
-                      <RoadmapProvider>
-                        <PhaseProvider>
-                          <PhaseCourseProvider>
-                            <DocumentProvider>
-                              <DocumentPhaseProvider>
-                                <ToastProvider>
-                                  <Router>
-                                    <Routes>
-                                      {/* Admin Routes - No Header/Footer */}
-                                      {AdminRoutes()}
+              <ModuleLessonProvider>
+                <LessonProvider>
+                  <LessonMediaProvider>
+                    <LessonQuestionProvider>
+                      <SkillProvider>
+                        <RoadmapProvider>
+                          <PhaseProvider>
+                            <PhaseCourseProvider>
+                              <DocumentProvider>
+                                <DocumentPhaseProvider>
+                                  <ToastProvider>
+                                    <Router>
+                                      <Routes>
+                                        {/* Admin Routes - No Header/Footer */}
+                                        {AdminRoutes()}
 
-                                      {/* Public & User Routes - With Header/Footer */}
-                                      <Route
-                                        path="*"
-                                        element={
-                                          <div className="min-h-screen bg-white text-gray-900 flex flex-col">
-                                            <Header />
-                                            <main className="flex-grow">
-                                              <Routes>
-                                                {/* Public Routes */}
-                                                <Route
-                                                  path="/"
-                                                  element={<Home />}
-                                                />
-                                                <Route
-                                                  path="/about"
-                                                  element={<About />}
-                                                />
-                                                <Route
-                                                  path="/courses"
-                                                  element={<Courses />}
-                                                />
-                                                <Route
-                                                  path="/resources"
-                                                  element={<Resources />}
-                                                />
-                                                <Route
-                                                  path="/blog"
-                                                  element={<Blog />}
-                                                />
-                                                <Route
-                                                  path="/tests"
-                                                  element={<OnlineTests />}
-                                                />
+                                        {/* Public & User Routes - With Header/Footer */}
+                                        <Route
+                                          path="*"
+                                          element={
+                                            <div className="min-h-screen bg-white text-gray-900 flex flex-col">
+                                              <Header />
+                                              <main className="flex-grow">
+                                                <Routes>
+                                                  {/* Public Routes */}
+                                                  <Route
+                                                    path="/"
+                                                    element={<Home />}
+                                                  />
+                                                  <Route
+                                                    path="/about"
+                                                    element={<About />}
+                                                  />
+                                                  <Route
+                                                    path="/courses"
+                                                    element={<Courses />}
+                                                  />
+                                                  <Route
+                                                    path="/resources"
+                                                    element={<Resources />}
+                                                  />
+                                                  <Route
+                                                    path="/blog"
+                                                    element={<Blog />}
+                                                  />
+                                                  <Route
+                                                    path="/tests"
+                                                    element={<OnlineTests />}
+                                                  />
 
-                                                {/* Auth Routes */}
-                                                <Route
-                                                  path="/login"
-                                                  element={<Login />}
-                                                />
-                                                <Route
-                                                  path="/register"
-                                                  element={<Register />}
-                                                />
-                                                <Route
-                                                  path="/forgot-password"
-                                                  element={<ForgotPassword />}
-                                                />
-                                                <Route
-                                                  path="/verify-otp"
-                                                  element={<VerifyOTP />}
-                                                />
-                                                <Route
-                                                  path="/reset-password"
-                                                  element={<ResetPassword />}
-                                                />
-                                                <Route
-                                                  path="/auth/callback"
-                                                  element={<AuthCallback />}
-                                                />
+                                                  {/* Auth Routes */}
+                                                  <Route
+                                                    path="/login"
+                                                    element={<Login />}
+                                                  />
+                                                  <Route
+                                                    path="/register"
+                                                    element={<Register />}
+                                                  />
+                                                  <Route
+                                                    path="/forgot-password"
+                                                    element={<ForgotPassword />}
+                                                  />
+                                                  <Route
+                                                    path="/verify-otp"
+                                                    element={<VerifyOTP />}
+                                                  />
+                                                  <Route
+                                                    path="/reset-password"
+                                                    element={<ResetPassword />}
+                                                  />
+                                                  <Route
+                                                    path="/auth/callback"
+                                                    element={<AuthCallback />}
+                                                  />
 
-                                                {/* User Routes - Protected */}
-                                                {UserRoutes()}
-                                              </Routes>
-                                            </main>
-                                            <Footer />
-                                          </div>
-                                        }
-                                      />
-                                    </Routes>
-                                  </Router>
-                                </ToastProvider>
-                              </DocumentPhaseProvider>
-                            </DocumentProvider>
-                          </PhaseCourseProvider>
-                        </PhaseProvider>
-                      </RoadmapProvider>
-                    </SkillProvider>
-                  </LessonQuestionProvider>
-                </LessonMediaProvider>
-              </LessonProvider>
+                                                  {/* User Routes - Protected */}
+                                                  {UserRoutes()}
+                                                </Routes>
+                                              </main>
+                                              <Footer />
+                                            </div>
+                                          }
+                                        />
+                                      </Routes>
+                                    </Router>
+                                  </ToastProvider>
+                                </DocumentPhaseProvider>
+                              </DocumentProvider>
+                            </PhaseCourseProvider>
+                          </PhaseProvider>
+                        </RoadmapProvider>
+                      </SkillProvider>
+                    </LessonQuestionProvider>
+                  </LessonMediaProvider>
+                </LessonProvider>
+              </ModuleLessonProvider>
             </ModuleProvider>
           </CourseProvider>
         </CertificateProvider>
