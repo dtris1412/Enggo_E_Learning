@@ -11,6 +11,8 @@ import {
   DollarSign,
   BookOpen,
   Trash2,
+  FileText,
+  Download,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
@@ -18,10 +20,13 @@ import { useRoadmap } from "../contexts/roadmapContext.tsx";
 import { usePhase } from "../contexts/phaseContext.tsx";
 import { useCertificate } from "../contexts/certificateContext.tsx";
 import { usePhaseCourse } from "../contexts/phaseCourseContext.tsx";
+import { useDocumentPhase } from "../contexts/documentPhaseContext.tsx";
 import {
   AddPhaseModal,
   EditPhaseModal,
   AddPhaseCourseModal,
+  AddDocumentPhaseModal,
+  EditDocumentPhaseModal,
 } from "../components/RoadmapManagement";
 
 const RoadmapDetail = () => {
@@ -35,6 +40,13 @@ const RoadmapDetail = () => {
     createPhaseCourse,
     removeCourseFromPhase,
   } = usePhaseCourse();
+  const {
+    documentPhases,
+    fetchDocumentPhasesByPhaseId,
+    addDocumentToPhase,
+    updateDocumentPhase,
+    removeDocumentFromPhase,
+  } = useDocumentPhase();
 
   const [roadmap, setRoadmap] = useState<any>(null);
   const [activePhase, setActivePhase] = useState(0);
@@ -43,6 +55,9 @@ const RoadmapDetail = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedPhase, setSelectedPhase] = useState<any>(null);
   const [showAddCourseModal, setShowAddCourseModal] = useState(false);
+  const [showAddDocumentModal, setShowAddDocumentModal] = useState(false);
+  const [showEditDocumentModal, setShowEditDocumentModal] = useState(false);
+  const [selectedDocumentPhase, setSelectedDocumentPhase] = useState<any>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -57,14 +72,17 @@ const RoadmapDetail = () => {
       }
     };
     fetchData();
-  }, [roadmap_id, getRoadmapById, getPhasesByRoadmapId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [roadmap_id]);
 
-  // Fetch courses when active phase changes
+  // Fetch courses and documents when active phase changes
   useEffect(() => {
     if (phases.length > 0 && phases[activePhase]) {
       getPhaseCoursesByPhaseId(phases[activePhase].phase_id);
+      fetchDocumentPhasesByPhaseId(phases[activePhase].phase_id);
     }
-  }, [activePhase, phases, getPhaseCoursesByPhaseId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activePhase, phases.length]);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("vi-VN");
@@ -82,6 +100,24 @@ const RoadmapDetail = () => {
   const getCertificateName = (certificate_id: number) => {
     const cert = certificates.find((c) => c.certificate_id === certificate_id);
     return cert ? cert.certificate_name : "N/A";
+  };
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes === 0) return "0 Bytes";
+    const k = 1024;
+    const sizes = ["Bytes", "KB", "MB", "GB"];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + " " + sizes[i];
+  };
+
+  const getDocumentTypeLabel = (type: string) => {
+    const types: { [key: string]: string } = {
+      reference: "Tài liệu tham khảo",
+      guide: "Hướng dẫn",
+      exercise: "Bài tập",
+      other: "Khác",
+    };
+    return types[type] || type;
   };
 
   const handleAddPhase = async (data: {
@@ -149,6 +185,48 @@ const RoadmapDetail = () => {
     ) {
       await removeCourseFromPhase(phase_course_id);
     }
+  };
+
+  const handleAddDocument = async (data: {
+    document_id: number;
+    order_index: number;
+  }) => {
+    if (phases[activePhase]) {
+      const success = await addDocumentToPhase(
+        phases[activePhase].phase_id,
+        data.document_id,
+        data.order_index,
+      );
+      if (success) {
+        setShowAddDocumentModal(false);
+      }
+    }
+  };
+
+  const handleEditDocument = async (orderIndex: number) => {
+    if (selectedDocumentPhase) {
+      const success = await updateDocumentPhase(
+        selectedDocumentPhase.document_phase_id,
+        orderIndex,
+      );
+      if (success) {
+        setShowEditDocumentModal(false);
+        setSelectedDocumentPhase(null);
+      }
+    }
+  };
+
+  const handleRemoveDocument = async (document_phase_id: number) => {
+    if (
+      window.confirm("Bạn có chắc chắn muốn xóa tài liệu này khỏi giai đoạn?")
+    ) {
+      await removeDocumentFromPhase(document_phase_id);
+    }
+  };
+
+  const openEditDocumentModal = (documentPhase: any) => {
+    setSelectedDocumentPhase(documentPhase);
+    setShowEditDocumentModal(true);
   };
 
   const openEditModal = (phase: any) => {
@@ -474,6 +552,107 @@ const RoadmapDetail = () => {
                       </div>
                     )}
                   </div>
+
+                  {/* Documents in Phase */}
+                  <div>
+                    <div className="flex items-center justify-between mb-4">
+                      <h4 className="text-lg font-medium text-gray-900">
+                        Tài liệu hỗ trợ ({documentPhases.length})
+                      </h4>
+                      <button
+                        onClick={() => setShowAddDocumentModal(true)}
+                        className="flex items-center px-3 py-2 text-sm bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                      >
+                        <Plus className="h-4 w-4 mr-1" />
+                        Thêm tài liệu
+                      </button>
+                    </div>
+
+                    {documentPhases.length === 0 ? (
+                      <div className="text-center py-8 bg-gray-50 rounded-lg">
+                        <FileText className="h-12 w-12 text-gray-400 mx-auto mb-2" />
+                        <p className="text-gray-500">
+                          Chưa có tài liệu hỗ trợ nào trong giai đoạn này
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {documentPhases
+                          .sort((a, b) => a.order_index - b.order_index)
+                          .map((docPhase) => (
+                            <div
+                              key={docPhase.document_phase_id}
+                              className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow duration-200"
+                            >
+                              <div className="flex items-start justify-between">
+                                <div className="flex-1">
+                                  <div className="flex items-center gap-2 mb-2">
+                                    <FileText className="h-5 w-5 text-purple-600" />
+                                    <span className="text-xs font-medium text-gray-500">
+                                      Thứ tự: {docPhase.order_index}
+                                    </span>
+                                  </div>
+                                  <h5 className="font-medium text-gray-900">
+                                    {docPhase.Document?.document_name}
+                                  </h5>
+                                  {docPhase.Document?.document_description && (
+                                    <p className="text-sm text-gray-600 mt-1 line-clamp-2">
+                                      {docPhase.Document.document_description}
+                                    </p>
+                                  )}
+                                  <div className="flex items-center gap-2 mt-2">
+                                    <span className="text-xs px-2 py-1 bg-purple-100 text-purple-700 rounded">
+                                      {getDocumentTypeLabel(
+                                        docPhase.Document?.document_type || "",
+                                      )}
+                                    </span>
+                                    <span className="text-xs px-2 py-1 bg-gray-100 text-gray-700 rounded uppercase">
+                                      {docPhase.Document?.file_type}
+                                    </span>
+                                    <span className="text-xs text-gray-500">
+                                      {formatFileSize(
+                                        docPhase.Document?.document_size || 0,
+                                      )}
+                                    </span>
+                                  </div>
+                                </div>
+                                <div className="flex flex-col gap-2 ml-2">
+                                  <a
+                                    href={docPhase.Document?.document_url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-blue-600 hover:text-blue-800"
+                                    title="Tải xuống"
+                                  >
+                                    <Download className="h-5 w-5" />
+                                  </a>
+                                  <button
+                                    onClick={() =>
+                                      openEditDocumentModal(docPhase)
+                                    }
+                                    className="text-gray-600 hover:text-gray-800"
+                                    title="Chỉnh sửa"
+                                  >
+                                    <Edit className="h-5 w-5" />
+                                  </button>
+                                  <button
+                                    onClick={() =>
+                                      handleRemoveDocument(
+                                        docPhase.document_phase_id,
+                                      )
+                                    }
+                                    className="text-red-600 hover:text-red-800"
+                                    title="Xóa"
+                                  >
+                                    <Trash2 className="h-5 w-5" />
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
             </>
@@ -505,6 +684,28 @@ const RoadmapDetail = () => {
           onClose={() => setShowAddCourseModal(false)}
           onSubmit={handleAddCourse}
           existingCourseIds={phaseCourses.map((pc) => pc.course_id)}
+        />
+      )}
+
+      {showAddDocumentModal && phases[activePhase] && (
+        <AddDocumentPhaseModal
+          onClose={() => setShowAddDocumentModal(false)}
+          onSubmit={handleAddDocument}
+          existingDocumentIds={documentPhases.map((dp) => dp.document_id)}
+        />
+      )}
+
+      {showEditDocumentModal && selectedDocumentPhase && (
+        <EditDocumentPhaseModal
+          onClose={() => {
+            setShowEditDocumentModal(false);
+            setSelectedDocumentPhase(null);
+          }}
+          onSubmit={handleEditDocument}
+          currentOrderIndex={selectedDocumentPhase.order_index}
+          documentName={
+            selectedDocumentPhase.Document?.document_name || "Tài liệu"
+          }
         />
       )}
     </div>

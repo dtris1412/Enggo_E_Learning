@@ -2,7 +2,11 @@ import { Model } from "sequelize";
 
 export default (sequelize, DataTypes) => {
   class Document extends Model {
-    static associate(models) {}
+    static associate(models) {
+      Document.hasMany(models.Document_Phase, {
+        foreignKey: "document_id",
+      });
+    }
   }
   Document.init(
     {

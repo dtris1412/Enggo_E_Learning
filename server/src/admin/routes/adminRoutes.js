@@ -130,6 +130,14 @@ import {
   deleteDocument,
 } from "../controllers/documentController.js";
 
+// ===========Document Phase Controllers===========
+import {
+  createDocumentPhase,
+  updateDocumentPhase,
+  deleteDocumentPhase,
+  getDocumentPhases,
+} from "../controllers/document_phaseController.js";
+
 const router = express.Router();
 
 const initAdminRoutes = (app) => {
@@ -564,6 +572,31 @@ const initAdminRoutes = (app) => {
     deleteDocument,
   );
 
+  //===========Document Phase Management Routes===========
+  router.get(
+    "/api/admin/phases/:phase_id/document-phases",
+    verifyToken,
+    requireAdmin,
+    getDocumentPhases,
+  );
+  router.post(
+    "/api/admin/phases/:phase_id/document-phases",
+    verifyToken,
+    requireAdmin,
+    createDocumentPhase,
+  );
+  router.put(
+    "/api/admin/document-phases/:document_phase_id",
+    verifyToken,
+    requireAdmin,
+    updateDocumentPhase,
+  );
+  router.delete(
+    "/api/admin/document-phases/:document_phase_id",
+    verifyToken,
+    requireAdmin,
+    deleteDocumentPhase,
+  );
   app.use("/", router);
 };
 
