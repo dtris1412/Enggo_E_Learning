@@ -167,6 +167,48 @@ class UploadService {
     };
   }
 
+  // Upload document (docx, pdf, audio)
+  async uploadDocument(file) {
+    let resourceType = "raw"; // Default for documents
+    let folder = "documents";
+
+    // Determine resource type and folder based on file type
+    if (file.mimetype.startsWith("audio/")) {
+      resourceType = "video"; // Cloudinary uses 'video' for audio files
+      folder = "documents/audios";
+    } else if (file.mimetype === "application/pdf") {
+      resourceType = "raw";
+      folder = "documents/pdfs";
+    } else if (
+      file.mimetype ===
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
+      file.mimetype === "application/msword"
+    ) {
+      resourceType = "raw";
+      folder = "documents/docx";
+    }
+
+    const result = await this.uploadToCloudinary(
+      file.buffer,
+      folder,
+      resourceType,
+      {
+        // Keep original filename
+        use_filename: true,
+        unique_filename: true,
+      },
+    );
+
+    return {
+      url: result.secure_url,
+      publicId: result.public_id,
+      format: result.format || file.mimetype.split("/")[1] || "unknown",
+      bytes: result.bytes,
+      resourceType: result.resource_type,
+      originalFilename: file.originalname,
+    };
+  }
+
   // Xóa file
   async deleteFile(publicId, resourceType = "image") {
     try {

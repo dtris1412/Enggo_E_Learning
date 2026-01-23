@@ -120,6 +120,16 @@ import {
   getPhaseCoursesByPhaseId,
   removeCourseFromPhase,
 } from "../controllers/phase_courseController.js";
+
+// ===========Document Controllers===========
+import {
+  createDocument,
+  updateDocument,
+  getDocumentById,
+  getDocumentsPaginated,
+  deleteDocument,
+} from "../controllers/documentController.js";
+
 const router = express.Router();
 
 const initAdminRoutes = (app) => {
@@ -521,6 +531,39 @@ const initAdminRoutes = (app) => {
     requireAdmin,
     removeCourseFromPhase,
   );
+
+  //===========Document Management Routes===========
+  router.get(
+    "/api/admin/documents/paginated",
+    verifyToken,
+    requireAdmin,
+    getDocumentsPaginated,
+  );
+  router.post(
+    "/api/admin/documents",
+    verifyToken,
+    requireAdmin,
+    createDocument,
+  );
+  router.get(
+    "/api/admin/documents/:document_id",
+    verifyToken,
+    requireAdmin,
+    getDocumentById,
+  );
+  router.put(
+    "/api/admin/documents/:document_id",
+    verifyToken,
+    requireAdmin,
+    updateDocument,
+  );
+  router.delete(
+    "/api/admin/documents/:document_id",
+    verifyToken,
+    requireAdmin,
+    deleteDocument,
+  );
+
   app.use("/", router);
 };
 

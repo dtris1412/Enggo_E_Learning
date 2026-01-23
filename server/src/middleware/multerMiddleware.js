@@ -8,8 +8,9 @@ const fileFilter = (req, file, cb) => {
   const allowedMimes = {
     image: ["image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp"],
     video: ["video/mp4", "video/mpeg", "video/quicktime", "video/x-msvideo"],
-    audio: ["audio/mpeg", "audio/mp3", "audio/wav", "audio/ogg"],
-    text: [
+    audio: ["audio/mpeg", "audio/mp3", "audio/wav", "audio/ogg", "audio/webm"],
+    document: [
+      "application/pdf", // .pdf
       "text/plain", // .txt
       "application/msword", // .doc
       "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // .docx

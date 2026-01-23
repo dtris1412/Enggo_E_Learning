@@ -169,6 +169,53 @@ class UploadController {
     }
   }
 
+  // Upload document (docx, pdf, audio)
+  async uploadDocument(req, res) {
+    try {
+      if (!req.file) {
+        return res.status(400).json({
+          success: false,
+          message: "No document file uploaded",
+        });
+      }
+
+      // Validate file type
+      const allowedMimeTypes = [
+        "application/pdf",
+        "application/msword",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "audio/mpeg",
+        "audio/mp3",
+        "audio/wav",
+        "audio/ogg",
+        "audio/webm",
+      ];
+
+      if (!allowedMimeTypes.includes(req.file.mimetype)) {
+        return res.status(400).json({
+          success: false,
+          message:
+            "Invalid file type. Only PDF, DOCX, DOC, and audio files are allowed.",
+        });
+      }
+
+      const result = await uploadService.uploadDocument(req.file);
+
+      return res.status(200).json({
+        success: true,
+        message: "Document uploaded successfully",
+        data: result,
+      });
+    } catch (error) {
+      console.error("Upload document error:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Upload failed",
+        error: error.message,
+      });
+    }
+  }
+
   // Xóa file
   async deleteFile(req, res) {
     try {

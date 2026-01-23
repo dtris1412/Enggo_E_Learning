@@ -14,6 +14,7 @@ import {
   ChevronDown,
   ChevronRight,
   Target,
+  FileText,
 } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "../../shared/contexts/authContext";
@@ -82,6 +83,11 @@ const AdminLayout = () => {
       name: "Quản lý kỹ năng",
       path: "/admin/skills",
       icon: Target,
+    },
+    {
+      name: "Quản lý tài liệu",
+      path: "/admin/documents",
+      icon: FileText,
     },
     {
       name: "Quản lý lộ trình",

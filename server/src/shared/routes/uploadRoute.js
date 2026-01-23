@@ -72,6 +72,16 @@ router.post(
   uploadController.uploadExamFile,
 );
 
+// Upload document (docx, pdf, audio) (chỉ admin)
+router.post(
+  "/document",
+  verifyToken,
+  requireAdmin,
+  upload.single("document"),
+  handleMulterError,
+  uploadController.uploadDocument,
+);
+
 // Xóa file (chỉ admin)
 router.delete(
   "/:publicId",

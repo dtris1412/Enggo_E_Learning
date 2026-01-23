@@ -18,6 +18,7 @@ import CertificateManagement from "../pages/CertificateManagement";
 import RoadmapManagement from "../pages/RoadmapManagement";
 import RoadmapDetail from "../pages/RoadmapDetail";
 import SkillManagement from "../pages/SkillManagement";
+import DocumentManagement from "../pages/DocumentManagement";
 
 export const AdminRoutes = () => {
   return (
@@ -64,6 +65,9 @@ export const AdminRoutes = () => {
 
         {/* Skill Management */}
         <Route path="skills" element={<SkillManagement />} />
+
+        {/* Document Management */}
+        <Route path="documents" element={<DocumentManagement />} />
       </Route>
     </>
   );
