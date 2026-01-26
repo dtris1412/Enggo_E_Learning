@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { X, Search } from "lucide-react";
 import { useCourse } from "../../contexts/courseContext";
+import { formatCurrency } from "../../../utils/formatters";
 
 interface Course {
   course_id: number;
@@ -164,7 +165,7 @@ const AddPhaseCourseModal: React.FC<AddPhaseCourseModalProps> = ({
                             </span>
                             <span>{course.estimate_duration}</span>
                             <span className="font-medium text-blue-600">
-                              {course.price.toLocaleString("vi-VN")} VNĐ
+                              {formatCurrency(course.price)}
                             </span>
                           </div>
                         </div>

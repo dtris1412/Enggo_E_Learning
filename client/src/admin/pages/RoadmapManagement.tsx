@@ -17,6 +17,7 @@ import { useRoadmap } from "../contexts/roadmapContext";
 import { useCertificate } from "../contexts/certificateContext";
 import AddRoadmapModal from "../components/RoadmapManagement/AddRoadmapModal.tsx";
 import EditRoadmapModal from "../components/RoadmapManagement/EditRoadmapModal.tsx";
+import { formatCurrency } from "../../utils/formatters";
 
 const RoadmapManagement = () => {
   const navigate = useNavigate();
@@ -248,15 +249,26 @@ const RoadmapManagement = () => {
                     {getLevelLabel(roadmap.roadmap_level)}
                   </span>
                 </div>
-                <div className="text-sm text-gray-600">
-                  {roadmap.discount_percent > 0 && (
-                    <span className="text-green-600 font-medium mr-2">
-                      -{roadmap.discount_percent}%
+                <div className="text-sm">
+                  {roadmap.discount_percent > 0 ? (
+                    <div className="flex flex-col items-end">
+                      <span className="text-gray-400 line-through text-xs">
+                        {formatCurrency(roadmap.calculated_price)}
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-green-600 font-medium text-xs">
+                          -{roadmap.discount_percent}%
+                        </span>
+                        <span className="font-semibold text-gray-900">
+                          {formatCurrency(roadmap.final_price)}
+                        </span>
+                      </div>
+                    </div>
+                  ) : (
+                    <span className="font-semibold text-gray-900">
+                      {formatCurrency(roadmap.calculated_price)}
                     </span>
                   )}
-                  <span className="font-semibold text-gray-900">
-                    {roadmap.roadmap_price?.toLocaleString("vi-VN")} VNĐ
-                  </span>
                 </div>
               </div>
 

@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
+import { formatCurrency } from "../../utils/formatters";
 import { useRoadmap } from "../contexts/roadmapContext.tsx";
 import { usePhase } from "../contexts/phaseContext.tsx";
 import { useCertificate } from "../contexts/certificateContext.tsx";
@@ -330,9 +331,25 @@ const RoadmapDetail = () => {
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Giá</p>
-              <p className="text-xl font-bold text-gray-900">
-                {roadmap.roadmap_price?.toLocaleString("vi-VN")} VNĐ
-              </p>
+              {roadmap.discount_percent > 0 ? (
+                <div className="flex flex-col gap-1">
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm text-gray-400 line-through">
+                      {formatCurrency(roadmap.calculated_price)}
+                    </p>
+                    <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded">
+                      -{roadmap.discount_percent}%
+                    </span>
+                  </div>
+                  <p className="text-xl font-bold text-gray-900">
+                    {formatCurrency(roadmap.final_price)}
+                  </p>
+                </div>
+              ) : (
+                <p className="text-xl font-bold text-gray-900">
+                  {formatCurrency(roadmap.calculated_price)}
+                </p>
+              )}
             </div>
           </div>
         </div>
@@ -529,10 +546,7 @@ const RoadmapDetail = () => {
                                     {phaseCourse.Course?.estimate_duration}
                                   </span>
                                   <span className="font-medium text-blue-600">
-                                    {phaseCourse.Course?.price.toLocaleString(
-                                      "vi-VN",
-                                    )}{" "}
-                                    VNĐ
+                                    {formatCurrency(phaseCourse.Course?.price)}
                                   </span>
                                 </div>
                               </div>

@@ -1,5 +1,42 @@
 import db from "../../models/index.js";
 
+// Hàm tính tổng giá của tất cả courses trong roadmap
+const calculateRoadmapPrice = async (roadmap_id) => {
+  try {
+    // Lấy tất cả phases của roadmap
+    const phases = await db.Phase.findAll({
+      where: { roadmap_id },
+      include: [
+        {
+          model: db.Phase_Course,
+          include: [
+            {
+              model: db.Course,
+              attributes: ["course_id", "price", "is_free"],
+            },
+          ],
+        },
+      ],
+    });
+
+    let totalPrice = 0;
+
+    // Duyệt qua tất cả phases và tính tổng giá courses
+    phases.forEach((phase) => {
+      phase.Phase_Courses?.forEach((phaseCourse) => {
+        if (phaseCourse.Course && !phaseCourse.Course.is_free) {
+          totalPrice += parseFloat(phaseCourse.Course.price || 0);
+        }
+      });
+    });
+
+    return totalPrice;
+  } catch (error) {
+    console.error("Error calculating roadmap price:", error);
+    return 0;
+  }
+};
+
 const createRoadmap = async (
   roadmap_title,
   roadmap_description,
@@ -100,13 +137,48 @@ const getRoadmapsPaginated = async (
     whereConditions.roadmap_status = roadmap_status;
   }
   const { count, rows } = await db.Roadmap.findAndCountAll({
+    include: [
+      {
+        model: db.Phase,
+        include: [
+          {
+            model: db.Phase_Course,
+            include: [
+              {
+                model: db.Course,
+                attributes: ["course_id", "price", "is_free"],
+              },
+            ],
+          },
+        ],
+      },
+    ],
     where: whereConditions,
     offset,
     limit: Number(limit),
   });
+
+  // Tính giá cho từng roadmap
+  const roadmapsWithPrice = await Promise.all(
+    rows.map(async (roadmap) => {
+      const calculatedPrice = await calculateRoadmapPrice(roadmap.roadmap_id);
+      const discountAmount = roadmap.discount_percent
+        ? (calculatedPrice * roadmap.discount_percent) / 100
+        : 0;
+      const finalPrice = calculatedPrice - discountAmount;
+
+      return {
+        ...roadmap.toJSON(),
+        calculated_price: calculatedPrice,
+        discount_amount: discountAmount,
+        final_price: finalPrice,
+      };
+    }),
+  );
+
   return {
     success: true,
-    data: rows,
+    data: roadmapsWithPrice,
     pagination: {
       total: count,
       page,
@@ -119,13 +191,47 @@ const getRoadmapById = async (roadmap_id) => {
   if (!roadmap_id) {
     return { success: false, message: "Roadmap ID is required." };
   }
-  const roadmap = await db.Roadmap.findByPk(roadmap_id);
+  const roadmap = await db.Roadmap.findByPk(roadmap_id, {
+    include: [
+      {
+        model: db.Phase,
+        include: [
+          {
+            model: db.Phase_Course,
+            include: [
+              {
+                model: db.Course,
+                attributes: ["course_id", "course_title", "price", "is_free"],
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  });
   if (!roadmap) {
     return { success: false, message: "Roadmap not found." };
   }
-  return { success: true, data: roadmap };
+
+  // Tính giá động
+  const calculatedPrice = await calculateRoadmapPrice(roadmap_id);
+  const discountAmount = roadmap.discount_percent
+    ? (calculatedPrice * roadmap.discount_percent) / 100
+    : 0;
+  const finalPrice = calculatedPrice - discountAmount;
+
+  return {
+    success: true,
+    data: {
+      ...roadmap.toJSON(),
+      calculated_price: calculatedPrice,
+      discount_amount: discountAmount,
+      final_price: finalPrice,
+    },
+  };
 };
 
+// calculateRoadmapPrice,
 const lockRoadmap = async (roadmap_id) => {
   if (!roadmap_id) {
     return { success: false, message: "Roadmap ID is required." };

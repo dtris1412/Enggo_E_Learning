@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
+import { formatCurrency } from "../../utils/formatters";
 import { useCourse } from "../contexts/courseContext";
 import { useModule } from "../contexts/moduleContext";
 import { useModuleLesson } from "../contexts/moduleLessonContext";
@@ -508,9 +509,7 @@ const CourseDetail = () => {
             <div className="flex justify-between">
               <span className="text-gray-600">Giá:</span>
               <span className="font-semibold text-gray-900">
-                {course.is_free
-                  ? "Miễn phí"
-                  : `${course.price.toLocaleString("vi-VN")} VNĐ`}
+                {course.is_free ? "Miễn phí" : formatCurrency(course.price)}
               </span>
             </div>
             <div className="flex justify-between">
