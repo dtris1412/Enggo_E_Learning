@@ -6,6 +6,7 @@ import {
   requireUser,
   verifyToken,
 } from "../../middleware/authMiddleware.js";
+import { upload } from "../../middleware/multerMiddleware.js";
 // ===========User Controllers===========
 import {
   getAllUsers,
@@ -145,6 +146,19 @@ import {
   deleteModuleLesson,
   getModuleLessons,
 } from "../controllers/module_lessonController.js";
+
+// ===========Blog Controllers===========
+import {
+  getBlogsPaginated,
+  getBlogById,
+  getBlogBySlug,
+  createBlog,
+  updateBlog,
+  updateBlogStatus,
+  deleteBlog,
+  getLatestBlogs,
+  getPopularBlogs,
+} from "../controllers/blogController.js";
 
 const router = express.Router();
 
@@ -631,6 +645,57 @@ const initAdminRoutes = (app) => {
     requireAdmin,
     deleteModuleLesson,
   );
+
+  //===========Blog Management Routes===========
+  router.get(
+    "/api/admin/blogs/paginated",
+    verifyToken,
+    requireAdmin,
+    getBlogsPaginated,
+  );
+  router.get(
+    "/api/admin/blogs/:blog_id",
+    verifyToken,
+    requireAdmin,
+    getBlogById,
+  );
+  router.get(
+    "/api/admin/blogs/slug/:slug",
+    verifyToken,
+    requireAdmin,
+    getBlogBySlug,
+  );
+  router.post(
+    "/api/admin/blogs",
+    verifyToken,
+    requireAdmin,
+    upload.single("file"),
+    createBlog,
+  );
+  router.put(
+    "/api/admin/blogs/:blog_id",
+    verifyToken,
+    requireAdmin,
+    upload.single("file"),
+    updateBlog,
+  );
+  router.patch(
+    "/api/admin/blogs/:blog_id/status",
+    verifyToken,
+    requireAdmin,
+    updateBlogStatus,
+  );
+  router.delete(
+    "/api/admin/blogs/:blog_id",
+    verifyToken,
+    requireAdmin,
+    deleteBlog,
+  );
+
+  // Public Blog Routes (không cần authentication)
+  router.get("/api/blogs/latest", getLatestBlogs);
+  router.get("/api/blogs/popular", getPopularBlogs);
+  router.get("/api/blogs/slug/:slug", getBlogBySlug); // Public access
 
   app.use("/", router);
 };

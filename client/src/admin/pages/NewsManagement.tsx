@@ -1,96 +1,75 @@
 import {
   Search,
   Plus,
-  CreditCard as Edit,
+  Edit,
   Trash2,
   Eye,
   Calendar,
   User,
   Tag,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useBlog } from "../contexts/blogContext";
+import AddBlogModal from "../components/BlogManagement/AddBlogModal";
+import EditBlogModal from "../components/BlogManagement/EditBlogModal";
+import { useNavigate } from "react-router-dom";
 
 const NewsManagement = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("all");
+  const navigate = useNavigate();
+  const {
+    blogs,
+    pagination,
+    loading,
+    fetchBlogsPaginated,
+    deleteBlog,
+    updateBlogStatus,
+  } = useBlog();
 
-  const news = [
-    {
-      id: 1,
-      title: "10 Mẹo học từ vựng tiếng Anh hiệu quả nhất",
-      excerpt:
-        "Khám phá những phương pháp học từ vựng được chứng minh khoa học, giúp bạn ghi nhớ lâu dài và ứng dụng linh hoạt trong giao tiếp.",
-      category: "Mẹo học tập",
-      author: "Nguyễn Minh Hạnh",
-      status: "published",
-      publishDate: "2024-01-15",
-      views: 2500,
-      likes: 180,
-      comments: 45,
-      image:
-        "https://images.pexels.com/photos/267669/pexels-photo-267669.jpeg?auto=compress&cs=tinysrgb&w=300",
-    },
-    {
-      id: 2,
-      title: "Chiến lược làm bài thi IELTS Reading đạt điểm cao",
-      excerpt:
-        "Hướng dẫn chi tiết các kỹ thuật đọc hiểu và quản lý thời gian trong phần Reading của kỳ thi IELTS.",
-      category: "IELTS",
-      author: "Ms. Sarah Johnson",
-      status: "published",
-      publishDate: "2024-01-12",
-      views: 1800,
-      likes: 120,
-      comments: 32,
-      image:
-        "https://images.pexels.com/photos/1181242/pexels-photo-1181242.jpeg?auto=compress&cs=tinysrgb&w=300",
-    },
-    {
-      id: 3,
-      title: "Cách cải thiện phát âm tiếng Anh như người bản ngữ",
-      excerpt:
-        "Những bài tập và kỹ thuật giúp bạn có phát âm chuẩn, tự tin giao tiếp trong mọi tình huống.",
-      category: "Phát âm",
-      author: "Mr. James Wilson",
-      status: "draft",
-      publishDate: "2024-01-10",
-      views: 0,
-      likes: 0,
-      comments: 0,
-      image:
-        "https://images.pexels.com/photos/1516440/pexels-photo-1516440.jpeg?auto=compress&cs=tinysrgb&w=300",
-    },
-    {
-      id: 4,
-      title: "Ngữ pháp tiếng Anh: Thì hiện tại hoàn thành",
-      excerpt:
-        "Giải thích chi tiết và bài tập thực hành về thì hiện tại hoàn thành - một trong những thì khó nhất.",
-      category: "Ngữ pháp",
-      author: "Trần Thùy Linh",
-      status: "published",
-      publishDate: "2024-01-08",
-      views: 1200,
-      likes: 95,
-      comments: 28,
-      image:
-        "https://images.pexels.com/photos/159711/books-bookstore-book-reading-159711.jpeg?auto=compress&cs=tinysrgb&w=300",
-    },
-    {
-      id: 5,
-      title: "TOEIC Listening: Bí quyết đạt điểm tối đa",
-      excerpt:
-        "Phân tích từng part trong TOEIC Listening và chia sẻ những mẹo làm bài hiệu quả nhất.",
-      category: "TOEIC",
-      author: "Lê Văn Nam",
-      status: "scheduled",
-      publishDate: "2024-01-20",
-      views: 0,
-      likes: 0,
-      comments: 0,
-      image:
-        "https://images.pexels.com/photos/256455/pexels-photo-256455.jpeg?auto=compress&cs=tinysrgb&w=300",
-    },
-  ];
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedBlogId, setSelectedBlogId] = useState<number | null>(null);
+
+  useEffect(() => {
+    loadBlogs();
+  }, [currentPage, searchTerm, selectedCategory, selectedStatus]);
+
+  const loadBlogs = () => {
+    fetchBlogsPaginated({
+      page: currentPage,
+      limit: 10,
+      search: searchTerm,
+      category: selectedCategory,
+      status: selectedStatus,
+      sortBy: "created_at",
+      order: "DESC",
+    });
+  };
+
+  const handleDelete = async (blog_id: number) => {
+    if (window.confirm("Bạn có chắc chắn muốn xóa bài viết này?")) {
+      const success = await deleteBlog(blog_id);
+      if (success) {
+        loadBlogs();
+      }
+    }
+  };
+
+  const handleEdit = (blog_id: number) => {
+    setSelectedBlogId(blog_id);
+    setIsEditModalOpen(true);
+  };
+
+  const handleViewDetail = (slug: string) => {
+    navigate(`/admin/blogs/${slug}`);
+  };
+
+  const categories = ["Mẹo học tập", "TOEIC", "IELTS", "Ngữ pháp", "Từ vựng"];
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -98,25 +77,29 @@ const NewsManagement = () => {
         return "bg-green-100 text-green-800";
       case "draft":
         return "bg-yellow-100 text-yellow-800";
-      case "scheduled":
-        return "bg-blue-100 text-blue-800";
-      case "archived":
+      case "hidden":
         return "bg-red-100 text-red-800";
       default:
         return "bg-gray-100 text-gray-800";
     }
   };
 
-  const filteredNews = news.filter((article) => {
-    const matchesSearch =
-      article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      article.excerpt.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory =
-      selectedCategory === "all" || article.category === selectedCategory;
-    return matchesSearch && matchesCategory;
-  });
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case "published":
+        return "Đã xuất bản";
+      case "draft":
+        return "Bản nháp";
+      case "hidden":
+        return "Ẩn";
+      default:
+        return status;
+    }
+  };
 
-  const categories = ["Mẹo học tập", "IELTS", "TOEIC", "Ngữ pháp", "Phát âm"];
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString("vi-VN");
+  };
 
   return (
     <div className="space-y-6">
@@ -128,7 +111,10 @@ const NewsManagement = () => {
             Tạo và quản lý nội dung blog, tin tức giáo dục
           </p>
         </div>
-        <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center">
+        <button
+          onClick={() => setIsAddModalOpen(true)}
+          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center"
+        >
           <Plus className="h-4 w-4 mr-2" />
           Tạo bài viết mới
         </button>
@@ -144,22 +130,41 @@ const NewsManagement = () => {
                 type="text"
                 placeholder="Tìm kiếm bài viết..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setCurrentPage(1);
+                }}
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
           </div>
           <select
             value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
+            onChange={(e) => {
+              setSelectedCategory(e.target.value);
+              setCurrentPage(1);
+            }}
             className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           >
-            <option value="all">Tất cả danh mục</option>
+            <option value="">Tất cả danh mục</option>
             {categories.map((category) => (
               <option key={category} value={category}>
                 {category}
               </option>
             ))}
+          </select>
+          <select
+            value={selectedStatus}
+            onChange={(e) => {
+              setSelectedStatus(e.target.value);
+              setCurrentPage(1);
+            }}
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          >
+            <option value="">Tất cả trạng thái</option>
+            <option value="published">Đã xuất bản</option>
+            <option value="draft">Bản nháp</option>
+            <option value="hidden">Ẩn</option>
           </select>
         </div>
       </div>
@@ -194,94 +199,147 @@ const NewsManagement = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {filteredNews.map((article) => (
-                <tr
-                  key={article.id}
-                  className="hover:bg-gray-50 transition-colors duration-200"
-                >
-                  <td className="px-6 py-4">
-                    <div className="flex items-start space-x-4">
-                      <img
-                        src={article.image}
-                        alt={article.title}
-                        className="h-16 w-16 object-cover rounded-lg"
-                      />
-                      <div className="flex-1 min-w-0">
-                        <div className="text-sm font-medium text-gray-900 mb-1 line-clamp-2">
-                          {article.title}
-                        </div>
-                        <div className="text-sm text-gray-500 line-clamp-2">
-                          {article.excerpt}
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
-                      {article.category}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <User className="h-4 w-4 text-gray-400 mr-2" />
-                      <span className="text-sm text-gray-900">
-                        {article.author}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span
-                      className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(
-                        article.status
-                      )}`}
-                    >
-                      {article.status === "published"
-                        ? "Đã xuất bản"
-                        : article.status === "draft"
-                        ? "Bản nháp"
-                        : article.status === "scheduled"
-                        ? "Đã lên lịch"
-                        : "Đã lưu trữ"}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <Calendar className="h-4 w-4 text-gray-400 mr-2" />
-                      <span className="text-sm text-gray-900">
-                        {article.publishDate}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">
-                      <div>{article.views} lượt xem</div>
-                      <div className="text-gray-500">
-                        {article.likes} thích • {article.comments} bình luận
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <div className="flex items-center justify-end space-x-2">
-                      <button className="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50 transition-colors duration-200">
-                        <Eye className="h-4 w-4" />
-                      </button>
-                      <button className="text-green-600 hover:text-green-900 p-1 rounded hover:bg-green-50 transition-colors duration-200">
-                        <Edit className="h-4 w-4" />
-                      </button>
-                      <button className="text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-50 transition-colors duration-200">
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </div>
+              {loading ? (
+                <tr>
+                  <td colSpan={7} className="px-6 py-12 text-center">
+                    <div className="text-gray-500">Đang tải...</div>
                   </td>
                 </tr>
-              ))}
+              ) : blogs.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="px-6 py-12 text-center">
+                    <div className="text-gray-500">Không có bài viết nào</div>
+                  </td>
+                </tr>
+              ) : (
+                blogs.map((blog) => (
+                  <tr
+                    key={blog.blog_id}
+                    className="hover:bg-gray-50 transition-colors duration-200"
+                  >
+                    <td className="px-6 py-4">
+                      <div className="flex items-start space-x-4">
+                        {blog.blog_thumbnail && (
+                          <img
+                            src={blog.blog_thumbnail}
+                            alt={blog.blog_title}
+                            className="h-16 w-16 object-cover rounded-lg"
+                          />
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <div className="text-sm font-medium text-gray-900 mb-1 line-clamp-2">
+                            {blog.blog_title}
+                          </div>
+                          <div className="text-sm text-gray-500 line-clamp-2">
+                            {blog.excerpt}
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                        {blog.category}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <User className="h-4 w-4 text-gray-400 mr-2" />
+                        <span className="text-sm text-gray-900">
+                          {blog.User?.user_name || "Unknown"}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span
+                        className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(
+                          blog.blog_status,
+                        )}`}
+                      >
+                        {getStatusText(blog.blog_status)}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <Calendar className="h-4 w-4 text-gray-400 mr-2" />
+                        <span className="text-sm text-gray-900">
+                          {formatDate(blog.created_at)}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">
+                        <div>{blog.views_count} lượt xem</div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <div className="flex items-center justify-end space-x-2">
+                        <button
+                          onClick={() => handleViewDetail(blog.slug)}
+                          className="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50 transition-colors duration-200"
+                          title="Xem chi tiết"
+                        >
+                          <Eye className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={() => handleEdit(blog.blog_id)}
+                          className="text-green-600 hover:text-green-900 p-1 rounded hover:bg-green-50 transition-colors duration-200"
+                          title="Chỉnh sửa"
+                        >
+                          <Edit className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(blog.blog_id)}
+                          className="text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-50 transition-colors duration-200"
+                          title="Xóa"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
+
+        {/* Pagination */}
+        {pagination.totalPages > 1 && (
+          <div className="flex items-center justify-between px-6 py-4 border-t">
+            <div className="text-sm text-gray-700">
+              Hiển thị {(currentPage - 1) * pagination.limit + 1} -{" "}
+              {Math.min(currentPage * pagination.limit, pagination.total)} của{" "}
+              {pagination.total} bài viết
+            </div>
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                disabled={currentPage === 1}
+                className="p-2 border rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </button>
+              <span className="text-sm text-gray-700">
+                Trang {currentPage} / {pagination.totalPages}
+              </span>
+              <button
+                onClick={() =>
+                  setCurrentPage(
+                    Math.min(pagination.totalPages, currentPage + 1),
+                  )
+                }
+                disabled={currentPage === pagination.totalPages}
+                className="p-2 border rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <ChevronRight className="h-5 w-5" />
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Statistics */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-white p-6 rounded-lg border border-gray-200">
           <div className="flex items-center">
             <div className="p-3 bg-blue-100 rounded-lg">
@@ -289,7 +347,9 @@ const NewsManagement = () => {
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Tổng bài viết</p>
-              <p className="text-2xl font-bold text-gray-900">{news.length}</p>
+              <p className="text-2xl font-bold text-gray-900">
+                {pagination.total}
+              </p>
             </div>
           </div>
         </div>
@@ -302,7 +362,7 @@ const NewsManagement = () => {
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Đã xuất bản</p>
               <p className="text-2xl font-bold text-gray-900">
-                {news.filter((n) => n.status === "published").length}
+                {blogs.filter((b) => b.blog_status === "published").length}
               </p>
             </div>
           </div>
@@ -316,26 +376,38 @@ const NewsManagement = () => {
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Bản nháp</p>
               <p className="text-2xl font-bold text-gray-900">
-                {news.filter((n) => n.status === "draft").length}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white p-6 rounded-lg border border-gray-200">
-          <div className="flex items-center">
-            <div className="p-3 bg-purple-100 rounded-lg">
-              <Tag className="h-6 w-6 text-purple-600" />
-            </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Tổng lượt xem</p>
-              <p className="text-2xl font-bold text-gray-900">
-                {news.reduce((sum, n) => sum + n.views, 0).toLocaleString()}
+                {blogs.filter((b) => b.blog_status === "draft").length}
               </p>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Modals */}
+      <AddBlogModal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        onSuccess={() => {
+          loadBlogs();
+          setIsAddModalOpen(false);
+        }}
+      />
+
+      {selectedBlogId && (
+        <EditBlogModal
+          isOpen={isEditModalOpen}
+          onClose={() => {
+            setIsEditModalOpen(false);
+            setSelectedBlogId(null);
+          }}
+          onSuccess={() => {
+            loadBlogs();
+            setIsEditModalOpen(false);
+            setSelectedBlogId(null);
+          }}
+          blogId={selectedBlogId}
+        />
+      )}
     </div>
   );
 };

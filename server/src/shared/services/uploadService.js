@@ -83,6 +83,34 @@ class UploadService {
     };
   }
 
+  // Upload blog thumbnail
+  async uploadBlogThumbnail(file) {
+    const result = await this.uploadToCloudinary(
+      file.buffer,
+      "blogs/thumbnails",
+      "image",
+      {
+        // Tối ưu cho blog thumbnail
+        transformation: [
+          { width: 1200, height: 630, crop: "fill" }, // Kích thước chuẩn OG image cho SEO
+          { quality: "auto:good" },
+          { fetch_format: "auto" }, // Tự động chọn format tốt nhất (webp)
+        ],
+        eager: [
+          { width: 600, height: 315, crop: "fill" }, // Thumbnail nhỏ hơn
+          { width: 400, height: 210, crop: "fill" }, // Thumbnail cho list view
+        ],
+        eager_async: true,
+      },
+    );
+    return {
+      url: result.secure_url,
+      publicId: result.public_id,
+      width: result.width,
+      height: result.height,
+    };
+  }
+
   // Upload audio
   async uploadAudio(file) {
     const result = await this.uploadToCloudinary(

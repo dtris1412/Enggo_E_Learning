@@ -436,8 +436,7 @@ const CourseDetail = () => {
                                     <div className="flex items-center gap-2 mt-2">
                                       <span className="text-xs text-gray-500">
                                         Thời lượng:{" "}
-                                        {moduleLesson.Lesson?.estimated_time ||
-                                          0}{" "}
+                                        {moduleLesson.Lesson?.duration || 0}{" "}
                                         phút
                                       </span>
                                       <span

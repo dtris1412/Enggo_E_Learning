@@ -12,6 +12,7 @@ import LessonDetail from "../pages/LessonDetail";
 import QuestionManagement from "../pages/QuestionManagement";
 import TestManagement from "../pages/TestManagement";
 import NewsManagement from "../pages/NewsManagement";
+import BlogDetail from "../pages/BlogDetail";
 import FeedbackManagement from "../pages/FeedbackManagement";
 import ReportManagement from "../pages/ReportManagement";
 import CertificateManagement from "../pages/CertificateManagement";
@@ -51,6 +52,7 @@ export const AdminRoutes = () => {
 
         {/* News/Blog Management */}
         <Route path="news" element={<NewsManagement />} />
+        <Route path="blogs/:slug" element={<BlogDetail />} />
 
         {/* Feedback Management */}
         <Route path="feedback" element={<FeedbackManagement />} />

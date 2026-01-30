@@ -2,7 +2,11 @@ import { Model } from "sequelize";
 
 export default (sequelize, DataTypes) => {
   class User extends Model {
-    static associate(models) {}
+    static associate(models) {
+      User.hasMany(models.Blog, {
+        foreignKey: "user_id",
+      });
+    }
   }
   User.init(
     {
@@ -32,7 +36,7 @@ export default (sequelize, DataTypes) => {
       tableName: "users",
       freezeTableName: true,
       timestamps: false,
-    }
+    },
   );
   return User;
 };

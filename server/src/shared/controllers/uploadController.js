@@ -61,6 +61,33 @@ class UploadController {
     }
   }
 
+  // Upload blog thumbnail
+  async uploadBlogThumbnail(req, res) {
+    try {
+      if (!req.file) {
+        return res.status(400).json({
+          success: false,
+          message: "No file uploaded",
+        });
+      }
+
+      const result = await uploadService.uploadBlogThumbnail(req.file);
+
+      return res.status(200).json({
+        success: true,
+        message: "Blog thumbnail uploaded successfully",
+        data: result,
+      });
+    } catch (error) {
+      console.error("Upload blog thumbnail error:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Upload failed",
+        error: error.message,
+      });
+    }
+  }
+
   // Upload audio
   async uploadAudio(req, res) {
     try {
