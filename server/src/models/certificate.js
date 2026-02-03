@@ -13,6 +13,9 @@ export default (sequelize, DataTypes) => {
       Certificate.hasMany(models.Roadmap, {
         foreignKey: "certificate_id",
       });
+      Certificate.hasMany(models.Exam, {
+        foreignKey: "certificate_id",
+      });
     }
   }
   Certificate.init(

@@ -6,6 +6,12 @@ export default (sequelize, DataTypes) => {
       Part.belongsTo(models.Certificate, {
         foreignKey: "certificate_id",
       });
+      Part.hasMany(models.Question, {
+        foreignKey: "part_id",
+      });
+      Part.hasMany(models.Passage, {
+        foreignKey: "part_id",
+      });
     }
   }
   Part.init(
@@ -35,7 +41,7 @@ export default (sequelize, DataTypes) => {
       tableName: "parts",
       freezeTableName: true,
       timestamps: false,
-    }
+    },
   );
   return Part;
 };

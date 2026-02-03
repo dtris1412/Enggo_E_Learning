@@ -1,7 +1,7 @@
 import crypto from "crypto";
 
 // In-memory store (thay bằng Redis trong production)
-// Structure: { "blog:1:hash123": timestamp }
+
 const viewStore = new Map();
 
 // Cleanup expired entries mỗi 1 giờ
