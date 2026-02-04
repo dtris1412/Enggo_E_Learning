@@ -3,37 +3,46 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable("exam_containers", {
-      container_id: {
+    await queryInterface.createTable("user_answers", {
+      user_answer_id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      container_id: {
+      user_exam_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: "exam_containers",
-          key: "container_id",
+          model: "user_exam",
+          key: "user_exam_id",
         },
         onUpdate: "CASCADE",
         onDelete: "CASCADE",
       },
-
-      question_id: {
+      container_question_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: "questions",
-          key: "question_id",
+          model: "container_questions",
+          key: "container_question_id",
         },
         onUpdate: "CASCADE",
         onDelete: "CASCADE",
       },
-      order: {
+      question_option_id: {
         type: Sequelize.INTEGER,
-        allowNull: false,
+        allowNull: true,
+        references: {
+          model: "question_options",
+          key: "question_option_id",
+        },
+        onUpdate: "CASCADE",
+        onDelete: "SET NULL",
+      },
+      is_correct: {
+        type: Sequelize.BOOLEAN,
+        allowNull: true,
       },
       created_at: {
         allowNull: false,
