@@ -3,9 +3,6 @@ import { Model } from "sequelize";
 export default (sequelize, DataTypes) => {
   class Certificate extends Model {
     static associate(models) {
-      Certificate.hasMany(models.Part, {
-        foreignKey: "certificate_id",
-      });
       Certificate.hasMany(models.Certificate_Skill, {
         foreignKey: "certificate_id",
         as: "Certificate_Skills",

@@ -196,6 +196,99 @@ class UploadController {
     }
   }
 
+  // Upload exam audio (for listening sections)
+  async uploadExamAudio(req, res) {
+    try {
+      if (!req.file) {
+        return res.status(400).json({
+          success: false,
+          message: "No audio file uploaded",
+        });
+      }
+
+      // Validate audio file type
+      const allowedMimeTypes = [
+        "audio/mpeg",
+        "audio/mp3",
+        "audio/wav",
+        "audio/ogg",
+        "audio/webm",
+      ];
+
+      if (!allowedMimeTypes.includes(req.file.mimetype)) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid audio file type. Allowed: mp3, wav, ogg, webm",
+        });
+      }
+
+      const result = await uploadService.uploadExamAudio(req.file);
+
+      return res.status(200).json({
+        success: true,
+        message: "Exam audio uploaded successfully",
+        data: result,
+      });
+    } catch (error) {
+      console.error("Upload exam audio error:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Upload failed",
+        error: error.message,
+      });
+    }
+  }
+
+  // Upload exam image (single or multiple)
+  async uploadExamImages(req, res) {
+    try {
+      const files = req.files || [req.file];
+
+      if (!files || files.length === 0) {
+        return res.status(400).json({
+          success: false,
+          message: "No image file uploaded",
+        });
+      }
+
+      // Validate image file types
+      const allowedMimeTypes = [
+        "image/jpeg",
+        "image/jpg",
+        "image/png",
+        "image/gif",
+        "image/webp",
+      ];
+
+      for (const file of files) {
+        if (!allowedMimeTypes.includes(file.mimetype)) {
+          return res.status(400).json({
+            success: false,
+            message: `Invalid image file type: ${file.originalname}. Allowed: jpeg, jpg, png, gif, webp`,
+          });
+        }
+      }
+
+      const results =
+        files.length === 1
+          ? await uploadService.uploadExamImage(files[0])
+          : await uploadService.uploadExamImages(files);
+
+      return res.status(200).json({
+        success: true,
+        message: `Exam image${files.length > 1 ? "s" : ""} uploaded successfully`,
+        data: results,
+      });
+    } catch (error) {
+      console.error("Upload exam images error:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Upload failed",
+        error: error.message,
+      });
+    }
+  }
+
   // Upload document (docx, pdf, audio)
   async uploadDocument(req, res) {
     try {

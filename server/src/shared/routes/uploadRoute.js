@@ -72,6 +72,26 @@ router.post(
   uploadController.uploadExamFile,
 );
 
+// Upload exam audio (chỉ admin)
+router.post(
+  "/exam/audio",
+  verifyToken,
+  requireAdmin,
+  upload.single("audio"),
+  handleMulterError,
+  uploadController.uploadExamAudio,
+);
+
+// Upload exam images (single or multiple) (chỉ admin)
+router.post(
+  "/exam/images",
+  verifyToken,
+  requireAdmin,
+  upload.array("images", 20),
+  handleMulterError,
+  uploadController.uploadExamImages,
+);
+
 // Upload document (docx, pdf, audio) (chỉ admin)
 router.post(
   "/document",

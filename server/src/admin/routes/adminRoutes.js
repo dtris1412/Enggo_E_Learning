@@ -160,6 +160,47 @@ import {
   getPopularBlogs,
 } from "../controllers/blogController.js";
 
+// ===========Exam Controllers===========
+import {
+  createExam,
+  getExamById,
+  getExamsPaginated,
+  updateExamById,
+  deleteExamById,
+  getExamWithDetails,
+} from "../controllers/examController.js";
+
+import {
+  createExamContainer,
+  updateExamContainer,
+  deleteExamContainer,
+  getContainersByExamId,
+} from "../controllers/examContainerController.js";
+
+import {
+  createQuestion as createExamQuestion,
+  updateQuestion as updateExamQuestion,
+  deleteQuestion as deleteExamQuestion,
+} from "../controllers/questionController.js";
+
+import {
+  addQuestionToContainer,
+  removeQuestionFromContainer,
+  updateQuestionOrderInContainer,
+} from "../controllers/containerQuestionController.js";
+
+import {
+  createQuestionOption,
+  updateQuestionOption,
+  deleteQuestionOption,
+} from "../controllers/questionOptionController.js";
+
+import {
+  createExamMedia,
+  deleteExamMedia,
+  getExamMediaByExamId,
+} from "../controllers/examMediaController.js";
+
 const router = express.Router();
 
 const initAdminRoutes = (app) => {
@@ -696,6 +737,146 @@ const initAdminRoutes = (app) => {
   router.get("/api/blogs/latest", getLatestBlogs);
   router.get("/api/blogs/popular", getPopularBlogs);
   router.get("/api/blogs/slug/:slug", getBlogBySlug); // Public access
+
+  //===========Exam Management Routes===========
+  // Exam CRUD
+  router.get(
+    "/api/admin/exams/paginated",
+    verifyToken,
+    requireAdmin,
+    getExamsPaginated,
+  );
+  router.get(
+    "/api/admin/exams/:exam_id",
+    verifyToken,
+    requireAdmin,
+    getExamById,
+  );
+  router.get(
+    "/api/admin/exams/:exam_id/details",
+    verifyToken,
+    requireAdmin,
+    getExamWithDetails,
+  );
+  router.post("/api/admin/exams", verifyToken, requireAdmin, createExam);
+  router.put(
+    "/api/admin/exams/:exam_id",
+    verifyToken,
+    requireAdmin,
+    updateExamById,
+  );
+  router.delete(
+    "/api/admin/exams/:exam_id",
+    verifyToken,
+    requireAdmin,
+    deleteExamById,
+  );
+
+  // Exam Container Management
+  router.get(
+    "/api/admin/exams/:exam_id/containers",
+    verifyToken,
+    requireAdmin,
+    getContainersByExamId,
+  );
+  router.post(
+    "/api/admin/exam-containers",
+    verifyToken,
+    requireAdmin,
+    createExamContainer,
+  );
+  router.put(
+    "/api/admin/exam-containers/:container_id",
+    verifyToken,
+    requireAdmin,
+    updateExamContainer,
+  );
+  router.delete(
+    "/api/admin/exam-containers/:container_id",
+    verifyToken,
+    requireAdmin,
+    deleteExamContainer,
+  );
+
+  // Question Management
+  router.post(
+    "/api/admin/questions",
+    verifyToken,
+    requireAdmin,
+    createExamQuestion,
+  );
+  router.put(
+    "/api/admin/questions/:question_id",
+    verifyToken,
+    requireAdmin,
+    updateExamQuestion,
+  );
+  router.delete(
+    "/api/admin/questions/:question_id",
+    verifyToken,
+    requireAdmin,
+    deleteExamQuestion,
+  );
+
+  // Container Question Management
+  router.post(
+    "/api/admin/container-questions",
+    verifyToken,
+    requireAdmin,
+    addQuestionToContainer,
+  );
+  router.delete(
+    "/api/admin/container-questions/:container_question_id",
+    verifyToken,
+    requireAdmin,
+    removeQuestionFromContainer,
+  );
+  router.patch(
+    "/api/admin/container-questions/:container_question_id/order",
+    verifyToken,
+    requireAdmin,
+    updateQuestionOrderInContainer,
+  );
+
+  // Question Options Management
+  router.post(
+    "/api/admin/question-options",
+    verifyToken,
+    requireAdmin,
+    createQuestionOption,
+  );
+  router.put(
+    "/api/admin/question-options/:question_option_id",
+    verifyToken,
+    requireAdmin,
+    updateQuestionOption,
+  );
+  router.delete(
+    "/api/admin/question-options/:question_option_id",
+    verifyToken,
+    requireAdmin,
+    deleteQuestionOption,
+  );
+
+  // Exam Media Management
+  router.get(
+    "/api/admin/exams/:exam_id/media",
+    verifyToken,
+    requireAdmin,
+    getExamMediaByExamId,
+  );
+  router.post(
+    "/api/admin/exam-media",
+    verifyToken,
+    requireAdmin,
+    createExamMedia,
+  );
+  router.delete(
+    "/api/admin/exam-media/:media_id",
+    verifyToken,
+    requireAdmin,
+    deleteExamMedia,
+  );
 
   app.use("/", router);
 };

@@ -195,6 +195,50 @@ class UploadService {
     };
   }
 
+  // Upload exam audio (for listening sections)
+  async uploadExamAudio(file) {
+    const result = await this.uploadToCloudinary(
+      file.buffer,
+      "exams/audios",
+      "video",
+      {
+        resource_type: "video", // Cloudinary uses 'video' for audio
+        format: "mp3",
+      },
+    );
+    return {
+      url: result.secure_url,
+      publicId: result.public_id,
+      duration: result.duration,
+      format: result.format,
+      bytes: result.bytes,
+    };
+  }
+
+  // Upload exam image (for questions/containers)
+  async uploadExamImage(file) {
+    const result = await this.uploadToCloudinary(
+      file.buffer,
+      "exams/images",
+      "image",
+      {
+        transformation: [{ quality: "auto:good" }, { fetch_format: "auto" }],
+      },
+    );
+    return {
+      url: result.secure_url,
+      publicId: result.public_id,
+      width: result.width,
+      height: result.height,
+    };
+  }
+
+  // Upload multiple exam images (for batch upload)
+  async uploadExamImages(files) {
+    const uploadPromises = files.map((file) => this.uploadExamImage(file));
+    return await Promise.all(uploadPromises);
+  }
+
   // Upload document (docx, pdf, audio)
   async uploadDocument(file) {
     let resourceType = "raw"; // Default for documents

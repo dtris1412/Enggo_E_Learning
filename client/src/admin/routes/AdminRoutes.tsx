@@ -20,6 +20,8 @@ import RoadmapManagement from "../pages/RoadmapManagement";
 import RoadmapDetail from "../pages/RoadmapDetail";
 import SkillManagement from "../pages/SkillManagement";
 import DocumentManagement from "../pages/DocumentManagement";
+import ExamManagement from "../pages/ExamManagement";
+import ExamDetail from "../pages/ExamDetail";
 
 export const AdminRoutes = () => {
   return (
@@ -49,6 +51,10 @@ export const AdminRoutes = () => {
 
         {/* Test Management */}
         <Route path="tests" element={<TestManagement />} />
+
+        {/* Exam Management */}
+        <Route path="exams" element={<ExamManagement />} />
+        <Route path="exams/:examId" element={<ExamDetail />} />
 
         {/* News/Blog Management */}
         <Route path="news" element={<NewsManagement />} />

@@ -6,6 +6,12 @@ export default (sequelize, DataTypes) => {
       User.hasMany(models.Blog, {
         foreignKey: "user_id",
       });
+      User.hasMany(models.User_Exam, {
+        foreignKey: "user_id",
+      });
+      User.hasMany(models.AI_Interaction, {
+        foreignKey: "user_id",
+      });
     }
   }
   User.init(

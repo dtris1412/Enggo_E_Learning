@@ -6,7 +6,13 @@ export default (sequelize, DataTypes) => {
       Exam.belongsTo(models.Certificate, {
         foreignKey: "certificate_id",
       });
-      Exam.hasMany(models.Passage, {
+      Exam.hasMany(models.Exam_Media, {
+        foreignKey: "exam_id",
+      });
+      Exam.hasMany(models.User_Exam, {
+        foreignKey: "exam_id",
+      });
+      Exam.hasMany(models.Exam_Container, {
         foreignKey: "exam_id",
       });
     }

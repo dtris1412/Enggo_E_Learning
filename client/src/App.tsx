@@ -16,6 +16,7 @@ import { PhaseCourseProvider } from "./admin/contexts/phaseCourseContext.tsx";
 import { DocumentProvider } from "./admin/contexts/documentContext.tsx";
 import { DocumentPhaseProvider } from "./admin/contexts/documentPhaseContext.tsx";
 import { BlogProvider } from "./admin/contexts/blogContext.tsx";
+import { ExamProvider } from "./admin/contexts/examContext.tsx";
 import { AdminRoutes } from "./admin/routes/AdminRoutes";
 import { UserRoutes } from "./user/routes/UserRoutes";
 import AuthCallback from "./shared/pages/AuthCallback";
@@ -51,87 +52,93 @@ function App() {
                               <DocumentProvider>
                                 <DocumentPhaseProvider>
                                   <BlogProvider>
-                                    <ToastProvider>
-                                      <Router>
-                                        <Routes>
-                                          {/* Admin Routes - No Header/Footer */}
-                                          {AdminRoutes()}
+                                    <ExamProvider>
+                                      <ToastProvider>
+                                        <Router>
+                                          <Routes>
+                                            {/* Admin Routes - No Header/Footer */}
+                                            {AdminRoutes()}
 
-                                          {/* Public & User Routes - With Header/Footer */}
-                                          <Route
-                                            path="*"
-                                            element={
-                                              <div className="min-h-screen bg-white text-gray-900 flex flex-col">
-                                                <Header />
-                                                <main className="flex-grow">
-                                                  <Routes>
-                                                    {/* Public Routes */}
-                                                    <Route
-                                                      path="/"
-                                                      element={<Home />}
-                                                    />
-                                                    <Route
-                                                      path="/about"
-                                                      element={<About />}
-                                                    />
-                                                    <Route
-                                                      path="/courses"
-                                                      element={<Courses />}
-                                                    />
-                                                    <Route
-                                                      path="/resources"
-                                                      element={<Resources />}
-                                                    />
-                                                    <Route
-                                                      path="/blog"
-                                                      element={<Blog />}
-                                                    />
-                                                    <Route
-                                                      path="/tests"
-                                                      element={<OnlineTests />}
-                                                    />
+                                            {/* Public & User Routes - With Header/Footer */}
+                                            <Route
+                                              path="*"
+                                              element={
+                                                <div className="min-h-screen bg-white text-gray-900 flex flex-col">
+                                                  <Header />
+                                                  <main className="flex-grow">
+                                                    <Routes>
+                                                      {/* Public Routes */}
+                                                      <Route
+                                                        path="/"
+                                                        element={<Home />}
+                                                      />
+                                                      <Route
+                                                        path="/about"
+                                                        element={<About />}
+                                                      />
+                                                      <Route
+                                                        path="/courses"
+                                                        element={<Courses />}
+                                                      />
+                                                      <Route
+                                                        path="/resources"
+                                                        element={<Resources />}
+                                                      />
+                                                      <Route
+                                                        path="/blog"
+                                                        element={<Blog />}
+                                                      />
+                                                      <Route
+                                                        path="/tests"
+                                                        element={
+                                                          <OnlineTests />
+                                                        }
+                                                      />
 
-                                                    {/* Auth Routes */}
-                                                    <Route
-                                                      path="/login"
-                                                      element={<Login />}
-                                                    />
-                                                    <Route
-                                                      path="/register"
-                                                      element={<Register />}
-                                                    />
-                                                    <Route
-                                                      path="/forgot-password"
-                                                      element={
-                                                        <ForgotPassword />
-                                                      }
-                                                    />
-                                                    <Route
-                                                      path="/verify-otp"
-                                                      element={<VerifyOTP />}
-                                                    />
-                                                    <Route
-                                                      path="/reset-password"
-                                                      element={
-                                                        <ResetPassword />
-                                                      }
-                                                    />
-                                                    <Route
-                                                      path="/auth/callback"
-                                                      element={<AuthCallback />}
-                                                    />
+                                                      {/* Auth Routes */}
+                                                      <Route
+                                                        path="/login"
+                                                        element={<Login />}
+                                                      />
+                                                      <Route
+                                                        path="/register"
+                                                        element={<Register />}
+                                                      />
+                                                      <Route
+                                                        path="/forgot-password"
+                                                        element={
+                                                          <ForgotPassword />
+                                                        }
+                                                      />
+                                                      <Route
+                                                        path="/verify-otp"
+                                                        element={<VerifyOTP />}
+                                                      />
+                                                      <Route
+                                                        path="/reset-password"
+                                                        element={
+                                                          <ResetPassword />
+                                                        }
+                                                      />
+                                                      <Route
+                                                        path="/auth/callback"
+                                                        element={
+                                                          <AuthCallback />
+                                                        }
+                                                      />
 
-                                                    {/* User Routes - Protected */}
-                                                    {UserRoutes()}
-                                                  </Routes>
-                                                </main>
-                                                <Footer />
-                                              </div>
-                                            }
-                                          />
-                                        </Routes>
-                                      </Router>
-                                    </ToastProvider>
+                                                      {/* User Routes - Protected */}
+                                                      {UserRoutes()}
+                                                    </Routes>
+                                                  </main>
+                                                  <Footer />
+                                                </div>
+                                              }
+                                            />
+                                          </Routes>
+                                        </Router>
+                                      </ToastProvider>
+                                    </ExamProvider>
                                   </BlogProvider>
                                 </DocumentPhaseProvider>
                               </DocumentProvider>
