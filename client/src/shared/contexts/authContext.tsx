@@ -6,6 +6,10 @@ import React, {
   useCallback,
   ReactNode,
 } from "react";
+import {
+  setupTokenRefreshInterval,
+  isTokenExpired,
+} from "../../utils/authUtils";
 
 const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
@@ -29,28 +33,28 @@ interface AuthContextType {
   login: (
     user_name: string,
     user_password: string,
-    remember?: boolean
+    remember?: boolean,
   ) => Promise<{ success: boolean; message: string; role?: number }>;
   register: (
     user_name: string,
     user_email: string,
     user_password: string,
     full_name?: string,
-    user_phone?: string
+    user_phone?: string,
   ) => Promise<{ success: boolean; message: string }>;
   logout: () => Promise<void>;
   forgotPassword: (
-    user_email: string
+    user_email: string,
   ) => Promise<{ success: boolean; message: string }>;
   verifyOTP: (
     user_email: string,
-    otp: string
+    otp: string,
   ) => Promise<{ success: boolean; message: string }>;
   resetPassword: (
     user_name: string,
     user_email: string,
     otp: string,
-    new_password: string
+    new_password: string,
   ) => Promise<{ success: boolean; message: string }>;
   loginWithGoogle: () => void;
   loginWithFacebook: () => void;
@@ -81,7 +85,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const storedToken = localStorage.getItem("accessToken");
 
     if (storedUser && storedToken) {
-      setUser(JSON.parse(storedUser));
+      // Check if token is still valid
+      if (!isTokenExpired(storedToken)) {
+        setUser(JSON.parse(storedUser));
+        // Setup auto token refresh
+        setupTokenRefreshInterval();
+      } else {
+        // Token expired, clear storage
+        localStorage.removeItem("user");
+        localStorage.removeItem("accessToken");
+      }
     }
     setIsLoading(false);
   }, []);
@@ -89,7 +102,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const login = async (
     user_name: string,
     user_password: string,
-    remember: boolean = false
+    remember: boolean = false,
   ): Promise<{ success: boolean; message: string; role?: number }> => {
     try {
       const response = await fetch(`${apiUrl}/auth/login`, {
@@ -107,6 +120,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setUser(data.user);
         localStorage.setItem("user", JSON.stringify(data.user));
         localStorage.setItem("accessToken", data.accessToken);
+
+        // Setup auto token refresh
+        setupTokenRefreshInterval();
+
         return {
           success: true,
           message: data.message || "Đăng nhập thành công!",
@@ -129,7 +146,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     user_email: string,
     user_password: string,
     full_name?: string,
-    user_phone?: string
+    user_phone?: string,
   ): Promise<{ success: boolean; message: string }> => {
     try {
       const response = await fetch(`${apiUrl}/auth/register`, {
@@ -178,7 +195,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const forgotPassword = async (
-    user_email: string
+    user_email: string,
   ): Promise<{ success: boolean; message: string }> => {
     try {
       const response = await fetch(`${apiUrl}/auth/forgot-password`, {
@@ -202,7 +219,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const verifyOTP = async (
     user_email: string,
-    otp: string
+    otp: string,
   ): Promise<{ success: boolean; message: string }> => {
     try {
       const response = await fetch(`${apiUrl}/auth/verify-otp`, {
@@ -228,7 +245,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     user_name: string,
     user_email: string,
     otp: string,
-    new_password: string
+    new_password: string,
   ): Promise<{ success: boolean; message: string }> => {
     try {
       const response = await fetch(`${apiUrl}/auth/reset-password`, {
@@ -290,6 +307,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setUser(userData);
     localStorage.setItem("user", JSON.stringify(userData));
     localStorage.setItem("accessToken", token);
+
+    // Setup auto token refresh
+    setupTokenRefreshInterval();
   }, []);
 
   const value: AuthContextType = {

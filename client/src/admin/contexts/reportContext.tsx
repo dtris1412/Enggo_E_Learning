@@ -5,6 +5,7 @@ import {
   ReactNode,
   useCallback,
 } from "react";
+import { authenticatedFetch } from "../../utils/authUtils";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080/api";
 
@@ -86,13 +87,6 @@ export const ReportProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  const getAuthHeaders = () => {
-    const token = localStorage.getItem("accessToken");
-    return {
-      Authorization: `Bearer ${token}`,
-    };
-  };
-
   const fetchReportsPaginated = useCallback(
     async (params?: {
       page?: number;
@@ -114,11 +108,10 @@ export const ReportProvider = ({ children }: { children: ReactNode }) => {
         if (params?.sortBy) queryParams.append("sortBy", params.sortBy);
         if (params?.order) queryParams.append("order", params.order);
 
-        const response = await fetch(
+        const response = await authenticatedFetch(
           `${API_URL}/admin/reports/paginated?${queryParams.toString()}`,
           {
             method: "GET",
-            headers: getAuthHeaders(),
           },
         );
 
@@ -146,10 +139,12 @@ export const ReportProvider = ({ children }: { children: ReactNode }) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(`${API_URL}/admin/reports/${report_id}`, {
-        method: "GET",
-        headers: getAuthHeaders(),
-      });
+      const response = await authenticatedFetch(
+        `${API_URL}/admin/reports/${report_id}`,
+        {
+          method: "GET",
+        },
+      );
 
       const result = await response.json();
 
@@ -178,14 +173,16 @@ export const ReportProvider = ({ children }: { children: ReactNode }) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(`${API_URL}/admin/reports/generate`, {
-        method: "POST",
-        headers: {
-          ...getAuthHeaders(),
-          "Content-Type": "application/json",
+      const response = await authenticatedFetch(
+        `${API_URL}/admin/reports/generate`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
         },
-        body: JSON.stringify(data),
-      });
+      );
 
       const result = await response.json();
       if (result.success) {
@@ -208,11 +205,10 @@ export const ReportProvider = ({ children }: { children: ReactNode }) => {
     report_name: string,
   ): Promise<boolean> => {
     try {
-      const response = await fetch(
+      const response = await authenticatedFetch(
         `${API_URL}/admin/reports/${report_id}/download`,
         {
           method: "GET",
-          headers: getAuthHeaders(),
         },
       );
 
@@ -248,10 +244,12 @@ export const ReportProvider = ({ children }: { children: ReactNode }) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(`${API_URL}/admin/reports/${report_id}`, {
-        method: "DELETE",
-        headers: getAuthHeaders(),
-      });
+      const response = await authenticatedFetch(
+        `${API_URL}/admin/reports/${report_id}`,
+        {
+          method: "DELETE",
+        },
+      );
 
       const result = await response.json();
       if (result.success) {
@@ -283,11 +281,10 @@ export const ReportProvider = ({ children }: { children: ReactNode }) => {
         });
       }
 
-      const response = await fetch(
+      const response = await authenticatedFetch(
         `${API_URL}/admin/${type}/export?${queryParams.toString()}`,
         {
           method: "GET",
-          headers: getAuthHeaders(),
         },
       );
 

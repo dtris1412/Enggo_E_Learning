@@ -43,7 +43,7 @@ const resetPassword = async (req, res) => {
       user_name,
       user_email,
       otp,
-      new_password
+      new_password,
     );
     if (!result.success) {
       return res.status(400).json(result);
@@ -137,12 +137,12 @@ const socialLoginCallBack = (req, res) => {
     const accessToken = jwt.sign(
       { user_id: user.user_id, role: user.role },
       process.env.JWT_SECRET,
-      { expiresIn: "1h" }
+      { expiresIn: "1h" },
     );
     const refreshToken = jwt.sign(
-      { user_id: user.user_id },
+      { user_id: user.user_id, role: user.role },
       process.env.JWT_REFRESH_SECRET,
-      { expiresIn: "7d" }
+      { expiresIn: "7d" },
     );
 
     // Set refresh token in cookie
@@ -160,7 +160,7 @@ const socialLoginCallBack = (req, res) => {
 
     const userData = encodeURIComponent(JSON.stringify(user));
     res.redirect(
-      `${frontendUrl}/auth/callback?token=${accessToken}&user=${userData}`
+      `${frontendUrl}/auth/callback?token=${accessToken}&user=${userData}`,
     );
   } catch (err) {
     console.error("Error in social login callback controller:", err);

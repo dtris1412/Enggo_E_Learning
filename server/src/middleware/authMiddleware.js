@@ -2,16 +2,48 @@ import jwt from "jsonwebtoken";
 
 // Middleware xác thực token
 export const verifyToken = (req, res, next) => {
-  const token = req.headers.authorization?.split(" ")[1];
-  if (!token) return res.status(401).json({ message: "Access denied" });
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({
+      success: false,
+      message: "Access denied - No token provided",
+    });
+  }
+
+  const token = authHeader.split(" ")[1];
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log("Token decoded:", decoded);
+    console.log("Token decoded successfully:", {
+      user_id: decoded.user_id,
+      role: decoded.role,
+    });
+
+    // Validate decoded token has required fields
+    if (!decoded.user_id || decoded.role === undefined) {
+      return res.status(403).json({
+        success: false,
+        message: "Invalid token - Missing user information",
+      });
+    }
+
     req.user = decoded;
     next();
   } catch (error) {
-    res.status(403).json({ message: "Invalid or expired token" });
+    console.error("Token verification error:", error.message);
+
+    if (error.name === "TokenExpiredError") {
+      return res.status(401).json({
+        success: false,
+        message: "Token expired - Please login again",
+      });
+    }
+
+    return res.status(403).json({
+      success: false,
+      message: "Invalid or expired token",
+    });
   }
 };
 

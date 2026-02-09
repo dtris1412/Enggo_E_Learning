@@ -53,7 +53,7 @@ const resetPassword = async (user_name, user_email, otp, new_password) => {
     //Cập nhật mật khẩu trong DB chỉ dựa vào email (không cần user_name)
     const result = await db.User.update(
       { user_password: hashedPassword },
-      { where: { user_email } }
+      { where: { user_email } },
     );
 
     if (result[0] === 0) {
@@ -102,7 +102,7 @@ const register = async (
   user_address,
   avatar,
   user_status,
-  role
+  role,
 ) => {
   //Kiểm tra dữ liệu bắt buộc
   if (!user_name || !user_email || !user_password) {
@@ -159,7 +159,7 @@ const register = async (
   const token = jwt.sign(
     { user_id: newUser.user_id, roles: newUser.role_id },
     process.env.JWT_SECRET,
-    { expiresIn: "7h" }
+    { expiresIn: "7h" },
   );
 
   return {
@@ -177,7 +177,7 @@ const login = async (user_name, user_password) => {
   //Kiểm tra mật khẩu
   const isMatchPassword = await bcrypt.compare(
     user_password,
-    user.user_password
+    user.user_password,
   );
   if (!isMatchPassword)
     return { success: false, message: "Incorrect password" };
@@ -193,12 +193,12 @@ const login = async (user_name, user_password) => {
   const accessToken = jwt.sign(
     { user_id: user.user_id, role: user.role },
     process.env.JWT_SECRET,
-    { expiresIn: "1h" }
+    { expiresIn: "1h" },
   );
   const refreshToken = jwt.sign(
-    { user_id: user.user_id },
+    { user_id: user.user_id, role: user.role },
     process.env.JWT_REFRESH_SECRET,
-    { expiresIn: "7d" }
+    { expiresIn: "7d" },
   );
   return {
     success: true,
@@ -215,13 +215,32 @@ const refreshToken = async (refreshToken) => {
   }
   try {
     const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+
+    // Verify user still exists and is active
+    const user = await db.User.findOne({
+      where: { user_id: decoded.user_id },
+      attributes: ["user_id", "role", "user_status"],
+    });
+
+    if (!user) {
+      return { success: false, message: "User not found" };
+    }
+
+    // Check if user is still active
+    if (!user.user_status) {
+      return { success: false, message: "User account is deactivated" };
+    }
+
+    // Create new access token with current user data
     const newAccessToken = jwt.sign(
-      { user_id: decoded.user_id },
+      { user_id: user.user_id, role: user.role },
       process.env.JWT_SECRET,
-      { expiresIn: "1h" }
+      { expiresIn: "1h" },
     );
+
     return { success: true, accessToken: newAccessToken };
-  } catch {
+  } catch (error) {
+    console.error("Refresh token error:", error);
     return { success: false, message: "Invalid or expired refresh token" };
   }
 };
