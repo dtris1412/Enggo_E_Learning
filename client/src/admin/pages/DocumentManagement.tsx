@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useDocument } from "../contexts/documentContext";
 import AddDocumentModal from "../components/DocumentManagement/AddDocumentModal.tsx";
 import EditDocumentModal from "../components/DocumentManagement/EditDocumentModal.tsx";
+import ExportButton from "../components/ExportButton";
 import {
   FileText,
   Search,
@@ -164,15 +165,25 @@ const DocumentManagement: React.FC = () => {
               </select>
             </div>
 
-            {/* Add Button */}
-            <button
-              type="button"
-              onClick={() => setIsAddModalOpen(true)}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 whitespace-nowrap"
-            >
-              <Plus className="w-5 h-5" />
-              Add Document
-            </button>
+            {/* Export and Add Buttons */}
+            <div className="flex gap-3">
+              <ExportButton
+                type="documents"
+                filters={{
+                  search: searchTerm,
+                  document_type: documentTypeFilter,
+                  file_type: fileTypeFilter,
+                }}
+              />
+              <button
+                type="button"
+                onClick={() => setIsAddModalOpen(true)}
+                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 whitespace-nowrap"
+              >
+                <Plus className="w-5 h-5" />
+                Add Document
+              </button>
+            </div>
           </div>
         </form>
       </div>

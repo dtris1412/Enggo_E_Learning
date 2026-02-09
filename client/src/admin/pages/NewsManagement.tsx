@@ -15,6 +15,7 @@ import { useBlog } from "../contexts/blogContext";
 import AddBlogModal from "../components/BlogManagement/AddBlogModal";
 import EditBlogModal from "../components/BlogManagement/EditBlogModal";
 import { useNavigate } from "react-router-dom";
+import ExportButton from "../components/ExportButton";
 
 const NewsManagement = () => {
   const navigate = useNavigate();
@@ -111,13 +112,23 @@ const NewsManagement = () => {
             Tạo và quản lý nội dung blog, tin tức giáo dục
           </p>
         </div>
-        <button
-          onClick={() => setIsAddModalOpen(true)}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center"
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Tạo bài viết mới
-        </button>
+        <div className="flex gap-3">
+          <ExportButton
+            type="blogs"
+            filters={{
+              blog_status: selectedStatus,
+              category: selectedCategory,
+              search: searchTerm,
+            }}
+          />
+          <button
+            onClick={() => setIsAddModalOpen(true)}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Tạo bài viết mới
+          </button>
+        </div>
       </div>
 
       {/* Filters */}

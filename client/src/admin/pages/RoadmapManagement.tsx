@@ -17,6 +17,7 @@ import { useRoadmap } from "../contexts/roadmapContext";
 import { useCertificate } from "../contexts/certificateContext";
 import AddRoadmapModal from "../components/RoadmapManagement/AddRoadmapModal.tsx";
 import EditRoadmapModal from "../components/RoadmapManagement/EditRoadmapModal.tsx";
+import ExportButton from "../components/ExportButton";
 import { formatCurrency } from "../../utils/formatters";
 
 const RoadmapManagement = () => {
@@ -133,13 +134,22 @@ const RoadmapManagement = () => {
             Tạo và quản lý các lộ trình học tập có hệ thống
           </p>
         </div>
-        <button
-          onClick={handleCreateRoadmap}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center"
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Tạo lộ trình mới
-        </button>
+        <div className="flex gap-3">
+          <ExportButton
+            type="roadmaps"
+            filters={{
+              search: searchTerm,
+              roadmap_level: levelFilter,
+            }}
+          />
+          <button
+            onClick={handleCreateRoadmap}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Tạo lộ trình mới
+          </button>
+        </div>
       </div>
 
       {/* Search and Filters */}

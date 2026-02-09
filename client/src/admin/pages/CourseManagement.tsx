@@ -14,6 +14,7 @@ import {
 import { useCourse } from "../contexts/courseContext";
 import AddCourseModal from "../components/CourseManagement/Course/AddCourseModal";
 import EditCourseModal from "../components/CourseManagement/Course/EditCourseModal";
+import ExportButton from "../components/ExportButton";
 
 const CourseManagement = () => {
   const navigate = useNavigate();
@@ -49,7 +50,7 @@ const CourseManagement = () => {
         1,
         statusFilter,
         selectedLevel || undefined,
-        selectedTag || undefined
+        selectedTag || undefined,
       );
     }, 300);
 
@@ -81,7 +82,7 @@ const CourseManagement = () => {
       data.course_status,
       data.tag,
       data.price,
-      data.is_free
+      data.is_free,
     );
     if (success) {
       setShowAddModal(false);
@@ -100,7 +101,7 @@ const CourseManagement = () => {
         data.course_status,
         data.tag,
         data.price,
-        data.is_free
+        data.is_free,
       );
       if (success) {
         setShowEditModal(false);
@@ -156,13 +157,24 @@ const CourseManagement = () => {
             Quản lý tất cả các khóa học trong hệ thống
           </p>
         </div>
-        <button
-          onClick={handleCreateCourse}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center"
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Tạo khóa học mới
-        </button>
+        <div className="flex gap-3">
+          <ExportButton
+            type="courses"
+            filters={{
+              search: searchTerm,
+              course_status: selectedStatus,
+              course_level: selectedLevel,
+              tags: selectedTag,
+            }}
+          />
+          <button
+            onClick={handleCreateCourse}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Tạo khóa học mới
+          </button>
+        </div>
       </div>
 
       {/* Search and Filter Bar */}
@@ -260,7 +272,7 @@ const CourseManagement = () => {
                             <div className="text-right">
                               <div className="text-xl font-bold text-blue-600">
                                 {new Intl.NumberFormat("vi-VN").format(
-                                  course.price
+                                  course.price,
                                 )}{" "}
                                 <span className="text-sm">VND</span>
                               </div>
@@ -282,7 +294,7 @@ const CourseManagement = () => {
                       <div className="flex items-center gap-2 flex-wrap">
                         <span
                           className={`px-3 py-1 rounded-full text-xs font-medium ${getLevelColor(
-                            course.course_level
+                            course.course_level,
                           )}`}
                         >
                           {getLevelText(course.course_level)}

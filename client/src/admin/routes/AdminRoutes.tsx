@@ -14,7 +14,7 @@ import TestManagement from "../pages/TestManagement";
 import NewsManagement from "../pages/NewsManagement";
 import BlogDetail from "../pages/BlogDetail";
 import FeedbackManagement from "../pages/FeedbackManagement";
-import ReportManagement from "../pages/ReportManagement";
+import ReportManagement from "../pages/ReportManagementNew";
 import CertificateManagement from "../pages/CertificateManagement";
 import RoadmapManagement from "../pages/RoadmapManagement";
 import RoadmapDetail from "../pages/RoadmapDetail";

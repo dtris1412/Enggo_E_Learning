@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import AddLessonModal from "../components/LessonManagement/AddLessonModal.tsx";
 import EditLessonModal from "../components/LessonManagement/EditLessonModal.tsx";
+import ExportButton from "../components/ExportButton";
 
 const LessonManagement = () => {
   const navigate = useNavigate();
@@ -190,13 +191,24 @@ const LessonManagement = () => {
             Quản lý các bài học và nội dung học tập
           </p>
         </div>
-        <button
-          onClick={handleCreateLesson}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center space-x-2"
-        >
-          <Plus className="h-5 w-5" />
-          <span>Thêm bài học</span>
-        </button>
+        <div className="flex gap-3">
+          <ExportButton
+            type="lessons"
+            filters={{
+              search: searchTerm,
+              lesson_type: filterType,
+              lesson_difficult: filterDifficulty,
+              lesson_status: filterStatus,
+            }}
+          />
+          <button
+            onClick={handleCreateLesson}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center space-x-2"
+          >
+            <Plus className="h-5 w-5" />
+            <span>Thêm bài học</span>
+          </button>
+        </div>
       </div>
 
       {/* Search and Filters */}

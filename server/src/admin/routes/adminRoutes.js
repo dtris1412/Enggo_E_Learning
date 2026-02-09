@@ -17,7 +17,18 @@ import {
   lockUser,
   unlockUser,
   getUsersPaginated,
+  exportUsersToExcel,
 } from "../controllers/userController.js";
+
+// ===========Export Controllers===========
+import {
+  exportCoursesToExcel,
+  exportLessonsToExcel,
+  exportExamsToExcel,
+  exportBlogsToExcel,
+  exportDocumentsToExcel,
+  exportRoadmapsToExcel,
+} from "../controllers/exportController.js";
 
 // ===========Certificate Controllers===========
 import {
@@ -160,6 +171,15 @@ import {
   getPopularBlogs,
 } from "../controllers/blogController.js";
 
+// ===========Report Controllers===========
+import {
+  getReportsPaginated,
+  getReportById,
+  generateReport,
+  downloadReport,
+  deleteReport,
+} from "../controllers/reportController.js";
+
 // ===========Exam Controllers===========
 import {
   createExam,
@@ -239,6 +259,13 @@ const initAdminRoutes = (app) => {
     requireAdmin,
     unlockUser,
   );
+  // Quick Export
+  router.get(
+    "/api/admin/users/export",
+    verifyToken,
+    requireAdmin,
+    exportUsersToExcel,
+  );
   //   router.patch(
   //     "/api/admin/users/:user_id/user_status",
   //     verifyToken,
@@ -315,6 +342,13 @@ const initAdminRoutes = (app) => {
     verifyToken,
     requireAdmin,
     unlockCourseById,
+  );
+  // Quick Export
+  router.get(
+    "/api/admin/courses/export",
+    verifyToken,
+    requireAdmin,
+    exportCoursesToExcel,
   );
 
   //===========Module Management Routes===========
@@ -435,6 +469,13 @@ const initAdminRoutes = (app) => {
     requireAdmin,
     unlockLesson,
   );
+  // Quick Export
+  router.get(
+    "/api/admin/lessons/export",
+    verifyToken,
+    requireAdmin,
+    exportLessonsToExcel,
+  );
 
   //===========Lesson Media Management Routes===========
   router.get(
@@ -550,6 +591,13 @@ const initAdminRoutes = (app) => {
     requireAdmin,
     unlockRoadmap,
   );
+  // Quick Export
+  router.get(
+    "/api/admin/roadmaps/export",
+    verifyToken,
+    requireAdmin,
+    exportRoadmapsToExcel,
+  );
 
   //===========Phase Management Routes===========
   router.get(
@@ -633,6 +681,13 @@ const initAdminRoutes = (app) => {
     verifyToken,
     requireAdmin,
     deleteDocument,
+  );
+  // Quick Export
+  router.get(
+    "/api/admin/documents/export",
+    verifyToken,
+    requireAdmin,
+    exportDocumentsToExcel,
   );
 
   //===========Document Phase Management Routes===========
@@ -732,11 +787,50 @@ const initAdminRoutes = (app) => {
     requireAdmin,
     deleteBlog,
   );
+  // Quick Export
+  router.get(
+    "/api/admin/blogs/export",
+    verifyToken,
+    requireAdmin,
+    exportBlogsToExcel,
+  );
 
   // Public Blog Routes (không cần authentication)
   router.get("/api/blogs/latest", getLatestBlogs);
   router.get("/api/blogs/popular", getPopularBlogs);
   router.get("/api/blogs/slug/:slug", getBlogBySlug); // Public access
+
+  //===========Report Management Routes===========
+  router.get(
+    "/api/admin/reports/paginated",
+    verifyToken,
+    requireAdmin,
+    getReportsPaginated,
+  );
+  router.get(
+    "/api/admin/reports/:report_id",
+    verifyToken,
+    requireAdmin,
+    getReportById,
+  );
+  router.post(
+    "/api/admin/reports/generate",
+    verifyToken,
+    requireAdmin,
+    generateReport,
+  );
+  router.get(
+    "/api/admin/reports/:report_id/download",
+    verifyToken,
+    requireAdmin,
+    downloadReport,
+  );
+  router.delete(
+    "/api/admin/reports/:report_id",
+    verifyToken,
+    requireAdmin,
+    deleteReport,
+  );
 
   //===========Exam Management Routes===========
   // Exam CRUD
@@ -770,6 +864,13 @@ const initAdminRoutes = (app) => {
     verifyToken,
     requireAdmin,
     deleteExamById,
+  );
+  // Quick Export
+  router.get(
+    "/api/admin/exams/export",
+    verifyToken,
+    requireAdmin,
+    exportExamsToExcel,
   );
 
   // Exam Container Management

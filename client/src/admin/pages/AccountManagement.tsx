@@ -5,6 +5,7 @@ import { useToast } from "../../shared/components/Toast/Toast";
 import AddUserModal from "../components/UserManagement/AddUserModal";
 import EditUserModal from "../components/UserManagement/EditUserModal";
 import ViewUserModal from "../components/UserManagement/ViewUserModal";
+import ExportButton from "../components/ExportButton";
 // import ViewUserModal from "../components/UserManagement/ViewUserModal";
 
 interface User {
@@ -148,13 +149,23 @@ const AccountManagement = () => {
             Quản lý người dùng và phân quyền hệ thống
           </p>
         </div>
-        <button
-          onClick={() => setIsAddModalOpen(true)}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center"
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Thêm tài khoản
-        </button>
+        <div className="flex gap-3">
+          <ExportButton
+            type="users"
+            filters={{
+              user_status:
+                selectedStatus === "all" ? "" : selectedStatus === "active",
+              search: searchTerm,
+            }}
+          />
+          <button
+            onClick={() => setIsAddModalOpen(true)}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Thêm tài khoản
+          </button>
+        </div>
       </div>
 
       {/* Filters */}
@@ -279,7 +290,7 @@ const AccountManagement = () => {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span
                         className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getRoleColor(
-                          user.role
+                          user.role,
                         )}`}
                       >
                         {getRoleText(user.role)}
@@ -288,7 +299,7 @@ const AccountManagement = () => {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span
                         className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(
-                          user.user_status
+                          user.user_status,
                         )}`}
                       >
                         {getStatusText(user.user_status)}

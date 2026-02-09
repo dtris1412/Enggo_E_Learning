@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { useExam } from "../contexts/examContext";
 import { AddExamModal, EditExamModal } from "../components/ExamManagement";
+import ExportButton from "../components/ExportButton";
 
 const ExamManagement = () => {
   const navigate = useNavigate();
@@ -152,7 +153,14 @@ const ExamManagement = () => {
         </div>
 
         {/* Add Button */}
-        <div className="mt-4 flex justify-end">
+        <div className="mt-4 flex justify-end gap-3">
+          <ExportButton
+            type="exams"
+            filters={{
+              search: searchTerm,
+              exam_type: selectedType !== "all" ? selectedType : undefined,
+            }}
+          />
           <button
             onClick={() => setIsAddModalOpen(true)}
             className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"

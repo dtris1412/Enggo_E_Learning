@@ -8,6 +8,8 @@ import {
   lockUser as lockUserService,
   unlockUser as unlockUserService,
 } from "../services/userService.js";
+import excelExportService from "../../shared/services/excelExportService.js";
+import db from "../../models/index.js";
 
 const getAllUsers = async (req, res) => {
   try {
@@ -56,7 +58,7 @@ const createUser = async (req, res) => {
       user_address,
       avatar,
       user_status,
-      role
+      role,
     );
     if (!newUser.success) {
       return res.status(400).json(newUser);
@@ -76,7 +78,7 @@ const updateUserById = async (req, res) => {
       full_name,
       user_phone,
       user_address,
-      avatar
+      avatar,
     );
     if (!updatedUser.success) {
       return res.status(400).json(updatedUser);
@@ -93,7 +95,7 @@ const updateUserStatusById = async (req, res) => {
     const { user_status } = req.body;
     const updatedUserStatus = await updateUserStatusByIdService(
       user_id,
-      user_status
+      user_status,
     );
     if (!updatedUserStatus.success) {
       return res.status(400).json(updatedUserStatus);
@@ -112,7 +114,7 @@ const getUsersPaginated = async (req, res) => {
       limit,
       page,
       role,
-      user_status
+      user_status,
     );
     if (!result.success) {
       return res.status(400).json(result);
@@ -161,6 +163,72 @@ const unlockUser = async (req, res) => {
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
+
+// Quick Export Users to Excel (không lưu vào DB)
+const exportUsersToExcel = async (req, res) => {
+  try {
+    const { user_status, search } = req.query;
+    const whereClause = {};
+
+    if (user_status) {
+      whereClause.user_status = user_status;
+    }
+
+    if (search) {
+      whereClause[db.Sequelize.Op.or] = [
+        { user_name: { [db.Sequelize.Op.like]: `%${search}%` } },
+        { user_email: { [db.Sequelize.Op.like]: `%${search}%` } },
+      ];
+    }
+
+    const users = await db.User.findAll({
+      where: whereClause,
+      attributes: [
+        "user_id",
+        "user_name",
+        "user_email",
+        "user_phone",
+        "user_status",
+        "user_role",
+        "created_at",
+      ],
+      order: [["created_at", "DESC"]],
+    });
+
+    const workbook = excelExportService.createWorkbook();
+
+    const columns = [
+      { header: "ID", key: "user_id", width: 10 },
+      { header: "Tên người dùng", key: "user_name", width: 30 },
+      { header: "Email", key: "user_email", width: 35 },
+      { header: "Số điện thoại", key: "user_phone", width: 20 },
+      { header: "Trạng thái", key: "user_status", width: 15 },
+      { header: "Vai trò", key: "user_role", width: 15 },
+      { header: "Ngày tạo", key: "created_at", width: 20 },
+    ];
+
+    const data = users.map((user) => ({
+      user_id: user.user_id,
+      user_name: user.user_name,
+      user_email: user.user_email,
+      user_phone: user.user_phone || "",
+      user_status: user.user_status,
+      user_role: user.user_role,
+      created_at: user.created_at
+        ? new Date(user.created_at).toLocaleString("vi-VN")
+        : "",
+    }));
+
+    excelExportService.addWorksheet(workbook, "Users", columns, data);
+
+    const filename = `users_${Date.now()}.xlsx`;
+    await excelExportService.writeToResponse(workbook, res, filename);
+  } catch (err) {
+    console.error("Error in export users controller:", err);
+    res.status(500).json({ success: false, message: "Export failed" });
+  }
+};
+
 export {
   getAllUsers,
   getUserById,
@@ -170,4 +238,5 @@ export {
   lockUser,
   unlockUser,
   getUsersPaginated,
+  exportUsersToExcel,
 };
