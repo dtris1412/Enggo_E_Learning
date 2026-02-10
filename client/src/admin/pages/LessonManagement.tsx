@@ -40,12 +40,16 @@ const LessonManagement = () => {
   const [filterStatus, setFilterStatus] = useState<boolean | undefined>(
     undefined,
   );
+  const [currentPage, setCurrentPage] = useState(1);
+  const [limit] = useState(10);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingLesson, setEditingLesson] = useState<any>(null);
 
+  const totalPages = Math.ceil(totalLessons / limit);
+
   useEffect(() => {
-    fetchLessonsPaginated("", 100, 1);
+    fetchLessonsPaginated("", limit, currentPage);
     fetchSkills("", 100, 1);
   }, [fetchLessonsPaginated, fetchSkills]);
 
@@ -53,8 +57,8 @@ const LessonManagement = () => {
     const timer = setTimeout(() => {
       fetchLessonsPaginated(
         searchTerm,
-        100,
-        1,
+        limit,
+        currentPage,
         filterType,
         filterDifficulty,
         undefined,
@@ -68,6 +72,8 @@ const LessonManagement = () => {
     filterType,
     filterDifficulty,
     filterStatus,
+    currentPage,
+    limit,
     fetchLessonsPaginated,
   ]);
 
@@ -430,6 +436,52 @@ const LessonManagement = () => {
           </div>
         )}
       </div>
+
+      {/* Pagination */}
+      {!loading && lessons.length > 0 && (
+        <div className="bg-white px-6 py-3 border border-gray-200 rounded-lg flex items-center justify-between">
+          <div className="text-sm text-gray-700">
+            Hiển thị{" "}
+            <span className="font-medium">{(currentPage - 1) * limit + 1}</span>{" "}
+            đến{" "}
+            <span className="font-medium">
+              {Math.min(currentPage * limit, totalLessons)}
+            </span>{" "}
+            của <span className="font-medium">{totalLessons}</span> kết quả
+          </div>
+          <div className="flex space-x-2">
+            <button
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              className="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Trước
+            </button>
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              <button
+                key={page}
+                onClick={() => setCurrentPage(page)}
+                className={`px-3 py-1 rounded text-sm transition-colors duration-200 ${
+                  currentPage === page
+                    ? "bg-blue-600 text-white"
+                    : "border border-gray-300 hover:bg-gray-50"
+                }`}
+              >
+                {page}
+              </button>
+            ))}
+            <button
+              onClick={() =>
+                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+              }
+              disabled={currentPage === totalPages}
+              className="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Sau
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Modals */}
       <AddLessonModal

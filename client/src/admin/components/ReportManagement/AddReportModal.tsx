@@ -21,31 +21,58 @@ const AddReportModal: React.FC<AddReportModalProps> = ({
   const [formData, setFormData] = useState({
     report_name: "",
     report_type: "users",
-    filters: {},
+    filters: {
+      from_date: "",
+      to_date: "",
+      page: 1,
+      limit: 1000,
+    },
   });
 
   const reportTypes = [
-    { value: "users", label: "Người dùng", icon: "👥" },
-    { value: "courses", label: "Khóa học", icon: "📚" },
-    { value: "lessons", label: "Bài học", icon: "📖" },
-    { value: "exams", label: "Đề thi", icon: "📝" },
-    { value: "blogs", label: "Tin tức", icon: "📰" },
-    { value: "documents", label: "Tài liệu", icon: "📄" },
-    { value: "roadmaps", label: "Lộ trình", icon: "🗺️" },
+    { value: "users", label: "Người dùng" },
+    { value: "courses", label: "Khóa học" },
+    { value: "lessons", label: "Bài học" },
+    { value: "exams", label: "Đề thi" },
+    { value: "blogs", label: "Tin tức" },
+    { value: "documents", label: "Tài liệu" },
+    { value: "roadmaps", label: "Lộ trình" },
   ];
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formData);
+    // Clean up empty values from filters
+    const cleanedFilters = Object.fromEntries(
+      Object.entries(formData.filters).filter(([_, value]) => value !== ""),
+    );
+    onSubmit({
+      ...formData,
+      filters: cleanedFilters,
+    });
   };
 
   const handleClose = () => {
     setFormData({
       report_name: "",
       report_type: "users",
-      filters: {},
+      filters: {
+        from_date: "",
+        to_date: "",
+        page: 1,
+        limit: 1000,
+      },
     });
     onClose();
+  };
+
+  const updateFilter = (key: string, value: any) => {
+    setFormData({
+      ...formData,
+      filters: {
+        ...formData.filters,
+        [key]: value,
+      },
+    });
   };
 
   if (!isOpen) return null;
@@ -93,16 +120,85 @@ const AddReportModal: React.FC<AddReportModalProps> = ({
             >
               {reportTypes.map((type) => (
                 <option key={type.value} value={type.value}>
-                  {type.icon} {type.label}
+                  {type.label}
                 </option>
               ))}
             </select>
           </div>
 
+          {/* Date Range Filter */}
+          <div className="space-y-3 rounded-lg border border-gray-200 p-4">
+            <h3 className="font-medium text-gray-900">Lọc theo thời gian</h3>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="mb-1 block text-sm text-gray-600">
+                  Từ ngày
+                </label>
+                <input
+                  type="date"
+                  value={formData.filters.from_date}
+                  onChange={(e) => updateFilter("from_date", e.target.value)}
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-sm text-gray-600">
+                  Đến ngày
+                </label>
+                <input
+                  type="date"
+                  value={formData.filters.to_date}
+                  onChange={(e) => updateFilter("to_date", e.target.value)}
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Pagination Options */}
+          <div className="space-y-3 rounded-lg border border-gray-200 p-4">
+            <h3 className="font-medium text-gray-900">Tùy chọn phân trang</h3>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="mb-1 block text-sm text-gray-600">
+                  Số bản ghi tối đa
+                </label>
+                <select
+                  value={formData.filters.limit}
+                  onChange={(e) =>
+                    updateFilter("limit", parseInt(e.target.value))
+                  }
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value={100}>100</option>
+                  <option value={500}>500</option>
+                  <option value={1000}>1,000</option>
+                  <option value={5000}>5,000</option>
+                  <option value={10000}>10,000</option>
+                </select>
+              </div>
+              <div>
+                <label className="mb-1 block text-sm text-gray-600">
+                  Trang
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  value={formData.filters.page}
+                  onChange={(e) =>
+                    updateFilter("page", parseInt(e.target.value) || 1)
+                  }
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            </div>
+          </div>
+
           <div className="rounded-lg bg-blue-50 p-4">
             <p className="text-sm text-blue-800">
-              💡 <strong>Lưu ý:</strong> Báo cáo sẽ xuất toàn bộ dữ liệu hiện có
-              của loại đã chọn. File Excel sẽ được tạo và lưu vào hệ thống.
+              <strong>Lưu ý:</strong> Bạn có thể lọc báo cáo theo khoảng thời
+              gian và giới hạn số lượng bản ghi. Nếu không chọn thời gian, hệ
+              thống sẽ xuất toàn bộ dữ liệu.
             </p>
           </div>
 

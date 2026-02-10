@@ -189,7 +189,7 @@ const exportUsersToExcel = async (req, res) => {
         "user_email",
         "user_phone",
         "user_status",
-        "user_role",
+        "role",
         "created_at",
       ],
       order: [["created_at", "DESC"]],
@@ -203,7 +203,7 @@ const exportUsersToExcel = async (req, res) => {
       { header: "Email", key: "user_email", width: 35 },
       { header: "Số điện thoại", key: "user_phone", width: 20 },
       { header: "Trạng thái", key: "user_status", width: 15 },
-      { header: "Vai trò", key: "user_role", width: 15 },
+      { header: "Vai trò", key: "role", width: 15 },
       { header: "Ngày tạo", key: "created_at", width: 20 },
     ];
 
@@ -213,7 +213,7 @@ const exportUsersToExcel = async (req, res) => {
       user_email: user.user_email,
       user_phone: user.user_phone || "",
       user_status: user.user_status,
-      user_role: user.user_role,
+      role: user.role,
       created_at: user.created_at
         ? new Date(user.created_at).toLocaleString("vi-VN")
         : "",

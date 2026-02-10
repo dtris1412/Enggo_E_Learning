@@ -50,13 +50,13 @@ const ReportManagementNew = () => {
   const [showAddModal, setShowAddModal] = useState(false);
 
   const reportTypes = [
-    { value: "users", label: "Người dùng", icon: "👥" },
-    { value: "courses", label: "Khóa học", icon: "📚" },
-    { value: "lessons", label: "Bài học", icon: "📖" },
-    { value: "exams", label: "Đề thi", icon: "📝" },
-    { value: "blogs", label: "Tin tức", icon: "📰" },
-    { value: "documents", label: "Tài liệu", icon: "📄" },
-    { value: "roadmaps", label: "Lộ trình", icon: "🗺️" },
+    { value: "users", label: "Người dùng" },
+    { value: "courses", label: "Khóa học" },
+    { value: "lessons", label: "Bài học" },
+    { value: "exams", label: "Đề thi" },
+    { value: "blogs", label: "Tin tức" },
+    { value: "documents", label: "Tài liệu" },
+    { value: "roadmaps", label: "Lộ trình" },
   ];
 
   useEffect(() => {
@@ -122,7 +122,7 @@ const ReportManagementNew = () => {
 
   const getReportTypeLabel = (type: string) => {
     const found = reportTypes.find((t) => t.value === type);
-    return found ? `${found.icon} ${found.label}` : type;
+    return found ? found.label : type;
   };
 
   return (
@@ -167,7 +167,7 @@ const ReportManagementNew = () => {
           <option value="">Tất cả loại báo cáo</option>
           {reportTypes.map((type) => (
             <option key={type.value} value={type.value}>
-              {type.icon} {type.label}
+              {type.label}
             </option>
           ))}
         </select>

@@ -17,6 +17,7 @@ import LinkCertificateSkillModal from "../components/SkillManagement/LinkCertifi
 const SkillManagement = () => {
   const {
     skills,
+    totalItems,
     loading,
     fetchSkills,
     createSkill,
@@ -30,6 +31,10 @@ const SkillManagement = () => {
   const { certificates, fetchCertificates } = useCertificate();
 
   const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [limit] = useState(10);
+
+  const totalPages = Math.ceil(totalItems / limit);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showLinkModal, setShowLinkModal] = useState(false);
@@ -37,13 +42,14 @@ const SkillManagement = () => {
   const [linkingSkill, setLinkingSkill] = useState<any>(null);
 
   useEffect(() => {
-    fetchSkills("", 100, 1);
+    fetchSkills("", limit, currentPage);
     fetchCertificates("", 100, 1);
-  }, [fetchSkills, fetchCertificates]);
+  }, [fetchSkills, fetchCertificates, currentPage]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      fetchSkills(searchTerm, 100, 1);
+      setCurrentPage(1);
+      fetchSkills(searchTerm, limit, 1);
     }, 300);
 
     return () => clearTimeout(timer);
@@ -67,7 +73,7 @@ const SkillManagement = () => {
     const success = await createSkill(data.skill_name);
     if (success) {
       setShowAddModal(false);
-      fetchSkills(searchTerm, 100, 1);
+      fetchSkills(searchTerm, limit, currentPage);
     }
   };
 
@@ -76,7 +82,7 @@ const SkillManagement = () => {
       const success = await updateSkill(editingSkill.skill_id, data.skill_name);
       if (success) {
         setShowEditModal(false);
-        fetchSkills(searchTerm, 100, 1);
+        fetchSkills(searchTerm, limit, currentPage);
       }
     }
   };
@@ -87,11 +93,11 @@ const SkillManagement = () => {
         data.certificate_id,
         linkingSkill.skill_id,
         data.weight,
-        data.description
+        data.description,
       );
       if (success) {
         setShowLinkModal(false);
-        fetchSkills(searchTerm, 100, 1);
+        fetchSkills(searchTerm, limit, currentPage);
       }
     }
   };
@@ -100,7 +106,7 @@ const SkillManagement = () => {
     if (window.confirm("Bạn có chắc chắn muốn xóa liên kết này?")) {
       const success = await deleteCertificateSkill(certificateSkillId);
       if (success) {
-        fetchSkills(searchTerm, 100, 1);
+        fetchSkills(searchTerm, limit, currentPage);
       }
     }
   };
@@ -216,7 +222,7 @@ const SkillManagement = () => {
                               <button
                                 onClick={() =>
                                   handleDeleteCertificateSkill(
-                                    cs.certificate_skill_id
+                                    cs.certificate_skill_id,
                                   )
                                 }
                                 className="ml-3 text-red-600 hover:text-red-800"
@@ -264,6 +270,59 @@ const SkillManagement = () => {
           </div>
         )}
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between px-6 py-4">
+          <div className="text-sm text-gray-700">
+            Hiển thị {(currentPage - 1) * limit + 1} đến{" "}
+            {Math.min(currentPage * limit, totalItems)} của {totalItems} kỹ năng
+          </div>
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              className="px-3 py-1 rounded border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+            >
+              Trước
+            </button>
+            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+              let pageNum;
+              if (totalPages <= 5) {
+                pageNum = i + 1;
+              } else if (currentPage <= 3) {
+                pageNum = i + 1;
+              } else if (currentPage >= totalPages - 2) {
+                pageNum = totalPages - 4 + i;
+              } else {
+                pageNum = currentPage - 2 + i;
+              }
+              return (
+                <button
+                  key={pageNum}
+                  onClick={() => setCurrentPage(pageNum)}
+                  className={`px-3 py-1 rounded border ${
+                    currentPage === pageNum
+                      ? "bg-blue-600 text-white border-blue-600"
+                      : "border-gray-300 hover:bg-gray-50"
+                  }`}
+                >
+                  {pageNum}
+                </button>
+              );
+            })}
+            <button
+              onClick={() =>
+                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+              }
+              disabled={currentPage === totalPages}
+              className="px-3 py-1 rounded border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+            >
+              Sau
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Modals */}
       <AddSkillModal

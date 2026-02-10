@@ -15,6 +15,7 @@ import EditCertificateModal from "../components/CourseManagement/Certificate/Edi
 const CertificateManagement = () => {
   const {
     certificates,
+    totalCertificates,
     loading,
     fetchCertificates,
     createCertificate,
@@ -24,17 +25,22 @@ const CertificateManagement = () => {
   } = useCertificate();
 
   const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [limit] = useState(10);
+
+  const totalPages = Math.ceil(totalCertificates / limit);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingCertificate, setEditingCertificate] = useState<any>(null);
 
   useEffect(() => {
-    fetchCertificates("", 100, 1);
-  }, [fetchCertificates]);
+    fetchCertificates("", limit, currentPage);
+  }, [fetchCertificates, currentPage]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      fetchCertificates(searchTerm, 100, 1);
+      setCurrentPage(1);
+      fetchCertificates(searchTerm, limit, 1);
     }, 300);
 
     return () => clearTimeout(timer);
@@ -53,7 +59,7 @@ const CertificateManagement = () => {
     const success = await createCertificate(
       data.certificate_name,
       data.description,
-      data.total_score
+      data.total_score,
     );
     if (success) {
       setShowAddModal(false);
@@ -66,7 +72,7 @@ const CertificateManagement = () => {
         editingCertificate.certificate_id,
         data.certificate_name,
         data.description,
-        data.total_score
+        data.total_score,
       );
       if (success) {
         setShowEditModal(false);
@@ -218,6 +224,60 @@ const CertificateManagement = () => {
           ))
         )}
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between px-6 py-4">
+          <div className="text-sm text-gray-700">
+            Hiển thị {(currentPage - 1) * limit + 1} đến{" "}
+            {Math.min(currentPage * limit, totalCertificates)} của{" "}
+            {totalCertificates} chứng chỉ
+          </div>
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              className="px-3 py-1 rounded border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+            >
+              Trước
+            </button>
+            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+              let pageNum;
+              if (totalPages <= 5) {
+                pageNum = i + 1;
+              } else if (currentPage <= 3) {
+                pageNum = i + 1;
+              } else if (currentPage >= totalPages - 2) {
+                pageNum = totalPages - 4 + i;
+              } else {
+                pageNum = currentPage - 2 + i;
+              }
+              return (
+                <button
+                  key={pageNum}
+                  onClick={() => setCurrentPage(pageNum)}
+                  className={`px-3 py-1 rounded border ${
+                    currentPage === pageNum
+                      ? "bg-blue-600 text-white border-blue-600"
+                      : "border-gray-300 hover:bg-gray-50"
+                  }`}
+                >
+                  {pageNum}
+                </button>
+              );
+            })}
+            <button
+              onClick={() =>
+                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+              }
+              disabled={currentPage === totalPages}
+              className="px-3 py-1 rounded border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+            >
+              Sau
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Modals */}
       <AddCertificateModal

@@ -82,33 +82,31 @@ const getReportById = async (report_id) => {
 const formatUsersData = async (filters = {}) => {
   const whereClause = {};
 
-  if (filters.user_status) {
+  if (filters.user_status !== undefined) {
     whereClause.user_status = filters.user_status;
   }
 
   const users = await db.User.findAll({
     where: whereClause,
-    attributes: [
-      "user_id",
-      "user_name",
-      "user_email",
-      "user_phone",
-      "user_status",
-      "user_role",
-      "created_at",
-    ],
     order: [["created_at", "DESC"]],
   });
 
   return users.map((user) => ({
     ID: user.user_id,
-    "Tên người dùng": user.user_name,
-    Email: user.user_email,
+    "Tên đăng nhập": user.user_name || "",
+    "Họ và tên": user.full_name || "",
+    Email: user.user_email || "",
     "Số điện thoại": user.user_phone || "",
-    "Trạng thái": user.user_status,
-    "Vai trò": user.user_role,
+    "Địa chỉ": user.user_address || "",
+    Avatar: user.avatar || "",
+    "Vai trò": user.role === 1 ? "Admin" : user.role === 2 ? "User" : "Unknown",
+    "Cấp độ": user.user_level || "",
+    "Trạng thái": user.user_status ? "Hoạt động" : "Khóa",
     "Ngày tạo": user.created_at
       ? new Date(user.created_at).toLocaleString("vi-VN")
+      : "",
+    "Ngày cập nhật": user.updated_at
+      ? new Date(user.updated_at).toLocaleString("vi-VN")
       : "",
   }));
 };
@@ -117,29 +115,31 @@ const formatUsersData = async (filters = {}) => {
 const formatCoursesData = async (filters = {}) => {
   const whereClause = {};
 
-  if (filters.course_status) {
+  if (filters.course_status !== undefined) {
     whereClause.course_status = filters.course_status;
   }
 
   const courses = await db.Course.findAll({
     where: whereClause,
-    include: [
-      {
-        model: db.Certificate,
-        attributes: ["certificate_id", "certificate_name"],
-      },
-    ],
     order: [["created_at", "DESC"]],
   });
 
   return courses.map((course) => ({
     ID: course.course_id,
-    "Tên khóa học": course.course_name,
-    "Mô tả": course.course_description || "",
-    "Chứng chỉ": course.Certificate?.certificate_name || "",
-    "Trạng thái": course.course_status,
+    "Tiêu đề khóa học": course.course_title || "",
+    "Mô tả": course.description || "",
+    "Cấp độ": course.course_level || "",
+    "Mục tiêu": course.course_aim || "",
+    "Thời lượng ước tính (giờ)": course.estimate_duration || 0,
+    "Thẻ tag": course.tag || "",
+    "Giá (VND)": course.price || 0,
+    "Miễn phí": course.is_free ? "Có" : "Không",
+    "Trạng thái": course.course_status ? "Hoạt động" : "Khóa",
     "Ngày tạo": course.created_at
       ? new Date(course.created_at).toLocaleString("vi-VN")
+      : "",
+    "Ngày cập nhật": course.updated_at
+      ? new Date(course.updated_at).toLocaleString("vi-VN")
       : "",
   }));
 };
@@ -148,7 +148,7 @@ const formatCoursesData = async (filters = {}) => {
 const formatLessonsData = async (filters = {}) => {
   const whereClause = {};
 
-  if (filters.lesson_status) {
+  if (filters.lesson_status !== undefined) {
     whereClause.lesson_status = filters.lesson_status;
   }
 
@@ -158,6 +158,7 @@ const formatLessonsData = async (filters = {}) => {
       {
         model: db.Skill,
         attributes: ["skill_id", "skill_name"],
+        required: false,
       },
     ],
     order: [["created_at", "DESC"]],
@@ -165,12 +166,21 @@ const formatLessonsData = async (filters = {}) => {
 
   return lessons.map((lesson) => ({
     ID: lesson.lesson_id,
-    "Tên bài học": lesson.lesson_name,
-    "Mô tả": lesson.lesson_description || "",
+    "Tiêu đề bài học": lesson.lesson_title || "",
+    "Loại bài học": lesson.lesson_type || "",
+    "Cấp độ khó": lesson.difficulty_level || "",
+    "Nội dung": lesson.lesson_content
+      ? lesson.lesson_content.substring(0, 200) + "..."
+      : "",
+    "Định dạng thi": lesson.is_exam_format ? "Có" : "Không",
+    "Thời gian ước tính (phút)": lesson.estimated_time || 0,
     "Kỹ năng": lesson.Skill?.skill_name || "",
-    "Trạng thái": lesson.lesson_status,
+    "Trạng thái": lesson.lesson_status ? "Hoạt động" : "Khóa",
     "Ngày tạo": lesson.created_at
       ? new Date(lesson.created_at).toLocaleString("vi-VN")
+      : "",
+    "Ngày cập nhật": lesson.updated_at
+      ? new Date(lesson.updated_at).toLocaleString("vi-VN")
       : "",
   }));
 };
@@ -179,16 +189,17 @@ const formatLessonsData = async (filters = {}) => {
 const formatExamsData = async (filters = {}) => {
   const whereClause = {};
 
-  if (filters.exam_status) {
-    whereClause.exam_status = filters.exam_status;
+  if (filters.exam_type) {
+    whereClause.exam_type = filters.exam_type;
   }
 
   const exams = await db.Exam.findAll({
     where: whereClause,
     include: [
       {
-        model: db.Skill,
-        attributes: ["skill_id", "skill_name"],
+        model: db.Certificate,
+        attributes: ["certificate_id", "certificate_name"],
+        required: false,
       },
     ],
     order: [["created_at", "DESC"]],
@@ -196,13 +207,19 @@ const formatExamsData = async (filters = {}) => {
 
   return exams.map((exam) => ({
     ID: exam.exam_id,
-    "Tên đề thi": exam.exam_name,
-    "Mô tả": exam.exam_description || "",
-    "Kỹ năng": exam.Skill?.skill_name || "",
-    "Thời gian (phút)": exam.duration || "",
-    "Trạng thái": exam.exam_status,
+    "Tiêu đề đề thi": exam.exam_title || "",
+    "Thời gian thi (phút)": exam.exam_duration || 0,
+    "Mã đề thi": exam.exam_code || "",
+    Năm: exam.year || "",
+    "Chứng chỉ": exam.Certificate?.certificate_name || "",
+    "Loại đề thi": exam.exam_type || "",
+    Nguồn: exam.source || "",
+    "Tổng số câu hỏi": exam.total_questions || 0,
     "Ngày tạo": exam.created_at
       ? new Date(exam.created_at).toLocaleString("vi-VN")
+      : "",
+    "Ngày cập nhật": exam.updated_at
+      ? new Date(exam.updated_at).toLocaleString("vi-VN")
       : "",
   }));
 };
@@ -220,7 +237,8 @@ const formatBlogsData = async (filters = {}) => {
     include: [
       {
         model: db.User,
-        attributes: ["user_id", "user_name"],
+        attributes: ["user_id", "user_name", "full_name"],
+        required: false,
       },
     ],
     order: [["created_at", "DESC"]],
@@ -228,14 +246,28 @@ const formatBlogsData = async (filters = {}) => {
 
   return blogs.map((blog) => ({
     ID: blog.blog_id,
-    "Tiêu đề": blog.blog_title,
+    "Tiêu đề": blog.blog_title || "",
+    Slug: blog.slug || "",
     "Tóm tắt": blog.excerpt || "",
+    "Nội dung": blog.blog_content
+      ? blog.blog_content.substring(0, 200) + "..."
+      : "",
     "Danh mục": blog.category || "",
-    "Tác giả": blog.User?.user_name || "",
+    "Ảnh thumbnail": blog.blog_thumbnail || "",
+    "Tác giả ID": blog.user_id || "",
+    "Tác giả": blog.User?.full_name || blog.User?.user_name || "",
     "Lượt xem": blog.views_count || 0,
-    "Trạng thái": blog.blog_status,
+    "Trạng thái":
+      blog.blog_status === "published"
+        ? "Đã xuất bản"
+        : blog.blog_status === "draft"
+          ? "Nháp"
+          : "Ẩn",
     "Ngày tạo": blog.created_at
       ? new Date(blog.created_at).toLocaleString("vi-VN")
+      : "",
+    "Ngày cập nhật": blog.updated_at
+      ? new Date(blog.updated_at).toLocaleString("vi-VN")
       : "",
   }));
 };
@@ -244,6 +276,10 @@ const formatBlogsData = async (filters = {}) => {
 const formatDocumentsData = async (filters = {}) => {
   const whereClause = {};
 
+  if (filters.document_type) {
+    whereClause.document_type = filters.document_type;
+  }
+
   const documents = await db.Document.findAll({
     where: whereClause,
     order: [["created_at", "DESC"]],
@@ -251,11 +287,17 @@ const formatDocumentsData = async (filters = {}) => {
 
   return documents.map((doc) => ({
     ID: doc.document_id,
-    "Tên tài liệu": doc.document_name,
+    "Tên tài liệu": doc.document_name || "",
     "Mô tả": doc.document_description || "",
+    "Loại tài liệu": doc.document_type || "",
     URL: doc.document_url || "",
+    "Loại file": doc.file_type || "",
+    "Kích thước": doc.document_size || "",
     "Ngày tạo": doc.created_at
       ? new Date(doc.created_at).toLocaleString("vi-VN")
+      : "",
+    "Ngày cập nhật": doc.updated_at
+      ? new Date(doc.updated_at).toLocaleString("vi-VN")
       : "",
   }));
 };
@@ -264,16 +306,21 @@ const formatDocumentsData = async (filters = {}) => {
 const formatRoadmapsData = async (filters = {}) => {
   const whereClause = {};
 
-  if (filters.roadmap_status) {
+  if (filters.roadmap_status !== undefined) {
     whereClause.roadmap_status = filters.roadmap_status;
+  }
+
+  if (filters.roadmap_level) {
+    whereClause.roadmap_level = filters.roadmap_level;
   }
 
   const roadmaps = await db.Roadmap.findAll({
     where: whereClause,
     include: [
       {
-        model: db.Skill,
-        attributes: ["skill_id", "skill_name"],
+        model: db.Certificate,
+        attributes: ["certificate_id", "certificate_name"],
+        required: false,
       },
     ],
     order: [["created_at", "DESC"]],
@@ -281,12 +328,20 @@ const formatRoadmapsData = async (filters = {}) => {
 
   return roadmaps.map((roadmap) => ({
     ID: roadmap.roadmap_id,
-    "Tên lộ trình": roadmap.roadmap_name,
+    "Tiêu đề lộ trình": roadmap.roadmap_title || "",
     "Mô tả": roadmap.roadmap_description || "",
-    "Kỹ năng": roadmap.Skill?.skill_name || "",
-    "Trạng thái": roadmap.roadmap_status,
+    "Mục tiêu": roadmap.roadmap_aim || "",
+    "Cấp độ": roadmap.roadmap_level || "",
+    "Thời lượng ước tính (giờ)": roadmap.estimated_duration || 0,
+    "Chứng chỉ": roadmap.Certificate?.certificate_name || "",
+    "Giảm giá (%)": roadmap.discount_percent || 0,
+    "Giá (VND)": roadmap.roadmap_price || 0,
+    "Trạng thái": roadmap.roadmap_status ? "Hoạt động" : "Khóa",
     "Ngày tạo": roadmap.created_at
       ? new Date(roadmap.created_at).toLocaleString("vi-VN")
+      : "",
+    "Ngày cập nhật": roadmap.updated_at
+      ? new Date(roadmap.updated_at).toLocaleString("vi-VN")
       : "",
   }));
 };

@@ -22,7 +22,7 @@ const createUser = async (
   user_address,
   avatar,
   user_status,
-  role
+  role,
 ) => {
   if (!user_name || !user_email || !user_password) {
     return {
@@ -59,7 +59,7 @@ const updateUserById = async (
   full_name,
   user_phone,
   user_address,
-  avatar
+  avatar,
 ) => {
   if (!user_id) {
     return { success: false, message: "User ID is required" };
@@ -104,7 +104,7 @@ const updateUserStatusById = async (user_id, user_status) => {
   const newStatus = user_status ? 1 : 0;
   await db.User.update(
     { user_status: newStatus, updated_at: new Date() },
-    { where: { user_id } }
+    { where: { user_id } },
   );
   const updatedUser = await db.User.findByPk(user_id);
   return {
@@ -118,7 +118,7 @@ const getUsersPaginated = async (
   limit = 10,
   page = 1,
   role,
-  user_status
+  user_status,
 ) => {
   const Op = db.Sequelize.Op;
   const offset = (Number(page) - 1) * Number(limit);
@@ -181,7 +181,7 @@ const lockUser = async (user_id) => {
   }
   await db.User.update(
     { user_status: 0, updated_at: new Date() },
-    { where: { user_id } }
+    { where: { user_id } },
   );
   const updatedUser = await db.User.findByPk(user_id);
   return {
@@ -202,7 +202,7 @@ const unlockUser = async (user_id) => {
   }
   await db.User.update(
     { user_status: 1, updated_at: new Date() },
-    { where: { user_id } }
+    { where: { user_id } },
   );
   const updatedUser = await db.User.findByPk(user_id);
   return {
