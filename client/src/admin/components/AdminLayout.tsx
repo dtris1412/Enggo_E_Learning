@@ -71,6 +71,11 @@ const AdminLayout = () => {
       icon: FileCheck,
     },
     {
+      name: "Quản lý flashcards",
+      path: "/admin/flashcards",
+      icon: BookOpen,
+    },
+    {
       name: "Quản lý tin tức",
       path: "/admin/news",
       icon: Newspaper,

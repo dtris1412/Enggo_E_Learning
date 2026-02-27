@@ -126,6 +126,26 @@ class UploadService {
     };
   }
 
+  // Upload flashcard audio
+  async uploadFlashcardAudio(file) {
+    const result = await this.uploadToCloudinary(
+      file.buffer,
+      "flashcards/audios",
+      "video",
+      {
+        resource_type: "video", // Cloudinary uses 'video' for audio
+        format: "mp3",
+      },
+    );
+    return {
+      url: result.secure_url,
+      publicId: result.public_id,
+      duration: result.duration,
+      format: result.format,
+      bytes: result.bytes,
+    };
+  }
+
   // Upload video
   async uploadVideo(file) {
     const result = await this.uploadToCloudinary(

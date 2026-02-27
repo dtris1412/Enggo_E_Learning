@@ -24,6 +24,9 @@ export default (sequelize, DataTypes) => {
       Container_Question.hasMany(models.AI_Interaction, {
         foreignKey: "container_question_id",
       });
+      Container_Question.hasMany(models.Flashcard, {
+        foreignKey: "container_question_id",
+      });
     }
   }
   Container_Question.init(

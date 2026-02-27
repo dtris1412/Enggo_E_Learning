@@ -102,6 +102,16 @@ router.post(
   uploadController.uploadDocument,
 );
 
+// Upload flashcard audio (chỉ admin)
+router.post(
+  "/flashcard/audio",
+  verifyToken,
+  requireAdmin,
+  upload.single("audio"),
+  handleMulterError,
+  uploadController.uploadFlashcardAudio,
+);
+
 // Xóa file (chỉ admin)
 router.delete(
   "/:publicId",

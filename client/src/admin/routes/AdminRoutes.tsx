@@ -22,6 +22,7 @@ import SkillManagement from "../pages/SkillManagement";
 import DocumentManagement from "../pages/DocumentManagement";
 import ExamManagement from "../pages/ExamManagement";
 import ExamDetail from "../pages/ExamDetail";
+import FlashcardManagement from "../pages/FlashcardManagement";
 
 export const AdminRoutes = () => {
   return (
@@ -76,6 +77,9 @@ export const AdminRoutes = () => {
 
         {/* Document Management */}
         <Route path="documents" element={<DocumentManagement />} />
+
+        {/* Flashcard Management */}
+        <Route path="flashcards" element={<FlashcardManagement />} />
       </Route>
     </>
   );

@@ -336,6 +336,49 @@ class UploadController {
     }
   }
 
+  // Upload flashcard audio
+  async uploadFlashcardAudio(req, res) {
+    try {
+      if (!req.file) {
+        return res.status(400).json({
+          success: false,
+          message: "No audio file uploaded",
+        });
+      }
+
+      // Validate audio file type
+      const allowedMimeTypes = [
+        "audio/mpeg",
+        "audio/mp3",
+        "audio/wav",
+        "audio/ogg",
+        "audio/webm",
+      ];
+
+      if (!allowedMimeTypes.includes(req.file.mimetype)) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid audio file type. Allowed: mp3, wav, ogg, webm",
+        });
+      }
+
+      const result = await uploadService.uploadFlashcardAudio(req.file);
+
+      return res.status(200).json({
+        success: true,
+        message: "Flashcard audio uploaded successfully",
+        data: result,
+      });
+    } catch (error) {
+      console.error("Upload flashcard audio error:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Upload failed",
+        error: error.message,
+      });
+    }
+  }
+
   // Xóa file
   async deleteFile(req, res) {
     try {

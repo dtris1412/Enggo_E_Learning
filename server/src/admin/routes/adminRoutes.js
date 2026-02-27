@@ -171,6 +171,26 @@ import {
   getPopularBlogs,
 } from "../controllers/blogController.js";
 
+// ===========Flashcard Set Controllers===========
+import {
+  getFlashcardSetsPaginated,
+  getFlashcardSetById,
+  createFlashcardSet,
+  updateFlashcardSet,
+  deleteFlashcardSet,
+} from "../controllers/flashcard_setController.js";
+
+// ===========Flashcard Controllers===========
+import {
+  getFlashcardsBySetId,
+  getFlashcardById,
+  createFlashcard,
+  createMultipleFlashcards,
+  updateFlashcard,
+  deleteFlashcard,
+  deleteMultipleFlashcards,
+} from "../controllers/flashcardController.js";
+
 // ===========Report Controllers===========
 import {
   getReportsPaginated,
@@ -799,6 +819,83 @@ const initAdminRoutes = (app) => {
   router.get("/api/blogs/latest", getLatestBlogs);
   router.get("/api/blogs/popular", getPopularBlogs);
   router.get("/api/blogs/slug/:slug", getBlogBySlug); // Public access
+
+  //===========Flashcard Management Routes===========
+  // Flashcard Set Routes
+  router.get(
+    "/api/admin/flashcard-sets/paginated",
+    verifyToken,
+    requireAdmin,
+    getFlashcardSetsPaginated,
+  );
+  router.get(
+    "/api/admin/flashcard-sets/:flashcard_set_id",
+    verifyToken,
+    requireAdmin,
+    getFlashcardSetById,
+  );
+  router.post(
+    "/api/admin/flashcard-sets",
+    verifyToken,
+    requireAdmin,
+    createFlashcardSet,
+  );
+  router.put(
+    "/api/admin/flashcard-sets/:flashcard_set_id",
+    verifyToken,
+    requireAdmin,
+    updateFlashcardSet,
+  );
+  router.delete(
+    "/api/admin/flashcard-sets/:flashcard_set_id",
+    verifyToken,
+    requireAdmin,
+    deleteFlashcardSet,
+  );
+
+  // Flashcard Routes
+  router.get(
+    "/api/admin/flashcard-sets/:flashcard_set_id/flashcards",
+    verifyToken,
+    requireAdmin,
+    getFlashcardsBySetId,
+  );
+  router.get(
+    "/api/admin/flashcards/:flashcard_id",
+    verifyToken,
+    requireAdmin,
+    getFlashcardById,
+  );
+  router.post(
+    "/api/admin/flashcards",
+    verifyToken,
+    requireAdmin,
+    createFlashcard,
+  );
+  router.post(
+    "/api/admin/flashcards/batch",
+    verifyToken,
+    requireAdmin,
+    createMultipleFlashcards,
+  );
+  router.put(
+    "/api/admin/flashcards/:flashcard_id",
+    verifyToken,
+    requireAdmin,
+    updateFlashcard,
+  );
+  router.delete(
+    "/api/admin/flashcards/:flashcard_id",
+    verifyToken,
+    requireAdmin,
+    deleteFlashcard,
+  );
+  router.post(
+    "/api/admin/flashcards/delete-multiple",
+    verifyToken,
+    requireAdmin,
+    deleteMultipleFlashcards,
+  );
 
   //===========Report Management Routes===========
   router.get(
