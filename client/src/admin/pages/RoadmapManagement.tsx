@@ -81,8 +81,6 @@ const RoadmapManagement = () => {
       data.estimated_duration,
       data.roadmap_status,
       data.certificate_id,
-      data.discount_percent,
-      data.roadmap_price,
     );
     if (success) {
       setShowAddModal(false);
@@ -100,7 +98,6 @@ const RoadmapManagement = () => {
         data.estimated_duration,
         data.roadmap_status,
         data.certificate_id,
-        data.discount_percent,
       );
       if (success) {
         setShowEditModal(false);
@@ -270,25 +267,7 @@ const RoadmapManagement = () => {
                   </span>
                 </div>
                 <div className="text-sm">
-                  {roadmap.discount_percent > 0 ? (
-                    <div className="flex flex-col items-end">
-                      <span className="text-gray-400 line-through text-xs">
-                        {formatCurrency(roadmap.calculated_price)}
-                      </span>
-                      <div className="flex items-center gap-2">
-                        <span className="text-green-600 font-medium text-xs">
-                          -{roadmap.discount_percent}%
-                        </span>
-                        <span className="font-semibold text-gray-900">
-                          {formatCurrency(roadmap.final_price)}
-                        </span>
-                      </div>
-                    </div>
-                  ) : (
-                    <span className="font-semibold text-gray-900">
-                      {formatCurrency(roadmap.calculated_price)}
-                    </span>
-                  )}
+                  <span className="font-semibold text-gray-900">Roadmap</span>
                 </div>
               </div>
 

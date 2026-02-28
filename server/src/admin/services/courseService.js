@@ -8,8 +8,7 @@ const createCourse = async (
   estimate_duration,
   course_status,
   tag,
-  price,
-  is_free
+  access_type,
 ) => {
   if (
     !course_title ||
@@ -19,8 +18,7 @@ const createCourse = async (
     !estimate_duration ||
     course_status === undefined ||
     !tag ||
-    !price ||
-    is_free === undefined
+    !access_type
   ) {
     return { success: false, message: "All fields are required." };
   }
@@ -33,10 +31,9 @@ const createCourse = async (
     estimate_duration,
     course_status,
     tag,
+    access_type,
     created_at: new Date(),
     updated_at: new Date(),
-    price,
-    is_free,
   });
 
   return {
@@ -55,8 +52,7 @@ const updateCourseById = async (
   estimate_duration,
   course_status,
   tag,
-  price,
-  is_free
+  access_type,
 ) => {
   if (!course_id) {
     return { success: false, message: "Course ID is required." };
@@ -75,8 +71,7 @@ const updateCourseById = async (
     estimate_duration,
     course_status,
     tag,
-    price,
-    is_free,
+    access_type,
     updated_at: new Date(),
   });
 
@@ -110,7 +105,7 @@ const getCoursePaginated = async (
   page = 1,
   course_status,
   course_level,
-  tag
+  tag,
 ) => {
   const Op = db.Sequelize.Op;
   const offset = (Number(page) - 1) * Number(limit);

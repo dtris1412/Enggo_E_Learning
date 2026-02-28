@@ -22,7 +22,7 @@ interface PhaseCourse {
     description: string;
     course_level: string;
     estimate_duration: string;
-    price: number;
+    access_type: "free" | "premium";
   };
 }
 

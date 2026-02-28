@@ -39,8 +39,6 @@ export default (sequelize, DataTypes) => {
           key: "certificate_id",
         },
       },
-      discount_percent: { type: DataTypes.INTEGER, allowNull: true },
-      roadmap_price: { type: DataTypes.DECIMAL(10, 2), allowNull: true },
       created_at: { type: DataTypes.DATE },
       updated_at: { type: DataTypes.DATE },
     },

@@ -88,8 +88,7 @@ const CourseManagement = () => {
       data.estimate_duration,
       data.course_status,
       data.tag,
-      data.price,
-      data.is_free,
+      data.access_type,
     );
     if (success) {
       setShowAddModal(false);
@@ -107,8 +106,7 @@ const CourseManagement = () => {
         data.estimate_duration,
         data.course_status,
         data.tag,
-        data.price,
-        data.is_free,
+        data.access_type,
       );
       if (success) {
         setShowEditModal(false);
@@ -271,20 +269,17 @@ const CourseManagement = () => {
                           {course.course_title}
                         </h3>
                         <div className="flex-shrink-0">
-                          {course.is_free ? (
-                            <span className="text-lg font-bold text-green-600">
-                              MIỄN PHÍ
-                            </span>
-                          ) : (
-                            <div className="text-right">
-                              <div className="text-xl font-bold text-blue-600">
-                                {new Intl.NumberFormat("vi-VN").format(
-                                  course.price,
-                                )}{" "}
-                                <span className="text-sm">VND</span>
-                              </div>
-                            </div>
-                          )}
+                          <span
+                            className={`text-lg font-bold ${
+                              course.access_type === "free"
+                                ? "text-green-600"
+                                : "text-blue-600"
+                            }`}
+                          >
+                            {course.access_type === "free"
+                              ? "MIỄN PHÍ"
+                              : "PREMIUM"}
+                          </span>
                         </div>
                       </div>
                       <p className="text-gray-600 text-sm mb-3 line-clamp-2">
@@ -441,8 +436,7 @@ const CourseManagement = () => {
             estimate_duration: "",
             course_status: true,
             tag: "",
-            price: 0,
-            is_free: false,
+            access_type: "free",
           }
         }
       />

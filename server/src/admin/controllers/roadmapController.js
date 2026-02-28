@@ -17,8 +17,6 @@ const createRoadmap = async (req, res) => {
       estimated_duration,
       roadmap_status,
       certificate_id,
-      discount_percent,
-      roadmap_price,
     } = req.body;
     const result = await createRoadmapService(
       roadmap_title,
@@ -28,8 +26,6 @@ const createRoadmap = async (req, res) => {
       estimated_duration,
       roadmap_status,
       certificate_id,
-      discount_percent,
-      roadmap_price,
     );
     if (!result.success) {
       return res.status(400).json(result);
@@ -51,7 +47,6 @@ const updateRoadmap = async (req, res) => {
       estimated_duration,
       roadmap_status,
       certificate_id,
-      discount_percent,
     } = req.body;
     const result = await updateRoadmapService(
       roadmap_id,
@@ -62,7 +57,6 @@ const updateRoadmap = async (req, res) => {
       estimated_duration,
       roadmap_status,
       certificate_id,
-      discount_percent,
     );
     if (!result.success) {
       return res.status(404).json(result);

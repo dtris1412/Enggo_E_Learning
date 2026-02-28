@@ -12,8 +12,7 @@ interface EditCourseModalProps {
     estimate_duration: string;
     course_status: boolean;
     tag: string;
-    price: number;
-    is_free: boolean;
+    access_type: "free" | "premium";
   }) => Promise<void>;
   initialData: {
     course_title: string;
@@ -23,8 +22,7 @@ interface EditCourseModalProps {
     estimate_duration: string;
     course_status: boolean;
     tag: string;
-    price: number;
-    is_free: boolean;
+    access_type: "free" | "premium";
   };
 }
 
@@ -42,8 +40,7 @@ const EditCourseModal: React.FC<EditCourseModalProps> = ({
     estimate_duration: initialData.estimate_duration,
     course_status: initialData.course_status,
     tag: initialData.tag,
-    price: initialData.price,
-    is_free: initialData.is_free,
+    access_type: initialData.access_type as "free" | "premium",
   });
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -59,8 +56,7 @@ const EditCourseModal: React.FC<EditCourseModalProps> = ({
         estimate_duration: initialData.estimate_duration,
         course_status: initialData.course_status,
         tag: initialData.tag,
-        price: initialData.price,
-        is_free: initialData.is_free,
+        access_type: initialData.access_type,
       });
     }
   }, [initialData]);
@@ -84,9 +80,6 @@ const EditCourseModal: React.FC<EditCourseModalProps> = ({
     }
     if (!formData.tag || !formData.tag.trim()) {
       newErrors.tag = "Vui lòng chọn danh mục";
-    }
-    if (!formData.is_free && (!formData.price || formData.price <= 0)) {
-      newErrors.price = "Giá khóa học phải lớn hơn 0 nếu không miễn phí";
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -262,55 +255,49 @@ const EditCourseModal: React.FC<EditCourseModalProps> = ({
             )}
           </div>
 
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              id="is_free"
-              checked={formData.is_free}
-              onChange={(e) => {
-                const isFree = e.target.checked;
-                setFormData({
-                  ...formData,
-                  is_free: isFree,
-                  price: isFree ? 0 : formData.price,
-                });
-              }}
-              className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-            />
-            <label
-              htmlFor="is_free"
-              className="ml-2 text-sm font-medium text-gray-700"
-            >
-              Khóa học miễn phí
+          <div className="flex items-center space-x-4">
+            <label className="block text-sm font-medium text-gray-700">
+              Loại truy cập <span className="text-red-500">*</span>
             </label>
-          </div>
-
-          {!formData.is_free && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Giá khóa học (VND) <span className="text-red-500">*</span>
-              </label>
+            <div className="flex items-center">
               <input
-                type="number"
-                min="0"
-                step="1000"
-                value={formData.price}
+                type="radio"
+                id="access_free"
+                name="access_type"
+                value="free"
+                checked={formData.access_type === "free"}
                 onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    price: Number(e.target.value),
-                  })
+                  setFormData({ ...formData, access_type: "free" })
                 }
-                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                  errors.price ? "border-red-500" : "border-gray-300"
-                }`}
-                placeholder="VD: 500000"
+                className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
               />
-              {errors.price && (
-                <p className="text-red-500 text-sm mt-1">{errors.price}</p>
-              )}
+              <label
+                htmlFor="access_free"
+                className="ml-2 text-sm font-medium text-gray-700"
+              >
+                Miễn phí
+              </label>
             </div>
-          )}
+            <div className="flex items-center">
+              <input
+                type="radio"
+                id="access_premium"
+                name="access_type"
+                value="premium"
+                checked={formData.access_type === "premium"}
+                onChange={(e) =>
+                  setFormData({ ...formData, access_type: "premium" })
+                }
+                className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+              />
+              <label
+                htmlFor="access_premium"
+                className="ml-2 text-sm font-medium text-gray-700"
+              >
+                Premium
+              </label>
+            </div>
+          </div>
 
           <div className="flex items-center">
             <input

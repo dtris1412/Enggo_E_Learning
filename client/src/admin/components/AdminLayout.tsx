@@ -60,11 +60,7 @@ const AdminLayout = () => {
         },
       ],
     },
-    {
-      name: "Quản lý bài kiểm tra",
-      path: "/admin/tests",
-      icon: ClipboardList,
-    },
+
     {
       name: "Quản lý đề thi",
       path: "/admin/exams",

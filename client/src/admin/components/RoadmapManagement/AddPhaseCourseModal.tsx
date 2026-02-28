@@ -9,7 +9,7 @@ interface Course {
   description: string;
   course_level: string;
   estimate_duration: string;
-  price: number;
+  access_type: "free" | "premium";
 }
 
 interface AddPhaseCourseModalProps {
@@ -165,7 +165,9 @@ const AddPhaseCourseModal: React.FC<AddPhaseCourseModalProps> = ({
                             </span>
                             <span>{course.estimate_duration}</span>
                             <span className="font-medium text-blue-600">
-                              {formatCurrency(course.price)}
+                              {course.access_type === "free"
+                                ? "Miễn phí"
+                                : "Premium"}
                             </span>
                           </div>
                         </div>

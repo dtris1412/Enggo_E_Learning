@@ -7,8 +7,6 @@ import {
   Plus,
   Edit,
   Route as RouteIcon,
-  TrendingUp,
-  DollarSign,
   BookOpen,
   Trash2,
   FileText,
@@ -16,7 +14,6 @@ import {
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
-import { formatCurrency } from "../../utils/formatters";
 import { useRoadmap } from "../contexts/roadmapContext.tsx";
 import { usePhase } from "../contexts/phaseContext.tsx";
 import { useCertificate } from "../contexts/certificateContext.tsx";
@@ -323,40 +320,10 @@ const RoadmapDetail = () => {
             </div>
           </div>
         </div>
-
-        <div className="bg-white p-6 rounded-lg border border-gray-200">
-          <div className="flex items-center">
-            <div className="p-3 bg-green-100 rounded-lg">
-              <DollarSign className="h-6 w-6 text-green-600" />
-            </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Giá</p>
-              {roadmap.discount_percent > 0 ? (
-                <div className="flex flex-col gap-1">
-                  <div className="flex items-center gap-2">
-                    <p className="text-sm text-gray-400 line-through">
-                      {formatCurrency(roadmap.calculated_price)}
-                    </p>
-                    <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded">
-                      -{roadmap.discount_percent}%
-                    </span>
-                  </div>
-                  <p className="text-xl font-bold text-gray-900">
-                    {formatCurrency(roadmap.final_price)}
-                  </p>
-                </div>
-              ) : (
-                <p className="text-xl font-bold text-gray-900">
-                  {formatCurrency(roadmap.calculated_price)}
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
       </div>
 
       {/* Additional Info */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="bg-white p-6 rounded-lg border border-gray-200">
           <div className="flex items-center gap-3 mb-2">
             <RouteIcon className="h-5 w-5 text-blue-600" />
@@ -364,16 +331,6 @@ const RoadmapDetail = () => {
           </div>
           <p className="text-lg font-bold text-gray-900">
             {getLevelLabel(roadmap.roadmap_level)}
-          </p>
-        </div>
-
-        <div className="bg-white p-6 rounded-lg border border-gray-200">
-          <div className="flex items-center gap-3 mb-2">
-            <TrendingUp className="h-5 w-5 text-green-600" />
-            <p className="text-sm font-medium text-gray-600">Giảm giá</p>
-          </div>
-          <p className="text-lg font-bold text-gray-900">
-            {roadmap.discount_percent}%
           </p>
         </div>
 
@@ -546,7 +503,9 @@ const RoadmapDetail = () => {
                                     {phaseCourse.Course?.estimate_duration}
                                   </span>
                                   <span className="font-medium text-blue-600">
-                                    {formatCurrency(phaseCourse.Course?.price)}
+                                    {phaseCourse.Course?.access_type === "free"
+                                      ? "Miễn phí"
+                                      : "Premium"}
                                   </span>
                                 </div>
                               </div>

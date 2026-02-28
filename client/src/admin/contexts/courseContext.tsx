@@ -17,8 +17,7 @@ interface Course {
   estimate_duration: string;
   course_status: boolean;
   tag: string;
-  price: number;
-  is_free: boolean;
+  access_type: "free" | "premium";
   created_at: string;
   updated_at: string;
 }
@@ -36,7 +35,7 @@ interface CourseContextType {
     page?: number,
     course_status?: boolean,
     course_level?: string,
-    tag?: string
+    tag?: string,
   ) => Promise<void>;
   createCourse: (
     course_title: string,
@@ -46,8 +45,7 @@ interface CourseContextType {
     estimate_duration: string,
     course_status: boolean,
     tag: string,
-    price: number,
-    is_free: boolean
+    access_type: "free" | "premium",
   ) => Promise<boolean>;
   updateCourse: (
     course_id: number,
@@ -58,8 +56,7 @@ interface CourseContextType {
     estimate_duration: string,
     course_status: boolean,
     tag: string,
-    price: number,
-    is_free: boolean
+    access_type: "free" | "premium",
   ) => Promise<boolean>;
   lockCourse: (course_id: number) => Promise<boolean>;
   unlockCourse: (course_id: number) => Promise<boolean>;
@@ -105,7 +102,7 @@ export const CourseProvider: React.FC<CourseProviderProps> = ({ children }) => {
       page: number = 1,
       course_status?: boolean,
       course_level?: string,
-      tag?: string
+      tag?: string,
     ) => {
       setLoading(true);
       setError(null);
@@ -134,7 +131,7 @@ export const CourseProvider: React.FC<CourseProviderProps> = ({ children }) => {
             method: "GET",
             headers: getAuthHeaders(),
             credentials: "include",
-          }
+          },
         );
 
         // Kiểm tra unauthorized
@@ -162,7 +159,7 @@ export const CourseProvider: React.FC<CourseProviderProps> = ({ children }) => {
         setLoading(false);
       }
     },
-    []
+    [],
   );
 
   const createCourse = useCallback(
@@ -174,8 +171,7 @@ export const CourseProvider: React.FC<CourseProviderProps> = ({ children }) => {
       estimate_duration: string,
       course_status: boolean,
       tag: string,
-      price: number,
-      is_free: boolean
+      access_type: "free" | "premium",
     ): Promise<boolean> => {
       try {
         const response = await fetch(`${apiUrl}/admin/courses`, {
@@ -190,8 +186,7 @@ export const CourseProvider: React.FC<CourseProviderProps> = ({ children }) => {
             estimate_duration,
             course_status,
             tag,
-            price,
-            is_free,
+            access_type,
           }),
         });
 
@@ -217,7 +212,7 @@ export const CourseProvider: React.FC<CourseProviderProps> = ({ children }) => {
         return false;
       }
     },
-    [fetchCoursesPaginated]
+    [fetchCoursesPaginated],
   );
 
   const updateCourse = useCallback(
@@ -230,8 +225,7 @@ export const CourseProvider: React.FC<CourseProviderProps> = ({ children }) => {
       estimate_duration: string,
       course_status: boolean,
       tag: string,
-      price: number,
-      is_free: boolean
+      access_type: "free" | "premium",
     ): Promise<boolean> => {
       try {
         const response = await fetch(`${apiUrl}/admin/courses/${course_id}`, {
@@ -246,8 +240,7 @@ export const CourseProvider: React.FC<CourseProviderProps> = ({ children }) => {
             estimate_duration,
             course_status,
             tag,
-            price,
-            is_free,
+            access_type,
           }),
         });
 
@@ -273,7 +266,7 @@ export const CourseProvider: React.FC<CourseProviderProps> = ({ children }) => {
         return false;
       }
     },
-    [fetchCoursesPaginated]
+    [fetchCoursesPaginated],
   );
 
   const lockCourse = useCallback(
@@ -285,7 +278,7 @@ export const CourseProvider: React.FC<CourseProviderProps> = ({ children }) => {
             method: "PATCH",
             headers: getAuthHeaders(),
             credentials: "include",
-          }
+          },
         );
 
         // Kiểm tra unauthorized
@@ -310,7 +303,7 @@ export const CourseProvider: React.FC<CourseProviderProps> = ({ children }) => {
         return false;
       }
     },
-    [fetchCoursesPaginated]
+    [fetchCoursesPaginated],
   );
 
   const unlockCourse = useCallback(
@@ -322,7 +315,7 @@ export const CourseProvider: React.FC<CourseProviderProps> = ({ children }) => {
             method: "PATCH",
             headers: getAuthHeaders(),
             credentials: "include",
-          }
+          },
         );
 
         // Kiểm tra unauthorized
@@ -347,7 +340,7 @@ export const CourseProvider: React.FC<CourseProviderProps> = ({ children }) => {
         return false;
       }
     },
-    [fetchCoursesPaginated]
+    [fetchCoursesPaginated],
   );
 
   return (

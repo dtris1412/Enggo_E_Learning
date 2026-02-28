@@ -17,8 +17,6 @@ interface Roadmap {
   estimated_duration: number;
   roadmap_status: boolean;
   certificate_id: number;
-  discount_percent: number;
-  roadmap_price: number;
   created_at: string;
   updated_at: string;
 }
@@ -46,8 +44,6 @@ interface RoadmapContextType {
     estimated_duration: number,
     roadmap_status: boolean,
     certificate_id: number,
-    discount_percent: number,
-    roadmap_price: number,
   ) => Promise<boolean>;
   updateRoadmap: (
     roadmap_id: number,
@@ -58,7 +54,6 @@ interface RoadmapContextType {
     estimated_duration: number,
     roadmap_status: boolean,
     certificate_id: number,
-    discount_percent: number,
   ) => Promise<boolean>;
   lockRoadmap: (roadmap_id: number) => Promise<boolean>;
   unlockRoadmap: (roadmap_id: number) => Promise<boolean>;
@@ -203,8 +198,6 @@ export const RoadmapProvider: React.FC<RoadmapProviderProps> = ({
       estimated_duration: number,
       roadmap_status: boolean,
       certificate_id: number,
-      discount_percent: number,
-      roadmap_price: number,
     ): Promise<boolean> => {
       setLoading(true);
       setError(null);
@@ -220,8 +213,6 @@ export const RoadmapProvider: React.FC<RoadmapProviderProps> = ({
             estimated_duration,
             roadmap_status,
             certificate_id,
-            discount_percent,
-            roadmap_price,
           }),
         });
 
@@ -261,7 +252,6 @@ export const RoadmapProvider: React.FC<RoadmapProviderProps> = ({
       estimated_duration: number,
       roadmap_status: boolean,
       certificate_id: number,
-      discount_percent: number,
     ): Promise<boolean> => {
       setLoading(true);
       setError(null);
@@ -277,7 +267,6 @@ export const RoadmapProvider: React.FC<RoadmapProviderProps> = ({
             estimated_duration,
             roadmap_status,
             certificate_id,
-            discount_percent,
           }),
         });
 
