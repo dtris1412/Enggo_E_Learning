@@ -26,6 +26,26 @@ export default (sequelize, DataTypes) => {
           key: "subscription_plan_id",
         },
       },
+      billing_type: {
+        type: DataTypes.ENUM("monthly", "yearly", "weekly"),
+        allowNull: false,
+      },
+      duration_days: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      price: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      discount_percentage: {
+        type: DataTypes.FLOAT,
+        allowNull: true,
+      },
+      is_active: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: true,
+      },
     },
     {
       sequelize,

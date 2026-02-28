@@ -191,6 +191,25 @@ import {
   deleteMultipleFlashcards,
 } from "../controllers/flashcardController.js";
 
+// ===========Subscription Plan Controllers===========
+import {
+  getSubscriptionPlansPaginated,
+  getSubscriptionPlanById,
+  updateSubscriptionPlan,
+  deleteSubscriptionPlan,
+  toggleSubscriptionPlanStatus,
+} from "../controllers/subscriptionPlanController.js";
+
+// ===========Subscription Price Controllers===========
+import {
+  getSubscriptionPricesPaginated,
+  getSubscriptionPricesByPlanId,
+  getSubscriptionPriceById,
+  updateSubscriptionPrice,
+  deleteSubscriptionPrice,
+  toggleSubscriptionPriceStatus,
+} from "../controllers/subscriptionPriceController.js";
+
 // ===========Report Controllers===========
 import {
   getReportsPaginated,
@@ -895,6 +914,77 @@ const initAdminRoutes = (app) => {
     verifyToken,
     requireAdmin,
     deleteMultipleFlashcards,
+  );
+
+  //===========Subscription Management Routes===========
+  // Subscription Plan Routes
+  router.get(
+    "/api/admin/subscription-plans/paginated",
+    verifyToken,
+    requireAdmin,
+    getSubscriptionPlansPaginated,
+  );
+  router.get(
+    "/api/admin/subscription-plans/:subscription_plan_id",
+    verifyToken,
+    requireAdmin,
+    getSubscriptionPlanById,
+  );
+  router.put(
+    "/api/admin/subscription-plans/:subscription_plan_id",
+    verifyToken,
+    requireAdmin,
+    updateSubscriptionPlan,
+  );
+  router.delete(
+    "/api/admin/subscription-plans/:subscription_plan_id",
+    verifyToken,
+    requireAdmin,
+    deleteSubscriptionPlan,
+  );
+  router.patch(
+    "/api/admin/subscription-plans/:subscription_plan_id/toggle-status",
+    verifyToken,
+    requireAdmin,
+    toggleSubscriptionPlanStatus,
+  );
+
+  // Subscription Price Routes
+  router.get(
+    "/api/admin/subscription-prices/paginated",
+    verifyToken,
+    requireAdmin,
+    getSubscriptionPricesPaginated,
+  );
+  router.get(
+    "/api/admin/subscription-plans/:subscription_plan_id/prices",
+    verifyToken,
+    requireAdmin,
+    getSubscriptionPricesByPlanId,
+  );
+  router.get(
+    "/api/admin/subscription-prices/:subscription_price_id",
+    verifyToken,
+    requireAdmin,
+    getSubscriptionPriceById,
+  );
+  router.put(
+    "/api/admin/subscription-prices/:subscription_price_id",
+    verifyToken,
+    requireAdmin,
+    updateSubscriptionPrice,
+  );
+  router.delete(
+    "/api/admin/subscription-prices/:subscription_price_id",
+    verifyToken,
+    requireAdmin,
+    deleteSubscriptionPrice,
+  );
+  router.patch(
+    "/api/admin/subscription-prices/:subscription_price_id/toggle-status",
+    verifyToken,
+    requireAdmin,
+    toggleSubscriptionPriceStatus,
   );
 
   //===========Report Management Routes===========

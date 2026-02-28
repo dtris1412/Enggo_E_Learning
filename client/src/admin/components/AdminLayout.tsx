@@ -3,7 +3,6 @@ import {
   LayoutDashboard,
   Users,
   BookOpen,
-  ClipboardList,
   Newspaper,
   MessageSquare,
   BarChart3,
@@ -16,6 +15,7 @@ import {
   Target,
   FileText,
   FileCheck,
+  CreditCard,
 } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "../../shared/contexts/authContext";
@@ -90,6 +90,11 @@ const AdminLayout = () => {
       name: "Quản lý kỹ năng",
       path: "/admin/skills",
       icon: Target,
+    },
+    {
+      name: "Quản lý gói đăng ký",
+      path: "/admin/subscriptions",
+      icon: CreditCard,
     },
     {
       name: "Quản lý tài liệu",

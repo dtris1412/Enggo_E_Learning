@@ -23,6 +23,7 @@ import DocumentManagement from "../pages/DocumentManagement";
 import ExamManagement from "../pages/ExamManagement";
 import ExamDetail from "../pages/ExamDetail";
 import FlashcardManagement from "../pages/FlashcardManagement";
+import SubscriptionManagement from "../pages/SubscriptionManagement";
 
 export const AdminRoutes = () => {
   return (
@@ -80,6 +81,9 @@ export const AdminRoutes = () => {
 
         {/* Flashcard Management */}
         <Route path="flashcards" element={<FlashcardManagement />} />
+
+        {/* Subscription Management */}
+        <Route path="subscriptions" element={<SubscriptionManagement />} />
       </Route>
     </>
   );
