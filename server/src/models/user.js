@@ -18,6 +18,15 @@ export default (sequelize, DataTypes) => {
       User.hasMany(models.User_Flashcard_Set, {
         foreignKey: "user_id",
       });
+      User.hasMany(models.User_Subscription, {
+        foreignKey: "user_id",
+      });
+      User.hasOne(models.User_Token_Wallet, {
+        foreignKey: "user_id",
+      });
+      User.hasMany(models.User_Token_Transaction, {
+        foreignKey: "user_id",
+      });
     }
   }
   User.init(
