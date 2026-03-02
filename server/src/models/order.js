@@ -1,22 +1,25 @@
 import { Model } from "sequelize";
 
 export default (sequelize, DataTypes) => {
-  class User_Subscription extends Model {
+  class Order extends Model {
     static associate(models) {
-      User_Subscription.belongsTo(models.User, {
+      Order.belongsTo(models.User, {
         foreignKey: "user_id",
       });
-      User_Subscription.belongsTo(models.Subscription_Price, {
+      Order.belongsTo(models.Subscription_Price, {
         foreignKey: "subscription_price_id",
       });
-      User_Subscription.belongsTo(models.Order, {
+      Order.hasOne(models.User_Subscription, {
+        foreignKey: "order_id",
+      });
+      Order.hasMany(models.Payment, {
         foreignKey: "order_id",
       });
     }
   }
-  User_Subscription.init(
+  Order.init(
     {
-      user_subscription_id: {
+      order_id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
@@ -24,7 +27,10 @@ export default (sequelize, DataTypes) => {
       user_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
-        references: { model: "users", key: "user_id" },
+        references: {
+          model: "users",
+          key: "user_id",
+        },
       },
       subscription_price_id: {
         type: DataTypes.INTEGER,
@@ -34,29 +40,31 @@ export default (sequelize, DataTypes) => {
           key: "subscription_price_id",
         },
       },
-      order_id: {
-        type: DataTypes.INTEGER,
-        allowNull: true,
-        references: {
-          model: "orders",
-          key: "order_id",
-        },
-      },
-      started_at: { type: DataTypes.DATE, allowNull: false },
-      expired_at: { type: DataTypes.DATE, allowNull: false },
       status: {
-        type: DataTypes.ENUM("active", "expired", "canceled"),
+        type: DataTypes.ENUM("pending", "completed", "failed"),
         allowNull: false,
-        defaultValue: "active",
+      },
+      amount: {
+        type: DataTypes.DECIMAL(10, 2),
+        allowNull: false,
+      },
+      content: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      order_date: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: DataTypes.NOW,
       },
     },
     {
       sequelize,
-      modelName: "User_Subscription",
-      tableName: "user_subscriptions",
+      modelName: "Order",
+      tableName: "orders",
       freezeTableName: true,
       timestamps: false,
     },
   );
-  return User_Subscription;
+  return Order;
 };

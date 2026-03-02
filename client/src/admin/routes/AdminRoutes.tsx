@@ -24,6 +24,8 @@ import ExamManagement from "../pages/ExamManagement";
 import ExamDetail from "../pages/ExamDetail";
 import FlashcardManagement from "../pages/FlashcardManagement";
 import SubscriptionManagement from "../pages/SubscriptionManagement";
+import OrderManagement from "../pages/OrderManagement";
+import UserSubscriptionTracking from "../pages/UserSubscriptionTracking";
 
 export const AdminRoutes = () => {
   return (
@@ -84,6 +86,18 @@ export const AdminRoutes = () => {
 
         {/* Subscription Management */}
         <Route path="subscriptions" element={<SubscriptionManagement />} />
+
+        {/* User Subscription Tracking */}
+        <Route
+          path="user-subscriptions"
+          element={<UserSubscriptionTracking />}
+        />
+
+        {/* Order Management */}
+        <Route path="orders" element={<OrderManagement />} />
+
+        {/* Payment Management */}
+        <Route path="payments" element={<OrderManagement />} />
       </Route>
     </>
   );

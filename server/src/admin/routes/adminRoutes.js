@@ -210,6 +210,44 @@ import {
   toggleSubscriptionPriceStatus,
 } from "../controllers/subscriptionPriceController.js";
 
+// ===========User Token Wallet Controllers (Admin)===========
+import {
+  getAllWallets,
+  updateWalletBalance,
+  addTokens,
+  deductTokens,
+} from "../controllers/userTokenWalletController.js";
+
+// ===========User Token Transaction Controllers (Admin)===========
+import {
+  getAllTransactions,
+  createTransaction,
+  getTransactionSummary,
+} from "../controllers/userTokenTransactionController.js";
+
+// ===========User Subscription Controllers (Admin)===========
+import {
+  getAllSubscriptions,
+  updateExpiredSubscriptions,
+} from "../controllers/userSubscriptionController.js";
+
+// ===========Order Controllers===========
+import {
+  getAllOrders,
+  getOrderById,
+  updateOrderStatus,
+  getOrderStatistics,
+} from "../controllers/orderController.js";
+
+// ===========Payment Controllers===========
+import {
+  getAllPayments,
+  getPaymentById as getAdminPaymentById,
+  updatePaymentStatus,
+  getPaymentStatistics,
+  getPaymentsByOrderId as getAdminPaymentsByOrderId,
+} from "../controllers/paymentController.js";
+
 // ===========Report Controllers===========
 import {
   getReportsPaginated,
@@ -260,9 +298,50 @@ import {
   getExamMediaByExamId,
 } from "../controllers/examMediaController.js";
 
+// ===========Dashboard Controllers===========
+import {
+  getDashboardStatistics,
+  getTotalUsers,
+  getActiveCourses,
+  getTestStatistics,
+  getRecentSubscriptions,
+} from "../controllers/dashboardController.js";
+
 const router = express.Router();
 
 const initAdminRoutes = (app) => {
+  //===========Dashboard Routes===========
+  router.get(
+    "/api/admin/dashboard/statistics",
+    verifyToken,
+    requireAdmin,
+    getDashboardStatistics,
+  );
+  router.get(
+    "/api/admin/dashboard/users/total",
+    verifyToken,
+    requireAdmin,
+    getTotalUsers,
+  );
+  router.get(
+    "/api/admin/dashboard/courses/active",
+    verifyToken,
+    requireAdmin,
+    getActiveCourses,
+  );
+  router.get(
+    "/api/admin/dashboard/tests/statistics",
+    verifyToken,
+    requireAdmin,
+    getTestStatistics,
+  );
+  router.get(
+    "/api/admin/dashboard/subscriptions/recent",
+    verifyToken,
+    requireAdmin,
+    getRecentSubscriptions,
+  );
+
   //===========User Management Routes===========
   router.get(
     "/api/admin/users/paginated",
@@ -985,6 +1064,114 @@ const initAdminRoutes = (app) => {
     verifyToken,
     requireAdmin,
     toggleSubscriptionPriceStatus,
+  );
+
+  //===========User Token Wallet Management Routes (Admin)===========
+  router.get(
+    "/api/admin/user-wallets",
+    verifyToken,
+    requireAdmin,
+    getAllWallets,
+  );
+  router.put(
+    "/api/admin/user-wallets/:walletId",
+    verifyToken,
+    requireAdmin,
+    updateWalletBalance,
+  );
+  router.post(
+    "/api/admin/user-wallets/add-tokens",
+    verifyToken,
+    requireAdmin,
+    addTokens,
+  );
+  router.post(
+    "/api/admin/user-wallets/deduct-tokens",
+    verifyToken,
+    requireAdmin,
+    deductTokens,
+  );
+
+  //===========User Token Transaction Management Routes (Admin)===========
+  router.get(
+    "/api/admin/user-transactions",
+    verifyToken,
+    requireAdmin,
+    getAllTransactions,
+  );
+  router.get(
+    "/api/admin/user-transactions/summary",
+    verifyToken,
+    requireAdmin,
+    getTransactionSummary,
+  );
+  router.post(
+    "/api/admin/user-transactions",
+    verifyToken,
+    requireAdmin,
+    createTransaction,
+  );
+
+  //===========User Subscription Management Routes (Admin)===========
+  router.get(
+    "/api/admin/user-subscriptions",
+    verifyToken,
+    requireAdmin,
+    getAllSubscriptions,
+  );
+  router.patch(
+    "/api/admin/user-subscriptions/update-expired",
+    verifyToken,
+    requireAdmin,
+    updateExpiredSubscriptions,
+  );
+
+  //===========Order Management Routes (Admin)===========
+  router.get("/api/admin/orders", verifyToken, requireAdmin, getAllOrders);
+  router.get(
+    "/api/admin/orders/statistics",
+    verifyToken,
+    requireAdmin,
+    getOrderStatistics,
+  );
+  router.get(
+    "/api/admin/orders/:orderId",
+    verifyToken,
+    requireAdmin,
+    getOrderById,
+  );
+  router.patch(
+    "/api/admin/orders/:orderId/status",
+    verifyToken,
+    requireAdmin,
+    updateOrderStatus,
+  );
+
+  //===========Payment Management Routes (Admin)===========
+  router.get("/api/admin/payments", verifyToken, requireAdmin, getAllPayments);
+  router.get(
+    "/api/admin/payments/statistics",
+    verifyToken,
+    requireAdmin,
+    getPaymentStatistics,
+  );
+  router.get(
+    "/api/admin/payments/:paymentId",
+    verifyToken,
+    requireAdmin,
+    getAdminPaymentById,
+  );
+  router.patch(
+    "/api/admin/payments/:paymentId/status",
+    verifyToken,
+    requireAdmin,
+    updatePaymentStatus,
+  );
+  router.get(
+    "/api/admin/orders/:orderId/payments",
+    verifyToken,
+    requireAdmin,
+    getAdminPaymentsByOrderId,
   );
 
   //===========Report Management Routes===========

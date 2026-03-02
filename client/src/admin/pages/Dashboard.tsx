@@ -1,253 +1,158 @@
+import { Users, BookOpen, FileText, TrendingUp } from "lucide-react";
+import { useEffect } from "react";
+import { useDashboard } from "../contexts/dashboardContext";
 import {
-  Users,
-  BookOpen,
-  FileText,
-  TrendingUp,
-  Eye,
-  Download,
-  MessageSquare,
-  Award,
-} from "lucide-react";
+  StatCard,
+  RecentSubscriptionsList,
+  TestCompletionChart,
+  AIPlaceholders,
+  RecentCompletedExams,
+  RecentFlashcards,
+  TopDocuments,
+  TopBlogs,
+  FeaturedBanner,
+} from "../components/Dashboard";
 
 const Dashboard = () => {
+  const { dashboardData, loading, error, fetchDashboardStatistics } =
+    useDashboard();
+
+  useEffect(() => {
+    fetchDashboardStatistics();
+  }, []);
+
   const stats = [
     {
-      title: "Tổng học viên",
-      value: "2,847",
+      title: "Tổng người dùng",
+      value: loading
+        ? "..."
+        : dashboardData?.totalUsers.toLocaleString("vi-VN") || "0",
       change: "+12%",
-      changeType: "increase",
+      changeType: "increase" as const,
       icon: <Users className="h-6 w-6 text-blue-600" />,
     },
     {
       title: "Khóa học hoạt động",
-      value: "24",
+      value: loading ? "..." : dashboardData?.activeCourses.toString() || "0",
       change: "+3",
-      changeType: "increase",
+      changeType: "increase" as const,
       icon: <BookOpen className="h-6 w-6 text-green-600" />,
     },
     {
       title: "Bài thi đã hoàn thành",
-      value: "15,632",
+      value: loading
+        ? "..."
+        : dashboardData?.testStatistics.completedTests.toLocaleString(
+            "vi-VN",
+          ) || "0",
       change: "+8%",
-      changeType: "increase",
+      changeType: "increase" as const,
       icon: <FileText className="h-6 w-6 text-purple-600" />,
     },
     {
       title: "Tỷ lệ hoàn thành",
-      value: "87%",
+      value: loading
+        ? "..."
+        : `${dashboardData?.testStatistics.completionRate || 0}%`,
       change: "+2%",
-      changeType: "increase",
+      changeType: "increase" as const,
       icon: <TrendingUp className="h-6 w-6 text-orange-600" />,
     },
   ];
 
-  const recentActivities = [
-    {
-      id: 1,
-      user: "Nguyễn Văn A",
-      action: "Hoàn thành khóa học IELTS Foundation",
-      time: "2 phút trước",
-      type: "course_completion",
-    },
-    {
-      id: 2,
-      user: "Trần Thị B",
-      action: "Đăng ký khóa học TOEIC Intensive",
-      time: "15 phút trước",
-      type: "enrollment",
-    },
-    {
-      id: 3,
-      user: "Lê Văn C",
-      action: "Hoàn thành bài thi thử IELTS Reading",
-      time: "1 giờ trước",
-      type: "test_completion",
-    },
-    {
-      id: 4,
-      user: "Phạm Thị D",
-      action: "Gửi phản hồi về khóa học Business English",
-      time: "2 giờ trước",
-      type: "feedback",
-    },
-  ];
-
-  const topCourses = [
-    {
-      id: 1,
-      name: "IELTS Foundation",
-      students: 1250,
-      completion: 89,
-      rating: 4.8,
-    },
-    {
-      id: 2,
-      name: "TOEIC Intensive",
-      students: 980,
-      completion: 92,
-      rating: 4.7,
-    },
-    {
-      id: 3,
-      name: "Business English Pro",
-      students: 750,
-      completion: 85,
-      rating: 4.9,
-    },
-    {
-      id: 4,
-      name: "Giao tiếp cơ bản",
-      students: 1500,
-      completion: 78,
-      rating: 4.6,
-    },
-  ];
+  const totalTestAttempts = dashboardData?.testStatistics.totalAttempts || 0;
+  const completedTests = dashboardData?.testStatistics.completedTests || 0;
+  const completionRate = dashboardData?.testStatistics.completionRate || 0;
+  const recentSubscriptions = dashboardData?.recentSubscriptions || [];
+  const recentCompletedExams = dashboardData?.recentCompletedExams || [];
+  const recentFlashcards = dashboardData?.recentFlashcards || [];
+  const topDocuments = dashboardData?.topDocuments || [];
+  const topBlogs = dashboardData?.topBlogs || [];
 
   return (
-    <div className="space-y-6">
+    <div className="p-6 bg-gray-50 min-h-screen">
       {/* Page Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-gray-600">Tổng quan hệ thống EnglishMaster</p>
-        </div>
-        <div className="flex space-x-3">
-          <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center">
-            <Download className="h-4 w-4 mr-2" />
-            Xuất báo cáo
-          </button>
-        </div>
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold text-gray-800 mb-2">Dashboard</h1>
+        <p className="text-gray-600">Tổng quan hệ thống EnglishMaster</p>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat, index) => (
-          <div
-            key={index}
-            className="bg-white p-6 rounded-lg border border-gray-200 hover:shadow-md transition-shadow duration-200"
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">
-                  {stat.title}
-                </p>
-                <p className="text-2xl font-bold text-gray-900 mt-1">
-                  {stat.value}
-                </p>
-                <p
-                  className={`text-sm mt-1 ${
-                    stat.changeType === "increase"
-                      ? "text-green-600"
-                      : "text-red-600"
-                  }`}
-                >
-                  {stat.change} so với tháng trước
-                </p>
-              </div>
-              <div className="p-3 bg-gray-50 rounded-lg">{stat.icon}</div>
-            </div>
-          </div>
-        ))}
-      </div>
+      {/* Error Message */}
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+          {error}
+        </div>
+      )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Recent Activities */}
-        <div className="bg-white rounded-lg border border-gray-200">
-          <div className="p-6 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900">
-              Hoạt động gần đây
-            </h2>
-          </div>
-          <div className="p-6">
-            <div className="space-y-4">
-              {recentActivities.map((activity) => (
-                <div key={activity.id} className="flex items-start space-x-3">
-                  <div className="flex-shrink-0">
-                    <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                      {activity.type === "course_completion" && (
-                        <Award className="h-4 w-4 text-blue-600" />
-                      )}
-                      {activity.type === "enrollment" && (
-                        <BookOpen className="h-4 w-4 text-green-600" />
-                      )}
-                      {activity.type === "test_completion" && (
-                        <FileText className="h-4 w-4 text-purple-600" />
-                      )}
-                      {activity.type === "feedback" && (
-                        <MessageSquare className="h-4 w-4 text-orange-600" />
-                      )}
-                    </div>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900">
-                      {activity.user}
-                    </p>
-                    <p className="text-sm text-gray-600">{activity.action}</p>
-                    <p className="text-xs text-gray-500 mt-1">
-                      {activity.time}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+      {/* Row 1: Featured Banner + Stats Grid (3 cards) */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+        {/* Featured Banner - takes 1/3 */}
+        <div className="lg:col-span-1">
+          <FeaturedBanner />
         </div>
 
-        {/* Top Courses */}
-        <div className="bg-white rounded-lg border border-gray-200">
-          <div className="p-6 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900">
-              Khóa học hàng đầu
-            </h2>
-          </div>
-          <div className="p-6">
-            <div className="space-y-4">
-              {topCourses.map((course) => (
-                <div
-                  key={course.id}
-                  className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
-                >
-                  <div>
-                    <h3 className="font-medium text-gray-900">{course.name}</h3>
-                    <p className="text-sm text-gray-600">
-                      {course.students} học viên
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-sm font-medium text-gray-900">
-                      {course.completion}% hoàn thành
-                    </p>
-                    <p className="text-sm text-yellow-600">★ {course.rating}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
+        {/* Stats Grid - takes 2/3 with 3 columns inside */}
+        <div className="lg:col-span-2">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 h-full">
+            {stats.slice(0, 3).map((stat, index) => (
+              <StatCard
+                key={index}
+                title={stat.title}
+                value={stat.value}
+                change={stat.change}
+                changeType={stat.changeType}
+                icon={stat.icon}
+              />
+            ))}
           </div>
         </div>
       </div>
 
-      {/* Quick Actions */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">
-          Thao tác nhanh
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <button className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200 text-left">
-            <BookOpen className="h-6 w-6 text-blue-600 mb-2" />
-            <h3 className="font-medium text-gray-900">Tạo khóa học mới</h3>
-            <p className="text-sm text-gray-600">Thêm khóa học vào hệ thống</p>
-          </button>
-          <button className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200 text-left">
-            <FileText className="h-6 w-6 text-green-600 mb-2" />
-            <h3 className="font-medium text-gray-900">Tạo bài thi mới</h3>
-            <p className="text-sm text-gray-600">Thêm bài thi thử mới</p>
-          </button>
-          <button className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200 text-left">
-            <Users className="h-6 w-6 text-purple-600 mb-2" />
-            <h3 className="font-medium text-gray-900">Quản lý người dùng</h3>
-            <p className="text-sm text-gray-600">Xem và chỉnh sửa tài khoản</p>
-          </button>
+      {/* Row 2: Recent Exams (2/4) + Test Chart Donut (1/4) + Top Blogs (1/4) */}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6">
+        {/* Recent Completed Exams - takes 2/4 (half) */}
+        <div className="lg:col-span-2">
+          <RecentCompletedExams
+            exams={recentCompletedExams}
+            loading={loading}
+          />
         </div>
+
+        {/* Test Completion Chart - takes 1/4 */}
+        <div className="lg:col-span-1">
+          <TestCompletionChart
+            totalAttempts={totalTestAttempts}
+            completedTests={completedTests}
+            completionRate={completionRate}
+          />
+        </div>
+
+        {/* Top Blogs - takes 1/4 */}
+        <div className="lg:col-span-1">
+          <TopBlogs blogs={topBlogs} loading={loading} />
+        </div>
+      </div>
+
+      {/* Row 3: Flashcards (1/3) + Documents (1/3) + Subscriptions (1/3) */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+        <RecentFlashcards flashcards={recentFlashcards} loading={loading} />
+        <TopDocuments documents={topDocuments} loading={loading} />
+        <RecentSubscriptionsList
+          subscriptions={recentSubscriptions}
+          loading={loading}
+        />
+      </div>
+
+      {/* Row 4: 4th Stat Card + AI Placeholder */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <StatCard
+          title={stats[3].title}
+          value={stats[3].value}
+          change={stats[3].change}
+          changeType={stats[3].changeType}
+          icon={stats[3].icon}
+        />
+        <AIPlaceholders />
       </div>
     </div>
   );

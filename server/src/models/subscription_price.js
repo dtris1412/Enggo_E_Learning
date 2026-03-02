@@ -9,6 +9,9 @@ export default (sequelize, DataTypes) => {
       Subscription_Price.hasMany(models.User_Subscription, {
         foreignKey: "subscription_price_id",
       });
+      Subscription_Price.hasMany(models.Order, {
+        foreignKey: "subscription_price_id",
+      });
     }
   }
   Subscription_Price.init(

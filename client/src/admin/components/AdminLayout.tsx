@@ -24,6 +24,8 @@ const AdminLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [courseMenuOpen, setCourseMenuOpen] = useState(false);
   const [roadmapMenuOpen, setRoadmapMenuOpen] = useState(false);
+  const [subscriptionMenuOpen, setSubscriptionMenuOpen] = useState(false);
+  const [orderMenuOpen, setOrderMenuOpen] = useState(false);
   const { logout, user } = useAuth();
   const navigate = useNavigate();
 
@@ -93,8 +95,37 @@ const AdminLayout = () => {
     },
     {
       name: "Quản lý gói đăng ký",
-      path: "/admin/subscriptions",
       icon: CreditCard,
+      hasDropdown: true,
+      isOpen: subscriptionMenuOpen,
+      toggle: () => setSubscriptionMenuOpen(!subscriptionMenuOpen),
+      children: [
+        {
+          name: "Quản lý gói",
+          path: "/admin/subscriptions",
+        },
+        {
+          name: "Quản lý đăng ký",
+          path: "/admin/user-subscriptions",
+        },
+      ],
+    },
+    {
+      name: "Quản lý đơn hàng",
+      icon: CreditCard,
+      hasDropdown: true,
+      isOpen: orderMenuOpen,
+      toggle: () => setOrderMenuOpen(!orderMenuOpen),
+      children: [
+        {
+          name: "Đơn hàng",
+          path: "/admin/orders",
+        },
+        {
+          name: "Thanh toán",
+          path: "/admin/payments",
+        },
+      ],
     },
     {
       name: "Quản lý tài liệu",

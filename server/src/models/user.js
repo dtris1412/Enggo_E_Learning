@@ -27,6 +27,9 @@ export default (sequelize, DataTypes) => {
       User.hasMany(models.User_Token_Transaction, {
         foreignKey: "user_id",
       });
+      User.hasMany(models.Order, {
+        foreignKey: "user_id",
+      });
     }
   }
   User.init(

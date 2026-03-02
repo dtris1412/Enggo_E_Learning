@@ -5,6 +5,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import initSharedRoutes from "./shared/routes/sharedRoute.js";
 import initAdminRoutes from "./admin/routes/adminRoutes.js";
+import initUserRoutes from "./user/routes/userRoutes.js";
 import uploadRoutes from "./shared/routes/uploadRoute.js";
 import connectDB from "./config/connectDB.js";
 import cors from "cors";
@@ -39,6 +40,7 @@ app.use("/api/upload", uploadRoutes);
 // ============================================
 initSharedRoutes(app); // /api/*
 initAdminRoutes(app); // /api/admin/*
+initUserRoutes(app); // /api/user/*
 
 // ============================================
 // SERVE REACT STATIC FILES (như Nginx)
