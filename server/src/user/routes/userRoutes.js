@@ -1,5 +1,20 @@
 import express, { Router } from "express";
-import { verifyToken } from "../../middleware/authMiddleware.js";
+import {
+  requireAdmin,
+  requireAuth,
+  requireRole,
+  requireUser,
+  verifyToken,
+  optionalVerifyToken,
+  checkSubscriptionAccess,
+  loadDocumentMiddleware,
+} from "../../middleware/authMiddleware.js";
+// ===========Document Controllers===========
+import {
+  getDocumentsPaginated,
+  getDocumentById,
+  downloadDocument,
+} from "../controllers/documentController.js";
 
 // ===========User Token Wallet Controllers===========
 import { getUserWallet } from "../controllers/userTokenWalletController.js";
@@ -38,13 +53,45 @@ import {
 const router = express.Router();
 
 const initUserRoutes = (app) => {
+  // ===========Document Routes===========
+  // List all documents (public)
+  router.get("/api/user/documents", getDocumentsPaginated);
+
+  // View document by ID
+  // - Free documents: Anyone can view (no login required)
+  // - Premium documents: Requires premium subscription (will show 401 if not logged in)
+  router.get(
+    "/api/user/documents/:document_id",
+    optionalVerifyToken, // Parse token if available, but don't reject if missing
+    loadDocumentMiddleware, // Load document and attach to req.resource
+    checkSubscriptionAccess, // Check subscription based on document.acess_type
+    getDocumentById,
+  );
+
+  // Download document
+  // - Free documents: Login required
+  // - Premium documents: Premium subscription required
+  router.get(
+    "/api/user/documents/:document_id/download",
+    verifyToken, // Authentication required for download
+    loadDocumentMiddleware, // Load document
+    checkSubscriptionAccess, // Check subscription access
+    downloadDocument,
+  );
+
   // ===========User Token Wallet Routes===========
-  router.get("/api/user/wallet", verifyToken, getUserWallet);
+  router.get("/api/user/wallet", requireUser, verifyToken, getUserWallet);
 
   // ===========User Token Transaction Routes===========
-  router.get("/api/user/transactions", verifyToken, getUserTransactions);
+  router.get(
+    "/api/user/transactions",
+    requireUser,
+    verifyToken,
+    getUserTransactions,
+  );
   router.get(
     "/api/user/transactions/:transactionId",
+    requireUser,
     verifyToken,
     getTransactionById,
   );
@@ -52,38 +99,68 @@ const initUserRoutes = (app) => {
   // ===========User Subscription Routes===========
   router.get(
     "/api/user/subscriptions/active",
+    requireUser,
     verifyToken,
     getUserActiveSubscription,
   );
-  router.get("/api/user/subscriptions", verifyToken, getUserSubscriptions);
+  router.get(
+    "/api/user/subscriptions",
+    requireUser,
+    verifyToken,
+    getUserSubscriptions,
+  );
   router.get(
     "/api/user/subscriptions/:subscriptionId",
+    requireUser,
     verifyToken,
     getSubscriptionById,
   );
-  router.post("/api/user/subscriptions", verifyToken, subscribeToplan);
+  router.post(
+    "/api/user/subscriptions",
+    requireUser,
+    verifyToken,
+    subscribeToplan,
+  );
   router.patch(
     "/api/user/subscriptions/:subscriptionId/cancel",
+    requireUser,
     verifyToken,
     cancelSubscription,
   );
 
   // ===========User Order Routes===========
-  router.get("/api/user/orders", verifyToken, getUserOrders);
-  router.get("/api/user/orders/:orderId", verifyToken, getOrderById);
-  router.post("/api/user/orders", verifyToken, createOrder);
+  router.get("/api/user/orders", requireUser, verifyToken, getUserOrders);
+  router.get(
+    "/api/user/orders/:orderId",
+    requireUser,
+    verifyToken,
+    getOrderById,
+  );
+  router.post("/api/user/orders", requireUser, verifyToken, createOrder);
 
   // ===========User Payment Routes===========
-  router.get("/api/user/payments", verifyToken, getUserPayments);
+  router.get("/api/user/payments", requireUser, verifyToken, getUserPayments);
   router.get(
     "/api/user/orders/:orderId/payments",
+    requireUser,
     verifyToken,
     getPaymentsByOrderId,
   );
-  router.get("/api/user/payments/:paymentId", verifyToken, getUserPaymentById);
-  router.post("/api/user/orders/:orderId/payments", verifyToken, createPayment);
+  router.get(
+    "/api/user/payments/:paymentId",
+    requireUser,
+    verifyToken,
+    getUserPaymentById,
+  );
+  router.post(
+    "/api/user/orders/:orderId/payments",
+    requireUser,
+    verifyToken,
+    createPayment,
+  );
   router.post(
     "/api/user/orders/:orderId/payments/retry",
+    requireUser,
     verifyToken,
     retryPayment,
   );

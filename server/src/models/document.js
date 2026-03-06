@@ -31,7 +31,7 @@ export default (sequelize, DataTypes) => {
         defaultValue: 0,
         allowNull: false,
       },
-      acess_type: {
+      access_type: {
         type: DataTypes.ENUM("free", "premium"),
         defaultValue: "free",
         allowNull: false,

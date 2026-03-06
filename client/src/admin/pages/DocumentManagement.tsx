@@ -3,15 +3,7 @@ import { useDocument } from "../contexts/documentContext";
 import AddDocumentModal from "../components/DocumentManagement/AddDocumentModal.tsx";
 import EditDocumentModal from "../components/DocumentManagement/EditDocumentModal.tsx";
 import ExportButton from "../components/ExportButton";
-import {
-  FileText,
-  Search,
-  Plus,
-  Edit2,
-  Trash2,
-  Download,
-  Filter,
-} from "lucide-react";
+import { FileText, Search, Plus, Edit2, Trash2, Download } from "lucide-react";
 
 const DocumentManagement: React.FC = () => {
   const {

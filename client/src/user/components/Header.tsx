@@ -15,7 +15,7 @@ const Header = () => {
     { path: "/", label: "Trang chủ" },
     { path: "/about", label: "Giới thiệu" },
     { path: "/courses", label: "Chương trình học" },
-    { path: "/resources", label: "Tài liệu" },
+    { path: "/documents", label: "Tài liệu" },
     { path: "/blog", label: "Blog" },
     { path: "/tests", label: "Thi thử online" },
   ];
