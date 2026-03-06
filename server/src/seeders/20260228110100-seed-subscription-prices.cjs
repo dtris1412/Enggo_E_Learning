@@ -5,15 +5,15 @@ module.exports = {
   async up(queryInterface, Sequelize) {
     // Lấy IDs của subscription plans theo code
     const [freePlan] = await queryInterface.sequelize.query(
-      `SELECT subscription_plan_id FROM subscription_plans WHERE code = 'FREE' LIMIT 1`,
+      `SELECT subscription_plan_id FROM subscription_plans WHERE code = 'free' LIMIT 1`,
     );
 
     const [proPlan] = await queryInterface.sequelize.query(
-      `SELECT subscription_plan_id FROM subscription_plans WHERE code = 'PRO' LIMIT 1`,
+      `SELECT subscription_plan_id FROM subscription_plans WHERE code = 'pro' LIMIT 1`,
     );
 
     const [premiumPlan] = await queryInterface.sequelize.query(
-      `SELECT subscription_plan_id FROM subscription_plans WHERE code = 'PREMIUM' LIMIT 1`,
+      `SELECT subscription_plan_id FROM subscription_plans WHERE code = 'premium' LIMIT 1`,
     );
 
     const prices = [];

@@ -58,12 +58,13 @@ const getDocumentById = async (req, res) => {
 const downloadDocument = async (req, res) => {
   try {
     const { document_id } = req.params;
+    const user_id = req.user?.user_id; // From authMiddleware
 
-    // Increment download count
-    const result = await incrementDownloadCountService(document_id);
+    // Increment download count and check premium access
+    const result = await incrementDownloadCountService(document_id, user_id);
 
     if (!result.success) {
-      return res.status(404).json(result);
+      return res.status(403).json(result);
     }
 
     // Return document data with URL for download

@@ -118,10 +118,24 @@ const DocumentList: React.FC = () => {
         accessTypeFilter,
       );
     } else {
-      showToast(
-        "error",
-        result.message || "Failed to download document. Please login first.",
-      );
+      // Check if it's a premium access issue
+      if (
+        result.message?.toLowerCase().includes("premium") ||
+        result.message?.toLowerCase().includes("subscription")
+      ) {
+        showToast(
+          "info",
+          "Tài liệu này yêu cầu gói Premium. Đang chuyển hướng...",
+        );
+        setTimeout(() => {
+          navigate("/subscription");
+        }, 1500);
+      } else {
+        showToast(
+          "error",
+          result.message || "Failed to download document. Please login first.",
+        );
+      }
     }
   };
 

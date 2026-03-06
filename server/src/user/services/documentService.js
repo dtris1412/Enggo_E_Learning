@@ -75,7 +75,7 @@ const getDocumentById = async (document_id, req) => {
   return { success: true, data: document };
 };
 
-const incrementDownloadCount = async (document_id) => {
+const incrementDownloadCount = async (document_id, user_id) => {
   if (!document_id) {
     return { success: false, message: "Document ID is required." };
   }
@@ -83,6 +83,47 @@ const incrementDownloadCount = async (document_id) => {
   const document = await db.Document.findByPk(document_id);
   if (!document) {
     return { success: false, message: "Document not found." };
+  }
+
+  // Check if document is premium and user has access
+  if (document.access_type === "premium") {
+    if (!user_id) {
+      return {
+        success: false,
+        message: "Premium content requires login and premium subscription.",
+      };
+    }
+
+    // Check if user has active premium subscription
+    const activeSubscription = await db.User_Subscription.findOne({
+      where: {
+        user_id: user_id,
+        status: "active",
+      },
+      include: [
+        {
+          model: db.Subscription_Price,
+          as: "Subscription_Price",
+          include: [
+            {
+              model: db.Subscription_Plan,
+              as: "Subscription_Plan",
+              where: {
+                code: "premium",
+              },
+            },
+          ],
+        },
+      ],
+    });
+
+    if (!activeSubscription) {
+      return {
+        success: false,
+        message:
+          "This is a premium document. Please upgrade to premium subscription to download.",
+      };
+    }
   }
 
   // Increment download count

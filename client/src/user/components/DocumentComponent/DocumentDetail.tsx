@@ -11,30 +11,65 @@ import {
   ArrowLeft,
   Lock,
   CheckCircle,
+  AlertCircle,
 } from "lucide-react";
+
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080/api";
 
 const DocumentDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { getDocumentById, downloadDocument } = useDocument();
+  const { downloadDocument } = useDocument();
   const { showToast } = useToast();
 
   const [document, setDocument] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
 
   useEffect(() => {
     const fetchDocument = async () => {
       if (!id) return;
 
       setLoading(true);
-      const doc = await getDocumentById(parseInt(id));
+      try {
+        const token = localStorage.getItem("accessToken");
+        const headers: any = {
+          "Content-Type": "application/json",
+        };
+        if (token) {
+          headers.Authorization = `Bearer ${token}`;
+        }
 
-      if (doc) {
-        setDocument(doc);
-      } else {
+        const response = await fetch(`${API_URL}/user/documents/${id}`, {
+          method: "GET",
+          headers,
+        });
+
+        const result = await response.json();
+
+        if (response.ok && result.success) {
+          setDocument(result.data);
+        } else {
+          // Check if it's a premium access error
+          if (
+            response.status === 401 ||
+            response.status === 403 ||
+            result.message?.toLowerCase().includes("premium") ||
+            result.message?.toLowerCase().includes("authentication")
+          ) {
+            setShowUpgradeModal(true);
+          } else {
+            showToast("error", result.message || "Failed to load document");
+            setTimeout(() => navigate("/documents"), 2000);
+          }
+        }
+      } catch (error: any) {
+        console.error("Error fetching document:", error);
         showToast("error", "Failed to load document");
+        setTimeout(() => navigate("/documents"), 2000);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     fetchDocument();
@@ -52,10 +87,24 @@ const DocumentDetail: React.FC = () => {
         download_count: prev.download_count + 1,
       }));
     } else {
-      showToast(
-        "error",
-        result.message || "Failed to download document. Please login first.",
-      );
+      // Check if it's a premium access issue
+      if (
+        result.message?.toLowerCase().includes("premium") ||
+        result.message?.toLowerCase().includes("subscription")
+      ) {
+        showToast(
+          "info",
+          "Tài liệu này yêu cầu gói Premium. Đang chuyển hướng...",
+        );
+        setTimeout(() => {
+          navigate("/subscription");
+        }, 1500);
+      } else {
+        showToast(
+          "error",
+          result.message || "Failed to download document. Please login first.",
+        );
+      }
     }
   };
 
@@ -109,6 +158,96 @@ const DocumentDetail: React.FC = () => {
       <div className="min-h-screen bg-gray-50 flex justify-center items-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
       </div>
+    );
+  }
+
+  // Premium Access Required Modal
+  if (showUpgradeModal) {
+    return (
+      <>
+        {/* Backdrop */}
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          {/* Modal */}
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden animate-fadeIn">
+            {/* Header with gradient */}transition-all transform scale-100
+            <div className="bg-gradient-to-r from-yellow-500 to-amber-500 p-6 text-white relative">
+              <div className="flex items-center justify-center mb-2">
+                <div className="p-3 bg-white bg-opacity-20 rounded-full">
+                  <Lock className="w-10 h-10" />
+                </div>
+              </div>
+              <h2 className="text-2xl font-bold text-center">
+                Tài liệu Premium
+              </h2>
+            </div>
+
+            {/* Body */}
+            <div className="p-6">
+              <div className="flex items-start gap-3 mb-6">
+                <AlertCircle className="w-6 h-6 text-yellow-600 flex-shrink-0 mt-1" />
+                <div>
+                  <p className="text-gray-700 leading-relaxed">
+                    Tài liệu này yêu cầu gói Premium để xem và tải xuống.
+                  </p>
+                  <p className="text-gray-600 text-sm mt-2">
+                    Nâng cấp ngay để truy cập kho tài liệu chất lượng cao và nhiều tính năng độc quyền khác!
+                  </p>
+                </div>
+              </div>
+
+              {/* Benefits List */}
+              <div className="bg-gradient-to-br from-yellow-50 to-amber-50 rounded-lg p-4 mb-6">
+                <p className="font-semibold text-gray-800 mb-2 text-sm">
+                  Lợi ích khi nâng cấp Premium:
+                </p>
+                <ul className="space-y-2 text-sm text-gray-700">
+                  <li className="flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0" />
+                    Truy cập không giới hạn tài liệu Premium
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0" />
+                    Hỗ trợ AI không giới hạn
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0" />
+                    Tải xuống tài liệu offline
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0" />
+                    Hỗ trợ ưu tiên 24/7
+                  </li>
+                </ul>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-3">
+                <button
+                  onClick={() => {
+                    setShowUpgradeModal(false);
+                    navigate("/documents");
+                  }}
+                  className="flex-1 px-4 py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-semibold"
+                >
+                  Hủy
+                </button>
+                <button
+                  onClick={() => navigate("/subscription")}
+                  className="flex-1 px-4 py-3 bg-gradient-to-r from-yellow-500 to-amber-500 text-white rounded-lg hover:from-yellow-600 hover:to-amber-600 transition-all font-semibold shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+                >
+                  <CheckCircle className="w-5 h-5" />
+                  Nâng cấp ngay
+                </button>
+              </div>
+
+              {/* Additional info */}
+              <p className="text-center text-xs text-gray-500 mt-4">
+                Có thể hủy bất cứ lúc nào
+              </p>
+            </div>
+          </div>
+        </div>
+      </>
     );
   }
 
@@ -300,10 +439,21 @@ const DocumentDetail: React.FC = () => {
             </button>
 
             {document.access_type === "premium" && (
-              <p className="text-center text-sm text-gray-500 mt-3">
-                <Lock className="w-4 h-4 inline mr-1" />
-                Premium content - Login required to download
-              </p>
+              <div className="mt-4 p-4 bg-gradient-to-r from-yellow-50 to-amber-50 border border-yellow-200 rounded-lg">
+                <p className="text-center text-sm text-gray-700 mb-3 flex items-center justify-center gap-2">
+                  <Lock className="w-4 h-4 text-yellow-600" />
+                  <span className="font-medium">
+                    Tài liệu Premium - Yêu cầu gói Premium để tải xuống
+                  </span>
+                </p>
+                <button
+                  onClick={() => navigate("/subscription")}
+                  className="w-full py-2.5 bg-gradient-to-r from-yellow-500 to-amber-500 text-white rounded-lg hover:from-yellow-600 hover:to-amber-600 transition-all flex items-center justify-center gap-2 font-semibold shadow-md hover:shadow-lg"
+                >
+                  <CheckCircle className="w-5 h-5" />
+                  Nâng cấp lên Premium
+                </button>
+              </div>
             )}
           </div>
         </div>

@@ -34,6 +34,9 @@ import {
   cancelSubscription,
 } from "../controllers/userSubscriptionController.js";
 
+// ===========Subscription Plan Controllers===========
+import { getAllSubscriptionPlans } from "../controllers/subscriptionPlanController.js";
+
 // ===========Order Controllers===========
 import {
   getUserOrders,
@@ -127,6 +130,10 @@ const initUserRoutes = (app) => {
     verifyToken,
     cancelSubscription,
   );
+
+  // ===========Subscription Plan Routes===========
+  // Public endpoint - anyone can view subscription plans and pricing
+  router.get("/api/user/subscription-plans", getAllSubscriptionPlans);
 
   // ===========User Order Routes===========
   router.get("/api/user/orders", requireUser, verifyToken, getUserOrders);
