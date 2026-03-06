@@ -21,6 +21,7 @@ const DocumentManagement: React.FC = () => {
     error,
     fetchDocumentsPaginated,
     deleteDocument,
+    incrementDownloadCount,
   } = useDocument();
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -81,7 +82,22 @@ const DocumentManagement: React.FC = () => {
     }
   };
 
-  const handleDownload = (url: string, name: string) => {
+  const handleDownload = async (
+    document_id: number,
+    url: string,
+    name: string,
+  ) => {
+    // Increment download count
+    await incrementDownloadCount(document_id);
+    // Refresh the documents list to show updated count
+    fetchDocumentsPaginated(
+      searchTerm,
+      currentPage,
+      itemsPerPage,
+      documentTypeFilter,
+      fileTypeFilter,
+    );
+    // Open download link
     window.open(url, "_blank");
   };
 
@@ -208,10 +224,19 @@ const DocumentManagement: React.FC = () => {
                   Type
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Access
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   File Type
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Size
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Views
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Downloads
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Created
@@ -224,7 +249,7 @@ const DocumentManagement: React.FC = () => {
             <tbody className="bg-white divide-y divide-gray-200">
               {loading ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center">
+                  <td colSpan={9} className="px-6 py-12 text-center">
                     <div className="flex justify-center items-center">
                       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
                     </div>
@@ -233,7 +258,7 @@ const DocumentManagement: React.FC = () => {
               ) : documents.length === 0 ? (
                 <tr>
                   <td
-                    colSpan={6}
+                    colSpan={9}
                     className="px-6 py-12 text-center text-gray-500"
                   >
                     <FileText className="w-12 h-12 mx-auto mb-2 text-gray-300" />
@@ -266,11 +291,28 @@ const DocumentManagement: React.FC = () => {
                         {doc.document_type}
                       </span>
                     </td>
+                    <td className="px-6 py-4">
+                      <span
+                        className={`px-2 py-1 text-xs font-medium rounded-full ${
+                          doc.acess_type === "premium"
+                            ? "bg-yellow-100 text-yellow-800"
+                            : "bg-green-100 text-green-800"
+                        }`}
+                      >
+                        {doc.acess_type || "free"}
+                      </span>
+                    </td>
                     <td className="px-6 py-4 text-sm text-gray-600">
                       {doc.file_type || "N/A"}
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-600">
                       {formatFileSize(doc.document_size)}
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-600">
+                      {doc.view_count || 0}
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-600">
+                      {doc.download_count || 0}
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-600">
                       {new Date(doc.created_at).toLocaleDateString()}
@@ -279,7 +321,11 @@ const DocumentManagement: React.FC = () => {
                       <div className="flex justify-end gap-2">
                         <button
                           onClick={() =>
-                            handleDownload(doc.document_url, doc.document_name)
+                            handleDownload(
+                              doc.document_id,
+                              doc.document_url,
+                              doc.document_name,
+                            )
                           }
                           className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
                           title="Download"

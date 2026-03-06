@@ -4,6 +4,8 @@ import {
   getDocumentsPaginated as getDocumentsPaginatedService,
   getDocumentById as getDocumentByIdService,
   deleteDocument as deleteDocumentService,
+  incrementViewCount as incrementViewCountService,
+  incrementDownloadCount as incrementDownloadCountService,
 } from "../services/documentService.js";
 
 const createDocument = async (req, res) => {
@@ -15,6 +17,7 @@ const createDocument = async (req, res) => {
       document_url,
       document_size,
       file_type,
+      acess_type,
     } = req.body;
     const result = await createDocumentService(
       document_type,
@@ -23,6 +26,7 @@ const createDocument = async (req, res) => {
       document_url,
       document_size,
       file_type,
+      acess_type,
     );
     if (!result.success) {
       return res.status(400).json(result);
@@ -42,8 +46,7 @@ const updateDocument = async (req, res) => {
       document_type,
       document_description,
       document_url,
-      document_size,
-      file_type,
+      acess_type,
     } = req.body;
     const result = await updateDocumentService(
       document_id,
@@ -51,6 +54,9 @@ const updateDocument = async (req, res) => {
       document_name,
       document_description,
       document_url,
+      document_size,
+      file_type,
+      acessment_url,
       document_size,
       file_type,
     );
@@ -117,10 +123,41 @@ const deleteDocument = async (req, res) => {
     res.status(500).json({ success: false, message: "Internal server error." });
   }
 };
+
+const incrementViewCount = async (req, res) => {
+  try {
+    const { document_id } = req.params;
+    const result = await incrementViewCountService(document_id);
+    if (!result.success) {
+      return res.status(404).json(result);
+    }
+    res.status(200).json(result);
+  } catch (err) {
+    console.error("Error in incrementViewCount controller:", err);
+    res.status(500).json({ success: false, message: "Internal server error." });
+  }
+};
+
+const incrementDownloadCount = async (req, res) => {
+  try {
+    const { document_id } = req.params;
+    const result = await incrementDownloadCountService(document_id);
+    if (!result.success) {
+      return res.status(404).json(result);
+    }
+    res.status(200).json(result);
+  } catch (err) {
+    console.error("Error in incrementDownloadCount controller:", err);
+    res.status(500).json({ success: false, message: "Internal server error." });
+  }
+};
+
 export {
   createDocument,
   updateDocument,
   getDocumentsPaginated,
   getDocumentById,
   deleteDocument,
+  incrementViewCount,
+  incrementDownloadCount,
 };

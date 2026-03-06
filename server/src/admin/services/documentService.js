@@ -8,6 +8,7 @@ const createDocument = async (
   document_url,
   document_size,
   file_type,
+  acess_type = "free",
 ) => {
   if (!document_type || !document_name || !document_url) {
     return { success: false, message: "Missing required fields." };
@@ -31,6 +32,9 @@ const createDocument = async (
     document_url,
     document_size,
     file_type,
+    acess_type,
+    view_count: 0,
+    download_count: 0,
     created_at: new Date(),
     updated_at: new Date(),
   });
@@ -45,6 +49,7 @@ const updateDocument = async (
   document_url,
   document_size,
   file_type,
+  acess_type,
 ) => {
   if (!document_id) {
     return { success: false, message: "Document ID is required." };
@@ -62,6 +67,9 @@ const updateDocument = async (
   document.document_url = document_url;
   document.document_size = document_size;
   document.file_type = file_type;
+  if (acess_type) {
+    document.acess_type = acess_type;
+  }
   document.updated_at = new Date();
   await document.save();
   return { success: true, data: document };
@@ -126,10 +134,38 @@ const deleteDocument = async (document_id) => {
   return { success: true, message: "Document deleted successfully." };
 };
 
+const incrementViewCount = async (document_id) => {
+  if (!document_id) {
+    return { success: false, message: "Document ID is required." };
+  }
+  const document = await db.Document.findByPk(document_id);
+  if (!document) {
+    return { success: false, message: "Document not found." };
+  }
+  document.view_count = (document.view_count || 0) + 1;
+  await document.save();
+  return { success: true, data: document };
+};
+
+const incrementDownloadCount = async (document_id) => {
+  if (!document_id) {
+    return { success: false, message: "Document ID is required." };
+  }
+  const document = await db.Document.findByPk(document_id);
+  if (!document) {
+    return { success: false, message: "Document not found." };
+  }
+  document.download_count = (document.download_count || 0) + 1;
+  await document.save();
+  return { success: true, data: document };
+};
+
 export {
   createDocument,
   updateDocument,
   getDocumentsPaginated,
   getDocumentById,
   deleteDocument,
+  incrementViewCount,
+  incrementDownloadCount,
 };

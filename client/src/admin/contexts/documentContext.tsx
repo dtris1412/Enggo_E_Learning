@@ -16,6 +16,9 @@ interface Document {
   document_url: string;
   document_size: string | null;
   file_type: string | null;
+  view_count: number;
+  download_count: number;
+  acess_type: "free" | "premium";
   created_at: string;
   updated_at: string;
 }
@@ -40,6 +43,7 @@ interface DocumentContextType {
     document_url: string,
     document_size: string,
     file_type: string,
+    acess_type?: string,
   ) => Promise<boolean>;
   updateDocument: (
     document_id: number,
@@ -49,8 +53,11 @@ interface DocumentContextType {
     document_url: string,
     document_size: string,
     file_type: string,
+    acess_type?: string,
   ) => Promise<boolean>;
   deleteDocument: (document_id: number) => Promise<boolean>;
+  incrementViewCount: (document_id: number) => Promise<boolean>;
+  incrementDownloadCount: (document_id: number) => Promise<boolean>;
   uploadDocument: (file: File) => Promise<{
     success: boolean;
     data?: any;
@@ -166,6 +173,7 @@ export const DocumentProvider = ({ children }: { children: ReactNode }) => {
     document_url: string,
     document_size: string,
     file_type: string,
+    acess_type?: string,
   ): Promise<boolean> => {
     setLoading(true);
     setError(null);
@@ -180,6 +188,7 @@ export const DocumentProvider = ({ children }: { children: ReactNode }) => {
           document_url,
           document_size,
           file_type,
+          acess_type,
         }),
       });
 
@@ -207,6 +216,7 @@ export const DocumentProvider = ({ children }: { children: ReactNode }) => {
     document_url: string,
     document_size: string,
     file_type: string,
+    acess_type?: string,
   ): Promise<boolean> => {
     setLoading(true);
     setError(null);
@@ -223,6 +233,7 @@ export const DocumentProvider = ({ children }: { children: ReactNode }) => {
             document_url,
             document_size,
             file_type,
+            acess_type,
           }),
         },
       );
@@ -268,6 +279,44 @@ export const DocumentProvider = ({ children }: { children: ReactNode }) => {
       return false;
     } finally {
       setLoading(false);
+    }
+  };
+
+  const incrementViewCount = async (document_id: number): Promise<boolean> => {
+    try {
+      const response = await fetch(
+        `${API_URL}/admin/documents/${document_id}/view`,
+        {
+          method: "PATCH",
+          headers: getAuthHeaders(),
+        },
+      );
+
+      const result = await response.json();
+      return result.success;
+    } catch (err: any) {
+      console.error("Error incrementing view count:", err);
+      return false;
+    }
+  };
+
+  const incrementDownloadCount = async (
+    document_id: number,
+  ): Promise<boolean> => {
+    try {
+      const response = await fetch(
+        `${API_URL}/admin/documents/${document_id}/download`,
+        {
+          method: "PATCH",
+          headers: getAuthHeaders(),
+        },
+      );
+
+      const result = await response.json();
+      return result.success;
+    } catch (err: any) {
+      console.error("Error incrementing download count:", err);
+      return false;
     }
   };
 
@@ -317,6 +366,8 @@ export const DocumentProvider = ({ children }: { children: ReactNode }) => {
         createDocument,
         updateDocument,
         deleteDocument,
+        incrementViewCount,
+        incrementDownloadCount,
         uploadDocument,
       }}
     >

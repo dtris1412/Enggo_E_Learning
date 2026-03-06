@@ -19,6 +19,7 @@ const AddDocumentModal: React.FC<AddDocumentModalProps> = ({
     document_type: "learning",
     document_name: "",
     document_description: "",
+    acess_type: "free",
   });
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -135,6 +136,7 @@ const AddDocumentModal: React.FC<AddDocumentModalProps> = ({
         uploadResult.data.url,
         uploadResult.data.bytes?.toString() || "",
         uploadResult.data.format || "",
+        formData.acess_type,
       );
 
       if (success) {
@@ -156,6 +158,7 @@ const AddDocumentModal: React.FC<AddDocumentModalProps> = ({
     setFormData({
       document_type: "learning",
       document_name: "",
+      acess_type: "free",
       document_description: "",
     });
     setSelectedFile(null);
@@ -218,6 +221,22 @@ const AddDocumentModal: React.FC<AddDocumentModalProps> = ({
                 {errors.document_type}
               </p>
             )}
+          </div>
+
+          {/* Access Type */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Access Type <span className="text-red-500">*</span>
+            </label>
+            <select
+              name="acess_type"
+              value={formData.acess_type}
+              onChange={handleInputChange}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="free">Free</option>
+              <option value="premium">Premium</option>
+            </select>
           </div>
 
           {/* File Upload */}

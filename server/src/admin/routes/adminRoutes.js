@@ -140,6 +140,8 @@ import {
   getDocumentById,
   getDocumentsPaginated,
   deleteDocument,
+  incrementViewCount,
+  incrementDownloadCount,
 } from "../controllers/documentController.js";
 
 // ===========Document Phase Controllers===========
@@ -799,6 +801,18 @@ const initAdminRoutes = (app) => {
     verifyToken,
     requireAdmin,
     deleteDocument,
+  );
+  router.patch(
+    "/api/admin/documents/:document_id/view",
+    verifyToken,
+    requireAdmin,
+    incrementViewCount,
+  );
+  router.patch(
+    "/api/admin/documents/:document_id/download",
+    verifyToken,
+    requireAdmin,
+    incrementDownloadCount,
   );
   // Quick Export
   router.get(

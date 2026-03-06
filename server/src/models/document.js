@@ -21,7 +21,21 @@ export default (sequelize, DataTypes) => {
       document_url: { type: DataTypes.STRING, allowNull: false },
       document_size: { type: DataTypes.STRING, allowNull: true },
       file_type: { type: DataTypes.STRING, allowNull: true },
-
+      view_count: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+        allowNull: false,
+      },
+      download_count: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+        allowNull: false,
+      },
+      acess_type: {
+        type: DataTypes.ENUM("free", "premium"),
+        defaultValue: "free",
+        allowNull: false,
+      },
       created_at: { type: DataTypes.DATE, allowNull: false },
       updated_at: { type: DataTypes.DATE, allowNull: false },
     },
