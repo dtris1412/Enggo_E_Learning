@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import nodemailer from "nodemailer";
 import dotenv from "dotenv";
+import { createSubscription } from "../../user/services/userSubscriptionService.js";
 dotenv.config();
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -155,6 +156,31 @@ const register = async (
     created_at: new Date(),
     updated_at: new Date(),
   });
+
+  // Create free subscription for new user
+  try {
+    // Find free plan's free subscription price
+    const freePrice = await db.Subscription_Price.findOne({
+      include: [
+        {
+          model: db.Subscription_Plan,
+          where: { code: "free" },
+        },
+      ],
+      where: { billing_type: "free" },
+    });
+
+    if (freePrice) {
+      await createSubscription(
+        newUser.user_id,
+        freePrice.subscription_price_id,
+        null, // No order_id for free plan
+      );
+    }
+  } catch (subscriptionError) {
+    console.error("Error creating free subscription:", subscriptionError);
+    // Continue even if subscription creation fails
+  }
 
   const token = jwt.sign(
     { user_id: newUser.user_id, roles: newUser.role_id },

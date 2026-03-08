@@ -151,7 +151,11 @@ export const getSubscriptionById = async (subscriptionId) => {
 };
 
 // Create subscription
-export const createSubscription = async (userId, subscriptionPriceId) => {
+export const createSubscription = async (
+  userId,
+  subscriptionPriceId,
+  order_id,
+) => {
   try {
     // Get subscription price with plan info
     const subscriptionPrice = await Subscription_Price.findByPk(
@@ -172,13 +176,22 @@ export const createSubscription = async (userId, subscriptionPriceId) => {
 
     // Calculate dates
     const startedAt = new Date();
-    const expiredAt = new Date();
-    expiredAt.setDate(expiredAt.getDate() + subscriptionPrice.duration_days);
+    let expiredAt;
+
+    if (subscriptionPrice.billing_type === "free") {
+      // For free plans, set expired_at to null
+      expiredAt = null;
+    } else {
+      // For paid plans, calculate expiration date
+      expiredAt = new Date();
+      expiredAt.setDate(expiredAt.getDate() + subscriptionPrice.duration_days);
+    }
 
     // Create subscription
     const subscription = await User_Subscription.create({
       user_id: userId,
       subscription_price_id: subscriptionPriceId,
+      order_id: order_id || null,
       started_at: startedAt,
       expired_at: expiredAt,
       status: "active",
