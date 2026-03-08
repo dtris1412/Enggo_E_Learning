@@ -78,7 +78,23 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
         const data = await response.json();
 
         if (data.success) {
-          setPlans(data.data);
+          // Ensure features is properly parsed (safety check)
+          const formattedPlans = data.data.map((plan: any) => {
+            // If features is still a string (shouldn't happen with backend fix, but safety first)
+            if (typeof plan.features === "string") {
+              try {
+                plan.features = JSON.parse(plan.features);
+              } catch (e) {
+                console.error("Error parsing features for plan:", plan.name, e);
+                plan.features = {};
+              }
+            } else if (!plan.features) {
+              plan.features = {};
+            }
+            return plan;
+          });
+
+          setPlans(formattedPlans);
         } else {
           throw new Error(data.message || "Failed to fetch plans");
         }

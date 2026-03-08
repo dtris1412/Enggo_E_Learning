@@ -16,7 +16,28 @@ export default (sequelize, DataTypes) => {
         autoIncrement: true,
       },
       name: { type: DataTypes.STRING, allowNull: false },
-      features: { type: DataTypes.JSON, allowNull: true },
+      features: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+        get() {
+          const rawValue = this.getDataValue("features");
+          if (!rawValue) return {};
+          if (typeof rawValue === "object") return rawValue;
+          try {
+            return JSON.parse(rawValue);
+          } catch (e) {
+            console.error("Error parsing features JSON:", e);
+            return {};
+          }
+        },
+        set(value) {
+          if (typeof value === "string") {
+            this.setDataValue("features", value);
+          } else {
+            this.setDataValue("features", JSON.stringify(value));
+          }
+        },
+      },
       monthly_ai_token_quota: { type: DataTypes.INTEGER, allowNull: false },
       code: { type: DataTypes.STRING, allowNull: false, unique: true },
       is_active: {

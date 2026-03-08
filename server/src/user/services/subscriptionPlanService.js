@@ -47,14 +47,22 @@ const getAllSubscriptionPlans = async (billing_type = null) => {
     const formattedData = subscriptionPlans.map((plan) => {
       const planData = plan.toJSON();
 
-      // Ensure features is an object (Sequelize should auto-parse JSON)
+      // Ensure features is an object
+      // The getter in the model should handle this, but double-check here
       if (typeof planData.features === "string") {
         try {
           planData.features = JSON.parse(planData.features);
         } catch (e) {
-          console.error("Error parsing features JSON:", e);
+          console.error(
+            "Error parsing features JSON for plan:",
+            planData.name,
+            e,
+          );
           planData.features = {};
         }
+      } else if (!planData.features) {
+        // If features is null or undefined, set to empty object
+        planData.features = {};
       }
 
       return planData;

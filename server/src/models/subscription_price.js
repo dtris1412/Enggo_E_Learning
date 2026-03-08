@@ -30,12 +30,12 @@ export default (sequelize, DataTypes) => {
         },
       },
       billing_type: {
-        type: DataTypes.ENUM("monthly", "yearly", "weekly"),
+        type: DataTypes.ENUM("free", "monthly", "yearly", "weekly"),
         allowNull: false,
       },
       duration_days: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true,
       },
       price: {
         type: DataTypes.INTEGER,

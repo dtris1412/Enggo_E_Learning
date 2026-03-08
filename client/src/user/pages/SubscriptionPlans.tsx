@@ -25,24 +25,24 @@ const SubscriptionPlans = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">
             Chọn gói phù hợp với bạn
           </h1>
-          <p className="text-lg text-gray-400 max-w-2xl mx-auto">
+          <p className="text-base text-gray-400 max-w-2xl mx-auto">
             Nâng cấp để trải nghiệm đầy đủ tính năng và học tập hiệu quả hơn
           </p>
         </div>
 
         {/* Billing Type Selector */}
-        <div className="flex justify-center mb-12">
+        <div className="flex justify-center mb-8">
           <div className="inline-flex items-center bg-gray-900 rounded-full p-1 shadow-lg">
             <button
               onClick={() => setBillingType("yearly")}
-              className={`relative px-6 py-3 rounded-full font-medium transition-all duration-200 ${
+              className={`relative px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
                 billingType === "yearly"
                   ? "bg-white text-gray-900 shadow-md"
                   : "text-gray-400 hover:text-white"
@@ -50,14 +50,14 @@ const SubscriptionPlans = () => {
             >
               Hàng năm
               {billingType === "yearly" && (
-                <span className="ml-2 text-green-500 text-sm font-semibold">
+                <span className="ml-1.5 text-green-500 text-xs font-semibold">
                   {getDiscountLabel("yearly")}
                 </span>
               )}
             </button>
             <button
               onClick={() => setBillingType("monthly")}
-              className={`relative px-6 py-3 rounded-full font-medium transition-all duration-200 ${
+              className={`relative px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
                 billingType === "monthly"
                   ? "bg-white text-gray-900 shadow-md"
                   : "text-gray-400 hover:text-white"
@@ -65,14 +65,14 @@ const SubscriptionPlans = () => {
             >
               Hàng tháng
               {billingType === "monthly" && (
-                <span className="ml-2 text-green-500 text-sm font-semibold">
+                <span className="ml-1.5 text-green-500 text-xs font-semibold">
                   {getDiscountLabel("monthly")}
                 </span>
               )}
             </button>
             <button
               onClick={() => setBillingType("weekly")}
-              className={`relative px-6 py-3 rounded-full font-medium transition-all duration-200 ${
+              className={`relative px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
                 billingType === "weekly"
                   ? "bg-white text-gray-900 shadow-md"
                   : "text-gray-400 hover:text-white"
@@ -105,7 +105,7 @@ const SubscriptionPlans = () => {
 
         {/* Pricing Cards Grid */}
         {!loading && !error && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-8 max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mt-8 max-w-5xl mx-auto">
             {plans.map((plan) => {
               // Get the first price for the selected billing type
               const price = plan.Subscription_Prices[0];

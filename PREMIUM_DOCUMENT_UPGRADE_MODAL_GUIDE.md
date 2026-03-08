@@ -1,11 +1,13 @@
 # Premium Document Upgrade Modal Guide
 
 ## Tổng quan
+
 Khi người dùng cố gắng truy cập (xem) tài liệu Premium mà không có quyền, hệ thống sẽ hiển thị modal xác nhận yêu cầu nâng cấp lên Premium.
 
 ## Luồng hoạt động
 
 ### Kịch bản 1: User chưa đăng nhập
+
 1. User click vào premium document
 2. Backend trả về status 401 với message: "Authentication required to access premium content"
 3. **Frontend hiển thị modal** với:
@@ -17,6 +19,7 @@ Khi người dùng cố gắng truy cập (xem) tài liệu Premium mà không c
    - **Nâng cấp ngay** → Navigate to `/subscription`
 
 ### Kịch bản 2: User đã đăng nhập nhưng không có Premium
+
 1. User click vào premium document
 2. Backend trả về status 403 với message premium/subscription related
 3. **Frontend hiển thị modal** tương tự kịch bản 1
@@ -25,6 +28,7 @@ Khi người dùng cố gắng truy cập (xem) tài liệu Premium mà không c
    - **Nâng cấp ngay** → Navigate to `/subscription`
 
 ### Kịch bản 3: User có Premium subscription
+
 1. User click vào premium document
 2. Backend cho phép truy cập (status 200)
 3. Document được load và hiển thị bình thường
@@ -35,11 +39,13 @@ Khi người dùng cố gắng truy cập (xem) tài liệu Premium mà không c
 ### Frontend: DocumentDetail Component
 
 #### 1. Added State
+
 ```typescript
 const [showUpgradeModal, setShowUpgradeModal] = useState(false);
 ```
 
 #### 2. Custom Fetch Logic
+
 Thay vì dùng `getDocumentById` từ context, component tự fetch để có được response đầy đủ:
 
 ```typescript
@@ -97,9 +103,7 @@ if (showUpgradeModal) {
               <Lock className="w-10 h-10" />
             </div>
           </div>
-          <h2 className="text-2xl font-bold text-center">
-            Tài liệu Premium
-          </h2>
+          <h2 className="text-2xl font-bold text-center">Tài liệu Premium</h2>
         </div>
 
         {/* Body */}
@@ -175,9 +179,11 @@ if (showUpgradeModal) {
 ### Backend: Middleware & Routes
 
 #### checkSubscriptionAccess Middleware
+
 Location: `server/src/middleware/authMiddleware.js`
 
 **Response khi không có quyền:**
+
 ```javascript
 // Status 401 - Not logged in
 {
@@ -195,14 +201,15 @@ Location: `server/src/middleware/authMiddleware.js`
 ```
 
 #### Route Configuration
+
 Location: `server/src/user/routes/userRoutes.js`
 
 ```javascript
 router.get(
   "/api/user/documents/:document_id",
-  optionalVerifyToken,        // Parse token if available
-  loadDocumentMiddleware,      // Load document to req.resource
-  checkSubscriptionAccess,     // Check if user can access
+  optionalVerifyToken, // Parse token if available
+  loadDocumentMiddleware, // Load document to req.resource
+  checkSubscriptionAccess, // Check if user can access
   getDocumentById,
 );
 ```
@@ -210,9 +217,10 @@ router.get(
 ## UI/UX Design
 
 ### Modal Design
+
 - **Backdrop**: Black overlay with 50% opacity
 - **Modal Container**: White background, rounded corners (2xl), max-width 28rem
-- **Header**: 
+- **Header**:
   - Gradient background (yellow-500 to amber-500)
   - Lock icon in center with white background opacity
   - Title: "Tài liệu Premium"
@@ -223,6 +231,7 @@ router.get(
   - Footer text: "Có thể hủy bất cứ lúc nào"
 
 ### Colors
+
 - **Primary**: Yellow-500 to Amber-500 gradient
 - **Success**: Green-600
 - **Text**: Gray-700 (primary), Gray-600 (secondary)
@@ -231,44 +240,56 @@ router.get(
 ## Test Cases
 
 ### Test 1: Anonymous User Access Premium Document
+
 **Steps:**
+
 1. Logout (clear localStorage)
 2. Navigate to `/documents/{premium_document_id}`
 
 **Expected:**
+
 - Loading spinner appears
 - Modal shows up with message
 - Click "Hủy" → Navigate to `/documents`
 - Click "Nâng cấp ngay" → Navigate to `/subscription`
 
 ### Test 2: Free User Access Premium Document
+
 **Steps:**
+
 1. Login with free account
 2. Navigate to `/documents/{premium_document_id}`
 
 **Expected:**
+
 - Loading spinner appears
 - Modal shows up with message
 - Click "Hủy" → Navigate to `/documents`
 - Click "Nâng cấp ngay" → Navigate to `/subscription`
 
 ### Test 3: Premium User Access Premium Document
+
 **Steps:**
+
 1. Login with premium account (active subscription)
 2. Navigate to `/documents/{premium_document_id}`
 
 **Expected:**
+
 - Loading spinner appears
 - Document loads successfully
 - No modal shows
 - Can view and download document
 
 ### Test 4: Access Free Document
+
 **Steps:**
+
 1. Any user (logged in or not)
 2. Navigate to `/documents/{free_document_id}`
 
 **Expected:**
+
 - Document loads successfully
 - No modal shows
 - No premium check
@@ -276,12 +297,14 @@ router.get(
 ## Key Differences from Previous Implementation
 
 ### Before (Toast + Auto Redirect)
+
 - Error → Show toast "Đang chuyển hướng..."
 - Auto redirect after 1.5s
 - No user interaction
 - Only on download, not view
 
 ### After (Modal + User Choice)
+
 - Error → Show modal with detailed message
 - User must choose: Cancel or Upgrade
 - Better UX with clear options
@@ -290,10 +313,13 @@ router.get(
 ## API Endpoints
 
 ### GET `/api/user/documents/:document_id`
+
 **Headers:**
+
 - `Authorization: Bearer {token}` (optional)
 
 **Response Success (200):**
+
 ```json
 {
   "success": true,
@@ -307,6 +333,7 @@ router.get(
 ```
 
 **Response Error (401):**
+
 ```json
 {
   "success": false,
@@ -315,6 +342,7 @@ router.get(
 ```
 
 **Response Error (403):**
+
 ```json
 {
   "success": false,

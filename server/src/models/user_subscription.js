@@ -43,7 +43,7 @@ export default (sequelize, DataTypes) => {
         },
       },
       started_at: { type: DataTypes.DATE, allowNull: false },
-      expired_at: { type: DataTypes.DATE, allowNull: false },
+      expired_at: { type: DataTypes.DATE, allowNull: true },
       status: {
         type: DataTypes.ENUM("active", "expired", "canceled"),
         allowNull: false,

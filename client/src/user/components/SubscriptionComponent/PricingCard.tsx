@@ -1,4 +1,5 @@
 import { Check, Sparkles, Crown } from "lucide-react";
+import { formatCurrency } from "../../../utils/formatters";
 
 interface SubscriptionPrice {
   subscription_price_id: number;
@@ -27,6 +28,10 @@ const PricingCard = ({
   isPopular = false,
   billingType,
 }: PricingCardProps) => {
+  // Ensure features is an object (safety check)
+  const safeFeatures =
+    typeof features === "object" && features !== null ? features : {};
+
   // Calculate original price if there's a discount
   const getOriginalPrice = () => {
     if (!price || !price.discount_percentage) return null;
@@ -61,15 +66,15 @@ const PricingCard = ({
 
   return (
     <div
-      className={`relative rounded-2xl border-2 ${getCardStyle()} p-8 transition-all duration-300 hover:shadow-2xl hover:scale-105 ${
+      className={`relative rounded-xl border-2 ${getCardStyle()} p-5 transition-all duration-300 hover:shadow-xl hover:scale-[1.02] ${
         isPopular ? "ring-2 ring-blue-400" : ""
       } ${code === "premium" ? "ring-2 ring-yellow-500" : ""}`}
     >
       {/* Popular Badge */}
       {isPopular && (
-        <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-          <span className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-4 py-1 rounded-full text-sm font-semibold shadow-md flex items-center gap-1">
-            <Sparkles className="w-4 h-4" />
+        <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+          <span className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-md flex items-center gap-1">
+            <Sparkles className="w-3 h-3" />
             Phổ biến nhất
           </span>
         </div>
@@ -77,39 +82,38 @@ const PricingCard = ({
 
       {/* Premium Badge */}
       {code === "premium" && (
-        <div className="absolute -top-4 right-4">
-          <Crown className="w-8 h-8 text-yellow-500 fill-yellow-300" />
+        <div className="absolute -top-3 right-3">
+          <Crown className="w-6 h-6 text-yellow-500 fill-yellow-300" />
         </div>
       )}
 
       {/* Plan Name */}
-      <div className="text-center mb-6">
-        <div className="flex items-center justify-center gap-2 mb-2">
-          <h3 className="text-2xl font-bold text-white">{name}</h3>
+      <div className="text-center mb-4">
+        <div className="flex items-center justify-center gap-2 mb-1.5">
+          <h3 className="text-xl font-bold text-white">{name}</h3>
           {code === "premium" && (
-            <span className="bg-yellow-500 text-gray-900 text-xs font-bold px-2 py-1 rounded">
+            <span className="bg-yellow-500 text-gray-900 text-[10px] font-bold px-1.5 py-0.5 rounded">
               NEW
             </span>
           )}
         </div>
         {price && price.discount_percentage > 0 && (
-          <span className="inline-block bg-green-500 text-white text-xs font-semibold px-3 py-1 rounded-full">
+          <span className="inline-block bg-green-500 text-white text-[10px] font-semibold px-2 py-0.5 rounded-full">
             Tiết kiệm {Math.round(price.discount_percentage)}%
           </span>
         )}
       </div>
 
       {/* Pricing */}
-      <div className="text-center mb-6">
+      <div className="text-center mb-4">
         {price ? (
           <>
-            <div className="flex items-center justify-center gap-2 mb-2">
-              <span className="text-sm text-gray-400">$</span>
-              <span className="text-5xl font-bold text-white">
-                {(price.price / 1000).toFixed(2)}
+            <div className="mb-1.5">
+              <span className="text-3xl font-bold text-white">
+                {formatCurrency(price.price, { showCurrency: false })}
               </span>
-              <span className="text-sm text-gray-400">
-                /{" "}
+              <span className="text-xs text-gray-400 ml-1">
+                VNĐ/{" "}
                 {billingType === "monthly"
                   ? "Tháng"
                   : billingType === "yearly"
@@ -119,20 +123,19 @@ const PricingCard = ({
             </div>
 
             {originalPrice && (
-              <div className="text-gray-400 line-through text-sm mb-2">
-                ${(originalPrice / 1000).toFixed(2)}
+              <div className="text-gray-400 line-through text-xs mb-1">
+                {formatCurrency(originalPrice)}
               </div>
             )}
 
             {renewalPrice && billingType !== "monthly" && (
-              <div className="text-xs text-gray-400">
-                Tương đương: ${(renewalPrice / 1000).toFixed(2)} (
-                {Math.round(price.discount_percentage)}% off)
+              <div className="text-[10px] text-gray-400">
+                Tương đương: {formatCurrency(renewalPrice)}/tháng
               </div>
             )}
           </>
         ) : (
-          <div className="text-5xl font-bold text-white">Miễn phí</div>
+          <div className="text-3xl font-bold text-white">Miễn phí</div>
         )}
       </div>
 
@@ -140,17 +143,17 @@ const PricingCard = ({
       {code !== "free" && (
         <>
           <button
-            className={`w-full py-3 px-6 rounded-lg font-semibold transition-all duration-200 mb-6 ${
+            className={`w-full py-2 px-4 rounded-lg text-sm font-semibold transition-all duration-200 mb-3 ${
               code === "premium"
-                ? "bg-gradient-to-r from-yellow-500 to-yellow-600 text-gray-900 hover:shadow-lg hover:shadow-yellow-500/50 hover:scale-105"
-                : "bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:shadow-lg hover:shadow-blue-500/50 hover:scale-105"
+                ? "bg-gradient-to-r from-yellow-500 to-yellow-600 text-gray-900 hover:shadow-lg hover:shadow-yellow-500/50 hover:scale-[1.02]"
+                : "bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:shadow-lg hover:shadow-blue-500/50 hover:scale-[1.02]"
             }`}
           >
             Đăng ký ngay
           </button>
 
           {price && (
-            <p className="text-xs text-center text-gray-400 mb-6">
+            <p className="text-[10px] text-center text-gray-400 mb-3">
               Chỉ giảm giá cho lần đăng ký đầu tiên, hủy bất kỳ lúc nào
             </p>
           )}
@@ -158,19 +161,19 @@ const PricingCard = ({
       )}
 
       {/* AI Tokens */}
-      <div className="mb-6 p-4 bg-gray-800/50 rounded-lg border border-gray-700">
-        <div className="flex items-center justify-between mb-2">
-          <div className="flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-yellow-400" />
-            <span className="font-semibold text-white">
+      <div className="mb-4 p-3 bg-gray-800/50 rounded-lg border border-gray-700">
+        <div className="flex items-center justify-between mb-1">
+          <div className="flex items-center gap-1.5">
+            <Sparkles className="w-4 h-4 text-yellow-400" />
+            <span className="text-sm font-semibold text-white">
               {monthlyTokens > 0 ? monthlyTokens.toLocaleString() : "Không có"}{" "}
               Credits
             </span>
           </div>
-          <span className="text-xs text-gray-400">mỗi tháng</span>
+          <span className="text-[10px] text-gray-400">mỗi tháng</span>
         </div>
         {monthlyTokens > 0 && (
-          <div className="text-xs text-gray-400">
+          <div className="text-[10px] text-gray-400">
             Tương đương ${((monthlyTokens * 0.01) / 100).toFixed(2)} mỗi 100
             Credits
           </div>
@@ -178,11 +181,11 @@ const PricingCard = ({
       </div>
 
       {/* Features List */}
-      <div className="space-y-3">
-        <p className="text-sm font-semibold text-gray-300 mb-3">
+      <div className="space-y-2">
+        <p className="text-xs font-semibold text-gray-300 mb-2">
           Tính năng bao gồm:
         </p>
-        {Object.entries(features).map(([key, value]) => {
+        {Object.entries(safeFeatures).map(([key, value]) => {
           const featureLabel = getFriendlyFeatureName(key);
           const isIncluded = value === true || value === -1;
           const featureValue =
@@ -193,14 +196,14 @@ const PricingCard = ({
                 : "";
 
           return (
-            <div key={key} className="flex items-start gap-3">
+            <div key={key} className="flex items-start gap-2">
               <Check
-                className={`w-5 h-5 flex-shrink-0 mt-0.5 ${
+                className={`w-4 h-4 flex-shrink-0 mt-0.5 ${
                   isIncluded ? "text-green-400" : "text-gray-600"
                 }`}
               />
               <span
-                className={`text-sm ${
+                className={`text-xs ${
                   isIncluded ? "text-gray-200" : "text-gray-500"
                 }`}
               >

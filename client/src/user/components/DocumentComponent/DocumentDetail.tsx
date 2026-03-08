@@ -180,7 +180,6 @@ const DocumentDetail: React.FC = () => {
                 Tài liệu Premium
               </h2>
             </div>
-
             {/* Body */}
             <div className="p-6">
               <div className="flex items-start gap-3 mb-6">
@@ -190,7 +189,8 @@ const DocumentDetail: React.FC = () => {
                     Tài liệu này yêu cầu gói Premium để xem và tải xuống.
                   </p>
                   <p className="text-gray-600 text-sm mt-2">
-                    Nâng cấp ngay để truy cập kho tài liệu chất lượng cao và nhiều tính năng độc quyền khác!
+                    Nâng cấp ngay để truy cập kho tài liệu chất lượng cao và
+                    nhiều tính năng độc quyền khác!
                   </p>
                 </div>
               </div>
