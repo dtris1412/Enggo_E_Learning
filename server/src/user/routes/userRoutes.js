@@ -51,6 +51,12 @@ import {
   getPaymentById as getUserPaymentById,
   createPayment,
   retryPayment,
+  createMomoPayment,
+  momoCallback,
+  momoIPN,
+  createVnpayPayment,
+  vnpayCallback,
+  vnpayIPN,
 } from "../controllers/paymentController.js";
 
 const router = express.Router();
@@ -83,7 +89,7 @@ const initUserRoutes = (app) => {
   );
 
   // ===========User Token Wallet Routes===========
-  router.get("/api/user/wallet", requireUser, verifyToken, getUserWallet);
+  router.get("/api/user/wallet", verifyToken, requireUser, getUserWallet);
 
   // ===========User Token Transaction Routes===========
   router.get(
@@ -136,41 +142,61 @@ const initUserRoutes = (app) => {
   router.get("/api/user/subscription-plans", getAllSubscriptionPlans);
 
   // ===========User Order Routes===========
-  router.get("/api/user/orders", requireUser, verifyToken, getUserOrders);
+  router.get("/api/user/orders", verifyToken, requireUser, getUserOrders);
   router.get(
     "/api/user/orders/:orderId",
-    requireUser,
     verifyToken,
+    requireUser,
     getOrderById,
   );
-  router.post("/api/user/orders", requireUser, verifyToken, createOrder);
+  router.post("/api/user/orders", verifyToken, requireUser, createOrder);
 
   // ===========User Payment Routes===========
-  router.get("/api/user/payments", requireUser, verifyToken, getUserPayments);
+  router.get("/api/user/payments", verifyToken, requireUser, getUserPayments);
   router.get(
     "/api/user/orders/:orderId/payments",
-    requireUser,
     verifyToken,
+    requireUser,
     getPaymentsByOrderId,
   );
   router.get(
     "/api/user/payments/:paymentId",
-    requireUser,
     verifyToken,
+    requireUser,
     getUserPaymentById,
   );
   router.post(
     "/api/user/orders/:orderId/payments",
-    requireUser,
     verifyToken,
+    requireUser,
     createPayment,
   );
   router.post(
     "/api/user/orders/:orderId/payments/retry",
-    requireUser,
     verifyToken,
+    requireUser,
     retryPayment,
   );
+
+  // ===========MoMo Payment Routes===========
+  router.post(
+    "/api/payment/momo/:orderId",
+    verifyToken,
+    requireUser,
+    createMomoPayment,
+  );
+  router.get("/api/payment/momo/callback", momoCallback);
+  router.post("/api/payment/momo/ipn", momoIPN);
+
+  // ===========VNPay Payment Routes===========
+  router.post(
+    "/api/payment/vnpay/:orderId",
+    verifyToken,
+    requireUser,
+    createVnpayPayment,
+  );
+  router.get("/api/payment/vnpay/callback", vnpayCallback);
+  router.get("/api/payment/vnpay/ipn", vnpayIPN);
 
   app.use("/", router);
 };

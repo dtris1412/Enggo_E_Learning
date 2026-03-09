@@ -24,7 +24,7 @@ export default (sequelize, DataTypes) => {
         },
       },
       payment_method: {
-        type: DataTypes.ENUM("credit_card", "paypal", "bank_transfer"),
+        type: DataTypes.ENUM("momo", "vnpay"),
         allowNull: false,
       },
       provider: {

@@ -1,5 +1,7 @@
 import { Check, Sparkles, Crown } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { formatCurrency } from "../../../utils/formatters";
+import { useAuth } from "../../../shared/contexts/authContext";
 
 interface SubscriptionPrice {
   subscription_price_id: number;
@@ -28,9 +30,28 @@ const PricingCard = ({
   isPopular = false,
   billingType,
 }: PricingCardProps) => {
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
+
   // Ensure features is an object (safety check)
   const safeFeatures =
     typeof features === "object" && features !== null ? features : {};
+
+  const handleSubscribe = () => {
+    if (!price) return;
+
+    // Check if user is logged in
+    if (!isAuthenticated) {
+      // Redirect to login with return URL
+      navigate(
+        `/login?redirect=/payment/checkout?plan=${price.subscription_price_id}`,
+      );
+      return;
+    }
+
+    // Navigate to checkout page with plan ID
+    navigate(`/payment/checkout?plan=${price.subscription_price_id}`);
+  };
 
   // Calculate original price if there's a discount
   const getOriginalPrice = () => {
@@ -143,6 +164,7 @@ const PricingCard = ({
       {code !== "free" && (
         <>
           <button
+            onClick={handleSubscribe}
             className={`w-full py-2 px-4 rounded-lg text-sm font-semibold transition-all duration-200 mb-3 ${
               code === "premium"
                 ? "bg-gradient-to-r from-yellow-500 to-yellow-600 text-gray-900 hover:shadow-lg hover:shadow-yellow-500/50 hover:scale-[1.02]"

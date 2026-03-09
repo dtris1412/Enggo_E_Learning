@@ -1,6 +1,9 @@
 import db from "../../models/index.js";
+import * as userSubscriptionService from "./userSubscriptionService.js";
+import * as userTokenWalletService from "../../admin/services/userTokenWalletService.js";
+import * as userTokenTransactionService from "../../admin/services/userTokenTransactionService.js";
 
-const { Payment, Order } = db;
+const { Payment, Order, Subscription_Price, Subscription_Plan } = db;
 
 // Get payments by order ID (for user)
 export const getPaymentsByOrderId = async (orderId, userId) => {
@@ -198,5 +201,113 @@ export const getUserPayments = async (
     };
   } catch (error) {
     throw new Error(`Error fetching user payments: ${error.message}`);
+  }
+};
+
+/**
+ * Process successful payment:
+ * - Update order status to 'completed'
+ * - Create user subscription
+ * - Grant AI tokens to user wallet
+ * - Create token transaction record
+ */
+export const processSuccessfulPayment = async (
+  orderId,
+  transactionId = null,
+) => {
+  const transaction = await db.sequelize.transaction();
+
+  try {
+    // Get order with subscription price and plan info
+    const order = await Order.findOne({
+      where: { order_id: orderId },
+      include: [
+        {
+          model: Subscription_Price,
+          include: [
+            {
+              model: Subscription_Plan,
+              attributes: [
+                "subscription_plan_id",
+                "name",
+                "monthly_ai_token_quota",
+              ],
+            },
+          ],
+        },
+      ],
+      transaction,
+    });
+
+    if (!order) {
+      throw new Error("Order not found");
+    }
+
+    // Check if order is already completed
+    if (order.status === "completed") {
+      // Already processed, return existing subscription
+      const existingSubscription = await db.User_Subscription.findOne({
+        where: { order_id: orderId },
+        transaction,
+      });
+      await transaction.commit();
+      return {
+        alreadyProcessed: true,
+        subscription: existingSubscription,
+      };
+    }
+
+    // Update order status to completed
+    await order.update({ status: "completed" }, { transaction });
+
+    // Check if user already has an active subscription
+    const activeSubscription =
+      await userSubscriptionService.getUserActiveSubscription(order.user_id);
+
+    // Cancel existing subscription if any (user is upgrading)
+    if (activeSubscription && activeSubscription.status === "active") {
+      await activeSubscription.update({ status: "canceled" }, { transaction });
+    }
+
+    // Create new subscription
+    const subscription = await userSubscriptionService.createSubscription(
+      order.user_id,
+      order.subscription_price_id,
+      order.order_id,
+    );
+
+    // Grant AI tokens if the plan has monthly quota
+    const monthlyTokens =
+      order.Subscription_Price?.Subscription_Plan?.monthly_ai_token_quota || 0;
+
+    if (monthlyTokens > 0) {
+      // Add tokens to user wallet
+      await userTokenWalletService.addTokensToWallet(
+        order.user_id,
+        monthlyTokens,
+        transaction,
+      );
+
+      // Create token transaction record
+      await userTokenTransactionService.createTransaction(
+        order.user_id,
+        monthlyTokens,
+        "subscription_grant",
+        subscription.user_subscription_id,
+        transaction,
+      );
+    }
+
+    await transaction.commit();
+
+    return {
+      alreadyProcessed: false,
+      subscription,
+      order,
+      tokensGranted: monthlyTokens,
+    };
+  } catch (error) {
+    await transaction.rollback();
+    throw new Error(`Error processing successful payment: ${error.message}`);
   }
 };
