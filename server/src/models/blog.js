@@ -6,6 +6,12 @@ export default (sequelize, DataTypes) => {
       Blog.belongsTo(models.User, {
         foreignKey: "user_id",
       });
+      Blog.hasMany(models.Blog_Like, {
+        foreignKey: "blog_id",
+      });
+      Blog.hasMany(models.Blog_Comment, {
+        foreignKey: "blog_id",
+      });
     }
   }
   Blog.init(

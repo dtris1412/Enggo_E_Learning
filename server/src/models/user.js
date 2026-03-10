@@ -30,6 +30,12 @@ export default (sequelize, DataTypes) => {
       User.hasMany(models.Order, {
         foreignKey: "user_id",
       });
+      User.hasMany(models.Blog_Like, {
+        foreignKey: "user_id",
+      });
+      User.hasMany(models.Blog_Comment, {
+        foreignKey: "user_id",
+      });
     }
   }
   User.init(
