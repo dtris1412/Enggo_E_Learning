@@ -29,7 +29,6 @@ export default (sequelize, DataTypes) => {
         references: { model: "blogs", key: "blog_id" },
       },
       created_at: DataTypes.DATE,
-      updated_at: DataTypes.DATE,
     },
     {
       sequelize,

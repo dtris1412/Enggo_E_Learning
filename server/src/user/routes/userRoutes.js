@@ -59,6 +59,31 @@ import {
   vnpayIPN,
 } from "../controllers/paymentController.js";
 
+// ===========Blog Controllers===========
+import {
+  getBlogsPaginated,
+  getBlogById,
+  getBlogBySlug,
+} from "../controllers/blogController.js";
+
+// ===========Blog Like Controllers===========
+import {
+  toggleLike,
+  getLikeCount,
+  checkUserLiked,
+  getBlogLikes,
+} from "../controllers/blogLikeController.js";
+
+// ===========Blog Comment Controllers===========
+import {
+  getCommentsByBlogId,
+  getRepliesByCommentId,
+  createComment,
+  updateComment,
+  deleteComment,
+  getCommentById,
+} from "../controllers/blogCommentController.js";
+
 const router = express.Router();
 
 const initUserRoutes = (app) => {
@@ -197,6 +222,73 @@ const initUserRoutes = (app) => {
   );
   router.get("/api/payment/vnpay/callback", vnpayCallback);
   router.get("/api/payment/vnpay/ipn", vnpayIPN);
+
+  // ===========Blog Routes===========
+  // List all blogs (public)
+  router.get("/api/user/blogs", getBlogsPaginated);
+
+  // Get blog by ID (public, optional auth to check if user liked)
+  router.get("/api/user/blogs/:blog_id", optionalVerifyToken, getBlogById);
+
+  // Get blog by slug (public, optional auth to check if user liked)
+  router.get("/api/user/blogs/slug/:slug", optionalVerifyToken, getBlogBySlug);
+
+  // ===========Blog Like Routes===========
+  // Toggle like/unlike (auth required)
+  router.post(
+    "/api/user/blogs/:blog_id/like",
+    verifyToken,
+    requireUser,
+    toggleLike,
+  );
+
+  // Get all likes for a blog (public)
+  router.get("/api/user/blogs/:blog_id/likes", getBlogLikes);
+
+  // Get like count for a blog (public)
+  router.get("/api/user/blogs/:blog_id/likes/count", getLikeCount);
+
+  // Check if current user liked a blog (auth required)
+  router.get(
+    "/api/user/blogs/:blog_id/likes/check",
+    verifyToken,
+    requireUser,
+    checkUserLiked,
+  );
+
+  // ===========Blog Comment Routes===========
+  // Get all comments for a blog (public)
+  router.get("/api/user/blogs/:blog_id/comments", getCommentsByBlogId);
+
+  // Create a comment or reply (auth required)
+  router.post(
+    "/api/user/blogs/:blog_id/comments",
+    verifyToken,
+    requireUser,
+    createComment,
+  );
+
+  // Get comment by ID (public)
+  router.get("/api/user/comments/:comment_id", getCommentById);
+
+  // Get replies for a comment (public)
+  router.get("/api/user/comments/:comment_id/replies", getRepliesByCommentId);
+
+  // Update a comment (auth required, owner only)
+  router.patch(
+    "/api/user/comments/:comment_id",
+    verifyToken,
+    requireUser,
+    updateComment,
+  );
+
+  // Delete a comment (auth required, owner only)
+  router.delete(
+    "/api/user/comments/:comment_id",
+    verifyToken,
+    requireUser,
+    deleteComment,
+  );
 
   app.use("/", router);
 };
