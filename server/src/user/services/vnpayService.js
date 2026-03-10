@@ -1,5 +1,6 @@
 import crypto from "crypto";
 import moment from "moment";
+import querystring from "querystring";
 import { vnPayConfig } from "../../config/vnPayConfig.js";
 
 /**
@@ -72,25 +73,25 @@ export const createPaymentUrl = (orderInfo, ipAddr = "127.0.0.1") => {
     throw new Error("VNPay configuration is incomplete");
   }
 
-  // Tạo VNPay params
+  // Tạo VNPay params - ALL values must be strings for signature consistency
   let vnpParams = {
     vnp_Version: "2.1.0",
     vnp_Command: "pay",
-    vnp_TmnCode: vnPayConfig.vnp_TmnCode,
-    vnp_Locale: language,
+    vnp_TmnCode: String(vnPayConfig.vnp_TmnCode),
+    vnp_Locale: String(language),
     vnp_CurrCode: "VND",
-    vnp_TxnRef: String(orderId), // Ensure orderId is string
-    vnp_OrderInfo: sanitizedDescription,
+    vnp_TxnRef: String(orderId),
+    vnp_OrderInfo: String(sanitizedDescription),
     vnp_OrderType: "other",
-    vnp_Amount: vnpAmount,
-    vnp_ReturnUrl: vnPayConfig.vnp_ReturnUrl,
-    vnp_IpAddr: ipAddr,
-    vnp_CreateDate: createDate,
+    vnp_Amount: String(vnpAmount), // Must be string for signature
+    vnp_ReturnUrl: String(vnPayConfig.vnp_ReturnUrl),
+    vnp_IpAddr: String(ipAddr),
+    vnp_CreateDate: String(createDate),
   };
 
   // Thêm bankCode nếu có
   if (bankCode) {
-    vnpParams.vnp_BankCode = bankCode;
+    vnpParams.vnp_BankCode = String(bankCode);
   }
 
   // Log params before signing
@@ -102,28 +103,31 @@ export const createPaymentUrl = (orderInfo, ipAddr = "127.0.0.1") => {
   // Tạo signData - CHỈ sort 1 lần, KHÔNG dùng sortObject
   const sortedKeys = Object.keys(vnpParams).sort();
 
-  // Build signData string - NO ENCODING
-  const signData = sortedKeys
-    .map((key) => {
-      const value = vnpParams[key];
-      return `${key}=${value}`;
-    })
-    .join("&");
-
-  console.log("=== VNPay Signature Debug ===");
+  console.log("=== VNPay CREATE Signature Debug ===");
   console.log("Sorted keys:", sortedKeys);
-  console.log("Full signData:", signData);
+
+  // Build sorted params object for querystring
+  const sortedParams = {};
+  sortedKeys.forEach((key) => {
+    sortedParams[key] = vnpParams[key];
+  });
+
+  // Build signData - CRITICAL: Manual build, NO encoding at all
+  // Theo VNPay spec: key1=value1&key2=value2 (raw string)
+  const signDataParts = [];
+  sortedKeys.forEach((key) => {
+    const value = vnpParams[key];
+    signDataParts.push(`${key}=${value}`);
+  });
+  const signData = signDataParts.join("&");
+
+  console.log("\nFull signData for CREATE:");
+  console.log(signData);
 
   const secureHash = createSignature(signData);
 
-  console.log("SecureHash:", secureHash);
+  console.log("\nSecureHash:", secureHash);
   console.log("============================");
-
-  // Thêm secure hash vào params (KHÔNG sort lại)
-  vnpParams.vnp_SecureHash = secureHash;
-
-  // Thêm secure hash vào params
-  vnpParams.vnp_SecureHash = secureHash;
 
   // Debug logging
   console.log("VNPay Payment Request:", {
@@ -137,16 +141,12 @@ export const createPaymentUrl = (orderInfo, ipAddr = "127.0.0.1") => {
     orderInfo: sanitizedDescription,
   });
 
-  // Tạo payment URL - params bây giờ có vnp_SecureHash
-  // Sort TẤT CẢ params (kể cả vnp_SecureHash) cho URL
-  const allParamKeys = Object.keys(vnpParams).sort();
-  const queryString = allParamKeys
-    .map((key) => {
-      return `${encodeURIComponent(key)}=${encodeURIComponent(vnpParams[key])}`;
-    })
-    .join("&");
+  // Tạo payment URL - vnp_SecureHash PHẢI ở cuối
+  // Build query string với URL encoding (khác với signData)
+  const queryString = querystring.stringify(sortedParams);
 
-  const paymentUrl = vnPayConfig.vnp_Url + "?" + queryString;
+  // Thêm vnp_SecureHash vào cuối
+  const paymentUrl = `${vnPayConfig.vnp_Url}?${queryString}&vnp_SecureHash=${secureHash}`;
 
   console.log("=== FULL PAYMENT URL ===");
   console.log(paymentUrl);
@@ -163,22 +163,41 @@ export const createPaymentUrl = (orderInfo, ipAddr = "127.0.0.1") => {
 export const verifyReturnUrl = (vnpParams) => {
   const secureHash = vnpParams.vnp_SecureHash;
 
+  console.log("=== Verify Signature Debug ===");
+  console.log("All received params:", JSON.stringify(vnpParams, null, 2));
+  console.log("Received hash:", secureHash);
+
   // Xóa các field không cần thiết cho việc verify
   const params = { ...vnpParams };
   delete params.vnp_SecureHash;
   delete params.vnp_SecureHashType;
 
-  // Sort keys và build signData - GIỐNG HỆT createPaymentUrl
+  // Sort keys
   const sortedKeys = Object.keys(params).sort();
-  const signData = sortedKeys.map((key) => `${key}=${params[key]}`).join("&");
+
+  // Build sorted params object
+  const sortedParams = {};
+  sortedKeys.forEach((key) => {
+    sortedParams[key] = String(params[key]); // Ensure string
+  });
+
+  console.log("Sorted keys for signature:", sortedKeys);
+
+  // Build signData - Manual build, NO encoding (giống CREATE)
+  const signDataParts = [];
+  sortedKeys.forEach((key) => {
+    const value = String(params[key]);
+    signDataParts.push(`${key}=${value}`);
+  });
+  const signData = signDataParts.join("&");
+
+  console.log("\nFull signData string:");
+  console.log(signData);
 
   const calculatedHash = createSignature(signData);
 
-  console.log("=== Verify Signature Debug ===");
-  console.log("Sorted keys:", sortedKeys);
-  console.log("Received hash:", secureHash);
-  console.log("Calculated signData:", signData);
-  console.log("Calculated hash:", calculatedHash);
+  console.log("\nCalculated hash:", calculatedHash);
+  console.log("Received hash:  ", secureHash);
   console.log("Match:", secureHash === calculatedHash);
   console.log("==============================");
 
@@ -306,25 +325,33 @@ export const queryTransaction = (queryInfo) => {
   const vnpParams = {
     vnp_Version: "2.1.0",
     vnp_Command: "querydr",
-    vnp_TmnCode: vnPayConfig.vnp_TmnCode,
-    vnp_TxnRef: orderId,
+    vnp_TmnCode: String(vnPayConfig.vnp_TmnCode),
+    vnp_TxnRef: String(orderId),
     vnp_OrderInfo: `Query transaction ${orderId}`,
-    vnp_TransactionDate: transDate,
-    vnp_CreateDate: createDate,
-    vnp_IpAddr: ipAddr,
-    vnp_RequestId: requestId,
+    vnp_TransactionDate: String(transDate),
+    vnp_CreateDate: String(createDate),
+    vnp_IpAddr: String(ipAddr),
+    vnp_RequestId: String(requestId),
   };
 
-  // Tạo signature - consistent method
+  // Tạo signature - Manual build, consistent method
   const sortedKeys = Object.keys(vnpParams).sort();
-  const signData = sortedKeys
-    .map((key) => `${key}=${vnpParams[key]}`)
-    .join("&");
+  const sortedParams = {};
+  sortedKeys.forEach((key) => {
+    sortedParams[key] = vnpParams[key];
+  });
+
+  const signDataParts = [];
+  sortedKeys.forEach((key) => {
+    signDataParts.push(`${key}=${vnpParams[key]}`);
+  });
+  const signData = signDataParts.join("&");
   const secureHash = createSignature(signData);
 
-  vnpParams.vnp_SecureHash = secureHash;
-
-  return vnpParams;
+  return {
+    ...sortedParams,
+    vnp_SecureHash: secureHash,
+  };
 };
 
 /**
@@ -349,28 +376,35 @@ export const refundTransaction = (refundInfo) => {
   const vnpParams = {
     vnp_Version: "2.1.0",
     vnp_Command: "refund",
-    vnp_TmnCode: vnPayConfig.vnp_TmnCode,
-    vnp_TransactionType: transactionType,
-    vnp_TxnRef: orderId,
-    vnp_Amount: amount * 100,
+    vnp_TmnCode: String(vnPayConfig.vnp_TmnCode),
+    vnp_TransactionType: String(transactionType),
+    vnp_TxnRef: String(orderId),
+    vnp_Amount: String(amount * 100),
     vnp_OrderInfo: `Refund transaction ${orderId}`,
-    vnp_TransactionNo: transactionNo,
-    vnp_TransactionDate: transDate,
-    vnp_CreateBy: createdBy,
-    vnp_CreateDate: createDate,
-    vnp_IpAddr: ipAddr,
-    vnp_RequestId: requestId,
+    vnp_TransactionNo: String(transactionNo),
+    vnp_TransactionDate: String(transDate),
+    vnp_CreateBy: String(createdBy),
+    vnp_CreateDate: String(createDate),
+    vnp_IpAddr: String(ipAddr),
+    vnp_RequestId: String(requestId),
   };
 
-  // Tạo signature - consistent method
+  // Tạo signature - Manual build, consistent method
   const sortedKeys = Object.keys(vnpParams).sort();
-  const signData = sortedKeys
-    .map((key) => `${key}=${vnpParams[key]}`)
-    .join("&");
+  const sortedParams = {};
+  sortedKeys.forEach((key) => {
+    sortedParams[key] = vnpParams[key];
+  });
+
+  const signDataParts = [];
+  sortedKeys.forEach((key) => {
+    signDataParts.push(`${key}=${vnpParams[key]}`);
+  });
+  const signData = signDataParts.join("&");
   const secureHash = createSignature(signData);
 
   return {
-    ...vnpParams,
+    ...sortedParams,
     vnp_SecureHash: secureHash,
   };
 };
