@@ -155,6 +155,7 @@ export const createSubscription = async (
   userId,
   subscriptionPriceId,
   order_id,
+  transaction = null,
 ) => {
   try {
     // Get subscription price with plan info
@@ -167,6 +168,7 @@ export const createSubscription = async (
             attributes: ["subscription_plan_id", "monthly_ai_token_quota"],
           },
         ],
+        transaction,
       },
     );
 
@@ -188,14 +190,17 @@ export const createSubscription = async (
     }
 
     // Create subscription
-    const subscription = await User_Subscription.create({
-      user_id: userId,
-      subscription_price_id: subscriptionPriceId,
-      order_id: order_id || null,
-      started_at: startedAt,
-      expired_at: expiredAt,
-      status: "active",
-    });
+    const subscription = await User_Subscription.create(
+      {
+        user_id: userId,
+        subscription_price_id: subscriptionPriceId,
+        order_id: order_id || null,
+        started_at: startedAt,
+        expired_at: expiredAt,
+        status: "active",
+      },
+      { transaction },
+    );
 
     return subscription;
   } catch (error) {

@@ -108,32 +108,32 @@ const initUserRoutes = (app) => {
   // ===========User Subscription Routes===========
   router.get(
     "/api/user/subscriptions/active",
-    requireUser,
     verifyToken,
+    requireUser,
     getUserActiveSubscription,
   );
   router.get(
     "/api/user/subscriptions",
-    requireUser,
     verifyToken,
+    requireUser,
     getUserSubscriptions,
   );
   router.get(
     "/api/user/subscriptions/:subscriptionId",
-    requireUser,
     verifyToken,
+    requireUser,
     getSubscriptionById,
   );
   router.post(
     "/api/user/subscriptions",
-    requireUser,
     verifyToken,
+    requireUser,
     subscribeToplan,
   );
   router.patch(
     "/api/user/subscriptions/:subscriptionId/cancel",
-    requireUser,
     verifyToken,
+    requireUser,
     cancelSubscription,
   );
 

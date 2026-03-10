@@ -18,13 +18,19 @@ export const getUserActiveSubscription = async (req, res) => {
         success: true,
         message: "No active subscription found",
         data: null,
+        planName: "Free", // Default to Free if no subscription
       });
     }
+
+    // Extract plan name for easier frontend access
+    const planName =
+      subscription.Subscription_Price?.Subscription_Plan?.name || "Free";
 
     res.status(200).json({
       success: true,
       message: "Active subscription fetched successfully",
       data: subscription,
+      planName: planName, // Add plan name at top level for easy access
     });
   } catch (error) {
     res.status(500).json({

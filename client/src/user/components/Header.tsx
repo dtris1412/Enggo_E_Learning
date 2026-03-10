@@ -15,6 +15,7 @@ import { useToast } from "../../shared/components/Toast/Toast";
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [userSubscription, setUserSubscription] = useState("Free");
   const dropdownRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
   const navigate = useNavigate();
@@ -36,8 +37,62 @@ const Header = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // TODO: Fetch real subscription from API
-  const userSubscription = "Free"; // Will be replaced with actual API call
+  // Fetch user subscription plan
+  useEffect(() => {
+    const fetchSubscription = async () => {
+      if (!user) {
+        setUserSubscription("Free");
+        return;
+      }
+
+      try {
+        const token = localStorage.getItem("accessToken");
+        if (!token) {
+          setUserSubscription("Free");
+          return;
+        }
+
+        const response = await fetch(
+          `${import.meta.env.VITE_API_URL || "http://localhost:8080/api"}/user/subscriptions/active`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
+
+        const result = await response.json();
+
+        if (result.success) {
+          // API now returns planName at top level
+          setUserSubscription(result.planName || "Free");
+        } else {
+          setUserSubscription("Free");
+        }
+      } catch (error) {
+        console.error("Error fetching subscription:", error);
+        setUserSubscription("Free");
+      }
+    };
+
+    fetchSubscription();
+
+    // Listen for subscription update events (after payment success)
+    const handleSubscriptionUpdate = () => {
+      fetchSubscription();
+    };
+
+    window.addEventListener("subscriptionUpdated", handleSubscriptionUpdate);
+
+    return () => {
+      window.removeEventListener(
+        "subscriptionUpdated",
+        handleSubscriptionUpdate,
+      );
+    };
+  }, [user?.user_id]); // Re-fetch when user changes
 
   const navItems = [
     { path: "/", label: "Trang chủ" },
@@ -64,9 +119,7 @@ const Header = () => {
             className="flex items-center space-x-3 hover:scale-105 transition-transform duration-200"
           >
             <BookOpen className="h-8 w-8 text-blue-600" />
-            <span className="text-xl font-bold text-gray-900">
-              EnglishMaster
-            </span>
+            <span className="text-xl font-bold text-gray-900">Enggo</span>
           </Link>
 
           {/* Desktop Navigation */}

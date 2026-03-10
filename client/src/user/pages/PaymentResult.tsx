@@ -17,10 +17,15 @@ const PaymentResult = () => {
     // Simulate loading for better UX
     const timer = setTimeout(() => {
       setLoading(false);
+
+      // Notify Header to refresh subscription after successful payment
+      if (success) {
+        window.dispatchEvent(new Event("subscriptionUpdated"));
+      }
     }, 1000);
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [success]);
 
   if (loading) {
     return (

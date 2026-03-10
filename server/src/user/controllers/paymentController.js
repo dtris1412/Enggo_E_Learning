@@ -199,6 +199,13 @@ export const createMomoPayment = async (req, res) => {
     }
 
     // Create MoMo payment request
+    console.log("Creating MoMo payment for order:", {
+      orderId: order.order_id,
+      amount: order.amount,
+      amountType: typeof order.amount,
+      userId,
+    });
+
     const orderInfo = {
       orderId: order.order_id,
       amount: order.amount,
@@ -220,6 +227,7 @@ export const createMomoPayment = async (req, res) => {
         payment = await existingPayment.update({
           provider: "momo",
           payment_method: "momo",
+          transaction_code: momoResponse.orderId, // MoMo orderId (unique)
           status: "pending",
           payment_date: new Date(),
         });
@@ -228,7 +236,7 @@ export const createMomoPayment = async (req, res) => {
           order_id: orderId,
           payment_method: "momo",
           provider: "momo",
-          transaction_code: momoResponse.orderId,
+          transaction_code: momoResponse.orderId, // MoMo orderId (unique)
           amount: order.amount,
           payment_date: new Date(),
           content: orderInfo.orderDescription,
@@ -241,7 +249,8 @@ export const createMomoPayment = async (req, res) => {
         message: "MoMo payment URL created successfully",
         data: {
           payUrl: momoResponse.payUrl,
-          orderId: order.order_id,
+          orderId: order.order_id, // Original order ID
+          momoOrderId: momoResponse.orderId, // MoMo unique orderId
           amount: order.amount,
           deeplink: momoResponse.deeplink,
           qrCodeUrl: momoResponse.qrCodeUrl,
@@ -270,16 +279,20 @@ export const momoCallback = async (req, res) => {
   try {
     const callbackData = req.query;
 
+    console.log("MoMo callback data:", callbackData);
+
     // Handle payment result
     const result = momoService.handlePaymentResult(callbackData);
 
+    console.log("MoMo payment result:", result);
+
     if (!result.success) {
-      // Update payment status to failed
+      // Update payment status to failed - tìm bằng transaction_code (MoMo orderId)
       await Payment.update(
         { status: "failed" },
         {
           where: {
-            order_id: result.orderId,
+            transaction_code: result.orderId, // MoMo orderId format: ORDER_31_timestamp
             provider: "momo",
           },
         },
@@ -291,30 +304,37 @@ export const momoCallback = async (req, res) => {
       );
     }
 
-    // Update payment record
+    // Update payment record - tìm bằng transaction_code
     const payment = await Payment.findOne({
       where: {
-        order_id: result.orderId,
+        transaction_code: result.orderId, // MoMo orderId
         provider: "momo",
       },
     });
 
-    if (payment) {
-      await payment.update({
-        status: "completed",
-        transaction_code: result.transactionId,
-      });
+    if (!payment) {
+      console.error("Payment not found for MoMo orderId:", result.orderId);
+      return res.redirect(
+        `${process.env.FRONTEND_URL}/payment/result?success=false&message=Payment%20record%20not%20found`,
+      );
     }
 
+    await payment.update({
+      status: "completed",
+      transaction_code: result.transactionId, // Update with MoMo transactionId
+    });
+
     // Process successful payment: create subscription and grant tokens
+    // Dùng payment.order_id (original order ID từ database)
     try {
       const processResult = await paymentService.processSuccessfulPayment(
-        result.orderId,
+        payment.order_id, // Original order ID (31)
         result.transactionId,
       );
 
       console.log("Payment processed successfully:", {
-        orderId: result.orderId,
+        orderId: payment.order_id,
+        momoOrderId: result.orderId,
         tokensGranted: processResult.tokensGranted,
         alreadyProcessed: processResult.alreadyProcessed,
       });
@@ -326,7 +346,7 @@ export const momoCallback = async (req, res) => {
 
     // Redirect to frontend with success
     res.redirect(
-      `${process.env.FRONTEND_URL}/payment/result?success=true&orderId=${result.orderId}&amount=${result.amount}`,
+      `${process.env.FRONTEND_URL}/payment/result?success=true&orderId=${payment.order_id}&amount=${result.amount}`,
     );
   } catch (error) {
     console.error("MoMo callback error:", error);
@@ -341,8 +361,12 @@ export const momoIPN = async (req, res) => {
   try {
     const ipnData = req.body;
 
+    console.log("MoMo IPN data:", ipnData);
+
     // Handle payment result
     const result = momoService.handlePaymentResult(ipnData);
+
+    console.log("MoMo IPN result:", result);
 
     if (!result.success) {
       return res.status(200).json({
@@ -351,26 +375,40 @@ export const momoIPN = async (req, res) => {
       });
     }
 
-    // Update payment record
+    // Update payment record - tìm bằng transaction_code (MoMo orderId)
     const payment = await Payment.findOne({
       where: {
-        order_id: result.orderId,
+        transaction_code: result.orderId, // MoMo orderId
         provider: "momo",
       },
     });
 
-    if (payment && payment.status !== "completed") {
+    if (!payment) {
+      console.error("Payment not found for MoMo orderId:", result.orderId);
+      return res.status(200).json({
+        resultCode: 1,
+        message: "Payment not found",
+      });
+    }
+
+    if (payment.status !== "completed") {
       await payment.update({
         status: "completed",
-        transaction_code: result.transactionId,
+        transaction_code: result.transactionId, // Update with MoMo transactionId
       });
 
       // Process successful payment: create subscription and grant tokens
+      // Dùng payment.order_id (original order ID)
       try {
         await paymentService.processSuccessfulPayment(
-          result.orderId,
+          payment.order_id, // Original order ID
           result.transactionId,
         );
+
+        console.log("MoMo IPN: Payment processed successfully:", {
+          orderId: payment.order_id,
+          momoOrderId: result.orderId,
+        });
       } catch (error) {
         console.error("Error processing payment in IPN:", error);
         // Log error but still respond success to MoMo

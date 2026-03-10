@@ -24,17 +24,62 @@ export const createPaymentRequest = async (orderInfo) => {
     language = "vi",
   } = orderInfo;
 
+  // Validate config
+  if (
+    !momoConfig.partnerCode ||
+    !momoConfig.accessKey ||
+    !momoConfig.secretKey
+  ) {
+    console.error("MoMo config error:", {
+      hasPartnerCode: !!momoConfig.partnerCode,
+      hasAccessKey: !!momoConfig.accessKey,
+      hasSecretKey: !!momoConfig.secretKey,
+    });
+    throw new Error("MoMo configuration is incomplete");
+  }
+
+  // Convert orderId to string và amount to integer
+  // MoMo yêu cầu orderId UNIQUE cho mỗi request
+  // Thêm timestamp để tránh trùng lặp
+  const timestamp = Date.now();
+  const orderIdStr = `ORDER_${orderId}_${timestamp}`;
+  const amountInt = Math.round(parseFloat(amount));
+
+  // Validate amount
+  if (isNaN(amountInt) || amountInt <= 0) {
+    console.error("Invalid MoMo amount:", { amount, amountInt });
+    throw new Error(`Invalid payment amount: ${amount}`);
+  }
+
+  // Sanitize orderDescription - MoMo không cho phép ký tự đặc biệt
+  const sanitizedDescription = orderDescription
+    .replace(/[^a-zA-Z0-9\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .substring(0, 255);
+
   // Tạo request ID duy nhất
   const requestId = `${momoConfig.partnerCode}_${Date.now()}`;
   const requestType = "payWithMethod";
-  const extraData = userInfo
-    ? Buffer.from(JSON.stringify(userInfo)).toString("base64")
-    : "";
+  const extraData =
+    userInfo && Object.keys(userInfo).length > 0
+      ? Buffer.from(JSON.stringify(userInfo)).toString("base64")
+      : "";
+
+  console.log("Creating MoMo payment with:", {
+    orderId: orderIdStr,
+    amount: amountInt,
+    requestId,
+    orderDescription: sanitizedDescription,
+  });
 
   // Tạo raw signature string theo yêu cầu của MoMo
-  const rawSignature = `accessKey=${momoConfig.accessKey}&amount=${amount}&extraData=${extraData}&ipnUrl=${momoConfig.ipnUrl}&orderId=${orderId}&orderInfo=${orderDescription}&partnerCode=${momoConfig.partnerCode}&redirectUrl=${momoConfig.redirectUrl}&requestId=${requestId}&requestType=${requestType}`;
+  const rawSignature = `accessKey=${momoConfig.accessKey}&amount=${amountInt}&extraData=${extraData}&ipnUrl=${momoConfig.ipnUrl}&orderId=${orderIdStr}&orderInfo=${sanitizedDescription}&partnerCode=${momoConfig.partnerCode}&redirectUrl=${momoConfig.redirectUrl}&requestId=${requestId}&requestType=${requestType}`;
+
+  console.log("MoMo signature data:", rawSignature);
 
   const signature = createSignature(rawSignature);
+  console.log("MoMo signature:", signature);
 
   // Request body gửi đến MoMo
   const requestBody = {
@@ -42,9 +87,9 @@ export const createPaymentRequest = async (orderInfo) => {
     partnerName: "E-Learning Platform",
     storeId: momoConfig.partnerCode,
     requestId,
-    amount,
-    orderId,
-    orderInfo: orderDescription,
+    amount: amountInt,
+    orderId: orderIdStr,
+    orderInfo: sanitizedDescription,
     redirectUrl: momoConfig.redirectUrl,
     ipnUrl: momoConfig.ipnUrl,
     lang: language,
@@ -54,6 +99,11 @@ export const createPaymentRequest = async (orderInfo) => {
     signature,
   };
 
+  console.log("MoMo request body:", {
+    ...requestBody,
+    signature: signature.substring(0, 20) + "...",
+  });
+
   try {
     const response = await axios.post(momoConfig.endpoint, requestBody, {
       headers: {
@@ -61,13 +111,18 @@ export const createPaymentRequest = async (orderInfo) => {
       },
     });
 
+    console.log("MoMo response:", response.data);
     return response.data;
   } catch (error) {
-    console.error(
-      "MoMo payment request error:",
-      error.response?.data || error.message,
+    console.error("MoMo payment request error:");
+    console.error("Error message:", error.message);
+    if (error.response) {
+      console.error("Response status:", error.response.status);
+      console.error("Response data:", error.response.data);
+    }
+    throw new Error(
+      error.response?.data?.message || "Không thể tạo yêu cầu thanh toán MoMo",
     );
-    throw new Error("Không thể tạo yêu cầu thanh toán MoMo");
   }
 };
 
@@ -93,10 +148,16 @@ export const verifySignature = (callbackData) => {
     signature,
   } = callbackData;
 
-  // Tạo raw signature string để verify
+  // Tạo raw signature string để verify - THEO ĐÚNG THỨ TỰ CỦA MOMO
   const rawSignature = `accessKey=${momoConfig.accessKey}&amount=${amount}&extraData=${extraData}&message=${message}&orderId=${orderId}&orderInfo=${orderInfo}&orderType=${orderType}&partnerCode=${partnerCode}&payType=${payType}&requestId=${requestId}&responseTime=${responseTime}&resultCode=${resultCode}&transId=${transId}`;
 
   const calculatedSignature = createSignature(rawSignature);
+
+  console.log("MoMo signature verification:", {
+    receivedSignature: signature,
+    calculatedSignature,
+    match: calculatedSignature === signature,
+  });
 
   return calculatedSignature === signature;
 };
@@ -169,8 +230,15 @@ export const handlePaymentResult = (callbackData) => {
     }
   }
 
-  // resultCode = 0 nghĩa là thành công
-  const isSuccess = resultCode === 0;
+  // resultCode = 0 hoặc '0' nghĩa là thành công
+  // MoMo có thể trả về string hoặc number tùy endpoint
+  const isSuccess = String(resultCode) === "0";
+
+  console.log("MoMo handlePaymentResult:", {
+    resultCode,
+    resultCodeType: typeof resultCode,
+    isSuccess,
+  });
 
   return {
     success: isSuccess,

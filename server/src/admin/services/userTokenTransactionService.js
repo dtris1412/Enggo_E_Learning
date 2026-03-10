@@ -109,6 +109,7 @@ export const createTransaction = async (
   amount,
   transactionType,
   referenceId = null,
+  transaction = null,
 ) => {
   try {
     // Validate transaction type
@@ -119,15 +120,18 @@ export const createTransaction = async (
       );
     }
 
-    const transaction = await User_Token_Transaction.create({
-      user_id: userId,
-      amount,
-      transaction_type: transactionType,
-      reference_id: referenceId,
-      created_at: new Date(),
-    });
+    const newTransaction = await User_Token_Transaction.create(
+      {
+        user_id: userId,
+        amount,
+        transaction_type: transactionType,
+        reference_id: referenceId,
+        created_at: new Date(),
+      },
+      { transaction },
+    );
 
-    return transaction;
+    return newTransaction;
   } catch (error) {
     throw new Error(`Error creating transaction: ${error.message}`);
   }

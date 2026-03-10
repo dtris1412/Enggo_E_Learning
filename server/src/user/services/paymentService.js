@@ -264,22 +264,57 @@ export const processSuccessfulPayment = async (
     const activeSubscription =
       await userSubscriptionService.getUserActiveSubscription(order.user_id);
 
-    // Cancel existing subscription if any (user is upgrading)
-    if (activeSubscription && activeSubscription.status === "active") {
-      await activeSubscription.update({ status: "canceled" }, { transaction });
-    }
+    let subscription;
 
-    // Create new subscription
-    const subscription = await userSubscriptionService.createSubscription(
-      order.user_id,
-      order.subscription_price_id,
-      order.order_id,
-    );
+    if (activeSubscription) {
+      // User already has a subscription (free or paid) → UPDATE it
+      console.log("Updating existing subscription:", {
+        oldPriceId: activeSubscription.subscription_price_id,
+        newPriceId: order.subscription_price_id,
+      });
+
+      // Calculate new dates
+      const startedAt = new Date();
+      let expiredAt;
+
+      const subscriptionPrice = order.Subscription_Price;
+      if (subscriptionPrice.billing_type === "free") {
+        expiredAt = null;
+      } else {
+        expiredAt = new Date();
+        expiredAt.setDate(
+          expiredAt.getDate() + subscriptionPrice.duration_days,
+        );
+      }
+
+      // Update existing subscription
+      subscription = await activeSubscription.update(
+        {
+          subscription_price_id: order.subscription_price_id,
+          order_id: order.order_id,
+          started_at: startedAt,
+          expired_at: expiredAt,
+          status: "active",
+        },
+        { transaction },
+      );
+    } else {
+      // User doesn't have any subscription → CREATE new
+      console.log("Creating new subscription for user:", order.user_id);
+
+      subscription = await userSubscriptionService.createSubscription(
+        order.user_id,
+        order.subscription_price_id,
+        order.order_id,
+        transaction,
+      );
+    }
 
     // Grant AI tokens if the plan has monthly quota
     const monthlyTokens =
       order.Subscription_Price?.Subscription_Plan?.monthly_ai_token_quota || 0;
 
+    let tokensGranted = 0;
     if (monthlyTokens > 0) {
       // Add tokens to user wallet
       await userTokenWalletService.addTokensToWallet(
@@ -296,15 +331,24 @@ export const processSuccessfulPayment = async (
         subscription.user_subscription_id,
         transaction,
       );
+
+      tokensGranted = monthlyTokens;
     }
 
     await transaction.commit();
+
+    console.log("✅ Payment processed successfully:", {
+      orderId: order.order_id,
+      userId: order.user_id,
+      subscriptionId: subscription.user_subscription_id,
+      tokensGranted,
+    });
 
     return {
       alreadyProcessed: false,
       subscription,
       order,
-      tokensGranted: monthlyTokens,
+      tokensGranted,
     };
   } catch (error) {
     await transaction.rollback();

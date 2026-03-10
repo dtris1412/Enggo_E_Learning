@@ -11,7 +11,7 @@ import {
   isTokenExpired,
 } from "../../utils/authUtils";
 
-const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
+const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8080/api";
 
 interface User {
   user_id: number;
