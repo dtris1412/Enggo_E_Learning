@@ -1,54 +1,55 @@
-import { Users, Award, BookOpen, Target } from 'lucide-react';
+import {
+  Brain,
+  Target,
+  Award,
+  BookOpen,
+  TrendingUp,
+  Sparkles,
+  Users,
+  BarChart,
+} from "lucide-react";
 
 const About = () => {
-  const values = [
+  const features = [
     {
-      icon: <Target className="h-8 w-8 text-blue-600" />,
-      title: "Mục tiêu rõ ràng",
-      description: "Chúng tôi cam kết giúp học viên đạt được mục tiêu tiếng Anh một cách hiệu quả nhất"
+      icon: <Brain className="h-8 w-8 text-blue-600" />,
+      title: "Trí tuệ nhân tạo tiên tiến",
+      description:
+        "Ứng dụng AI để đánh giá, chấm điểm tự động và phản hồi chi tiết cho từng kỹ năng Nghe - Nói - Đọc - Viết",
     },
     {
-      icon: <Award className="h-8 w-8 text-blue-600" />,
-      title: "Chất lượng hàng đầu",
-      description: "Đảm bảo chất lượng giảng dạy theo tiêu chuẩn quốc tế với đội ngũ giảng viên chuyên nghiệp"
+      icon: <TrendingUp className="h-8 w-8 text-blue-600" />,
+      title: "Lộ trình học cá nhân hóa",
+      description:
+        "Thuật toán thông minh phân tích điểm mạnh/yếu, đề xuất lộ trình học tập phù hợp với từng cá nhân",
     },
     {
-      icon: <Users className="h-8 w-8 text-blue-600" />,
-      title: "Hỗ trợ tận tâm",
-      description: "Đồng hành cùng học viên trong suốt quá trình học tập với sự hỗ trợ 24/7"
+      icon: <Sparkles className="h-8 w-8 text-blue-600" />,
+      title: "Luyện nói với AI",
+      description:
+        "Rèn luyện kỹ năng giao tiếp với trợ lý AI, nhận phản hồi tức thì về phát âm, ngữ pháp và từ vựng",
     },
     {
-      icon: <BookOpen className="h-8 w-8 text-blue-600" />,
-      title: "Phương pháp hiện đại",
-      description: "Ứng dụng công nghệ và phương pháp giảng dạy tiên tiến để tối ưu hóa hiệu quả học tập"
-    }
+      icon: <BarChart className="h-8 w-8 text-blue-600" />,
+      title: "Phân tích chi tiết",
+      description:
+        "Báo cáo chi tiết về tiến độ học tập, điểm số từng phần và gợi ý cải thiện dựa trên dữ liệu thực tế",
+    },
   ];
 
-  const team = [
+  const certifications = [
     {
-      name: "Dr. Nguyễn Minh Hạnh",
-      role: "Giám đốc Học thuật",
-      image: "https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=300&h=300&fit=crop",
-      description: "Tiến sĩ ngôn ngữ học, 15 năm kinh nghiệm giảng dạy IELTS"
+      name: "IELTS",
+      icon: "🎓",
+      description:
+        "Đề thi chuẩn quốc tế từ Cambridge, bao gồm đầy đủ 4 kỹ năng Listening, Reading, Writing, Speaking",
     },
     {
-      name: "Ms. Sarah Johnson",
-      role: "Chuyên gia IELTS",
-      image: "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=300&h=300&fit=crop",
-      description: "Cựu giám khảo IELTS, chứng chỉ CELTA, TESOL quốc tế"
+      name: "TOEIC",
+      icon: "📋",
+      description:
+        "Tài liệu chính thống từ ETS, tập trung vào kỹ năng tiếng Anh trong môi trường doanh nghiệp",
     },
-    {
-      name: "Mr. James Wilson",
-      role: "Chuyên gia TOEIC",
-      image: "https://images.pexels.com/photos/2182970/pexels-photo-2182970.jpeg?auto=compress&cs=tinysrgb&w=300&h=300&fit=crop",
-      description: "Thạc sĩ giáo dục, chuyên gia luyện thi TOEIC với 10 năm kinh nghiệm"
-    },
-    {
-      name: "Ms. Trần Thùy Linh",
-      role: "Chuyên gia Business English",
-      image: "https://images.pexels.com/photos/733872/pexels-photo-733872.jpeg?auto=compress&cs=tinysrgb&w=300&h=300&fit=crop",
-      description: "MBA quốc tế, 12 năm kinh nghiệm trong môi trường doanh nghiệp"
-    }
   ];
 
   return (
@@ -57,76 +58,94 @@ const About = () => {
       <section className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h1 className="text-4xl lg:text-5xl font-bold mb-6">
-              Về EnglishMaster
-            </h1>
-            <p className="text-xl text-blue-100 max-w-3xl mx-auto">
-              Chúng tôi là nền tảng học tiếng Anh trực tuyến hàng đầu, 
-              cam kết mang đến trải nghiệm học tập tối ưu cho mọi học viên
+            <div className="inline-flex items-center justify-center mb-6">
+              <Brain className="h-12 w-12 text-yellow-300 mr-3" />
+              <h1 className="text-4xl lg:text-5xl font-bold">EnglishMaster</h1>
+            </div>
+            <p className="text-xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
+              Hệ thống luyện thi tiếng Anh ứng dụng trí tuệ nhân tạo - Cá nhân
+              hóa lộ trình học tập, nâng cao hiệu quả, tiết kiệm chi phí
             </p>
           </div>
         </div>
       </section>
 
-      {/* Mission & Vision */}
+      {/* Problem & Solution */}
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
             <div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-6">Sứ mệnh</h2>
-              <p className="text-lg text-gray-700 mb-6">
-                EnglishMaster được thành lập với sứ mệnh democratize English education - 
-                làm cho việc học tiếng Anh chất lượng cao trở nên dễ dàng tiếp cận 
-                với mọi người Việt Nam.
-              </p>
-              <p className="text-lg text-gray-700">
-                Chúng tôi tin rằng ngôn ngữ là cầu nối kết nối con người với thế giới, 
-                và mỗi cá nhân đều xứng đáng có cơ hội phát triển kỹ năng này một cách 
-                hiệu quả và bền vững.
-              </p>
+              <h2 className="text-3xl font-bold text-gray-900 mb-6 flex items-center">
+                <Target className="h-8 w-8 text-blue-600 mr-3" />
+                Thách thức trong học tiếng Anh
+              </h2>
+              <div className="space-y-4 text-lg text-gray-700">
+                <p>
+                  Trong bối cảnh hội nhập quốc tế, các chứng chỉ tiếng Anh như{" "}
+                  <strong>IELTS, TOEIC</strong> đã trở thành yêu cầu quan trọng
+                  cho học tập, xin học bổng và cơ hội nghề nghiệp.
+                </p>
+                <p>Tuy nhiên, nhiều người gặp khó khăn do:</p>
+                <ul className="list-disc list-inside space-y-2 ml-4">
+                  <li>Thiếu môi trường phù hợp để luyện tập</li>
+                  <li>Không có lộ trình học tập cá nhân hóa</li>
+                  <li>Chi phí các trung tâm Anh ngữ rất đắt đỏ</li>
+                  <li>Không nhận được phản hồi chi tiết về điểm yếu</li>
+                </ul>
+              </div>
             </div>
             <div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-6">Tầm nhìn</h2>
-              <p className="text-lg text-gray-700 mb-6">
-                Trở thành nền tảng giáo dục tiếng Anh trực tuyến số 1 tại Việt Nam, 
-                được tin tưởng bởi hàng triệu học viên và đối tác.
-              </p>
-              <p className="text-lg text-gray-700">
-                Chúng tôi hướng tới việc xây dựng một cộng đồng học tập năng động, 
-                nơi mọi người có thể phát triển không chỉ kỹ năng ngôn ngữ mà còn 
-                tự tin giao tiếp trên trường quốc tế.
-              </p>
+              <h2 className="text-3xl font-bold text-gray-900 mb-6 flex items-center">
+                <Sparkles className="h-8 w-8 text-blue-600 mr-3" />
+                Giải pháp với AI
+              </h2>
+              <div className="space-y-4 text-lg text-gray-700">
+                <p>
+                  EnglishMaster kết hợp <strong>trí tuệ nhân tạo</strong> với
+                  phương pháp giảng dạy hiện đại để mang đến trải nghiệm học tập
+                  vượt trội:
+                </p>
+                <ul className="list-disc list-inside space-y-2 ml-4">
+                  <li>Đánh giá năng lực tự động và chính xác</li>
+                  <li>Phân tích điểm mạnh/yếu của từng cá nhân</li>
+                  <li>Gợi ý lộ trình học tập dựa trên AI</li>
+                  <li>Luyện tập mọi lúc, mọi nơi với chi phí hợp lý</li>
+                  <li>Phản hồi chi tiết cho từng bài làm</li>
+                </ul>
+                <p className="font-semibold text-blue-600">
+                  Học thông minh hơn, tiến bộ nhanh hơn!
+                </p>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Values */}
+      {/* Key Features */}
       <section className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-              Giá trị cốt lõi
+              Tính năng nổi bật
             </h2>
             <p className="text-xl text-gray-600">
-              Những nguyên tắc định hướng mọi hoạt động của chúng tôi
+              Công nghệ AI tiên tiến giúp tối ưu hóa quá trình học tập
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {values.map((value, index) => (
-              <div key={index} className="bg-white p-8 rounded-lg border border-gray-200 card-hover">
+            {features.map((feature, index) => (
+              <div
+                key={index}
+                className="bg-white p-8 rounded-lg border border-gray-200 card-hover"
+              >
                 <div className="flex items-start space-x-4">
-                  <div className="flex-shrink-0">
-                    {value.icon}
-                  </div>
+                  <div className="flex-shrink-0">{feature.icon}</div>
                   <div>
                     <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                      {value.title}
+                      {feature.title}
                     </h3>
-                    <p className="text-gray-700">
-                      {value.description}
-                    </p>
+                    <p className="text-gray-700">{feature.description}</p>
                   </div>
                 </div>
               </div>
@@ -135,34 +154,30 @@ const About = () => {
         </div>
       </section>
 
-      {/* Team */}
+      {/* Certifications */}
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-              Đội ngũ chuyên gia
+              Chứng chỉ hỗ trợ
             </h2>
             <p className="text-xl text-gray-600">
-              Những giảng viên hàng đầu với kinh nghiệm và chứng chỉ quốc tế
+              Tài liệu chính thống từ các tổ chức uy tín quốc tế
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {team.map((member, index) => (
-              <div key={index} className="text-center hover:scale-105 transition-transform duration-300">
-                <img
-                  src={member.image}
-                  alt={member.name}
-                  className="w-48 h-48 object-cover rounded-lg mx-auto mb-6 shadow-lg hover:shadow-xl transition-shadow duration-300"
-                />
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                  {member.name}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            {certifications.map((cert, index) => (
+              <div
+                key={index}
+                className="bg-gradient-to-br from-blue-50 to-white p-8 rounded-xl border-2 border-blue-200 hover:border-blue-400 transition-all duration-300 hover:shadow-lg"
+              >
+                <div className="text-5xl mb-4 text-center">{cert.icon}</div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-3 text-center">
+                  {cert.name}
                 </h3>
-                <p className="text-blue-600 font-medium mb-3">
-                  {member.role}
-                </p>
-                <p className="text-gray-600 text-sm">
-                  {member.description}
+                <p className="text-gray-700 text-center leading-relaxed">
+                  {cert.description}
                 </p>
               </div>
             ))}
@@ -170,34 +185,196 @@ const About = () => {
         </div>
       </section>
 
-      {/* Statistics */}
-      <section className="py-20 bg-blue-600 text-white">
+      {/* Research Objectives */}
+      <section className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl lg:text-4xl font-bold mb-4">
-              Thành tựu của chúng tôi
+            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+              Mục tiêu nghiên cứu
             </h2>
-            <p className="text-xl text-blue-100">
-              Những con số biết nói về hành trình phát triển
+            <p className="text-xl text-gray-600">
+              Nền tảng khoa học và công nghệ đằng sau hệ thống
             </p>
           </div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-            <div className="text-center">
-              <div className="text-4xl lg:text-5xl font-bold text-yellow-300 mb-2 hover:scale-110 transition-transform duration-300">10,000+</div>
-              <div className="text-blue-100">Học viên đã tin tưởng</div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="bg-white p-6 rounded-lg border border-gray-200">
+              <div className="flex items-start">
+                <div className="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold mr-3">
+                  1
+                </div>
+                <p className="text-gray-700">
+                  Nghiên cứu và lựa chọn mô hình AI phù hợp để xử lý các kỹ năng
+                  Nghe - Nói - Đọc - Viết
+                </p>
+              </div>
             </div>
-            <div className="text-center">
-              <div className="text-4xl lg:text-5xl font-bold text-yellow-300 mb-2 hover:scale-110 transition-transform duration-300">95%</div>
-              <div className="text-blue-100">Tỷ lệ đậu kỳ thi</div>
+            <div className="bg-white p-6 rounded-lg border border-gray-200">
+              <div className="flex items-start">
+                <div className="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold mr-3">
+                  2
+                </div>
+                <p className="text-gray-700">
+                  Phát triển hệ thống tự động chấm điểm và phản hồi chi tiết cho
+                  từng phần thi
+                </p>
+              </div>
             </div>
-            <div className="text-center">
-              <div className="text-4xl lg:text-5xl font-bold text-yellow-300 mb-2 hover:scale-110 transition-transform duration-300">50+</div>
-              <div className="text-blue-100">Khóa học chất lượng</div>
+            <div className="bg-white p-6 rounded-lg border border-gray-200">
+              <div className="flex items-start">
+                <div className="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold mr-3">
+                  3
+                </div>
+                <p className="text-gray-700">
+                  Xây dựng thuật toán gợi ý lộ trình học tập dựa trên lịch sử và
+                  điểm mạnh/yếu cá nhân
+                </p>
+              </div>
             </div>
-            <div className="text-center">
-              <div className="text-4xl lg:text-5xl font-bold text-yellow-300 mb-2 hover:scale-110 transition-transform duration-300">5</div>
-              <div className="text-blue-100">Năm kinh nghiệm</div>
+            <div className="bg-white p-6 rounded-lg border border-gray-200">
+              <div className="flex items-start">
+                <div className="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold mr-3">
+                  4
+                </div>
+                <p className="text-gray-700">
+                  Tạo môi trường học tập thuận tiện, có thể truy cập mọi lúc mọi
+                  nơi
+                </p>
+              </div>
+            </div>
+            <div className="bg-white p-6 rounded-lg border border-gray-200">
+              <div className="flex items-start">
+                <div className="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold mr-3">
+                  5
+                </div>
+                <p className="text-gray-700">
+                  Ứng dụng kỹ thuật Prompt Engineering để tối ưu hóa tương tác
+                  với AI
+                </p>
+              </div>
+            </div>
+            <div className="bg-white p-6 rounded-lg border border-gray-200">
+              <div className="flex items-start">
+                <div className="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold mr-3">
+                  6
+                </div>
+                <p className="text-gray-700">
+                  Đánh giá và thử nghiệm hiệu quả của hệ thống trên môi trường
+                  thực tế
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Target Audience */}
+      <section className="py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <Users className="h-12 w-12 text-blue-600 mx-auto mb-4" />
+            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+              Đối tượng sử dụng
+            </h2>
+          </div>
+
+          <div className="max-w-3xl mx-auto bg-blue-50 p-8 rounded-xl border-2 border-blue-200">
+            <p className="text-lg text-gray-700 text-center leading-relaxed mb-4">
+              EnglishMaster được thiết kế phù hợp với{" "}
+              <strong>mọi lứa tuổi</strong>, đặc biệt là:
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+              <div className="text-center">
+                <div className="text-4xl mb-2">🎓</div>
+                <div className="font-semibold text-gray-900">
+                  Học sinh - Sinh viên
+                </div>
+                <p className="text-sm text-gray-600 mt-1">
+                  Chuẩn bị cho kỳ thi, xin học bổng
+                </p>
+              </div>
+              <div className="text-center">
+                <div className="text-4xl mb-2">💼</div>
+                <div className="font-semibold text-gray-900">
+                  Người lao động
+                </div>
+                <p className="text-sm text-gray-600 mt-1">
+                  Nâng cao kỹ năng nghề nghiệp
+                </p>
+              </div>
+              <div className="text-center">
+                <div className="text-4xl mb-2">🌍</div>
+                <div className="font-semibold text-gray-900">Du học sinh</div>
+                <p className="text-sm text-gray-600 mt-1">
+                  Đáp ứng yêu cầu quốc tế
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Achievements */}
+      <section className="py-20 bg-blue-600 text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <Award className="h-12 w-12 text-yellow-300 mx-auto mb-4" />
+            <h2 className="text-3xl lg:text-4xl font-bold mb-4">
+              Kết quả đạt được
+            </h2>
+            <p className="text-xl text-blue-100">
+              Những đổi mới mang tính đột phá trong giáo dục tiếng Anh
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="bg-white/10 backdrop-blur-sm p-8 rounded-xl border border-white/20 hover:bg-white/20 transition-all duration-300">
+              <div className="text-4xl mb-4">🎯</div>
+              <h3 className="text-xl font-bold mb-3">Hệ thống AI hoàn chỉnh</h3>
+              <p className="text-blue-100">
+                Tích hợp AI vào toàn bộ quy trình học tập từ đánh giá, phân tích
+                đến gợi ý cải thiện
+              </p>
+            </div>
+            <div className="bg-white/10 backdrop-blur-sm p-8 rounded-xl border border-white/20 hover:bg-white/20 transition-all duration-300">
+              <div className="text-4xl mb-4">📊</div>
+              <h3 className="text-xl font-bold mb-3">Phản hồi chi tiết</h3>
+              <p className="text-blue-100">
+                Phân tích từng phần thi, chỉ ra điểm mạnh/yếu và đề xuất cách
+                cải thiện cụ thể
+              </p>
+            </div>
+            <div className="bg-white/10 backdrop-blur-sm p-8 rounded-xl border border-white/20 hover:bg-white/20 transition-all duration-300">
+              <div className="text-4xl mb-4">🗣️</div>
+              <h3 className="text-xl font-bold mb-3">Luyện nói với AI</h3>
+              <p className="text-blue-100">
+                Rèn luyện kỹ năng giao tiếp thực tế với trợ lý AI thông minh,
+                phản hồi tức thì
+              </p>
+            </div>
+            <div className="bg-white/10 backdrop-blur-sm p-8 rounded-xl border border-white/20 hover:bg-white/20 transition-all duration-300">
+              <div className="text-4xl mb-4">🎓</div>
+              <h3 className="text-xl font-bold mb-3">Lộ trình cá nhân hóa</h3>
+              <p className="text-blue-100">
+                Thuật toán thông minh phân tích dữ liệu học tập và đề xuất lộ
+                trình tối ưu cho từng cá nhân
+              </p>
+            </div>
+            <div className="bg-white/10 backdrop-blur-sm p-8 rounded-xl border border-white/20 hover:bg-white/20 transition-all duration-300">
+              <div className="text-4xl mb-4">💰</div>
+              <h3 className="text-xl font-bold mb-3">Tiết kiệm chi phí</h3>
+              <p className="text-blue-100">
+                Giảm thiểu chi phí học tập so với các trung tâm truyền thống
+                nhưng vẫn đảm bảo chất lượng
+              </p>
+            </div>
+            <div className="bg-white/10 backdrop-blur-sm p-8 rounded-xl border border-white/20 hover:bg-white/20 transition-all duration-300">
+              <div className="text-4xl mb-4">🚀</div>
+              <h3 className="text-xl font-bold mb-3">Đổi mới giáo dục</h3>
+              <p className="text-blue-100">
+                Góp phần cải tiến phương pháp giảng dạy và học tập tiếng Anh tại
+                Việt Nam
+              </p>
             </div>
           </div>
         </div>
