@@ -2,15 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useBlog } from "../contexts/blogContext";
 import MDEditor from "@uiw/react-md-editor";
-import {
-  Calendar,
-  User,
-  Eye,
-  Tag,
-  ArrowLeft,
-  Edit,
-  Trash2,
-} from "lucide-react";
+import { Calendar, User, Eye, ArrowLeft, Edit, Trash2 } from "lucide-react";
 
 const BlogDetail = () => {
   const { slug } = useParams<{ slug: string }>();

@@ -16,6 +16,8 @@ import { PhaseCourseProvider } from "./admin/contexts/phaseCourseContext.tsx";
 import { DocumentProvider } from "./admin/contexts/documentContext.tsx";
 import { DocumentPhaseProvider } from "./admin/contexts/documentPhaseContext.tsx";
 import { DocumentProvider as UserDocumentProvider } from "./user/contexts/documentContext.tsx";
+import { CourseProvider as UserCourseProvider } from "./user/contexts/courseContext.tsx";
+import { RoadmapProvider as UserRoadmapProvider } from "./user/contexts/roadmapContext.tsx";
 import { SubscriptionProvider as UserSubscriptionProvider } from "./user/contexts/subscriptionContext.tsx";
 import { PaymentProvider } from "./user/contexts/paymentContext.tsx";
 import { BlogProvider } from "./admin/contexts/blogContext.tsx";
@@ -35,6 +37,8 @@ import Footer from "./user/components/Footer.tsx";
 import Home from "./user/pages/Home.tsx";
 import About from "./user/pages/About.tsx";
 import Courses from "./user/pages/Courses.tsx";
+import CourseDetail from "./user/pages/CourseDetail.tsx";
+import RoadmapDetail from "./user/pages/RoadmapDetail.tsx";
 import Blog from "./user/pages/Blog.tsx";
 import BlogDetail from "./user/pages/BlogDetail.tsx";
 import BlogLayoutPage from "./user/pages/BlogLayoutPage.tsx";
@@ -67,152 +71,168 @@ function App() {
                                 <DocumentPhaseProvider>
                                   <BlogProvider>
                                     <UserDocumentProvider>
-                                      <UserSubscriptionProvider>
-                                        <UserBlogProvider>
-                                          <PaymentProvider>
-                                            <ExamProvider>
-                                              <ReportProvider>
-                                                <FlashcardProvider>
-                                                  <SubscriptionProvider>
-                                                    <OrderPaymentProvider>
-                                                      <UserSubscriptionTrackingProvider>
-                                                        <DashboardProvider>
-                                                          <ToastProvider>
-                                                            <Router>
-                                                              <Routes>
-                                                                {/* Admin Routes - No Header/Footer */}
-                                                                {AdminRoutes()}
+                                      <UserCourseProvider>
+                                        <UserRoadmapProvider>
+                                          <UserSubscriptionProvider>
+                                            <UserBlogProvider>
+                                              <PaymentProvider>
+                                                <ExamProvider>
+                                                  <ReportProvider>
+                                                    <FlashcardProvider>
+                                                      <SubscriptionProvider>
+                                                        <OrderPaymentProvider>
+                                                          <UserSubscriptionTrackingProvider>
+                                                            <DashboardProvider>
+                                                              <ToastProvider>
+                                                                <Router>
+                                                                  <Routes>
+                                                                    {/* Admin Routes - No Header/Footer */}
+                                                                    {AdminRoutes()}
 
-                                                                {/* Public & User Routes - With Header/Footer */}
-                                                                <Route
-                                                                  path="*"
-                                                                  element={
-                                                                    <div className="min-h-screen bg-white text-gray-900 flex flex-col">
-                                                                      <Header />
-                                                                      <main className="flex-grow">
-                                                                        <Routes>
-                                                                          {/* Public Routes */}
-                                                                          <Route
-                                                                            path="/"
-                                                                            element={
-                                                                              <Home />
-                                                                            }
-                                                                          />
-                                                                          <Route
-                                                                            path="/about"
-                                                                            element={
-                                                                              <About />
-                                                                            }
-                                                                          />
-                                                                          <Route
-                                                                            path="/courses"
-                                                                            element={
-                                                                              <Courses />
-                                                                            }
-                                                                          />
-                                                                          <Route
-                                                                            path="/blog"
-                                                                            element={
-                                                                              <BlogLayoutPage />
-                                                                            }
-                                                                          >
-                                                                            <Route
-                                                                              index
-                                                                              element={
-                                                                                <Blog />
-                                                                              }
-                                                                            />
-                                                                            <Route
-                                                                              path=":slug"
-                                                                              element={
-                                                                                <BlogDetail />
-                                                                              }
-                                                                            />
-                                                                          </Route>
-                                                                          <Route
-                                                                            path="/documents"
-                                                                            element={
-                                                                              <Document />
-                                                                            }
-                                                                          />
-                                                                          <Route
-                                                                            path="/documents/:id"
-                                                                            element={
-                                                                              <DocumentDetail />
-                                                                            }
-                                                                          />
-                                                                          <Route
-                                                                            path="/tests"
-                                                                            element={
-                                                                              <OnlineTests />
-                                                                            }
-                                                                          />
-                                                                          <Route
-                                                                            path="/subscription"
-                                                                            element={
-                                                                              <SubscriptionPlans />
-                                                                            }
-                                                                          />
+                                                                    {/* Public & User Routes - With Header/Footer */}
+                                                                    <Route
+                                                                      path="*"
+                                                                      element={
+                                                                        <div className="min-h-screen bg-white text-gray-900 flex flex-col">
+                                                                          <Header />
+                                                                          <main className="flex-grow">
+                                                                            <Routes>
+                                                                              {/* Public Routes */}
+                                                                              <Route
+                                                                                path="/"
+                                                                                element={
+                                                                                  <Home />
+                                                                                }
+                                                                              />
+                                                                              <Route
+                                                                                path="/about"
+                                                                                element={
+                                                                                  <About />
+                                                                                }
+                                                                              />
+                                                                              <Route
+                                                                                path="/courses"
+                                                                                element={
+                                                                                  <Courses />
+                                                                                }
+                                                                              />
+                                                                              <Route
+                                                                                path="/courses/:id"
+                                                                                element={
+                                                                                  <CourseDetail />
+                                                                                }
+                                                                              />
+                                                                              <Route
+                                                                                path="/roadmaps/:id"
+                                                                                element={
+                                                                                  <RoadmapDetail />
+                                                                                }
+                                                                              />
+                                                                              <Route
+                                                                                path="/blog"
+                                                                                element={
+                                                                                  <BlogLayoutPage />
+                                                                                }
+                                                                              >
+                                                                                <Route
+                                                                                  index
+                                                                                  element={
+                                                                                    <Blog />
+                                                                                  }
+                                                                                />
+                                                                                <Route
+                                                                                  path=":slug"
+                                                                                  element={
+                                                                                    <BlogDetail />
+                                                                                  }
+                                                                                />
+                                                                              </Route>
+                                                                              <Route
+                                                                                path="/documents"
+                                                                                element={
+                                                                                  <Document />
+                                                                                }
+                                                                              />
+                                                                              <Route
+                                                                                path="/documents/:id"
+                                                                                element={
+                                                                                  <DocumentDetail />
+                                                                                }
+                                                                              />
+                                                                              <Route
+                                                                                path="/tests"
+                                                                                element={
+                                                                                  <OnlineTests />
+                                                                                }
+                                                                              />
+                                                                              <Route
+                                                                                path="/subscription"
+                                                                                element={
+                                                                                  <SubscriptionPlans />
+                                                                                }
+                                                                              />
 
-                                                                          {/* Auth Routes */}
-                                                                          <Route
-                                                                            path="/login"
-                                                                            element={
-                                                                              <Login />
-                                                                            }
-                                                                          />
-                                                                          <Route
-                                                                            path="/register"
-                                                                            element={
-                                                                              <Register />
-                                                                            }
-                                                                          />
-                                                                          <Route
-                                                                            path="/forgot-password"
-                                                                            element={
-                                                                              <ForgotPassword />
-                                                                            }
-                                                                          />
-                                                                          <Route
-                                                                            path="/verify-otp"
-                                                                            element={
-                                                                              <VerifyOTP />
-                                                                            }
-                                                                          />
-                                                                          <Route
-                                                                            path="/reset-password"
-                                                                            element={
-                                                                              <ResetPassword />
-                                                                            }
-                                                                          />
-                                                                          <Route
-                                                                            path="/auth/callback"
-                                                                            element={
-                                                                              <AuthCallback />
-                                                                            }
-                                                                          />
+                                                                              {/* Auth Routes */}
+                                                                              <Route
+                                                                                path="/login"
+                                                                                element={
+                                                                                  <Login />
+                                                                                }
+                                                                              />
+                                                                              <Route
+                                                                                path="/register"
+                                                                                element={
+                                                                                  <Register />
+                                                                                }
+                                                                              />
+                                                                              <Route
+                                                                                path="/forgot-password"
+                                                                                element={
+                                                                                  <ForgotPassword />
+                                                                                }
+                                                                              />
+                                                                              <Route
+                                                                                path="/verify-otp"
+                                                                                element={
+                                                                                  <VerifyOTP />
+                                                                                }
+                                                                              />
+                                                                              <Route
+                                                                                path="/reset-password"
+                                                                                element={
+                                                                                  <ResetPassword />
+                                                                                }
+                                                                              />
+                                                                              <Route
+                                                                                path="/auth/callback"
+                                                                                element={
+                                                                                  <AuthCallback />
+                                                                                }
+                                                                              />
 
-                                                                          {/* User Routes - Protected */}
-                                                                          {UserRoutes()}
-                                                                        </Routes>
-                                                                      </main>
-                                                                      <Footer />
-                                                                    </div>
-                                                                  }
-                                                                />
-                                                              </Routes>
-                                                            </Router>
-                                                          </ToastProvider>
-                                                        </DashboardProvider>
-                                                      </UserSubscriptionTrackingProvider>
-                                                    </OrderPaymentProvider>
-                                                  </SubscriptionProvider>
-                                                </FlashcardProvider>
-                                              </ReportProvider>
-                                            </ExamProvider>
-                                          </PaymentProvider>
-                                        </UserBlogProvider>
-                                      </UserSubscriptionProvider>
+                                                                              {/* User Routes - Protected */}
+                                                                              {UserRoutes()}
+                                                                            </Routes>
+                                                                          </main>
+                                                                          <Footer />
+                                                                        </div>
+                                                                      }
+                                                                    />
+                                                                  </Routes>
+                                                                </Router>
+                                                              </ToastProvider>
+                                                            </DashboardProvider>
+                                                          </UserSubscriptionTrackingProvider>
+                                                        </OrderPaymentProvider>
+                                                      </SubscriptionProvider>
+                                                    </FlashcardProvider>
+                                                  </ReportProvider>
+                                                </ExamProvider>
+                                              </PaymentProvider>
+                                            </UserBlogProvider>
+                                          </UserSubscriptionProvider>
+                                        </UserRoadmapProvider>
+                                      </UserCourseProvider>
                                     </UserDocumentProvider>
                                   </BlogProvider>
                                 </DocumentPhaseProvider>

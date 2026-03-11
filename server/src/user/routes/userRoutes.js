@@ -16,6 +16,18 @@ import {
   downloadDocument,
 } from "../controllers/documentController.js";
 
+// ===========Roadmap Controllers===========
+import {
+  getRoadmapsPaginated,
+  getRoadmapById,
+} from "../controllers/roadmapController.js";
+
+// ===========Course Controllers===========
+import {
+  getCoursesPaginated,
+  getCourseById,
+} from "../controllers/courseController.js";
+
 // ===========User Token Wallet Controllers===========
 import { getUserWallet } from "../controllers/userTokenWalletController.js";
 
@@ -112,6 +124,21 @@ const initUserRoutes = (app) => {
     checkSubscriptionAccess, // Check subscription access
     downloadDocument,
   );
+
+  // ===========Roadmap Routes===========
+  // List all roadmaps (public)
+  router.get("/api/user/roadmaps", getRoadmapsPaginated);
+
+  // View roadmap by ID with full details (phases, courses, documents)
+  router.get("/api/user/roadmaps/:roadmap_id", getRoadmapById);
+
+  // ===========Course Routes===========
+  // List all courses (public)
+  // Can filter by roadmap_id, phase_id, course_level, access_type, tag
+  router.get("/api/user/courses", getCoursesPaginated);
+
+  // View course by ID with full details (modules, lessons)
+  router.get("/api/user/courses/:course_id", getCourseById);
 
   // ===========User Token Wallet Routes===========
   router.get("/api/user/wallet", verifyToken, requireUser, getUserWallet);
