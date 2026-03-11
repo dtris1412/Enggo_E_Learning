@@ -79,6 +79,26 @@ const getBlogsPaginated = async ({
         attributes: ["user_id", "user_name", "user_email", "avatar"],
       },
     ],
+    attributes: {
+      include: [
+        [
+          db.sequelize.literal(`(
+            SELECT COUNT(*)
+            FROM blog_likes
+            WHERE blog_likes.blog_id = Blog.blog_id
+          )`),
+          "likes_count",
+        ],
+        [
+          db.sequelize.literal(`(
+            SELECT COUNT(*)
+            FROM blog_comments
+            WHERE blog_comments.blog_id = Blog.blog_id
+          )`),
+          "comments_count",
+        ],
+      ],
+    },
     limit: parseInt(limit),
     offset: offset,
     order: [[sortBy, order]],
@@ -105,6 +125,26 @@ const getBlogById = async (blog_id) => {
         attributes: ["user_id", "user_name", "user_email", "avatar"],
       },
     ],
+    attributes: {
+      include: [
+        [
+          db.sequelize.literal(`(
+            SELECT COUNT(*)
+            FROM blog_likes
+            WHERE blog_likes.blog_id = Blog.blog_id
+          )`),
+          "likes_count",
+        ],
+        [
+          db.sequelize.literal(`(
+            SELECT COUNT(*)
+            FROM blog_comments
+            WHERE blog_comments.blog_id = Blog.blog_id
+          )`),
+          "comments_count",
+        ],
+      ],
+    },
   });
 
   return blog;
@@ -120,6 +160,26 @@ const getBlogBySlug = async (slug) => {
         attributes: ["user_id", "user_name", "user_email", "avatar"],
       },
     ],
+    attributes: {
+      include: [
+        [
+          db.sequelize.literal(`(
+            SELECT COUNT(*)
+            FROM blog_likes
+            WHERE blog_likes.blog_id = Blog.blog_id
+          )`),
+          "likes_count",
+        ],
+        [
+          db.sequelize.literal(`(
+            SELECT COUNT(*)
+            FROM blog_comments
+            WHERE blog_comments.blog_id = Blog.blog_id
+          )`),
+          "comments_count",
+        ],
+      ],
+    },
   });
 
   return blog;

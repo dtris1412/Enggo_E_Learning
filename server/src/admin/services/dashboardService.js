@@ -252,26 +252,48 @@ export const getTopDocuments = async (limit = 5) => {
   }
 };
 
-// Get top blogs by views_count
+// Get top blogs by interaction count (views + likes + comments)
 export const getTopBlogs = async (limit = 5) => {
   try {
     const blogs = await Blog.findAll({
       where: { blog_status: "published" },
       limit,
-      order: [["views_count", "DESC"]],
       include: [
         {
           model: User,
           attributes: ["user_id", "user_name", "full_name"],
         },
       ],
-      attributes: [
-        "blog_id",
-        "blog_title",
-        "category",
-        "views_count",
-        "created_at",
-      ],
+      attributes: {
+        include: [
+          [
+            db.sequelize.literal(`(
+              SELECT COUNT(*)
+              FROM blog_likes
+              WHERE blog_likes.blog_id = Blog.blog_id
+            )`),
+            "likes_count",
+          ],
+          [
+            db.sequelize.literal(`(
+              SELECT COUNT(*)
+              FROM blog_comments
+              WHERE blog_comments.blog_id = Blog.blog_id
+            )`),
+            "comments_count",
+          ],
+          [
+            db.sequelize.literal(`(
+              views_count + 
+              (SELECT COUNT(*) FROM blog_likes WHERE blog_likes.blog_id = Blog.blog_id) +
+              (SELECT COUNT(*) FROM blog_comments WHERE blog_comments.blog_id = Blog.blog_id)
+            )`),
+            "interaction_count",
+          ],
+        ],
+      },
+      order: [[db.sequelize.literal("interaction_count"), "DESC"]],
+      subQuery: false,
     });
 
     return { success: true, data: blogs };

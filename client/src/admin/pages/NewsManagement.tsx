@@ -9,6 +9,8 @@ import {
   Tag,
   ChevronLeft,
   ChevronRight,
+  Heart,
+  MessageCircle,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useBlog } from "../contexts/blogContext";
@@ -278,8 +280,19 @@ const NewsManagement = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">
-                        <div>{blog.views_count} lượt xem</div>
+                      <div className="space-y-1">
+                        <div className="flex items-center text-sm text-gray-900">
+                          <Eye className="h-4 w-4 text-gray-400 mr-2" />
+                          <span>{blog.views_count || 0} lượt xem</span>
+                        </div>
+                        <div className="flex items-center text-sm text-gray-600">
+                          <Heart className="h-4 w-4 text-red-400 mr-2" />
+                          <span>{blog.likes_count || 0} thích</span>
+                        </div>
+                        <div className="flex items-center text-sm text-gray-600">
+                          <MessageCircle className="h-4 w-4 text-blue-400 mr-2" />
+                          <span>{blog.comments_count || 0} bình luận</span>
+                        </div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">

@@ -1,11 +1,14 @@
 import React from "react";
-import { Eye, TrendingUp } from "lucide-react";
+import { Eye, TrendingUp, Heart, MessageCircle } from "lucide-react";
 
 interface Blog {
   blog_id: number;
   blog_title: string;
   category: string;
   views_count: number;
+  likes_count?: number;
+  comments_count?: number;
+  interaction_count?: number;
   created_at: string;
   User: {
     user_name: string;
@@ -60,13 +63,29 @@ const TopBlogs: React.FC<TopBlogsProps> = ({ blogs, loading = false }) => {
                   <p className="text-xs text-gray-500 mt-0.5">
                     {blog.User.full_name || blog.User.user_name}
                   </p>
-                  <div className="flex items-center gap-2 mt-1">
+                  <div className="flex items-center gap-3 mt-1 flex-wrap">
                     <div className="flex items-center gap-1 text-gray-600">
                       <Eye className="h-3 w-3" />
                       <span className="text-xs font-medium">
                         {blog.views_count.toLocaleString("vi-VN")}
                       </span>
                     </div>
+                    {blog.likes_count !== undefined && (
+                      <div className="flex items-center gap-1 text-red-500">
+                        <Heart className="h-3 w-3" />
+                        <span className="text-xs font-medium">
+                          {blog.likes_count.toLocaleString("vi-VN")}
+                        </span>
+                      </div>
+                    )}
+                    {blog.comments_count !== undefined && (
+                      <div className="flex items-center gap-1 text-blue-500">
+                        <MessageCircle className="h-3 w-3" />
+                        <span className="text-xs font-medium">
+                          {blog.comments_count.toLocaleString("vi-VN")}
+                        </span>
+                      </div>
+                    )}
                     <span className="text-xs text-gray-500">
                       {timeAgo(blog.created_at)}
                     </span>

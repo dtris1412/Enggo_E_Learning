@@ -18,6 +18,8 @@ interface Blog {
   category: "Mẹo học tập" | "TOEIC" | "IELTS" | "Ngữ pháp" | "Từ vựng";
   blog_status: "draft" | "published" | "hidden";
   views_count: number;
+  likes_count?: number;
+  comments_count?: number;
   user_id: number;
   created_at: string;
   updated_at?: string;

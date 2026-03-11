@@ -75,6 +75,9 @@ interface TopBlog {
   blog_title: string;
   category: string;
   views_count: number;
+  likes_count?: number;
+  comments_count?: number;
+  interaction_count?: number;
   created_at: string;
   User: {
     user_id: number;
