@@ -10,7 +10,7 @@ const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080/api";
 
 interface User {
   user_id: number;
-  username: string;
+  user_name: string;
   email: string;
   avatar: string | null;
 }

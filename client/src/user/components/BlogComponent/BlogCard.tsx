@@ -1,10 +1,10 @@
 import React from "react";
-import { Calendar, User } from "lucide-react";
+import { Calendar, User as UserIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface User {
   user_id: number;
-  username: string;
+  user_name: string;
   email: string;
   avatar: string | null;
 }
@@ -97,15 +97,15 @@ const BlogCard: React.FC<BlogCardProps> = ({
           <div className="flex flex-wrap items-center gap-3 text-xs text-gray-500">
             {author && (
               <div className="flex items-center gap-1">
-                <User className="h-3 w-3" />
-                <span className="font-medium">{author.username}</span>
+                <UserIcon className="h-3 w-3" />
+                <span className="font-medium">{author.user_name}</span>
               </div>
             )}
             <div className="flex items-center gap-1">
               <Calendar className="h-3 w-3" />
               <span>
                 {formatDate(created_at)} bởi{" "}
-                {author ? author.username : "Admin"}
+                {author ? author.user_name : "Admin"}
               </span>
             </div>
           </div>

@@ -136,19 +136,23 @@ const BlogDetail: React.FC = () => {
               {currentBlog.User.avatar ? (
                 <img
                   src={currentBlog.User.avatar}
-                  alt={currentBlog.User.username}
+                  alt={currentBlog.User.user_name}
                   className="w-10 h-10 rounded-full"
                 />
               ) : (
-                <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
-                  <User className="h-5 w-5 text-blue-600" />
+                <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
+                  <User className="h-5 w-5 text-gray-600" />
                 </div>
               )}
               <div>
-                <p className="font-medium text-gray-900">
-                  {currentBlog.User.username}
-                </p>
-                <p className="text-xs text-gray-500">Tác giả</p>
+                <div className="flex items-center gap-2">
+                  <p className="font-semibold text-gray-900">
+                    {currentBlog.User.user_name}
+                  </p>
+                  <span className="px-2 py-0.5 bg-gray-800 text-white text-xs font-medium rounded">
+                    Tác giả
+                  </span>
+                </div>
               </div>
             </div>
           )}
@@ -230,6 +234,7 @@ const BlogDetail: React.FC = () => {
         blog_id={currentBlog.blog_id}
         comments={comments}
         currentUserId={currentUserId}
+        authorId={currentBlog.user_id}
       />
     </div>
   );
