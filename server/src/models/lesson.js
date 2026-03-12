@@ -15,6 +15,9 @@ export default (sequelize, DataTypes) => {
       Lesson.hasMany(models.Module_Lesson, {
         foreignKey: "lesson_id",
       });
+      Lesson.hasMany(models.User_Lesson_Progress, {
+        foreignKey: "lesson_id",
+      });
     }
   }
   Lesson.init(

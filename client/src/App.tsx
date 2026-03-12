@@ -39,6 +39,8 @@ import About from "./user/pages/About.tsx";
 import Courses from "./user/pages/Courses.tsx";
 import CourseDetail from "./user/pages/CourseDetail.tsx";
 import RoadmapDetail from "./user/pages/RoadmapDetail.tsx";
+import LearningSpace from "./user/pages/LearningSpace.tsx";
+import MyLearning from "./user/pages/MyLearning.tsx";
 import Blog from "./user/pages/Blog.tsx";
 import BlogDetail from "./user/pages/BlogDetail.tsx";
 import BlogLayoutPage from "./user/pages/BlogLayoutPage.tsx";
@@ -126,6 +128,18 @@ function App() {
                                                                                 path="/roadmaps/:id"
                                                                                 element={
                                                                                   <RoadmapDetail />
+                                                                                }
+                                                                              />
+                                                                              <Route
+                                                                                path="/learning/:courseId"
+                                                                                element={
+                                                                                  <LearningSpace />
+                                                                                }
+                                                                              />
+                                                                              <Route
+                                                                                path="/my-learning"
+                                                                                element={
+                                                                                  <MyLearning />
                                                                                 }
                                                                               />
                                                                               <Route

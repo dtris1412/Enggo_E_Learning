@@ -25,6 +25,40 @@ const DocumentDetail: React.FC = () => {
   const [document, setDocument] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [userHasPremium, setUserHasPremium] = useState(false);
+
+  // Fetch user subscription status
+  useEffect(() => {
+    const fetchUserSubscription = async () => {
+      try {
+        const token = localStorage.getItem("accessToken");
+        if (!token) {
+          setUserHasPremium(false);
+          return;
+        }
+
+        const response = await fetch(`${API_URL}/user/subscriptions/active`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const result = await response.json();
+        if (result.success && result.planName) {
+          setUserHasPremium(result.planName.toLowerCase() === "premium");
+        } else {
+          setUserHasPremium(false);
+        }
+      } catch (error) {
+        console.error("Error fetching subscription:", error);
+        setUserHasPremium(false);
+      }
+    };
+
+    fetchUserSubscription();
+  }, []);
 
   useEffect(() => {
     const fetchDocument = async () => {
@@ -50,12 +84,13 @@ const DocumentDetail: React.FC = () => {
         if (response.ok && result.success) {
           setDocument(result.data);
         } else {
-          // Check if it's a premium access error
+          // Check if it's a premium access error - only show modal if user doesn't have premium
           if (
-            response.status === 401 ||
-            response.status === 403 ||
-            result.message?.toLowerCase().includes("premium") ||
-            result.message?.toLowerCase().includes("authentication")
+            !userHasPremium &&
+            (response.status === 401 ||
+              response.status === 403 ||
+              result.message?.toLowerCase().includes("premium") ||
+              result.message?.toLowerCase().includes("authentication"))
           ) {
             setShowUpgradeModal(true);
           } else {
@@ -73,7 +108,7 @@ const DocumentDetail: React.FC = () => {
     };
 
     fetchDocument();
-  }, [id]);
+  }, [id, userHasPremium]);
 
   const handleDownload = async () => {
     if (!document) return;
@@ -87,10 +122,11 @@ const DocumentDetail: React.FC = () => {
         download_count: prev.download_count + 1,
       }));
     } else {
-      // Check if it's a premium access issue
+      // Check if it's a premium access issue - only redirect if user doesn't have premium
       if (
-        result.message?.toLowerCase().includes("premium") ||
-        result.message?.toLowerCase().includes("subscription")
+        !userHasPremium &&
+        (result.message?.toLowerCase().includes("premium") ||
+          result.message?.toLowerCase().includes("subscription"))
       ) {
         showToast(
           "info",
@@ -438,7 +474,7 @@ const DocumentDetail: React.FC = () => {
               Download Document
             </button>
 
-            {document.access_type === "premium" && (
+            {document.access_type === "premium" && !userHasPremium && (
               <div className="mt-4 p-4 bg-gradient-to-r from-yellow-50 to-amber-50 border border-yellow-200 rounded-lg">
                 <p className="text-center text-sm text-gray-700 mb-3 flex items-center justify-center gap-2">
                   <Lock className="w-4 h-4 text-yellow-600" />

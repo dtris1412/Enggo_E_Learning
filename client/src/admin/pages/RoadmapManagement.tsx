@@ -10,6 +10,7 @@ import {
   Award,
   Calendar,
   Eye,
+  Users,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -18,7 +19,6 @@ import { useCertificate } from "../contexts/certificateContext";
 import AddRoadmapModal from "../components/RoadmapManagement/AddRoadmapModal.tsx";
 import EditRoadmapModal from "../components/RoadmapManagement/EditRoadmapModal.tsx";
 import ExportButton from "../components/ExportButton";
-import { formatCurrency } from "../../utils/formatters";
 
 const RoadmapManagement = () => {
   const navigate = useNavigate();
@@ -250,6 +250,15 @@ const RoadmapManagement = () => {
                     {getCertificateName(roadmap.certificate_id)}
                   </span>
                 </div>
+                {roadmap.enrolled_users_count !== undefined && (
+                  <div className="flex items-center gap-2 text-sm">
+                    <Users className="h-4 w-4 text-blue-500" />
+                    <span className="text-gray-600">Người học:</span>
+                    <span className="font-semibold text-blue-600">
+                      {roadmap.enrolled_users_count}
+                    </span>
+                  </div>
+                )}
               </div>
 
               <div className="flex items-center justify-between mb-4 pb-4 border-b border-gray-200">

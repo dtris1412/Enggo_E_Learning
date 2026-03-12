@@ -28,6 +28,20 @@ import {
   getCourseById,
 } from "../controllers/courseController.js";
 
+// ===========Lesson Controllers===========
+import { getLessonById } from "../controllers/lessonController.js";
+
+// ===========Progress Controllers===========
+import {
+  startCourse,
+  startRoadmap,
+  updateLessonProgress,
+  getCourseProgress,
+  getRoadmapProgress,
+  getLessonProgress,
+  getEnrolledCourses,
+} from "../controllers/progressController.js";
+
 // ===========User Token Wallet Controllers===========
 import { getUserWallet } from "../controllers/userTokenWalletController.js";
 
@@ -137,8 +151,69 @@ const initUserRoutes = (app) => {
   // Can filter by roadmap_id, phase_id, course_level, access_type, tag
   router.get("/api/user/courses", getCoursesPaginated);
 
+  // Get all enrolled courses for authenticated user (MUST be before :course_id)
+  router.get(
+    "/api/user/courses/enrolled",
+    verifyToken,
+    requireUser,
+    getEnrolledCourses,
+  );
+
   // View course by ID with full details (modules, lessons)
   router.get("/api/user/courses/:course_id", getCourseById);
+
+  // ===========Lesson Routes===========
+  // Get lesson detail with media and questions
+  router.get("/api/user/lessons/:id", getLessonById);
+
+  // ===========Progress Tracking Routes===========
+  // Start a course (create user_course record)
+  router.post(
+    "/api/user/courses/:id/start",
+    verifyToken,
+    requireUser,
+    startCourse,
+  );
+
+  // Start a roadmap (create user_roadmap record)
+  router.post(
+    "/api/user/roadmaps/:id/start",
+    verifyToken,
+    requireUser,
+    startRoadmap,
+  );
+
+  // Update lesson progress
+  router.put(
+    "/api/user/lessons/:id/progress",
+    verifyToken,
+    requireUser,
+    updateLessonProgress,
+  );
+
+  // Get course progress
+  router.get(
+    "/api/user/courses/:id/progress",
+    verifyToken,
+    requireUser,
+    getCourseProgress,
+  );
+
+  // Get roadmap progress
+  router.get(
+    "/api/user/roadmaps/:id/progress",
+    verifyToken,
+    requireUser,
+    getRoadmapProgress,
+  );
+
+  // Get lesson progress
+  router.get(
+    "/api/user/lessons/:id/progress",
+    verifyToken,
+    requireUser,
+    getLessonProgress,
+  );
 
   // ===========User Token Wallet Routes===========
   router.get("/api/user/wallet", verifyToken, requireUser, getUserWallet);

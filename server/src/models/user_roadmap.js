@@ -2,7 +2,16 @@ import { Model } from "sequelize";
 
 export default (sequelize, DataTypes) => {
   class User_Roadmap extends Model {
-    static associate(models) {}
+    static associate(models) {
+      User_Roadmap.belongsTo(models.User, {
+        foreignKey: "user_id",
+        as: "user",
+      });
+      User_Roadmap.belongsTo(models.Roadmap, {
+        foreignKey: "roadmap_id",
+        as: "roadmap",
+      });
+    }
   }
   User_Roadmap.init(
     {

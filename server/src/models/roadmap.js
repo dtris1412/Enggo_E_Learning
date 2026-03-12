@@ -9,6 +9,9 @@ export default (sequelize, DataTypes) => {
       Roadmap.hasMany(models.Phase, {
         foreignKey: "roadmap_id",
       });
+      Roadmap.hasMany(models.User_Roadmap, {
+        foreignKey: "roadmap_id",
+      });
     }
   }
   Roadmap.init(

@@ -10,6 +10,7 @@ import {
   Filter,
   Calendar,
   Eye,
+  Users,
 } from "lucide-react";
 import { useCourse } from "../contexts/courseContext";
 import AddCourseModal from "../components/CourseManagement/Course/AddCourseModal";
@@ -316,6 +317,12 @@ const CourseManagement = () => {
                         <span className="px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
                           {course.estimate_duration} tuần
                         </span>
+                        {course.enrolled_users_count !== undefined && (
+                          <span className="px-3 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 flex items-center gap-1">
+                            <Users className="h-3 w-3" />
+                            {course.enrolled_users_count} người học
+                          </span>
+                        )}
                         <span className="text-xs text-gray-500 flex items-center gap-1">
                           <Calendar className="h-3 w-3" />
                           {formatDate(course.created_at)}

@@ -7,6 +7,8 @@ import RecentFlashcards from "./RecentFlashcards";
 import TopDocuments from "./TopDocuments";
 import TopBlogs from "./TopBlogs";
 import FeaturedBanner from "./FeaturedBanner";
+import TopCourses from "./TopCourses";
+import TopRoadmaps from "./TopRoadmaps";
 
 export {
   StatCard,
@@ -18,4 +20,6 @@ export {
   TopDocuments,
   TopBlogs,
   FeaturedBanner,
+  TopCourses,
+  TopRoadmaps,
 };

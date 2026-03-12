@@ -87,7 +87,20 @@ const getCourseById = async (course_id) => {
     return { success: false, message: "Course ID is required." };
   }
 
-  const course = await db.Course.findByPk(course_id);
+  const course = await db.Course.findByPk(course_id, {
+    attributes: {
+      include: [
+        [
+          db.sequelize.literal(`(
+            SELECT COUNT(DISTINCT user_id)
+            FROM user_courses
+            WHERE user_courses.course_id = Course.course_id
+          )`),
+          "enrolled_users_count",
+        ],
+      ],
+    },
+  });
   if (!course) {
     return { success: false, message: "Course not found." };
   }
@@ -137,6 +150,19 @@ const getCoursePaginated = async (
     limit: Number(limit),
     offset,
     order: [["course_id", "ASC"]],
+    attributes: {
+      include: [
+        [
+          db.sequelize.literal(`(
+            SELECT COUNT(DISTINCT user_id)
+            FROM user_courses
+            WHERE user_courses.course_id = Course.course_id
+          )`),
+          "enrolled_users_count",
+        ],
+      ],
+    },
+    subQuery: false,
   });
 
   return {

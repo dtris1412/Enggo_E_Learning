@@ -47,7 +47,6 @@ const getCoursesPaginated = async (
           "module_title",
           "module_description",
           "order_index",
-          "estimated_time",
         ],
         required: false,
       },
@@ -84,9 +83,7 @@ const getCourseById = async (course_id) => {
           "module_title",
           "module_description",
           "order_index",
-          "estimated_time",
         ],
-        order: [["order_index", "ASC"]],
         include: [
           {
             model: db.Module_Lesson,
@@ -98,7 +95,6 @@ const getCourseById = async (course_id) => {
             ],
             where: { status: true },
             required: false,
-            order: [["order_index", "ASC"]],
             include: [
               {
                 model: db.Lesson,
@@ -108,12 +104,18 @@ const getCourseById = async (course_id) => {
                   "lesson_title",
                   "lesson_content",
                   "estimated_time",
+                  "difficulty_level",
+                  "is_exam_format",
                 ],
               },
             ],
           },
         ],
       },
+    ],
+    order: [
+      [db.Module, "order_index", "ASC"],
+      [db.Module, db.Module_Lesson, "order_index", "ASC"],
     ],
   });
 

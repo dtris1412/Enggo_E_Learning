@@ -36,6 +36,43 @@ const DocumentList: React.FC = () => {
   const [accessTypeFilter, setAccessTypeFilter] = useState("");
   const [itemsPerPage] = useState(12);
   const [topDocuments, setTopDocuments] = useState<any[]>([]);
+  const [userHasPremium, setUserHasPremium] = useState(false);
+
+  // Fetch user subscription status
+  useEffect(() => {
+    const fetchUserSubscription = async () => {
+      try {
+        const token = localStorage.getItem("accessToken");
+        if (!token) {
+          setUserHasPremium(false);
+          return;
+        }
+
+        const response = await fetch(
+          `${import.meta.env.VITE_API_URL || "http://localhost:8080/api"}/user/subscriptions/active`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
+
+        const result = await response.json();
+        if (result.success && result.planName) {
+          setUserHasPremium(result.planName.toLowerCase() === "premium");
+        } else {
+          setUserHasPremium(false);
+        }
+      } catch (error) {
+        console.error("Error fetching subscription:", error);
+        setUserHasPremium(false);
+      }
+    };
+
+    fetchUserSubscription();
+  }, []);
 
   // Initial load
   useEffect(() => {
@@ -118,10 +155,11 @@ const DocumentList: React.FC = () => {
         accessTypeFilter,
       );
     } else {
-      // Check if it's a premium access issue
+      // Check if it's a premium access issue - only redirect if user doesn't have premium
       if (
-        result.message?.toLowerCase().includes("premium") ||
-        result.message?.toLowerCase().includes("subscription")
+        !userHasPremium &&
+        (result.message?.toLowerCase().includes("premium") ||
+          result.message?.toLowerCase().includes("subscription"))
       ) {
         showToast(
           "info",

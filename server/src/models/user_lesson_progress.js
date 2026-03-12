@@ -2,7 +2,16 @@ import { Model } from "sequelize";
 
 export default (sequelize, DataTypes) => {
   class User_Lesson_Progress extends Model {
-    static associate(models) {}
+    static associate(models) {
+      User_Lesson_Progress.belongsTo(models.User, {
+        foreignKey: "user_id",
+        as: "user",
+      });
+      User_Lesson_Progress.belongsTo(models.Lesson, {
+        foreignKey: "lesson_id",
+        as: "lesson",
+      });
+    }
   }
   User_Lesson_Progress.init(
     {
@@ -47,7 +56,7 @@ export default (sequelize, DataTypes) => {
     {
       sequelize,
       modelName: "User_Lesson_Progress",
-      tableName: "user_lesson_progresss",
+      tableName: "user_lesson_progress",
       freezeTableName: true,
       timestamps: false,
     },

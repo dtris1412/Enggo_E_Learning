@@ -15,16 +15,23 @@ import {
   FileText,
   File,
   Download,
+  Rocket,
 } from "lucide-react";
 
 const RoadmapDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { getRoadmapById, loading } = useRoadmap();
+  const { getRoadmapById, loading, startRoadmap, getRoadmapProgress } =
+    useRoadmap();
 
   const [roadmap, setRoadmap] = useState<any>(null);
   const [expandedPhases, setExpandedPhases] = useState<number[]>([]);
   const [expandedCourses, setExpandedCourses] = useState<number[]>([]);
+  const [roadmapProgress, setRoadmapProgress] = useState<{
+    started: boolean;
+    progress: any;
+  } | null>(null);
+  const [startingRoadmap, setStartingRoadmap] = useState(false);
 
   useEffect(() => {
     const fetchRoadmap = async () => {
@@ -36,13 +43,28 @@ const RoadmapDetail: React.FC = () => {
         if (roadmapData.Phases && roadmapData.Phases.length > 0) {
           setExpandedPhases([roadmapData.Phases[0].phase_id]);
         }
+
+        // Fetch progress
+        const progress = await getRoadmapProgress(Number(id));
+        setRoadmapProgress(progress);
       } else {
         navigate("/roadmaps");
       }
     };
 
     fetchRoadmap();
-  }, [id, getRoadmapById, navigate]);
+  }, [id, getRoadmapById, getRoadmapProgress, navigate]);
+
+  const handleStartRoadmap = async () => {
+    if (!id) return;
+    setStartingRoadmap(true);
+    const success = await startRoadmap(Number(id));
+    if (success) {
+      const progress = await getRoadmapProgress(Number(id));
+      setRoadmapProgress(progress);
+    }
+    setStartingRoadmap(false);
+  };
 
   const togglePhase = (phaseId: number) => {
     setExpandedPhases((prev) =>
@@ -512,9 +534,51 @@ const RoadmapDetail: React.FC = () => {
                 </div>
               </div>
 
-              <button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition-all shadow-lg">
-                Bắt đầu lộ trình
-              </button>
+              {/* Progress Section */}
+              {roadmapProgress?.started && roadmapProgress.progress ? (
+                <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-semibold text-blue-900">
+                      Tiến độ
+                    </span>
+                    <span className="text-sm font-bold text-blue-700">
+                      {Math.round(roadmapProgress.progress.progress_percentage)}
+                      %
+                    </span>
+                  </div>
+                  <div className="w-full bg-blue-200 rounded-full h-2.5 mb-2">
+                    <div
+                      className="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
+                      style={{
+                        width: `${roadmapProgress.progress.progress_percentage}%`,
+                      }}
+                    />
+                  </div>
+                  <p className="text-xs text-blue-700">
+                    {roadmapProgress.progress.completedCourses || 0} /{" "}
+                    {roadmapProgress.progress.totalCourses || 0} khóa học hoàn
+                    thành
+                  </p>
+                </div>
+              ) : (
+                <button
+                  onClick={handleStartRoadmap}
+                  disabled={startingRoadmap}
+                  className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {startingRoadmap ? (
+                    <>
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                      <span>Đang bắt đầu...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Rocket className="h-5 w-5" />
+                      <span>Bắt đầu lộ trình</span>
+                    </>
+                  )}
+                </button>
+              )}
 
               {/* Certificate Info */}
               {roadmap.Certificate && (

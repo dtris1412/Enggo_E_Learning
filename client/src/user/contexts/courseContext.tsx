@@ -55,6 +55,32 @@ interface CourseDetail extends Course {
   Modules: ModuleWithLessons[];
 }
 
+interface UserCourseProgress {
+  user_course_id: number;
+  user_id: number;
+  course_id: number;
+  started_at: string | null;
+  completed_at: string | null;
+  progress_percentage: number;
+  is_completed: boolean;
+  created_at: string;
+  updated_at: string;
+  completedLessons?: number;
+  totalLessons?: number;
+}
+
+interface LessonProgress {
+  user_lesson_progress_id: number;
+  user_id: number;
+  lesson_id: number;
+  started_at: string | null;
+  completed_at: string | null;
+  progress_percentage: number;
+  is_completed: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 interface CourseContextType {
   courses: Course[];
   totalCourses: number;
@@ -73,6 +99,18 @@ interface CourseContextType {
     sortOrder?: string,
   ) => Promise<void>;
   getCourseById: (course_id: number) => Promise<CourseDetail | null>;
+  startCourse: (course_id: number) => Promise<boolean>;
+  getCourseProgress: (
+    course_id: number,
+  ) => Promise<{ started: boolean; progress: UserCourseProgress | null }>;
+  updateLessonProgress: (
+    lesson_id: number,
+    progressPercentage: number,
+    isCompleted?: boolean,
+  ) => Promise<boolean>;
+  getLessonProgress: (
+    lesson_id: number,
+  ) => Promise<{ started: boolean; progress: LessonProgress | null }>;
 }
 
 const CourseContext = createContext<CourseContextType | undefined>(undefined);
@@ -171,6 +209,141 @@ export const CourseProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
+  const startCourse = useCallback(async (course_id: number) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const token = localStorage.getItem("accessToken");
+      if (!token) {
+        throw new Error("You must be logged in to start a course");
+      }
+
+      const response = await fetch(
+        `${API_URL}/user/courses/${course_id}/start`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to start course");
+      }
+
+      const result = await response.json();
+      return result.success;
+    } catch (err: any) {
+      setError(err.message || "Failed to start course");
+      console.error("Error starting course:", err);
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const getCourseProgress = useCallback(async (course_id: number) => {
+    try {
+      const token = localStorage.getItem("accessToken");
+      if (!token) {
+        return { started: false, progress: null };
+      }
+
+      const response = await fetch(
+        `${API_URL}/user/courses/${course_id}/progress`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch course progress");
+      }
+
+      const result = await response.json();
+      return result.data;
+    } catch (err: any) {
+      console.error("Error fetching course progress:", err);
+      return { started: false, progress: null };
+    }
+  }, []);
+
+  const updateLessonProgress = useCallback(
+    async (
+      lesson_id: number,
+      progressPercentage: number,
+      isCompleted = false,
+    ) => {
+      try {
+        const token = localStorage.getItem("accessToken");
+        if (!token) {
+          throw new Error("You must be logged in to update progress");
+        }
+
+        const response = await fetch(
+          `${API_URL}/user/lessons/${lesson_id}/progress`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ progressPercentage, isCompleted }),
+          },
+        );
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.message || "Failed to update lesson progress");
+        }
+
+        const result = await response.json();
+        return result.success;
+      } catch (err: any) {
+        console.error("Error updating lesson progress:", err);
+        return false;
+      }
+    },
+    [],
+  );
+
+  const getLessonProgress = useCallback(async (lesson_id: number) => {
+    try {
+      const token = localStorage.getItem("accessToken");
+      if (!token) {
+        return { started: false, progress: null };
+      }
+
+      const response = await fetch(
+        `${API_URL}/user/lessons/${lesson_id}/progress`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch lesson progress");
+      }
+
+      const result = await response.json();
+      return result.data;
+    } catch (err: any) {
+      console.error("Error fetching lesson progress:", err);
+      return { started: false, progress: null };
+    }
+  }, []);
+
   return (
     <CourseContext.Provider
       value={{
@@ -182,6 +355,10 @@ export const CourseProvider = ({ children }: { children: ReactNode }) => {
         error,
         fetchCoursesPaginated,
         getCourseById,
+        startCourse,
+        getCourseProgress,
+        updateLessonProgress,
+        getLessonProgress,
       }}
     >
       {children}

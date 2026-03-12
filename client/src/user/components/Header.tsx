@@ -103,11 +103,26 @@ const Header = () => {
     { path: "/tests", label: "Thi thử online" },
   ];
 
+  // Add conditional nav items based on user status
+  let allNavItems = [...navItems];
+
+  // Add "Góc học tập" if user is logged in
+  if (user) {
+    // Insert after "Chương trình học" (index 2)
+    allNavItems = [
+      ...navItems.slice(0, 3),
+      { path: "/my-learning", label: "Góc học tập" },
+      ...navItems.slice(3),
+    ];
+  }
+
   // Add Admin link if user is admin (role = 1)
-  const allNavItems =
-    user?.role === 1
-      ? [...navItems, { path: "/admin/dashboard", label: "Quản trị" }]
-      : navItems;
+  if (user?.role === 1) {
+    allNavItems = [
+      ...allNavItems,
+      { path: "/admin/dashboard", label: "Quản trị" },
+    ];
+  }
 
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-50 backdrop-blur-sm bg-white/95">

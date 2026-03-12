@@ -2,7 +2,14 @@ import { Model } from "sequelize";
 
 export default (sequelize, DataTypes) => {
   class User_Course extends Model {
-    static associate(models) {}
+    static associate(models) {
+      User_Course.belongsTo(models.User, {
+        foreignKey: "user_id",
+      });
+      User_Course.belongsTo(models.Course, {
+        foreignKey: "course_id",
+      });
+    }
   }
   User_Course.init(
     {

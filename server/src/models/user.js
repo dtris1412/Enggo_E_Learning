@@ -36,6 +36,15 @@ export default (sequelize, DataTypes) => {
       User.hasMany(models.Blog_Comment, {
         foreignKey: "user_id",
       });
+      User.hasMany(models.User_Lesson_Progress, {
+        foreignKey: "user_id",
+      });
+      User.hasMany(models.User_Roadmap, {
+        foreignKey: "user_id",
+      });
+      User.hasMany(models.User_Course, {
+        foreignKey: "user_id",
+      });
     }
   }
   User.init(

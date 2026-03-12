@@ -86,6 +86,25 @@ interface TopBlog {
   };
 }
 
+interface TopCourse {
+  course_id: number;
+  course_title: string;
+  course_level: string;
+  course_status: boolean;
+  tag: string;
+  access_type: string;
+  enrolled_users_count: number;
+}
+
+interface TopRoadmap {
+  roadmap_id: number;
+  roadmap_title: string;
+  roadmap_level: string;
+  roadmap_status: boolean;
+  estimated_duration: number;
+  enrolled_users_count: number;
+}
+
 interface DashboardData {
   totalUsers: number;
   activeCourses: number;
@@ -95,6 +114,8 @@ interface DashboardData {
   recentFlashcards: RecentFlashcard[];
   topDocuments: TopDocument[];
   topBlogs: TopBlog[];
+  topCourses: TopCourse[];
+  topRoadmaps: TopRoadmap[];
 }
 
 interface DashboardContextType {

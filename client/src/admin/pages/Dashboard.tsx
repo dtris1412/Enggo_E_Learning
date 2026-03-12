@@ -11,6 +11,8 @@ import {
   TopDocuments,
   TopBlogs,
   FeaturedBanner,
+  TopCourses,
+  TopRoadmaps,
 } from "../components/Dashboard";
 
 const Dashboard = () => {
@@ -68,6 +70,8 @@ const Dashboard = () => {
   const recentFlashcards = dashboardData?.recentFlashcards || [];
   const topDocuments = dashboardData?.topDocuments || [];
   const topBlogs = dashboardData?.topBlogs || [];
+  const topCourses = dashboardData?.topCourses || [];
+  const topRoadmaps = dashboardData?.topRoadmaps || [];
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
@@ -153,6 +157,12 @@ const Dashboard = () => {
           icon={stats[3].icon}
         />
         <AIPlaceholders />
+      </div>
+
+      {/* Row 5: Top Courses (1/2) + Top Roadmaps (1/2) */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <TopCourses courses={topCourses} loading={loading} />
+        <TopRoadmaps roadmaps={topRoadmaps} loading={loading} />
       </div>
     </div>
   );

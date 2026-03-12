@@ -20,6 +20,7 @@ interface Course {
   access_type: "free" | "premium";
   created_at: string;
   updated_at: string;
+  enrolled_users_count?: number;
 }
 
 interface CourseContextType {

@@ -97,6 +97,19 @@ const getRoadmapsPaginated = async (
     where: whereConditions,
     offset,
     limit: Number(limit),
+    attributes: {
+      include: [
+        [
+          db.sequelize.literal(`(
+            SELECT COUNT(DISTINCT user_id)
+            FROM user_roadmaps
+            WHERE user_roadmaps.roadmap_id = Roadmap.roadmap_id
+          )`),
+          "enrolled_users_count",
+        ],
+      ],
+    },
+    subQuery: false,
   });
 
   return {
@@ -131,6 +144,18 @@ const getRoadmapById = async (roadmap_id) => {
         ],
       },
     ],
+    attributes: {
+      include: [
+        [
+          db.sequelize.literal(`(
+            SELECT COUNT(DISTINCT user_id)
+            FROM user_roadmaps
+            WHERE user_roadmaps.roadmap_id = Roadmap.roadmap_id
+          )`),
+          "enrolled_users_count",
+        ],
+      ],
+    },
   });
   if (!roadmap) {
     return { success: false, message: "Roadmap not found." };

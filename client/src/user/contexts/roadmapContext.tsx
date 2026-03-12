@@ -101,6 +101,20 @@ interface RoadmapDetail extends Roadmap {
   Phases: Phase[];
 }
 
+interface UserRoadmapProgress {
+  user_roadmap_id: number;
+  user_id: number;
+  roadmap_id: number;
+  started_at: string | null;
+  completed_at: string | null;
+  progress_percentage: number;
+  is_completed: boolean;
+  created_at: string;
+  updated_at: string;
+  completedCourses?: number;
+  totalCourses?: number;
+}
+
 interface RoadmapContextType {
   roadmaps: Roadmap[];
   totalRoadmaps: number;
@@ -118,6 +132,10 @@ interface RoadmapContextType {
     sortOrder?: string,
   ) => Promise<void>;
   getRoadmapById: (roadmap_id: number) => Promise<RoadmapDetail | null>;
+  startRoadmap: (roadmap_id: number) => Promise<boolean>;
+  getRoadmapProgress: (
+    roadmap_id: number,
+  ) => Promise<{ started: boolean; progress: UserRoadmapProgress | null }>;
 }
 
 const RoadmapContext = createContext<RoadmapContextType | undefined>(undefined);
@@ -215,6 +233,72 @@ export const RoadmapProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
+  const startRoadmap = useCallback(async (roadmap_id: number) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const token = localStorage.getItem("accessToken");
+      if (!token) {
+        throw new Error("You must be logged in to start a roadmap");
+      }
+
+      const response = await fetch(
+        `${API_URL}/user/roadmaps/${roadmap_id}/start`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to start roadmap");
+      }
+
+      const result = await response.json();
+      return result.success;
+    } catch (err: any) {
+      setError(err.message || "Failed to start roadmap");
+      console.error("Error starting roadmap:", err);
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const getRoadmapProgress = useCallback(async (roadmap_id: number) => {
+    try {
+      const token = localStorage.getItem("accessToken");
+      if (!token) {
+        return { started: false, progress: null };
+      }
+
+      const response = await fetch(
+        `${API_URL}/user/roadmaps/${roadmap_id}/progress`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch roadmap progress");
+      }
+
+      const result = await response.json();
+      return result.data;
+    } catch (err: any) {
+      console.error("Error fetching roadmap progress:", err);
+      return { started: false, progress: null };
+    }
+  }, []);
+
   return (
     <RoadmapContext.Provider
       value={{
@@ -226,6 +310,8 @@ export const RoadmapProvider = ({ children }: { children: ReactNode }) => {
         error,
         fetchRoadmapsPaginated,
         getRoadmapById,
+        startRoadmap,
+        getRoadmapProgress,
       }}
     >
       {children}

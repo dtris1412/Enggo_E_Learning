@@ -12,6 +12,7 @@ import {
   FileText,
   Lock,
   CheckCircle,
+  Rocket,
 } from "lucide-react";
 
 interface Lesson {
@@ -57,10 +58,61 @@ interface Course {
 const CourseDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { getCourseById, loading } = useCourse();
+  const {
+    getCourseById,
+    loading,
+    startCourse,
+    getCourseProgress,
+    getLessonProgress,
+  } = useCourse();
 
   const [course, setCourse] = useState<Course | null>(null);
   const [expandedModules, setExpandedModules] = useState<number[]>([]);
+  const [courseProgress, setCourseProgress] = useState<{
+    started: boolean;
+    progress: any;
+  } | null>(null);
+  const [lessonProgressMap, setLessonProgressMap] = useState<
+    Record<number, any>
+  >({});
+  const [startingCourse, setStartingCourse] = useState(false);
+  const [userHasPremium, setUserHasPremium] = useState(false);
+
+  // Fetch user subscription status
+  useEffect(() => {
+    const fetchUserSubscription = async () => {
+      try {
+        const token = localStorage.getItem("accessToken");
+        if (!token) {
+          setUserHasPremium(false);
+          return;
+        }
+
+        const response = await fetch(
+          `${import.meta.env.VITE_API_URL || "http://localhost:8080/api"}/user/subscriptions/active`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
+
+        const result = await response.json();
+        if (result.success && result.planName) {
+          setUserHasPremium(result.planName.toLowerCase() === "premium");
+        } else {
+          setUserHasPremium(false);
+        }
+      } catch (error) {
+        console.error("Error fetching subscription:", error);
+        setUserHasPremium(false);
+      }
+    };
+
+    fetchUserSubscription();
+  }, []);
 
   useEffect(() => {
     const fetchCourse = async () => {
@@ -72,13 +124,53 @@ const CourseDetail: React.FC = () => {
         if (courseData.Modules && courseData.Modules.length > 0) {
           setExpandedModules([courseData.Modules[0].module_id]);
         }
+
+        // Fetch progress
+        const progress = await getCourseProgress(Number(id));
+        setCourseProgress(progress);
+
+        // Fetch lesson progress for all lessons
+        if (courseData.Modules) {
+          const lessonProgressPromises: Promise<any>[] = [];
+          courseData.Modules.forEach((module) => {
+            module.Module_Lessons?.forEach((ml) => {
+              lessonProgressPromises.push(
+                getLessonProgress(ml.Lesson.lesson_id),
+              );
+            });
+          });
+
+          const lessonProgresses = await Promise.all(lessonProgressPromises);
+          const progressMap: Record<number, any> = {};
+
+          let lessonIndex = 0;
+          courseData.Modules.forEach((module) => {
+            module.Module_Lessons?.forEach((ml) => {
+              progressMap[ml.Lesson.lesson_id] = lessonProgresses[lessonIndex];
+              lessonIndex++;
+            });
+          });
+
+          setLessonProgressMap(progressMap);
+        }
       } else {
         navigate("/courses");
       }
     };
 
     fetchCourse();
-  }, [id, getCourseById, navigate]);
+  }, [id, getCourseById, getCourseProgress, getLessonProgress, navigate]);
+
+  const handleStartCourse = async () => {
+    if (!id) return;
+    setStartingCourse(true);
+    const success = await startCourse(Number(id));
+    if (success) {
+      // Navigate to learning space after starting course
+      navigate(`/learning/${id}`);
+    }
+    setStartingCourse(false);
+  };
 
   const toggleModule = (moduleId: number) => {
     setExpandedModules((prev) =>
@@ -185,10 +277,57 @@ const CourseDetail: React.FC = () => {
             </div>
 
             <div className="lg:col-span-1">
-              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6">
+              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 space-y-4">
                 <h3 className="text-lg font-semibold mb-4">
                   Thông tin khóa học
                 </h3>
+
+                {/* Progress Section */}
+                {courseProgress?.started && courseProgress.progress ? (
+                  <div className="mb-6">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm font-medium">Tiến độ</span>
+                      <span className="text-sm font-semibold">
+                        {Math.round(
+                          courseProgress.progress.progress_percentage,
+                        )}
+                        %
+                      </span>
+                    </div>
+                    <div className="w-full bg-white/20 rounded-full h-2 mb-2">
+                      <div
+                        className="bg-green-400 h-2 rounded-full transition-all duration-300"
+                        style={{
+                          width: `${courseProgress.progress.progress_percentage}%`,
+                        }}
+                      />
+                    </div>
+                    <p className="text-xs text-blue-100">
+                      {courseProgress.progress.completedLessons || 0} /{" "}
+                      {courseProgress.progress.totalLessons || 0} bài học hoàn
+                      thành
+                    </p>
+                  </div>
+                ) : (
+                  <button
+                    onClick={handleStartCourse}
+                    disabled={startingCourse}
+                    className="w-full bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-semibold py-3 px-6 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:scale-105"
+                  >
+                    {startingCourse ? (
+                      <>
+                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-900"></div>
+                        <span>Đang bắt đầu...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Rocket className="h-5 w-5" />
+                        <span>Bắt đầu học ngay</span>
+                      </>
+                    )}
+                  </button>
+                )}
+
                 <div className="space-y-3 text-sm">
                   <div className="flex items-start">
                     <Target className="h-5 w-5 mr-2 flex-shrink-0" />
@@ -259,32 +398,70 @@ const CourseDetail: React.FC = () => {
                               <div className="space-y-2">
                                 {module.Module_Lessons.sort(
                                   (a, b) => a.order_index - b.order_index,
-                                ).map((moduleLesson) => (
-                                  <div
-                                    key={moduleLesson.module_lesson_id}
-                                    className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
-                                  >
-                                    {getLessonIcon(
-                                      moduleLesson.Lesson.lesson_type,
-                                    )}
-                                    <div className="flex-1">
-                                      <p className="font-medium text-gray-900">
-                                        {moduleLesson.Lesson.lesson_title}
-                                      </p>
-                                      {moduleLesson.description && (
-                                        <p className="text-sm text-gray-500">
-                                          {moduleLesson.description}
+                                ).map((moduleLesson) => {
+                                  const lessonProgress =
+                                    lessonProgressMap[
+                                      moduleLesson.Lesson.lesson_id
+                                    ];
+                                  const isCompleted =
+                                    lessonProgress?.started &&
+                                    lessonProgress?.progress?.is_completed;
+                                  const progressPercentage =
+                                    lessonProgress?.started &&
+                                    lessonProgress?.progress
+                                      ?.progress_percentage;
+
+                                  return (
+                                    <div
+                                      key={moduleLesson.module_lesson_id}
+                                      className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${
+                                        isCompleted
+                                          ? "bg-green-50 border border-green-200"
+                                          : "bg-gray-50 hover:bg-gray-100"
+                                      }`}
+                                    >
+                                      {getLessonIcon(
+                                        moduleLesson.Lesson.lesson_type,
+                                      )}
+                                      <div className="flex-1">
+                                        <p
+                                          className={`font-medium ${
+                                            isCompleted
+                                              ? "text-green-900"
+                                              : "text-gray-900"
+                                          }`}
+                                        >
+                                          {moduleLesson.Lesson.lesson_title}
                                         </p>
+                                        {moduleLesson.description && (
+                                          <p className="text-sm text-gray-500">
+                                            {moduleLesson.description}
+                                          </p>
+                                        )}
+                                        {progressPercentage > 0 &&
+                                          !isCompleted && (
+                                            <div className="mt-1">
+                                              <div className="w-full bg-gray-200 rounded-full h-1">
+                                                <div
+                                                  className="bg-blue-600 h-1 rounded-full transition-all duration-300"
+                                                  style={{
+                                                    width: `${progressPercentage}%`,
+                                                  }}
+                                                />
+                                              </div>
+                                            </div>
+                                          )}
+                                      </div>
+                                      <span className="text-sm text-gray-500">
+                                        {moduleLesson.Lesson.estimated_time}{" "}
+                                        phút
+                                      </span>
+                                      {isCompleted && (
+                                        <CheckCircle className="h-5 w-5 text-green-500" />
                                       )}
                                     </div>
-                                    <span className="text-sm text-gray-500">
-                                      {moduleLesson.Lesson.estimated_time} phút
-                                    </span>
-                                    {moduleLesson.status && (
-                                      <CheckCircle className="h-5 w-5 text-green-500" />
-                                    )}
-                                  </div>
-                                ))}
+                                  );
+                                })}
                               </div>
                             )}
                         </div>
@@ -334,16 +511,31 @@ const CourseDetail: React.FC = () => {
                 </div>
               </div>
 
-              {course.access_type === "premium" ? (
+              {course.access_type === "premium" && !userHasPremium ? (
                 <Link
                   to="/subscription"
-                  className="block w-full bg-yellow-500 text-white py-3 rounded-lg font-semibold text-center hover:bg-yellow-600 transition-colors"
+                  className="block w-full bg-yellow-500 text-white py-3 rounded-lg font-semibold text-center hover:bg-yellow-600 transition-colors flex items-center justify-center gap-2"
                 >
+                  <Lock className="h-5 w-5" />
                   Nâng cấp Premium
                 </Link>
               ) : (
-                <button className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
-                  Bắt đầu học
+                <button
+                  onClick={handleStartCourse}
+                  disabled={startingCourse}
+                  className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                >
+                  {courseProgress?.started ? (
+                    <>
+                      <PlayCircle className="h-5 w-5" />
+                      Tiếp tục học
+                    </>
+                  ) : (
+                    <>
+                      <Rocket className="h-5 w-5" />
+                      {startingCourse ? "Đang xử lý..." : "Bắt đầu học"}
+                    </>
+                  )}
                 </button>
               )}
 

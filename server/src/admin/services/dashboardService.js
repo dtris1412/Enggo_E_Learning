@@ -109,6 +109,8 @@ export const getDashboardStatistics = async () => {
       recentFlashcardsResult,
       topDocumentsResult,
       topBlogsResult,
+      topCoursesResult,
+      topRoadmapsResult,
     ] = await Promise.all([
       getTotalUsers(),
       getActiveCourses(),
@@ -118,6 +120,8 @@ export const getDashboardStatistics = async () => {
       getRecentFlashcards(5),
       getTopDocuments(5),
       getTopBlogs(5),
+      getTopCourses(5),
+      getTopRoadmaps(5),
     ]);
 
     if (!totalUsersResult.success) {
@@ -154,6 +158,8 @@ export const getDashboardStatistics = async () => {
           : [],
         topDocuments: topDocumentsResult.success ? topDocumentsResult.data : [],
         topBlogs: topBlogsResult.success ? topBlogsResult.data : [],
+        topCourses: topCoursesResult.success ? topCoursesResult.data : [],
+        topRoadmaps: topRoadmapsResult.success ? topRoadmapsResult.data : [],
       },
     };
   } catch (error) {
@@ -299,6 +305,65 @@ export const getTopBlogs = async (limit = 5) => {
     return { success: true, data: blogs };
   } catch (error) {
     console.error("Error in getTopBlogs:", error);
+    return { success: false, message: error.message };
+  }
+};
+
+// Get top courses by enrolled users count
+export const getTopCourses = async (limit = 5) => {
+  try {
+    const courses = await Course.findAll({
+      where: { course_status: true },
+      limit,
+      attributes: {
+        include: [
+          [
+            db.sequelize.literal(`(
+              SELECT COUNT(DISTINCT user_id)
+              FROM user_courses
+              WHERE user_courses.course_id = Course.course_id
+            )`),
+            "enrolled_users_count",
+          ],
+        ],
+      },
+      order: [[db.sequelize.literal("enrolled_users_count"), "DESC"]],
+      subQuery: false,
+    });
+
+    return { success: true, data: courses };
+  } catch (error) {
+    console.error("Error in getTopCourses:", error);
+    return { success: false, message: error.message };
+  }
+};
+
+// Get top roadmaps by enrolled users count
+export const getTopRoadmaps = async (limit = 5) => {
+  try {
+    const { Roadmap } = db;
+    const roadmaps = await Roadmap.findAll({
+      where: { roadmap_status: true },
+      limit,
+      attributes: {
+        include: [
+          [
+            db.sequelize.literal(`(
+              SELECT COUNT(DISTINCT user_id)
+              FROM user_roadmaps
+              WHERE user_roadmaps.roadmap_id = Roadmap.roadmap_id
+            )`),
+            "enrolled_users_count",
+          ],
+        ],
+      },
+      order: [[db.sequelize.literal("enrolled_users_count"), "DESC"]],
+      subQuery: false,
+    });
+
+    return { success: true, data: roadmaps };
+  } catch (error) {
+    console.error("Error in getTopRoadmaps:", error);
     return { success: false, message: error.message };
   }
 };

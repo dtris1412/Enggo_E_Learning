@@ -9,6 +9,9 @@ export default (sequelize, DataTypes) => {
       Course.hasMany(models.Phase_Course, {
         foreignKey: "course_id",
       });
+      Course.hasMany(models.User_Course, {
+        foreignKey: "course_id",
+      });
     }
   }
   Course.init(
