@@ -110,6 +110,23 @@ import {
   getCommentById,
 } from "../controllers/blogCommentController.js";
 
+// ===========Flashcard Controllers===========
+import {
+  getFlashcardSetsPaginated,
+  getMyFlashcardSets,
+  getFlashcardSetById,
+  createFlashcardSet,
+  updateFlashcardSet,
+  deleteFlashcardSet,
+  getFlashcardsBySetId,
+  getFlashcardById,
+  createFlashcard,
+  createMultipleFlashcards,
+  updateFlashcard,
+  deleteFlashcard,
+  deleteMultipleFlashcards,
+} from "../controllers/flashcardController.js";
+
 const router = express.Router();
 
 const initUserRoutes = (app) => {
@@ -390,6 +407,108 @@ const initUserRoutes = (app) => {
     verifyToken,
     requireUser,
     deleteComment,
+  );
+
+  // ===========Flashcard Set Routes===========
+  // List all flashcard sets (public sets and user's own sets if logged in)
+  router.get(
+    "/api/user/flashcard-sets",
+    optionalVerifyToken,
+    getFlashcardSetsPaginated,
+  );
+
+  // Get my flashcard sets (auth required)
+  router.get(
+    "/api/user/flashcard-sets/my-sets",
+    verifyToken,
+    requireUser,
+    getMyFlashcardSets,
+  );
+
+  // Get flashcard set by ID (public if visibility is public, or owner)
+  router.get(
+    "/api/user/flashcard-sets/:flashcard_set_id",
+    optionalVerifyToken,
+    getFlashcardSetById,
+  );
+
+  // Create flashcard set (auth required)
+  router.post(
+    "/api/user/flashcard-sets",
+    verifyToken,
+    requireUser,
+    createFlashcardSet,
+  );
+
+  // Update flashcard set (auth required, owner only)
+  router.patch(
+    "/api/user/flashcard-sets/:flashcard_set_id",
+    verifyToken,
+    requireUser,
+    updateFlashcardSet,
+  );
+
+  // Delete flashcard set (auth required, owner only)
+  router.delete(
+    "/api/user/flashcard-sets/:flashcard_set_id",
+    verifyToken,
+    requireUser,
+    deleteFlashcardSet,
+  );
+
+  // ===========Flashcard Routes===========
+  // Get all flashcards in a set (public if set is public, or owner)
+  router.get(
+    "/api/user/flashcard-sets/:flashcard_set_id/flashcards",
+    optionalVerifyToken,
+    getFlashcardsBySetId,
+  );
+
+  // Get flashcard by ID (public if set is public, or owner)
+  router.get(
+    "/api/user/flashcards/:flashcard_id",
+    optionalVerifyToken,
+    getFlashcardById,
+  );
+
+  // Create flashcard in a set (auth required, owner only)
+  router.post(
+    "/api/user/flashcard-sets/:flashcard_set_id/flashcards",
+    verifyToken,
+    requireUser,
+    createFlashcard,
+  );
+
+  // Create multiple flashcards in a set (auth required, owner only)
+  router.post(
+    "/api/user/flashcard-sets/:flashcard_set_id/flashcards/bulk",
+    verifyToken,
+    requireUser,
+    createMultipleFlashcards,
+  );
+
+  // Update flashcard (auth required, owner only)
+  router.patch(
+    "/api/user/flashcards/:flashcard_id",
+    verifyToken,
+    requireUser,
+    updateFlashcard,
+  );
+
+  // Delete flashcard (auth required, owner only)
+  router.delete(
+    "/api/user/flashcards/:flashcard_id",
+    verifyToken,
+    requireUser,
+    deleteFlashcard,
+  );
+
+  // Delete multiple flashcards (auth required, owner only)
+  router.post(
+    "/api/user/flashcards/bulk-delete",
+    verifyToken,
+    requireUser,
+    deleteMultipleFlashcards,
   );
 
   app.use("/", router);

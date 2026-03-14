@@ -57,8 +57,16 @@ export const verifyToken = (req, res, next) => {
 export const optionalVerifyToken = (req, res, next) => {
   const authHeader = req.headers.authorization;
 
+  console.log(
+    "[optionalVerifyToken] Auth header:",
+    authHeader ? "Present" : "Not present",
+  );
+
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     // No token provided, continue without user
+    console.log(
+      "[optionalVerifyToken] No token provided - Proceeding as anonymous",
+    );
     req.user = null;
     return next();
   }
@@ -68,18 +76,34 @@ export const optionalVerifyToken = (req, res, next) => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
+    console.log("[optionalVerifyToken] Token decoded successfully:", {
+      user_id: decoded.user_id,
+      role: decoded.role,
+    });
+
     // Validate decoded token has required fields
     if (!decoded.user_id || decoded.role === undefined) {
       // Invalid token, continue without user
+      console.log(
+        "[optionalVerifyToken] Invalid token structure - Proceeding as anonymous",
+      );
       req.user = null;
       return next();
     }
 
     req.user = decoded;
+    console.log(
+      "[optionalVerifyToken] Authenticated as user_id:",
+      decoded.user_id,
+    );
     next();
   } catch (error) {
     // Invalid or expired token, continue without user
-    console.log("Optional token verification failed:", error.message);
+    console.log(
+      "[optionalVerifyToken] Token verification failed:",
+      error.message,
+      "- Proceeding as anonymous",
+    );
     req.user = null;
     next();
   }
