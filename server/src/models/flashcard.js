@@ -9,6 +9,9 @@ export default (sequelize, DataTypes) => {
       Flashcard.belongsTo(models.Container_Question, {
         foreignKey: "container_question_id",
       });
+      Flashcard.hasMany(models.User_Flashcard_Progress, {
+        foreignKey: "flashcard_id",
+      });
     }
   }
   Flashcard.init(

@@ -2,7 +2,14 @@ import { Model } from "sequelize";
 
 export default (sequelize, DataTypes) => {
   class User_Flashcard_Progress extends Model {
-    static associate(models) {}
+    static associate(models) {
+      User_Flashcard_Progress.belongsTo(models.User, {
+        foreignKey: "user_id",
+      });
+      User_Flashcard_Progress.belongsTo(models.Flashcard, {
+        foreignKey: "flashcard_id",
+      });
+    }
   }
   User_Flashcard_Progress.init(
     {
@@ -10,11 +17,6 @@ export default (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
-      },
-      user_id: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        references: { model: "users", key: "user_id" },
       },
       user_id: {
         type: DataTypes.INTEGER,

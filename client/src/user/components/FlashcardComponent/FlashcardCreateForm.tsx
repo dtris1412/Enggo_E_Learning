@@ -1,12 +1,24 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { useFlashcard } from "../../contexts/flashcardContext";
 import { useToast } from "../../../shared/components/Toast/Toast";
 import { ArrowLeft, Save, BookMarked, Globe, LockKeyhole } from "lucide-react";
 
-const FlashcardCreateForm: React.FC = () => {
+interface FlashcardCreateFormProps {
+  isEditMode?: boolean;
+}
+
+const FlashcardCreateForm: React.FC<FlashcardCreateFormProps> = ({
+  isEditMode = false,
+}) => {
   const navigate = useNavigate();
-  const { createFlashcardSet, loading } = useFlashcard();
+  const { flashcard_set_id } = useParams<{ flashcard_set_id: string }>();
+  const {
+    createFlashcardSet,
+    updateFlashcardSet,
+    getFlashcardSetById,
+    loading,
+  } = useFlashcard();
   const { showToast } = useToast();
 
   const [formData, setFormData] = useState({
@@ -18,6 +30,31 @@ const FlashcardCreateForm: React.FC = () => {
   const [errors, setErrors] = useState({
     title: "",
   });
+
+  // Load existing data in edit mode
+  useEffect(() => {
+    if (isEditMode && flashcard_set_id) {
+      const loadFlashcardSet = async () => {
+        try {
+          const data = await getFlashcardSetById(Number(flashcard_set_id));
+          if (data) {
+            setFormData({
+              title: data.title || "",
+              description: data.description || "",
+              visibility: data.visibility || "private",
+            });
+          } else {
+            showToast("error", "Không tìm thấy flashcard set");
+            navigate("/flashcards");
+          }
+        } catch (error) {
+          showToast("error", "Có lỗi xảy ra khi tải dữ liệu");
+          navigate("/flashcards");
+        }
+      };
+      loadFlashcardSet();
+    }
+  }, [isEditMode, flashcard_set_id]);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -54,16 +91,31 @@ const FlashcardCreateForm: React.FC = () => {
       return;
     }
 
-    const result = await createFlashcardSet(formData);
+    let result;
 
-    if (result.success) {
-      showToast("success", "Tạo flashcard set thành công!");
-      navigate(`/flashcards/${result.data.flashcard_set_id}`);
+    if (isEditMode && flashcard_set_id) {
+      // Update existing set
+      result = await updateFlashcardSet(Number(flashcard_set_id), formData);
+
+      if (result.success) {
+        showToast("success", "Cập nhật flashcard set thành công!");
+        navigate(`/flashcards/${flashcard_set_id}`);
+      } else {
+        showToast("error", result.message || "Có lỗi xảy ra khi cập nhật");
+      }
     } else {
-      showToast(
-        "error",
-        result.message || "Có lỗi xảy ra khi tạo flashcard set",
-      );
+      // Create new set
+      result = await createFlashcardSet(formData);
+
+      if (result.success) {
+        showToast("success", "Tạo flashcard set thành công!");
+        navigate(`/flashcards/${result.data.flashcard_set_id}`);
+      } else {
+        showToast(
+          "error",
+          result.message || "Có lỗi xảy ra khi tạo flashcard set",
+        );
+      }
     }
   };
 
@@ -81,10 +133,14 @@ const FlashcardCreateForm: React.FC = () => {
             </button>
             <div>
               <h1 className="text-2xl font-bold text-gray-900">
-                Tạo Flashcard Set Mới
+                {isEditMode
+                  ? "Chỉnh sửa Flashcard Set"
+                  : "Tạo Flashcard Set Mới"}
               </h1>
               <p className="text-sm text-gray-600 mt-1">
-                Tạo bộ flashcard mới để bắt đầu học tập
+                {isEditMode
+                  ? "Cập nhật thông tin bộ flashcard"
+                  : "Tạo bộ flashcard mới để bắt đầu học tập"}
               </p>
             </div>
           </div>

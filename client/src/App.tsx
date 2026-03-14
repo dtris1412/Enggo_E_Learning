@@ -49,6 +49,7 @@ import Document from "./user/pages/Document.tsx";
 import DocumentDetail from "./user/components/DocumentComponent/DocumentDetail.tsx";
 import Flashcard from "./user/pages/Flashcard.tsx";
 import FlashcardCreate from "./user/pages/FlashcardCreate.tsx";
+import FlashcardEdit from "./user/pages/FlashcardEdit.tsx";
 import FlashcardDetailPage from "./user/pages/FlashcardDetail.tsx";
 import FlashcardLearn from "./user/pages/FlashcardLearn.tsx";
 import OnlineTests from "./user/pages/OnlineTests.tsx";
@@ -189,6 +190,12 @@ function App() {
                                                                                   path="/flashcards/create"
                                                                                   element={
                                                                                     <FlashcardCreate />
+                                                                                  }
+                                                                                />
+                                                                                <Route
+                                                                                  path="/flashcards/:flashcard_set_id/edit"
+                                                                                  element={
+                                                                                    <FlashcardEdit />
                                                                                   }
                                                                                 />
                                                                                 <Route

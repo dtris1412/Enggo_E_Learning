@@ -127,6 +127,16 @@ import {
   deleteMultipleFlashcards,
 } from "../controllers/flashcardController.js";
 
+// ===========Flashcard Progress Controllers===========
+import {
+  startFlashcardSet,
+  reviewFlashcard,
+  getFlashcardSetProgress,
+  getNextCard,
+  getDailyReviewQueue,
+  getActiveSets,
+} from "../controllers/flashcardProgressController.js";
+
 const router = express.Router();
 
 const initUserRoutes = (app) => {
@@ -464,6 +474,23 @@ const initUserRoutes = (app) => {
     getFlashcardsBySetId,
   );
 
+  // ===========Flashcard Progress Routes (SM-2 - Specific routes MUST come before parameterized routes)===========
+  // Get daily review queue (all sets) (auth required)
+  router.get(
+    "/api/user/flashcards/review-queue",
+    verifyToken,
+    requireUser,
+    getDailyReviewQueue,
+  );
+
+  // Get active learning sets (auth required)
+  router.get(
+    "/api/user/flashcards/active-sets",
+    verifyToken,
+    requireUser,
+    getActiveSets,
+  );
+
   // Get flashcard by ID (public if set is public, or owner)
   router.get(
     "/api/user/flashcards/:flashcard_id",
@@ -509,6 +536,40 @@ const initUserRoutes = (app) => {
     verifyToken,
     requireUser,
     deleteMultipleFlashcards,
+  );
+
+  // ===========Flashcard Progress Routes (SM-2 Spaced Repetition - Parameterized routes)===========
+  // Start learning a flashcard set (auth required)
+  router.post(
+    "/api/user/flashcard-sets/:flashcard_set_id/start",
+    verifyToken,
+    requireUser,
+    startFlashcardSet,
+  );
+
+  // Review a flashcard (auth required)
+  // Body: { quality: "again" | "hard" | "good" | "easy" }
+  router.post(
+    "/api/user/flashcards/:flashcard_id/review",
+    verifyToken,
+    requireUser,
+    reviewFlashcard,
+  );
+
+  // Get progress of a flashcard set (auth required)
+  router.get(
+    "/api/user/flashcard-sets/:flashcard_set_id/progress",
+    verifyToken,
+    requireUser,
+    getFlashcardSetProgress,
+  );
+
+  // Get next card to study in a set (auth required)
+  router.get(
+    "/api/user/flashcard-sets/:flashcard_set_id/next-card",
+    verifyToken,
+    requireUser,
+    getNextCard,
   );
 
   app.use("/", router);

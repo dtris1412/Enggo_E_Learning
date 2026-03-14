@@ -13,7 +13,25 @@ import {
   CheckCircle,
   XCircle,
   BookMarked,
+  Clock,
+  Zap,
+  Brain,
+  Award,
+  BookOpen,
+  TrendingUp,
 } from "lucide-react";
+
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080/api";
+
+type QualityRating = "again" | "hard" | "good" | "easy";
+
+interface ProgressStats {
+  total: number;
+  new: number;
+  learning: number;
+  mastered: number;
+  due_for_review: number;
+}
 
 const FlashcardViewer: React.FC = () => {
   const { flashcard_set_id } = useParams<{ flashcard_set_id: string }>();
@@ -21,15 +39,28 @@ const FlashcardViewer: React.FC = () => {
   const { getFlashcardSetById, loading } = useFlashcard();
   const { showToast } = useToast();
 
+  // Core states
   const [flashcardSet, setFlashcardSet] = useState<any>(null);
   const [flashcards, setFlashcards] = useState<any[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
   const [showAnswer, setShowAnswer] = useState(false);
   const [markedCards, setMarkedCards] = useState<Set<number>>(new Set());
-  const [knownCards, setKnownCards] = useState<Set<number>>(new Set());
-  const [unknownCards, setUnknownCards] = useState<Set<number>>(new Set());
 
+  // Progress tracking states
+  const [studyMode, setStudyMode] = useState(false);
+  const [currentCard, setCurrentCard] = useState<any>(null);
+  const [isCompleted, setIsCompleted] = useState(false);
+  const [progressStats, setProgressStats] = useState<ProgressStats>({
+    total: 0,
+    new: 0,
+    learning: 0,
+    mastered: 0,
+    due_for_review: 0,
+  });
+  const [isReviewing, setIsReviewing] = useState(false);
+
+  // Load flashcard set (always on mount)
   useEffect(() => {
     const fetchData = async () => {
       if (!flashcard_set_id) return;
@@ -38,6 +69,21 @@ const FlashcardViewer: React.FC = () => {
       if (data && data.Flashcards) {
         setFlashcardSet(data);
         setFlashcards(data.Flashcards);
+
+        // Restore saved position in browser mode
+        const savedPosition = localStorage.getItem(
+          `flashcard_position_${flashcard_set_id}`,
+        );
+        if (savedPosition) {
+          const position = parseInt(savedPosition, 10);
+          if (position >= 0 && position < data.Flashcards.length) {
+            setCurrentIndex(position);
+          } else {
+            setCurrentIndex(0);
+          }
+        } else {
+          setCurrentIndex(0);
+        }
       } else {
         showToast("error", "Không tìm thấy flashcard set");
         navigate("/flashcards");
@@ -47,28 +93,248 @@ const FlashcardViewer: React.FC = () => {
     fetchData();
   }, [flashcard_set_id]);
 
+  // Save position in browser mode
+  useEffect(() => {
+    if (!studyMode && flashcard_set_id && flashcards.length > 0) {
+      localStorage.setItem(
+        `flashcard_position_${flashcard_set_id}`,
+        currentIndex.toString(),
+      );
+    }
+  }, [currentIndex, studyMode, flashcard_set_id, flashcards.length]);
+
+  // Toggle Progress Tracking
+  const handleToggleStudyMode = async () => {
+    if (!studyMode) {
+      // Turning ON Progress Tracking - start learning with SM-2
+      const token = localStorage.getItem("accessToken");
+      if (!token) {
+        showToast("error", "Vui lòng đăng nhập để theo dõi tiến độ");
+        return;
+      }
+
+      try {
+        // Call API to start the set
+        const response = await fetch(
+          `${API_URL}/user/flashcard-sets/${flashcard_set_id}/start`,
+          {
+            method: "POST",
+            headers: { Authorization: `Bearer ${token}` },
+          },
+        );
+
+        if (response.ok || response.status === 409) {
+          // 409 means already started, which is fine
+          showToast("success", "📊 Đã bật theo dõi tiến độ - SM-2 algorithm");
+
+          // Get first card from backend
+          await fetchNextCard();
+          await fetchProgressStats();
+
+          // Set study mode AFTER fetching data to avoid showing completion screen during loading
+          setStudyMode(true);
+
+          // Clear saved position when entering progress tracking mode
+          localStorage.removeItem(`flashcard_position_${flashcard_set_id}`);
+        } else {
+          const result = await response.json();
+          showToast("error", result.message || "Lỗi khi bật theo dõi tiến độ");
+        }
+      } catch (error) {
+        console.error("Error starting progress tracking:", error);
+        showToast("error", "Lỗi kết nối server");
+      }
+    } else {
+      // Turning OFF Progress Tracking - back to free browsing
+      setStudyMode(false);
+      setCurrentCard(null);
+      setIsCompleted(false);
+      setCurrentIndex(0);
+      setIsFlipped(false);
+      setShowAnswer(false);
+      showToast("info", "📖 Xem tự do - không theo dõi tiến độ");
+    }
+  };
+
+  // Fetch next card from backend
+  const fetchNextCard = async () => {
+    if (!flashcard_set_id) return;
+
+    const token = localStorage.getItem("accessToken");
+    if (!token) return;
+
+    try {
+      const response = await fetch(
+        `${API_URL}/user/flashcard-sets/${flashcard_set_id}/next-card`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        // Backend returns: { success: true, data: { flashcard: {...}, reason: "..." } }
+        // or { success: true, data: null, message: "..." } when completed
+        if (result.data === null) {
+          // All completed
+          showToast("success", "🎉 Đã hoàn thành tất cả flashcard!");
+          setCurrentCard(null);
+          setIsCompleted(true);
+        } else if (result.data && result.data.flashcard) {
+          // Got next card
+          const flashcard = result.data.flashcard;
+          setCurrentCard({
+            ...flashcard,
+            is_new: result.data.reason === "new",
+            is_due: result.data.reason === "due",
+          });
+          setIsCompleted(false);
+
+          // Find index in flashcards array
+          const index = flashcards.findIndex(
+            (card) => card.flashcard_id === flashcard.flashcard_id,
+          );
+          if (index !== -1) {
+            setCurrentIndex(index);
+          }
+        }
+      } else {
+        showToast("error", result.message || "Lỗi khi lấy thẻ tiếp theo");
+      }
+    } catch (error) {
+      console.error("Error fetching next card:", error);
+    }
+  };
+
+  // Fetch progress statistics
+  const fetchProgressStats = async () => {
+    if (!flashcard_set_id) return;
+
+    const token = localStorage.getItem("accessToken");
+    if (!token) return;
+
+    try {
+      const response = await fetch(
+        `${API_URL}/user/flashcard-sets/${flashcard_set_id}/progress`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+
+      const result = await response.json();
+
+      if (response.ok && result.cards_stats) {
+        setProgressStats(result.cards_stats);
+      }
+    } catch (error) {
+      console.error("Error fetching progress stats:", error);
+    }
+  };
+
+  // Review flashcard with quality rating (SM-2 algorithm)
+  const handleReviewCard = async (quality: QualityRating) => {
+    if (!currentCard || isReviewing) return;
+
+    setIsReviewing(true);
+    const token = localStorage.getItem("accessToken");
+    if (!token) {
+      showToast("error", "Vui lòng đăng nhập");
+      navigate("/login");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${API_URL}/user/flashcards/${currentCard.flashcard_id}/review`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ quality }),
+        },
+      );
+
+      const result = await response.json();
+
+      if (response.ok) {
+        // Show feedback based on quality
+        const messages = {
+          again: "Chưa nhớ - Sẽ ôn lại sớm",
+          hard: "Khó - Ôn lại sau 10 phút",
+          good: `Tốt - Ôn lại sau ${result.progress?.interval_days || 1} ngày`,
+          easy: `Dễ - Ôn lại sau ${result.progress?.interval_days || 4} ngày`,
+        };
+        showToast("success", messages[quality]);
+
+        // Update progress stats
+        await fetchProgressStats();
+
+        // Get next card after delay
+        setTimeout(() => {
+          setIsFlipped(false);
+          setShowAnswer(false);
+          fetchNextCard();
+          setIsReviewing(false);
+        }, 500);
+      } else {
+        showToast("error", "Lỗi khi đánh giá flashcard");
+        setIsReviewing(false);
+      }
+    } catch (error) {
+      console.error("Error reviewing flashcard:", error);
+      showToast("error", "Lỗi kết nối server");
+      setIsReviewing(false);
+    }
+  };
+
   const handleFlip = () => {
     setIsFlipped(!isFlipped);
     setShowAnswer(!showAnswer);
   };
 
-  const handleNext = () => {
-    if (currentIndex < flashcards.length - 1) {
-      setCurrentIndex(currentIndex + 1);
-      setIsFlipped(false);
-      setShowAnswer(false);
+  const handleNext = async () => {
+    setIsFlipped(false);
+    setShowAnswer(false);
+
+    if (studyMode) {
+      // Progress Tracking: Get next card from backend (SM-2)
+      await fetchNextCard();
+    } else {
+      // Free browsing: Simple array navigation
+      if (currentIndex < flashcards.length - 1) {
+        setCurrentIndex(currentIndex + 1);
+      } else {
+        showToast("info", "Đã đến thẻ cuối cùng");
+      }
     }
   };
 
   const handlePrevious = () => {
-    if (currentIndex > 0) {
-      setCurrentIndex(currentIndex - 1);
-      setIsFlipped(false);
-      setShowAnswer(false);
+    setIsFlipped(false);
+    setShowAnswer(false);
+
+    if (studyMode) {
+      // Progress Tracking: Cannot go back (SM-2 flow)
+      showToast("info", "Chế độ theo dõi không hỗ trợ quay lại thẻ trước");
+    } else {
+      // Free browsing: Simple array navigation
+      if (currentIndex > 0) {
+        setCurrentIndex(currentIndex - 1);
+      } else {
+        showToast("info", "Đã ở thẻ đầu tiên");
+      }
     }
   };
 
   const handleShuffle = () => {
+    if (studyMode) {
+      showToast("info", "Không thể xáo trộn khi đang theo dõi tiến độ");
+      return;
+    }
+
     const shuffled = [...flashcards].sort(() => Math.random() - 0.5);
     setFlashcards(shuffled);
     setCurrentIndex(0);
@@ -77,61 +343,38 @@ const FlashcardViewer: React.FC = () => {
     showToast("success", "Đã xáo trộn thẻ");
   };
 
-  const handleReset = () => {
+  const handleReset = async () => {
     setCurrentIndex(0);
     setIsFlipped(false);
     setShowAnswer(false);
     setMarkedCards(new Set());
-    setKnownCards(new Set());
-    setUnknownCards(new Set());
-    showToast("success", "Đã reset tiến trình");
+
+    if (studyMode) {
+      // Study Mode: Restart and get first card
+      await fetchNextCard();
+      await fetchProgressStats();
+      showToast("success", "Đã reset tiến trình Study Mode");
+    } else {
+      showToast("success", "Đã reset về thẻ đầu tiên");
+    }
   };
 
   const handleMarkCard = () => {
+    const cardId = studyMode
+      ? currentCard?.flashcard_id
+      : flashcards[currentIndex]?.flashcard_id;
+
+    if (!cardId) return;
+
     const newMarked = new Set(markedCards);
-    const cardId = flashcards[currentIndex].flashcard_id;
     if (newMarked.has(cardId)) {
       newMarked.delete(cardId);
-      showToast("info", "Đã bỏ đánh dấu thẻ");
+      showToast("success", "Đã bỏ đánh dấu thẻ");
     } else {
       newMarked.add(cardId);
       showToast("success", "Đã đánh dấu thẻ khó");
     }
     setMarkedCards(newMarked);
-  };
-
-  const handleKnowCard = () => {
-    const cardId = flashcards[currentIndex].flashcard_id;
-    const newKnown = new Set(knownCards);
-    const newUnknown = new Set(unknownCards);
-
-    newKnown.add(cardId);
-    newUnknown.delete(cardId);
-
-    setKnownCards(newKnown);
-    setUnknownCards(newUnknown);
-
-    // Auto move to next card
-    setTimeout(() => {
-      handleNext();
-    }, 300);
-  };
-
-  const handleDontKnowCard = () => {
-    const cardId = flashcards[currentIndex].flashcard_id;
-    const newKnown = new Set(knownCards);
-    const newUnknown = new Set(unknownCards);
-
-    newUnknown.add(cardId);
-    newKnown.delete(cardId);
-
-    setKnownCards(newKnown);
-    setUnknownCards(newUnknown);
-
-    // Auto move to next card
-    setTimeout(() => {
-      handleNext();
-    }, 300);
   };
 
   const handleKeyPress = (e: KeyboardEvent) => {
@@ -176,11 +419,88 @@ const FlashcardViewer: React.FC = () => {
     );
   }
 
-  const currentCard = flashcards[currentIndex];
-  const isMarked = markedCards.has(currentCard.flashcard_id);
-  const isKnown = knownCards.has(currentCard.flashcard_id);
-  const isDontKnow = unknownCards.has(currentCard.flashcard_id);
-  const progress = ((currentIndex + 1) / flashcards.length) * 100;
+  // If all cards completed (Progress Tracking only)
+  if (studyMode && isCompleted) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-indigo-100 via-purple-50 to-pink-100">
+        <div className="container mx-auto px-4 py-12">
+          <div className="max-w-2xl mx-auto text-center">
+            <div className="bg-white rounded-2xl shadow-xl p-12">
+              <Award className="w-24 h-24 text-yellow-500 mx-auto mb-6" />
+              <h2 className="text-4xl font-bold text-gray-900 mb-4">
+                🎉 Chúc mừng!
+              </h2>
+              <p className="text-xl text-gray-700 mb-8">
+                Bạn đã hoàn thành tất cả flashcard trong set này
+              </p>
+
+              <div className="grid grid-cols-2 gap-4 mb-8 text-left">
+                <div className="bg-blue-50 rounded-lg p-4">
+                  <p className="text-sm text-blue-600 font-medium mb-1">
+                    Tổng thẻ
+                  </p>
+                  <p className="text-3xl font-bold text-blue-900">
+                    {progressStats.total}
+                  </p>
+                </div>
+                <div className="bg-green-50 rounded-lg p-4">
+                  <p className="text-sm text-green-600 font-medium mb-1">
+                    Đã thành thạo
+                  </p>
+                  <p className="text-3xl font-bold text-green-900">
+                    {progressStats.mastered}
+                  </p>
+                </div>
+                <div className="bg-yellow-50 rounded-lg p-4">
+                  <p className="text-sm text-yellow-600 font-medium mb-1">
+                    Đang học
+                  </p>
+                  <p className="text-3xl font-bold text-yellow-900">
+                    {progressStats.learning}
+                  </p>
+                </div>
+                <div className="bg-purple-50 rounded-lg p-4">
+                  <p className="text-sm text-purple-600 font-medium mb-1">
+                    Cần ôn hôm nay
+                  </p>
+                  <p className="text-3xl font-bold text-purple-900">
+                    {progressStats.due_for_review}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex gap-4 justify-center">
+                <button
+                  onClick={() => navigate("/flashcards")}
+                  className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-3 px-8 rounded-lg transition-colors"
+                >
+                  Về trang chủ
+                </button>
+                <button
+                  onClick={handleReset}
+                  className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-8 rounded-lg transition-colors"
+                >
+                  Học lại từ đầu
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Get current card data based on mode
+  const displayCard = studyMode ? currentCard : flashcards[currentIndex];
+  const isMarked = displayCard
+    ? markedCards.has(displayCard.flashcard_id)
+    : false;
+  const progress =
+    studyMode && progressStats.total > 0
+      ? ((progressStats.learning + progressStats.mastered) /
+          progressStats.total) *
+        100
+      : ((currentIndex + 1) / flashcards.length) * 100;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-100 via-purple-50 to-pink-100">
@@ -200,12 +520,58 @@ const FlashcardViewer: React.FC = () => {
               <h1 className="text-lg font-bold text-gray-900 truncate">
                 {flashcardSet.title}
               </h1>
-              <p className="text-sm text-gray-600">
-                {currentIndex + 1} / {flashcards.length}
-              </p>
+              <div className="flex items-center justify-center gap-3 mt-1">
+                {studyMode ? (
+                  <>
+                    <p className="text-sm text-gray-600">
+                      {progressStats.learning + progressStats.mastered} /{" "}
+                      {progressStats.total} đã học
+                    </p>
+                    {currentCard?.is_due && (
+                      <span className="inline-flex items-center gap-1 text-xs font-medium text-red-600 bg-red-50 px-2 py-1 rounded">
+                        <Clock className="w-3 h-3" />
+                        Cần ôn
+                      </span>
+                    )}
+                    {currentCard?.is_new && (
+                      <span className="inline-flex items-center gap-1 text-xs font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded">
+                        Thẻ mới
+                      </span>
+                    )}
+                  </>
+                ) : (
+                  <p className="text-sm text-gray-600">
+                    {currentIndex + 1} / {flashcards.length} thẻ
+                  </p>
+                )}
+              </div>
             </div>
 
             <div className="flex items-center gap-2">
+              {/* Progress Tracking Toggle */}
+              <button
+                onClick={handleToggleStudyMode}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
+                  studyMode
+                    ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                }`}
+                title={
+                  studyMode ? "Tắt theo dõi tiến độ" : "Bật theo dõi tiến độ"
+                }
+              >
+                {studyMode ? (
+                  <>
+                    <TrendingUp className="w-5 h-5" />
+                    <span className="text-sm">Theo dõi tiến độ</span>
+                  </>
+                ) : (
+                  <>
+                    <BookOpen className="w-5 h-5" />
+                    <span className="text-sm">Xem tự do</span>
+                  </>
+                )}
+              </button>
               <button
                 onClick={handleShuffle}
                 className="p-2 text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
@@ -233,28 +599,47 @@ const FlashcardViewer: React.FC = () => {
             </div>
           </div>
 
-          {/* Stats */}
-          <div className="flex items-center justify-center gap-6 mt-4 text-sm">
-            <div className="flex items-center gap-2">
-              <CheckCircle className="w-4 h-4 text-green-600" />
-              <span className="text-gray-700">
-                Biết: <span className="font-bold">{knownCards.size}</span>
-              </span>
+          {/* Progress Stats - Only show when tracking */}
+          {studyMode && (
+            <div className="flex items-center justify-center gap-6 mt-4 text-sm">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-gray-400 rounded-full"></div>
+                <span className="text-gray-700">
+                  Mới: <span className="font-bold">{progressStats.new}</span>
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                <span className="text-gray-700">
+                  Đang học:{" "}
+                  <span className="font-bold">{progressStats.learning}</span>
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                <span className="text-gray-700">
+                  Thành thạo:{" "}
+                  <span className="font-bold">{progressStats.mastered}</span>
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                <span className="text-gray-700">
+                  Cần ôn:{" "}
+                  <span className="font-bold">
+                    {progressStats.due_for_review}
+                  </span>
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Star className="w-4 h-4 text-yellow-600" />
+                <span className="text-gray-700">
+                  Đánh dấu:{" "}
+                  <span className="font-bold">{markedCards.size}</span>
+                </span>
+              </div>
             </div>
-            <div className="flex items-center gap-2">
-              <XCircle className="w-4 h-4 text-red-600" />
-              <span className="text-gray-700">
-                Chưa biết:{" "}
-                <span className="font-bold">{unknownCards.size}</span>
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Star className="w-4 h-4 text-yellow-600" />
-              <span className="text-gray-700">
-                Đánh dấu: <span className="font-bold">{markedCards.size}</span>
-              </span>
-            </div>
-          </div>
+          )}
         </div>
       </div>
 
@@ -284,41 +669,40 @@ const FlashcardViewer: React.FC = () => {
 
                   <div className="absolute top-4 left-4">
                     <SpeakButton
-                      text={currentCard.front_content}
+                      text={displayCard.front_content}
                       lang="en-US"
                       className=""
                     />
                   </div>
 
-                  <div className="text-center">
-                    <p className="text-sm text-gray-500 mb-4 uppercase tracking-wide">
-                      Mặt trước
-                    </p>
-                    <h2 className="text-4xl font-bold text-gray-900 mb-4">
-                      {currentCard.front_content}
+                  <div className="text-center px-8">
+                    <h2 className="text-5xl font-bold text-gray-900 mb-6">
+                      {displayCard.front_content}
                     </h2>
-                    {currentCard.pronunciation && (
-                      <p className="text-xl text-indigo-600 mb-4">
-                        {currentCard.pronunciation}
+                    {displayCard.pronunciation && (
+                      <p className="text-2xl text-indigo-600 mb-4">
+                        {displayCard.pronunciation}
                       </p>
                     )}
-                    {currentCard.difficulty_level && (
+                    {displayCard.difficulty_level && (
                       <span
-                        className={`px-3 py-1 text-sm font-medium rounded-full ${
-                          currentCard.difficulty_level === "easy"
+                        className={`px-4 py-2 text-sm font-medium rounded-full ${
+                          displayCard.difficulty_level === "easy"
                             ? "bg-green-100 text-green-800"
-                            : currentCard.difficulty_level === "medium"
+                            : displayCard.difficulty_level === "medium"
                               ? "bg-yellow-100 text-yellow-800"
                               : "bg-red-100 text-red-800"
                         }`}
                       >
-                        {currentCard.difficulty_level}
+                        {displayCard.difficulty_level}
                       </span>
                     )}
                   </div>
 
-                  <div className="absolute bottom-8 text-gray-400 text-sm">
-                    Nhấp để lật thẻ hoặc nhấn Space
+                  <div className="absolute bottom-8 text-gray-400 text-sm flex items-center gap-2">
+                    <span>Nhấp để lật thẻ</span>
+                    <span className="text-gray-300">|</span>
+                    <span>Space</span>
                   </div>
                 </div>
               </div>
@@ -329,30 +713,86 @@ const FlashcardViewer: React.FC = () => {
                   isFlipped ? "visible" : "invisible"
                 }`}
               >
-                <div className="flex flex-col items-center justify-center h-full text-white">
+                <div className="flex flex-col h-full text-white">
                   <div className="absolute top-4 right-4">
                     {isMarked && (
                       <Star className="w-6 h-6 text-yellow-300 fill-yellow-300" />
                     )}
                   </div>
 
-                  <div className="text-center">
-                    <p className="text-sm text-white/80 mb-4 uppercase tracking-wide">
-                      Mặt sau
-                    </p>
-                    <h2 className="text-4xl font-bold mb-4">
-                      {currentCard.back_content}
+                  {/* Content Area */}
+                  <div className="flex-1 flex flex-col items-center justify-center px-8">
+                    <h2 className="text-5xl font-bold mb-6">
+                      {displayCard.back_content}
                     </h2>
-                    {currentCard.example && (
-                      <p className="text-lg text-white/90 italic max-w-2xl">
-                        "{currentCard.example}"
+                    {displayCard.example && (
+                      <p className="text-xl text-white/90 italic max-w-2xl text-center">
+                        "{displayCard.example}"
                       </p>
                     )}
                   </div>
 
-                  <div className="absolute bottom-8 text-white/70 text-sm">
-                    Nhấp để lật lại thẻ
-                  </div>
+                  {/* SM-2 Quality Rating Buttons - Only in Study Mode */}
+                  {studyMode && (
+                    <div className="pb-4">
+                      <p className="text-center text-white/80 text-sm mb-3 font-medium">
+                        Đánh giá mức độ nhớ của bạn:
+                      </p>
+                      <div className="flex items-center justify-center gap-3">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleReviewCard("again");
+                          }}
+                          disabled={isReviewing}
+                          className="flex-1 max-w-[140px] bg-white hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed text-red-600 px-4 py-3 rounded-lg font-semibold transition-all shadow-lg hover:shadow-xl"
+                        >
+                          <XCircle className="w-5 h-5 inline-block mb-1" />
+                          <div className="text-sm">Chưa nhớ</div>
+                          <div className="text-xs opacity-75">&lt;10 phút</div>
+                        </button>
+
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleReviewCard("hard");
+                          }}
+                          disabled={isReviewing}
+                          className="flex-1 max-w-[140px] bg-white hover:bg-orange-50 disabled:opacity-50 disabled:cursor-not-allowed text-orange-600 px-4 py-3 rounded-lg font-semibold transition-all shadow-lg hover:shadow-xl"
+                        >
+                          <Brain className="w-5 h-5 inline-block mb-1" />
+                          <div className="text-sm">Khó</div>
+                          <div className="text-xs opacity-75">&lt;1 ngày</div>
+                        </button>
+
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleReviewCard("good");
+                          }}
+                          disabled={isReviewing}
+                          className="flex-1 max-w-[140px] bg-white hover:bg-green-50 disabled:opacity-50 disabled:cursor-not-allowed text-green-600 px-4 py-3 rounded-lg font-semibold transition-all shadow-lg hover:shadow-xl"
+                        >
+                          <CheckCircle className="w-5 h-5 inline-block mb-1" />
+                          <div className="text-sm">Tốt</div>
+                          <div className="text-xs opacity-75">&lt;4 ngày</div>
+                        </button>
+
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleReviewCard("easy");
+                          }}
+                          disabled={isReviewing}
+                          className="flex-1 max-w-[140px] bg-white hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed text-blue-600 px-4 py-3 rounded-lg font-semibold transition-all shadow-lg hover:shadow-xl"
+                        >
+                          <Zap className="w-5 h-5 inline-block mb-1" />
+                          <div className="text-sm">Dễ</div>
+                          <div className="text-xs opacity-75">4+ ngày</div>
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -362,8 +802,13 @@ const FlashcardViewer: React.FC = () => {
           <div className="mt-8 flex items-center justify-center gap-4">
             <button
               onClick={handlePrevious}
-              disabled={currentIndex === 0}
+              disabled={studyMode || currentIndex === 0}
               className="p-4 bg-white rounded-full shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              title={
+                studyMode
+                  ? "Chế độ theo dõi không hỗ trợ quay lại"
+                  : "Thẻ trước"
+              }
             >
               <ChevronLeft className="w-6 h-6 text-gray-700" />
             </button>
@@ -382,40 +827,13 @@ const FlashcardViewer: React.FC = () => {
 
             <button
               onClick={handleNext}
-              disabled={currentIndex === flashcards.length - 1}
+              disabled={!studyMode && currentIndex === flashcards.length - 1}
               className="p-4 bg-white rounded-full shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              title={studyMode ? "Lấy thẻ tiếp theo" : "Thẻ sau"}
             >
               <ChevronRight className="w-6 h-6 text-gray-700" />
             </button>
           </div>
-
-          {/* Know / Don't Know Buttons */}
-          {isFlipped && (
-            <div className="mt-6 flex items-center justify-center gap-4">
-              <button
-                onClick={handleDontKnowCard}
-                className={`px-8 py-3 rounded-lg font-medium transition-all ${
-                  isDontKnow
-                    ? "bg-red-500 text-white"
-                    : "bg-white text-red-600 hover:bg-red-50 shadow-md hover:shadow-lg"
-                }`}
-              >
-                <XCircle className="w-5 h-5 inline-block mr-2" />
-                Chưa biết
-              </button>
-              <button
-                onClick={handleKnowCard}
-                className={`px-8 py-3 rounded-lg font-medium transition-all ${
-                  isKnown
-                    ? "bg-green-500 text-white"
-                    : "bg-white text-green-600 hover:bg-green-50 shadow-md hover:shadow-lg"
-                }`}
-              >
-                <CheckCircle className="w-5 h-5 inline-block mr-2" />
-                Đã biết
-              </button>
-            </div>
-          )}
 
           {/* Keyboard Shortcuts Help */}
           <div className="mt-8 bg-white/80 backdrop-blur-sm rounded-lg p-4">
