@@ -210,6 +210,71 @@ const getActiveSets = async (req, res) => {
   }
 };
 
+// Get due notifications for user
+const getDueNotifications = async (req, res) => {
+  try {
+    const user_id = req.user.user_id;
+
+    const result =
+      await userFlashcardProgressService.getDueNotifications(user_id);
+
+    if (!result.success) {
+      return res.status(400).json(result);
+    }
+
+    console.log(
+      "[CONTROLLER] getDueNotifications - Success:",
+      result.total_due_cards,
+      "cards due,",
+      result.total_sets_with_due,
+      "sets",
+    );
+    res.status(200).json(result);
+  } catch (err) {
+    console.error("[CONTROLLER] Error in getDueNotifications:", err);
+    res.status(500).json({ success: false, message: "Internal server error." });
+  }
+};
+
+// Reset toàn bộ progress của một flashcard set
+const resetFlashcardSetProgress = async (req, res) => {
+  try {
+    const { flashcard_set_id } = req.params;
+    const user_id = req.user.user_id;
+
+    console.log("[CONTROLLER] resetFlashcardSetProgress - Request:", {
+      user_id,
+      flashcard_set_id,
+    });
+
+    if (!flashcard_set_id || isNaN(Number(flashcard_set_id))) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid flashcard set ID.",
+      });
+    }
+
+    const result = await userFlashcardProgressService.resetFlashcardSetProgress(
+      Number(flashcard_set_id),
+      user_id,
+    );
+
+    if (!result.success) {
+      console.log(
+        "[CONTROLLER] resetFlashcardSetProgress - Error:",
+        result.message,
+      );
+      return res.status(400).json(result);
+    }
+
+    console.log("[CONTROLLER] resetFlashcardSetProgress - Success");
+    res.status(200).json(result);
+  } catch (err) {
+    console.error("[CONTROLLER] Error in resetFlashcardSetProgress:", err);
+    res.status(500).json({ success: false, message: "Internal server error." });
+  }
+};
+
 export {
   startFlashcardSet,
   reviewFlashcard,
@@ -217,4 +282,6 @@ export {
   getNextCard,
   getDailyReviewQueue,
   getActiveSets,
+  getDueNotifications,
+  resetFlashcardSetProgress,
 };

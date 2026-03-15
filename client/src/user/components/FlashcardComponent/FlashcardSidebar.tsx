@@ -2,14 +2,42 @@ import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Home, BookMarked, Bell } from "lucide-react";
 
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080/api";
+
 const FlashcardSidebar: React.FC = () => {
   const location = useLocation();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [dueCount, setDueCount] = useState(0);
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
     setIsLoggedIn(!!token);
+
+    if (token) {
+      fetchDueCount();
+    }
   }, []);
+
+  const fetchDueCount = async () => {
+    try {
+      const token = localStorage.getItem("accessToken");
+      if (!token) return;
+
+      const response = await fetch(
+        `${API_URL}/user/flashcards/due-notifications`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+
+      const result = await response.json();
+      if (result.success) {
+        setDueCount(result.total_due_cards || 0);
+      }
+    } catch (error) {
+      console.error("Error fetching due count:", error);
+    }
+  };
 
   const navItems = [
     { path: "/flashcards", label: "Trang chính", icon: Home },
@@ -37,19 +65,26 @@ const FlashcardSidebar: React.FC = () => {
 
             const Icon = item.icon;
             const isActive = location.pathname === item.path;
+            const showBadge =
+              item.path === "/flashcards/notifications" && dueCount > 0;
 
             return (
               <Link
                 key={item.path}
                 to={item.path}
-                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
+                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 relative ${
                   isActive
                     ? "bg-indigo-700 text-white shadow-lg"
                     : "text-indigo-100 hover:bg-indigo-700/50 hover:text-white"
                 }`}
               >
                 <Icon className="w-5 h-5" />
-                <span className="font-medium text-sm">{item.label}</span>
+                <span className="font-medium text-sm flex-1">{item.label}</span>
+                {showBadge && (
+                  <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 bg-red-500 text-white text-xs font-bold rounded-full">
+                    {dueCount > 99 ? "99+" : dueCount}
+                  </span>
+                )}
               </Link>
             );
           })}

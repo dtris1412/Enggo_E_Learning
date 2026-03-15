@@ -120,8 +120,8 @@ const Flashcard: React.FC = () => {
                   total_cards:
                     progressData.cards_stats?.total || set.total_cards || 0,
                   learned_cards:
-                    (progressData.cards_stats?.learning || 0) +
-                    (progressData.cards_stats?.mastered || 0),
+                    (progressData.cards_stats?.total || 0) -
+                    (progressData.cards_stats?.new || 0),
                   progress: progressData.progress_percent || 0,
                   created_by_type: "user",
                   visibility: "private",
@@ -553,16 +553,6 @@ const Flashcard: React.FC = () => {
           }
         `}</style>
       </div>
-
-      {/* Right Sidebar */}
-      <aside className="hidden lg:block w-64 bg-gradient-to-b from-purple-900 via-indigo-800 to-indigo-900 text-white">
-        <div className="p-6">
-          {/* Content will be added later */}
-          <div className="text-indigo-300 text-sm text-center opacity-50">
-            Nội dung sẽ được thêm sau
-          </div>
-        </div>
-      </aside>
     </div>
   );
 };

@@ -21,25 +21,35 @@ const calculateNextReview = (
 
   // Calculate new interval based on quality
   if (quality < 3) {
-    // Again - reset
+    // Again - reset and review after 10 minutes
     newRepetition = 0;
-    newInterval = 0;
+    newInterval = 10 / (24 * 60); // 10 minutes converted to days (0.00694 days)
   } else {
     newRepetition = repetitionCount + 1;
 
     if (newRepetition === 1) {
-      newInterval = 1; // 1 day
+      // First review
+      if (quality === 3) {
+        // Hard - review after 6 hours for first time
+        newInterval = 6 / 24; // 6 hours = 0.25 days
+      } else if (quality === 4) {
+        // Good - review after 1 day
+        newInterval = 1;
+      } else {
+        // Easy - review after 4 days
+        newInterval = 4;
+      }
     } else if (newRepetition === 2) {
       newInterval = 6; // 6 days
     } else {
       newInterval = Math.round(intervalDays * newEaseFactor);
     }
 
-    // Adjust interval based on quality
-    if (quality === 3) {
+    // Adjust interval based on quality (for repetition > 2)
+    if (quality === 3 && newRepetition > 2) {
       // Hard - reduce interval slightly
       newInterval = Math.max(1, Math.round(newInterval * 0.85));
-    } else if (quality === 5) {
+    } else if (quality === 5 && newRepetition > 2) {
       // Easy - increase interval
       newInterval = Math.round(newInterval * 1.3);
     }
@@ -251,22 +261,22 @@ const updateSetProgress = async (user_id, flashcard_set_id) => {
 
     if (totalCards === 0) return;
 
-    // Đếm số cards đã review (repetition_count > 0)
-    const reviewedCards = await db.User_Flashcard_Progress.count({
+    // Đếm số cards đã từng review (có User_Flashcard_Progress record)
+    // Không phụ thuộc vào repetition_count vì khi click "Chưa nhớ" sẽ reset về 0
+    const allCardIds = await db.Flashcard.findAll({
+      where: { flashcard_set_id },
+      attributes: ["flashcard_id"],
+      raw: true,
+    }).then((cards) => cards.map((c) => c.flashcard_id));
+
+    const reviewedCardsCount = await db.User_Flashcard_Progress.count({
       where: {
         user_id,
-        repetition_count: { [Op.gt]: 0 },
+        flashcard_id: { [Op.in]: allCardIds },
       },
-      include: [
-        {
-          model: db.Flashcard,
-          where: { flashcard_set_id },
-          attributes: [],
-        },
-      ],
     });
 
-    const progressPercent = (reviewedCards / totalCards) * 100;
+    const progressPercent = (reviewedCardsCount / totalCards) * 100;
 
     // Cập nhật user_flashcard_set
     await db.User_Flashcard_Set.update(
@@ -335,22 +345,21 @@ const getFlashcardSetProgress = async (flashcard_set_id, user_id) => {
     // Thống kê
     const stats = {
       total: flashcards.length,
-      new: flashcards.length - progressData.length,
+      new: flashcards.length - progressData.length, // Cards chưa có progress record
       learning: progressData.filter(
         (p) => p.repetition_count > 0 && p.repetition_count < 3,
       ).length,
       mastered: progressData.filter((p) => p.repetition_count >= 3).length,
+      reviewing: progressData.filter((p) => p.repetition_count === 0).length, // Cards đang ôn lại (clicked "Chưa nhớ")
       due_for_review: progressData.filter(
         (p) => p.next_review_at && new Date(p.next_review_at) <= new Date(),
       ).length,
     };
 
-    // Tính progress_percent
+    // Tính progress_percent: dựa trên số cards đã từng review (có progress record)
     const progressPercent =
       flashcards.length > 0
-        ? Math.round(
-            ((stats.learning + stats.mastered) / flashcards.length) * 100,
-          )
+        ? Math.round((progressData.length / flashcards.length) * 100)
         : 0;
 
     return {
@@ -384,7 +393,9 @@ const getNextCard = async (flashcard_set_id, user_id) => {
       };
     }
 
-    // Lưu: ưu tiên cards đến hạn review > cards mới > cards sắp tới
+    // Lưu ý: Ưu tiên cards đến hạn review > cards mới
+    // Session học được coi là hoàn thành khi không còn due hoặc new cards
+    // Cards sắp tới (chưa đến hạn) sẽ hiển thị trong session tương lai
     const now = new Date();
 
     // 1. Cards đến hạn review
@@ -445,7 +456,8 @@ const getNextCard = async (flashcard_set_id, user_id) => {
       };
     }
 
-    // 3. Không còn card nào - set đã hoàn thành
+    // 3. Không còn card due hoặc new - session hoàn thành
+    // Cards sắp tới (upcoming) sẽ được review trong session tương lai
     return {
       success: true,
       data: null,
@@ -540,16 +552,26 @@ const getActiveSets = async (user_id) => {
       order: [["started_at", "DESC"]],
     });
 
-    // Transform data to match frontend expectation
-    const transformedSets = activeSets.map((userSet) => ({
-      flashcard_set_id: userSet.Flashcard_Set.flashcard_set_id,
-      set_name: userSet.Flashcard_Set.title,
-      description: userSet.Flashcard_Set.description,
-      total_cards: userSet.Flashcard_Set.total_cards,
-      progress_percent: userSet.progress_percent,
-      started_at: userSet.started_at,
-      status: userSet.status,
-    }));
+    // Transform data and deduplicate by flashcard_set_id
+    const seenIds = new Set();
+    const transformedSets = activeSets
+      .map((userSet) => ({
+        flashcard_set_id: userSet.Flashcard_Set.flashcard_set_id,
+        set_name: userSet.Flashcard_Set.title,
+        description: userSet.Flashcard_Set.description,
+        total_cards: userSet.Flashcard_Set.total_cards,
+        progress_percent: userSet.progress_percent,
+        started_at: userSet.started_at,
+        status: userSet.status,
+      }))
+      .filter((set) => {
+        // Deduplicate: only keep first occurrence of each flashcard_set_id
+        if (seenIds.has(set.flashcard_set_id)) {
+          return false;
+        }
+        seenIds.add(set.flashcard_set_id);
+        return true;
+      });
 
     return {
       success: true,
@@ -561,6 +583,137 @@ const getActiveSets = async (user_id) => {
   }
 };
 
+// Lấy danh sách thông báo về cards đến hạn ôn tập
+const getDueNotifications = async (user_id) => {
+  try {
+    const now = new Date();
+
+    // Lấy tất cả cards đến hạn của user
+    const dueCards = await db.User_Flashcard_Progress.findAll({
+      where: {
+        user_id,
+        next_review_at: { [Op.lte]: now },
+      },
+      include: [
+        {
+          model: db.Flashcard,
+          required: true,
+          include: [
+            {
+              model: db.Flashcard_Set,
+              required: true,
+              attributes: ["flashcard_set_id", "title", "description"],
+            },
+          ],
+        },
+      ],
+      order: [["next_review_at", "ASC"]], // Oldest due first
+    });
+
+    // Group cards by flashcard set
+    const notificationsBySet = {};
+
+    dueCards.forEach((progress) => {
+      const flashcard = progress.Flashcard;
+      const flashcardSet = flashcard.Flashcard_Set;
+      const setId = flashcardSet.flashcard_set_id;
+
+      if (!notificationsBySet[setId]) {
+        notificationsBySet[setId] = {
+          flashcard_set_id: setId,
+          set_title: flashcardSet.title,
+          set_description: flashcardSet.description,
+          due_cards: [],
+          total_due: 0,
+        };
+      }
+
+      notificationsBySet[setId].due_cards.push({
+        flashcard_id: flashcard.flashcard_id,
+        front_content: flashcard.front_content,
+        back_content: flashcard.back_content,
+        next_review_at: progress.next_review_at,
+        due_hours_ago: Math.floor(
+          (now - new Date(progress.next_review_at)) / (1000 * 60 * 60),
+        ),
+      });
+
+      notificationsBySet[setId].total_due++;
+    });
+
+    // Convert to array and sort by total_due descending
+    const notifications = Object.values(notificationsBySet).sort(
+      (a, b) => b.total_due - a.total_due,
+    );
+
+    // Calculate total stats
+    const totalDue = dueCards.length;
+    const totalSets = notifications.length;
+
+    return {
+      success: true,
+      total_due_cards: totalDue,
+      total_sets_with_due: totalSets,
+      notifications,
+    };
+  } catch (error) {
+    console.error("[getDueNotifications] Error:", error);
+    return { success: false, message: "Internal server error." };
+  }
+};
+
+// Reset toàn bộ progress của một flashcard set
+const resetFlashcardSetProgress = async (flashcard_set_id, user_id) => {
+  try {
+    // Kiểm tra quyền truy cập
+    const flashcardSet = await db.Flashcard_Set.findOne({
+      where: {
+        flashcard_set_id,
+        [Op.or]: [{ visibility: "public" }, { user_id }],
+      },
+    });
+
+    if (!flashcardSet) {
+      return {
+        success: false,
+        message: "Flashcard set not found or access denied.",
+      };
+    }
+
+    // Lấy tất cả flashcard IDs trong set
+    const flashcardIds = await db.Flashcard.findAll({
+      where: { flashcard_set_id },
+      attributes: ["flashcard_id"],
+      raw: true,
+    }).then((cards) => cards.map((c) => c.flashcard_id));
+
+    // Xóa toàn bộ progress records
+    const deletedCount = await db.User_Flashcard_Progress.destroy({
+      where: {
+        user_id,
+        flashcard_id: { [Op.in]: flashcardIds },
+      },
+    });
+
+    // Xóa hoặc reset user_flashcard_set record
+    await db.User_Flashcard_Set.destroy({
+      where: {
+        user_id,
+        flashcard_set_id,
+      },
+    });
+
+    return {
+      success: true,
+      deleted_progress_count: deletedCount,
+      message: "Progress reset successfully.",
+    };
+  } catch (error) {
+    console.error("[resetFlashcardSetProgress] Error:", error);
+    return { success: false, message: "Internal server error." };
+  }
+};
+
 export default {
   startFlashcardSet,
   reviewFlashcard,
@@ -568,4 +721,6 @@ export default {
   getNextCard,
   getDailyReviewQueue,
   getActiveSets,
+  getDueNotifications,
+  resetFlashcardSetProgress,
 };

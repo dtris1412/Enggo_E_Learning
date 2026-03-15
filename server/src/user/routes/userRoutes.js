@@ -135,6 +135,8 @@ import {
   getNextCard,
   getDailyReviewQueue,
   getActiveSets,
+  getDueNotifications,
+  resetFlashcardSetProgress,
 } from "../controllers/flashcardProgressController.js";
 
 const router = express.Router();
@@ -491,6 +493,14 @@ const initUserRoutes = (app) => {
     getActiveSets,
   );
 
+  // Get due notifications (auth required)
+  router.get(
+    "/api/user/flashcards/due-notifications",
+    verifyToken,
+    requireUser,
+    getDueNotifications,
+  );
+
   // Get flashcard by ID (public if set is public, or owner)
   router.get(
     "/api/user/flashcards/:flashcard_id",
@@ -570,6 +580,14 @@ const initUserRoutes = (app) => {
     verifyToken,
     requireUser,
     getNextCard,
+  );
+
+  // Reset progress for a flashcard set (auth required)
+  router.delete(
+    "/api/user/flashcard-sets/:flashcard_set_id/progress",
+    verifyToken,
+    requireUser,
+    resetFlashcardSetProgress,
   );
 
   app.use("/", router);

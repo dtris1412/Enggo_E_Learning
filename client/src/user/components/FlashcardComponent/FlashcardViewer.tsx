@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useFlashcard } from "../../contexts/flashcardContext";
 import { useToast } from "../../../shared/components/Toast/Toast";
 import { SpeakButton } from "../../../shared/components/SpeakButton";
+import Confetti from "react-confetti";
 import {
   ArrowLeft,
   ChevronLeft,
@@ -16,7 +17,6 @@ import {
   Clock,
   Zap,
   Brain,
-  Award,
   BookOpen,
   TrendingUp,
 } from "lucide-react";
@@ -30,6 +30,7 @@ interface ProgressStats {
   new: number;
   learning: number;
   mastered: number;
+  reviewing: number;
   due_for_review: number;
 }
 
@@ -50,21 +51,66 @@ const FlashcardViewer: React.FC = () => {
   // Progress tracking states
   const [studyMode, setStudyMode] = useState(false);
   const [currentCard, setCurrentCard] = useState<any>(null);
+  const [lastReviewedCard, setLastReviewedCard] = useState<any>(null);
   const [isCompleted, setIsCompleted] = useState(false);
   const [progressStats, setProgressStats] = useState<ProgressStats>({
     total: 0,
     new: 0,
     learning: 0,
     mastered: 0,
+    reviewing: 0,
     due_for_review: 0,
   });
   const [isReviewing, setIsReviewing] = useState(false);
 
-  // Load flashcard set (always on mount)
+  // Window dimensions for confetti
+  const [windowDimensions, setWindowDimensions] = useState({
+    width: window.innerWidth,
+    height: window.innerHeight,
+  });
+
+  // Update window dimensions on resize
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowDimensions({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // Load flashcard set (only when needed for browse mode)
   useEffect(() => {
     const fetchData = async () => {
       if (!flashcard_set_id) return;
 
+      // Kiểm tra xem có cần load tất cả cards không
+      // Nếu sẽ auto-start study mode, bỏ qua việc load toàn bộ cards
+      const savedStudyMode = localStorage.getItem(
+        `flashcard_study_mode_${flashcard_set_id}`,
+      );
+
+      if (savedStudyMode === "true") {
+        // Chỉ load metadata của set, không load cards
+        console.log(
+          "[Optimization] Skipping full card load - will use API for study mode",
+        );
+        const data = await getFlashcardSetById(Number(flashcard_set_id));
+        if (data) {
+          setFlashcardSet(data);
+          // Không set flashcards array - sẽ dùng API next-card
+        } else {
+          showToast("error", "Không tìm thấy flashcard set");
+          navigate("/flashcards");
+        }
+        return;
+      }
+
+      // Browse mode: Load đầy đủ cards
+      console.log("[Browse mode] Loading all flashcards for free navigation");
       const data = await getFlashcardSetById(Number(flashcard_set_id));
       if (data && data.Flashcards) {
         setFlashcardSet(data);
@@ -91,6 +137,42 @@ const FlashcardViewer: React.FC = () => {
     };
 
     fetchData();
+  }, [flashcard_set_id]);
+
+  // Load saved study mode preference on mount
+  useEffect(() => {
+    if (!flashcard_set_id) return;
+
+    const savedStudyMode = localStorage.getItem(
+      `flashcard_study_mode_${flashcard_set_id}`,
+    );
+
+    if (savedStudyMode === "true") {
+      // Auto-enable study mode if it was previously enabled
+      const token = localStorage.getItem("accessToken");
+      if (token) {
+        // Delay to ensure flashcards are loaded first
+        setTimeout(async () => {
+          try {
+            const response = await fetch(
+              `${API_URL}/user/flashcard-sets/${flashcard_set_id}/start`,
+              {
+                method: "POST",
+                headers: { Authorization: `Bearer ${token}` },
+              },
+            );
+
+            if (response.ok || response.status === 409) {
+              await fetchNextCard();
+              await fetchProgressStats();
+              setStudyMode(true);
+            }
+          } catch (error) {
+            console.error("Error auto-starting study mode:", error);
+          }
+        }, 100);
+      }
+    }
   }, [flashcard_set_id]);
 
   // Save position in browser mode
@@ -134,6 +216,12 @@ const FlashcardViewer: React.FC = () => {
           // Set study mode AFTER fetching data to avoid showing completion screen during loading
           setStudyMode(true);
 
+          // Save study mode preference
+          localStorage.setItem(
+            `flashcard_study_mode_${flashcard_set_id}`,
+            "true",
+          );
+
           // Clear saved position when entering progress tracking mode
           localStorage.removeItem(`flashcard_position_${flashcard_set_id}`);
         } else {
@@ -147,11 +235,35 @@ const FlashcardViewer: React.FC = () => {
     } else {
       // Turning OFF Progress Tracking - back to free browsing
       setStudyMode(false);
+
+      // Remove study mode preference
+      localStorage.removeItem(`flashcard_study_mode_${flashcard_set_id}`);
+
       setCurrentCard(null);
       setIsCompleted(false);
       setCurrentIndex(0);
       setIsFlipped(false);
       setShowAnswer(false);
+
+      // Load all flashcards if not already loaded (for browse mode)
+      if (flashcards.length === 0 && flashcard_set_id) {
+        const data = await getFlashcardSetById(Number(flashcard_set_id));
+        if (data && data.Flashcards) {
+          setFlashcards(data.Flashcards);
+
+          // Restore saved position if exists
+          const savedPosition = localStorage.getItem(
+            `flashcard_position_${flashcard_set_id}`,
+          );
+          if (savedPosition) {
+            const position = parseInt(savedPosition, 10);
+            if (position >= 0 && position < data.Flashcards.length) {
+              setCurrentIndex(position);
+            }
+          }
+        }
+      }
+
       showToast("info", "📖 Xem tự do - không theo dõi tiến độ");
     }
   };
@@ -173,22 +285,30 @@ const FlashcardViewer: React.FC = () => {
 
       const result = await response.json();
 
+      console.log("[DEBUG] Next card response:", result);
+
       if (response.ok && result.success) {
         // Backend returns: { success: true, data: { flashcard: {...}, reason: "..." } }
         // or { success: true, data: null, message: "..." } when completed
         if (result.data === null) {
           // All completed
+          console.log("[DEBUG] Session completed!");
           showToast("success", "🎉 Đã hoàn thành tất cả flashcard!");
           setCurrentCard(null);
           setIsCompleted(true);
         } else if (result.data && result.data.flashcard) {
           // Got next card
           const flashcard = result.data.flashcard;
-          setCurrentCard({
+          const cardData = {
             ...flashcard,
             is_new: result.data.reason === "new",
             is_due: result.data.reason === "due",
-          });
+            is_upcoming: result.data.reason === "upcoming",
+          };
+
+          // Save as last reviewed card
+          setLastReviewedCard(cardData);
+          setCurrentCard(cardData);
           setIsCompleted(false);
 
           // Find index in flashcards array
@@ -225,6 +345,7 @@ const FlashcardViewer: React.FC = () => {
       const result = await response.json();
 
       if (response.ok && result.cards_stats) {
+        console.log("[DEBUG] Progress stats updated:", result.cards_stats);
         setProgressStats(result.cards_stats);
       }
     } catch (error) {
@@ -260,23 +381,49 @@ const FlashcardViewer: React.FC = () => {
       const result = await response.json();
 
       if (response.ok) {
-        // Show feedback based on quality
+        // Get interval from server response
+        const intervalDays = result.data?.nextReview?.intervalDays || 0;
+
+        // Format time display based on interval
+        const formatInterval = (days: number) => {
+          if (days < 1) {
+            // Convert to minutes
+            const minutes = Math.round(days * 24 * 60);
+            if (minutes < 60) {
+              return `${minutes} phút`;
+            } else {
+              const hours = Math.round(minutes / 60);
+              return `${hours} giờ`;
+            }
+          } else {
+            return `${Math.round(days)} ngày`;
+          }
+        };
+
+        // Show feedback based on quality with actual interval from server
+        const timeDisplay = formatInterval(intervalDays);
         const messages = {
-          again: "Chưa nhớ - Sẽ ôn lại sớm",
-          hard: "Khó - Ôn lại sau 10 phút",
-          good: `Tốt - Ôn lại sau ${result.progress?.interval_days || 1} ngày`,
-          easy: `Dễ - Ôn lại sau ${result.progress?.interval_days || 4} ngày`,
+          again: `Chưa nhớ - Ôn lại sau ${timeDisplay}`,
+          hard: `Khó - Ôn lại sau ${timeDisplay}`,
+          good: `Tốt - Ôn lại sau ${timeDisplay}`,
+          easy: `Dễ - Ôn lại sau ${timeDisplay}`,
         };
         showToast("success", messages[quality]);
 
-        // Update progress stats
-        await fetchProgressStats();
-
-        // Get next card after delay
-        setTimeout(() => {
+        // Get next card and update progress
+        setTimeout(async () => {
           setIsFlipped(false);
           setShowAnswer(false);
-          fetchNextCard();
+
+          // Fetch next card first
+          await fetchNextCard();
+
+          // Wait a bit for backend to finish processing
+          await new Promise((resolve) => setTimeout(resolve, 100));
+
+          // Then update progress stats to reflect new state
+          await fetchProgressStats();
+
           setIsReviewing(false);
         }, 500);
       } else {
@@ -350,12 +497,68 @@ const FlashcardViewer: React.FC = () => {
     setMarkedCards(new Set());
 
     if (studyMode) {
-      // Study Mode: Restart and get first card
-      await fetchNextCard();
-      await fetchProgressStats();
-      showToast("success", "Đã reset tiến trình Study Mode");
+      // Study Mode: Reset progress in database, then restart
+      const token = localStorage.getItem("accessToken");
+      if (!token) {
+        showToast("error", "Vui lòng đăng nhập");
+        return;
+      }
+
+      try {
+        setIsReviewing(true);
+
+        // Call API to reset progress
+        const response = await fetch(
+          `${API_URL}/user/flashcard-sets/${flashcard_set_id}/progress`,
+          {
+            method: "DELETE",
+            headers: { Authorization: `Bearer ${token}` },
+          },
+        );
+
+        if (response.ok) {
+          // Reset local states completely
+          setIsCompleted(false);
+          setCurrentCard(null);
+          setLastReviewedCard(null);
+          setIsFlipped(false);
+          setShowAnswer(false);
+
+          // Start fresh session
+          await fetch(
+            `${API_URL}/user/flashcard-sets/${flashcard_set_id}/start`,
+            {
+              method: "POST",
+              headers: { Authorization: `Bearer ${token}` },
+            },
+          );
+
+          // Get first card
+          await fetchNextCard();
+          await fetchProgressStats();
+
+          showToast("success", "✨ Đã reset tiến trình - Bắt đầu lại từ đầu!");
+        } else {
+          const result = await response.json();
+          showToast("error", result.message || "Lỗi khi reset tiến trình");
+        }
+      } catch (error) {
+        console.error("Error resetting progress:", error);
+        showToast("error", "Lỗi kết nối server");
+      } finally {
+        setIsReviewing(false);
+      }
     } else {
       showToast("success", "Đã reset về thẻ đầu tiên");
+    }
+  };
+
+  const handleBackToLastCard = () => {
+    if (lastReviewedCard) {
+      setCurrentCard(lastReviewedCard);
+      setIsCompleted(false);
+      setIsFlipped(false);
+      setShowAnswer(false);
     }
   };
 
@@ -402,7 +605,26 @@ const FlashcardViewer: React.FC = () => {
     );
   }
 
-  if (!flashcardSet || flashcards.length === 0) {
+  if (!flashcardSet) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <BookMarked className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+          <p className="text-gray-600 mb-4">Không tìm thấy flashcard set</p>
+          <button
+            onClick={() => navigate("/flashcards")}
+            className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-6 rounded-lg transition-colors"
+          >
+            Quay lại danh sách
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Only check flashcards length in browse mode
+  // In study mode, we use backend API (currentCard) instead of flashcards array
+  if (!studyMode && flashcards.length === 0) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -421,68 +643,146 @@ const FlashcardViewer: React.FC = () => {
 
   // If all cards completed (Progress Tracking only)
   if (studyMode && isCompleted) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-indigo-100 via-purple-50 to-pink-100">
-        <div className="container mx-auto px-4 py-12">
-          <div className="max-w-2xl mx-auto text-center">
-            <div className="bg-white rounded-2xl shadow-xl p-12">
-              <Award className="w-24 h-24 text-yellow-500 mx-auto mb-6" />
-              <h2 className="text-4xl font-bold text-gray-900 mb-4">
-                🎉 Chúc mừng!
-              </h2>
-              <p className="text-xl text-gray-700 mb-8">
-                Bạn đã hoàn thành tất cả flashcard trong set này
-              </p>
+    const learnedCount = progressStats.total - progressStats.new;
 
-              <div className="grid grid-cols-2 gap-4 mb-8 text-left">
-                <div className="bg-blue-50 rounded-lg p-4">
-                  <p className="text-sm text-blue-600 font-medium mb-1">
-                    Tổng thẻ
-                  </p>
-                  <p className="text-3xl font-bold text-blue-900">
-                    {progressStats.total}
-                  </p>
-                </div>
-                <div className="bg-green-50 rounded-lg p-4">
-                  <p className="text-sm text-green-600 font-medium mb-1">
-                    Đã thành thạo
-                  </p>
-                  <p className="text-3xl font-bold text-green-900">
-                    {progressStats.mastered}
-                  </p>
-                </div>
-                <div className="bg-yellow-50 rounded-lg p-4">
-                  <p className="text-sm text-yellow-600 font-medium mb-1">
-                    Đang học
-                  </p>
-                  <p className="text-3xl font-bold text-yellow-900">
-                    {progressStats.learning}
-                  </p>
-                </div>
-                <div className="bg-purple-50 rounded-lg p-4">
-                  <p className="text-sm text-purple-600 font-medium mb-1">
-                    Cần ôn hôm nay
-                  </p>
-                  <p className="text-3xl font-bold text-purple-900">
-                    {progressStats.due_for_review}
-                  </p>
-                </div>
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-indigo-900 to-slate-900 relative overflow-hidden">
+        {/* Confetti effect */}
+        <Confetti
+          width={windowDimensions.width}
+          height={windowDimensions.height}
+          recycle={false}
+          numberOfPieces={500}
+          gravity={0.3}
+        />
+
+        <div className="container mx-auto px-4 py-12">
+          <div className="max-w-3xl mx-auto">
+            {/* Main completion card */}
+            <div className="text-center mb-12">
+              {/* Megaphone Icon */}
+              <div className="inline-flex items-center justify-center w-24 h-24 bg-yellow-400 rounded-full mb-8 transform rotate-12">
+                <span className="text-6xl transform -rotate-12">📣</span>
               </div>
 
-              <div className="flex gap-4 justify-center">
+              <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+                Chà, bạn nằm bài thật chắc! Bạn đã sắp xếp tất cả các thẻ.
+              </h1>
+            </div>
+
+            {/* Progress Stats */}
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 mb-8">
+              <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
+                <span>🎯</span>
+                Tiến độ của bạn
+              </h2>
+
+              <div className="space-y-4">
+                {/* Đã biết */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                    <span className="text-white font-medium">Đã biết</span>
+                  </div>
+                  <span className="text-white font-bold text-xl">
+                    {learnedCount}
+                  </span>
+                </div>
+                <div className="h-2 bg-white/20 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-green-500 transition-all duration-500"
+                    style={{
+                      width: `${(learnedCount / progressStats.total) * 100}%`,
+                    }}
+                  ></div>
+                </div>
+
+                {/* Đang học */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
+                    <span className="text-white font-medium">Đang học</span>
+                  </div>
+                  <span className="text-white font-bold text-xl">
+                    {progressStats.learning}
+                  </span>
+                </div>
+                <div className="h-2 bg-white/20 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-orange-500 transition-all duration-500"
+                    style={{
+                      width: `${(progressStats.learning / progressStats.total) * 100}%`,
+                    }}
+                  ></div>
+                </div>
+
+                {/* Còn lại */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-3 h-3 bg-gray-400 rounded-full"></div>
+                    <span className="text-white font-medium">Còn lại</span>
+                  </div>
+                  <span className="text-white font-bold text-xl">
+                    {progressStats.new}
+                  </span>
+                </div>
+                <div className="h-2 bg-white/20 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-gray-400 transition-all duration-500"
+                    style={{
+                      width: `${(progressStats.new / progressStats.total) * 100}%`,
+                    }}
+                  ></div>
+                </div>
+              </div>
+            </div>
+
+            {/* Next Steps */}
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 mb-8">
+              <h2 className="text-2xl font-bold text-white mb-6">
+                Bước tiếp theo
+              </h2>
+
+              <div className="space-y-4">
                 <button
                   onClick={() => navigate("/flashcards")}
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-3 px-8 rounded-lg transition-colors"
+                  className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-4 px-6 rounded-xl transition-all transform hover:scale-105 flex items-center justify-center gap-3"
                 >
-                  Về trang chủ
+                  <span className="text-xl">🔄</span>
+                  <span>Ôn luyện với các câu hỏi</span>
                 </button>
+
                 <button
                   onClick={handleReset}
-                  className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-8 rounded-lg transition-colors"
+                  disabled={isReviewing}
+                  className="w-full bg-slate-700 hover:bg-slate-600 text-white font-semibold py-4 px-6 rounded-xl transition-all transform hover:scale-105 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Học lại từ đầu
+                  <span className="text-xl">🔁</span>
+                  <span>
+                    {isReviewing ? "Đang reset..." : "Đặt lại Thẻ ghi nhớ"}
+                  </span>
                 </button>
               </div>
+            </div>
+
+            {/* Bottom Navigation */}
+            <div className="flex items-center justify-between text-white">
+              <button
+                onClick={handleBackToLastCard}
+                disabled={!lastReviewedCard}
+                className="flex items-center gap-2 hover:text-indigo-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <ArrowLeft className="w-5 h-5" />
+                <span>Quay lại câu hỏi cuối cùng</span>
+              </button>
+
+              <button
+                onClick={() => navigate("/flashcards")}
+                className="flex items-center gap-2 hover:text-indigo-300 transition-colors"
+              >
+                <span>Nhấn phím bất kỳ để tiếp tục</span>
+                <ChevronRight className="w-5 h-5" />
+              </button>
             </div>
           </div>
         </div>
@@ -495,12 +795,14 @@ const FlashcardViewer: React.FC = () => {
   const isMarked = displayCard
     ? markedCards.has(displayCard.flashcard_id)
     : false;
-  const progress =
-    studyMode && progressStats.total > 0
-      ? ((progressStats.learning + progressStats.mastered) /
-          progressStats.total) *
-        100
-      : ((currentIndex + 1) / flashcards.length) * 100;
+
+  const progress = studyMode
+    ? progressStats.total > 0
+      ? ((progressStats.total - progressStats.new) / progressStats.total) * 100
+      : 0
+    : flashcards.length > 0
+      ? ((currentIndex + 1) / flashcards.length) * 100
+      : 0;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-100 via-purple-50 to-pink-100">
@@ -524,7 +826,7 @@ const FlashcardViewer: React.FC = () => {
                 {studyMode ? (
                   <>
                     <p className="text-sm text-gray-600">
-                      {progressStats.learning + progressStats.mastered} /{" "}
+                      {progressStats.total - progressStats.new} /{" "}
                       {progressStats.total} đã học
                     </p>
                     {currentCard?.is_due && (
@@ -536,6 +838,11 @@ const FlashcardViewer: React.FC = () => {
                     {currentCard?.is_new && (
                       <span className="inline-flex items-center gap-1 text-xs font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded">
                         Thẻ mới
+                      </span>
+                    )}
+                    {currentCard?.is_upcoming && (
+                      <span className="inline-flex items-center gap-1 text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded">
+                        Ôn trước
                       </span>
                     )}
                   </>
@@ -613,6 +920,13 @@ const FlashcardViewer: React.FC = () => {
                 <span className="text-gray-700">
                   Đang học:{" "}
                   <span className="font-bold">{progressStats.learning}</span>
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
+                <span className="text-gray-700">
+                  Ôn lại:{" "}
+                  <span className="font-bold">{progressStats.reviewing}</span>
                 </span>
               </div>
               <div className="flex items-center gap-2">
@@ -749,7 +1063,7 @@ const FlashcardViewer: React.FC = () => {
                         >
                           <XCircle className="w-5 h-5 inline-block mb-1" />
                           <div className="text-sm">Chưa nhớ</div>
-                          <div className="text-xs opacity-75">&lt;10 phút</div>
+                          <div className="text-xs opacity-75">10 phút</div>
                         </button>
 
                         <button
@@ -762,7 +1076,7 @@ const FlashcardViewer: React.FC = () => {
                         >
                           <Brain className="w-5 h-5 inline-block mb-1" />
                           <div className="text-sm">Khó</div>
-                          <div className="text-xs opacity-75">&lt;1 ngày</div>
+                          <div className="text-xs opacity-75">6 giờ+</div>
                         </button>
 
                         <button
@@ -775,7 +1089,7 @@ const FlashcardViewer: React.FC = () => {
                         >
                           <CheckCircle className="w-5 h-5 inline-block mb-1" />
                           <div className="text-sm">Tốt</div>
-                          <div className="text-xs opacity-75">&lt;4 ngày</div>
+                          <div className="text-xs opacity-75">1 ngày+</div>
                         </button>
 
                         <button
