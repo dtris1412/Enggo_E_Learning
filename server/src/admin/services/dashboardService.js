@@ -14,6 +14,7 @@ const {
   Flashcard,
   Document,
   Blog,
+  User_Flashcard_Set,
 } = db;
 
 // Get total users count
@@ -111,6 +112,7 @@ export const getDashboardStatistics = async () => {
       topBlogsResult,
       topCoursesResult,
       topRoadmapsResult,
+      topLearnedFlashcardsResult,
     ] = await Promise.all([
       getTotalUsers(),
       getActiveCourses(),
@@ -122,6 +124,7 @@ export const getDashboardStatistics = async () => {
       getTopBlogs(5),
       getTopCourses(5),
       getTopRoadmaps(5),
+      getTopLearnedFlashcards(5),
     ]);
 
     if (!totalUsersResult.success) {
@@ -160,6 +163,9 @@ export const getDashboardStatistics = async () => {
         topBlogs: topBlogsResult.success ? topBlogsResult.data : [],
         topCourses: topCoursesResult.success ? topCoursesResult.data : [],
         topRoadmaps: topRoadmapsResult.success ? topRoadmapsResult.data : [],
+        topLearnedFlashcards: topLearnedFlashcardsResult.success
+          ? topLearnedFlashcardsResult.data
+          : [],
       },
     };
   } catch (error) {
@@ -364,6 +370,41 @@ export const getTopRoadmaps = async (limit = 5) => {
     return { success: true, data: roadmaps };
   } catch (error) {
     console.error("Error in getTopRoadmaps:", error);
+    return { success: false, message: error.message };
+  }
+};
+
+// Get top learned flashcards by learner count
+export const getTopLearnedFlashcards = async (limit = 5) => {
+  try {
+    const flashcards = await Flashcard_Set.findAll({
+      limit,
+      include: [
+        {
+          model: User,
+          attributes: ["user_id", "user_name", "full_name"],
+        },
+      ],
+      attributes: {
+        include: [
+          [
+            db.sequelize.literal(`(
+              SELECT COUNT(DISTINCT user_id)
+              FROM user_flashcard_sets
+              WHERE user_flashcard_sets.flashcard_set_id = Flashcard_Set.flashcard_set_id
+            )`),
+            "learner_count",
+          ],
+        ],
+      },
+      order: [[db.sequelize.literal("learner_count"), "DESC"]],
+      subQuery: false,
+      having: db.sequelize.literal("learner_count > 0"),
+    });
+
+    return { success: true, data: flashcards };
+  } catch (error) {
+    console.error("Error in getTopLearnedFlashcards:", error);
     return { success: false, message: error.message };
   }
 };

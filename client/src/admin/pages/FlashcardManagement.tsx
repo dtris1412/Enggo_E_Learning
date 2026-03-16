@@ -8,6 +8,7 @@ import {
   Eye,
   Loader2,
   BookOpen,
+  Users,
 } from "lucide-react";
 import AddFlashcardSetModal from "../components/FlashcardManagement/AddFlashcardSetModal";
 import EditFlashcardSetModal from "../components/FlashcardManagement/EditFlashcardSetModal.tsx";
@@ -239,6 +240,9 @@ const FlashcardManagement: React.FC = () => {
                     Cards
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Learners
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Visibility
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -252,7 +256,7 @@ const FlashcardManagement: React.FC = () => {
               <tbody className="bg-white divide-y divide-gray-200">
                 {flashcardSets.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="px-6 py-12 text-center">
+                    <td colSpan={8} className="px-6 py-12 text-center">
                       <div className="flex flex-col items-center justify-center text-gray-500">
                         <BookOpen className="w-12 h-12 mb-2 text-gray-400" />
                         <p className="text-lg font-medium">
@@ -284,6 +288,12 @@ const FlashcardManagement: React.FC = () => {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
                           {set.total_cards} cards
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                          <Users className="w-4 h-4 mr-1" />
+                          {set.learner_count || 0} learners
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">

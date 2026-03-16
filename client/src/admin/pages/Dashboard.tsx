@@ -7,12 +7,12 @@ import {
   TestCompletionChart,
   AIPlaceholders,
   RecentCompletedExams,
-  RecentFlashcards,
   TopDocuments,
   TopBlogs,
   FeaturedBanner,
   TopCourses,
   TopRoadmaps,
+  TopLearnedFlashcards,
 } from "../components/Dashboard";
 
 const Dashboard = () => {
@@ -67,11 +67,11 @@ const Dashboard = () => {
   const completionRate = dashboardData?.testStatistics.completionRate || 0;
   const recentSubscriptions = dashboardData?.recentSubscriptions || [];
   const recentCompletedExams = dashboardData?.recentCompletedExams || [];
-  const recentFlashcards = dashboardData?.recentFlashcards || [];
   const topDocuments = dashboardData?.topDocuments || [];
   const topBlogs = dashboardData?.topBlogs || [];
   const topCourses = dashboardData?.topCourses || [];
   const topRoadmaps = dashboardData?.topRoadmaps || [];
+  const topLearnedFlashcards = dashboardData?.topLearnedFlashcards || [];
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
@@ -137,9 +137,12 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Row 3: Flashcards (1/3) + Documents (1/3) + Subscriptions (1/3) */}
+      {/* Row 3: Top Learned Flashcards (1/3) + Documents (1/3) + Subscriptions (1/3) */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-        <RecentFlashcards flashcards={recentFlashcards} loading={loading} />
+        <TopLearnedFlashcards
+          flashcards={topLearnedFlashcards}
+          loading={loading}
+        />
         <TopDocuments documents={topDocuments} loading={loading} />
         <RecentSubscriptionsList
           subscriptions={recentSubscriptions}

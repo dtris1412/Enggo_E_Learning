@@ -105,6 +105,22 @@ interface TopRoadmap {
   enrolled_users_count: number;
 }
 
+interface TopLearnedFlashcard {
+  flashcard_set_id: number;
+  title: string;
+  description: string | null;
+  total_cards: number;
+  visibility: string;
+  created_by_type: string;
+  created_at: string;
+  learner_count: number;
+  User: {
+    user_id: number;
+    user_name: string;
+    full_name: string;
+  };
+}
+
 interface DashboardData {
   totalUsers: number;
   activeCourses: number;
@@ -116,6 +132,7 @@ interface DashboardData {
   topBlogs: TopBlog[];
   topCourses: TopCourse[];
   topRoadmaps: TopRoadmap[];
+  topLearnedFlashcards: TopLearnedFlashcard[];
 }
 
 interface DashboardContextType {

@@ -21,6 +21,7 @@ interface FlashcardSet {
   total_cards: number;
   created_at: string;
   updated_at: string;
+  learner_count?: number;
   User?: {
     user_id: number;
     user_name: string;

@@ -43,11 +43,25 @@ const getFlashcardSetsPaginated = async ({
       {
         model: db.Flashcard,
         attributes: ["flashcard_id", "front_content", "back_content"],
+        separate: true, // Fetch flashcards in separate query to avoid cartesian product
       },
     ],
+    attributes: {
+      include: [
+        [
+          db.sequelize.literal(`(
+            SELECT COUNT(DISTINCT user_id)
+            FROM user_flashcard_sets
+            WHERE user_flashcard_sets.flashcard_set_id = Flashcard_Set.flashcard_set_id
+          )`),
+          "learner_count",
+        ],
+      ],
+    },
     limit: parseInt(limit),
     offset: offset,
     order: [[sortBy, order]],
+    distinct: true,
   });
 
   return {
@@ -83,6 +97,19 @@ const getFlashcardSetById = async (flashcard_set_id) => {
         ],
       },
     ],
+    attributes: {
+      include: [
+        [
+          db.sequelize.literal(`(
+            SELECT COUNT(DISTINCT user_id)
+            FROM user_flashcard_sets
+            WHERE user_flashcard_sets.flashcard_set_id = Flashcard_Set.flashcard_set_id
+          )`),
+          "learner_count",
+        ],
+      ],
+    },
+    subQuery: false,
   });
 
   return flashcardSet;

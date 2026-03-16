@@ -9,6 +9,7 @@ import TopBlogs from "./TopBlogs";
 import FeaturedBanner from "./FeaturedBanner";
 import TopCourses from "./TopCourses";
 import TopRoadmaps from "./TopRoadmaps";
+import TopLearnedFlashcards from "./TopLearnedFlashcards";
 
 export {
   StatCard,
@@ -22,4 +23,5 @@ export {
   FeaturedBanner,
   TopCourses,
   TopRoadmaps,
+  TopLearnedFlashcards,
 };
