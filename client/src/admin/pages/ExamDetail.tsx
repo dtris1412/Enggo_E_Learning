@@ -14,6 +14,10 @@ import {
   AlertCircle,
   Save,
   X,
+  Upload,
+  Info,
+  Layers,
+  MessageSquare,
 } from "lucide-react";
 import { useExam } from "../contexts/examContext";
 import {
@@ -21,6 +25,7 @@ import {
   EditExamContainerModal,
   AddQuestionModal,
   AddExamMediaModal,
+  BulkQuestionImportModal,
 } from "../components/ExamManagement";
 
 const ExamDetail = () => {
@@ -53,6 +58,12 @@ const ExamDetail = () => {
     null,
   );
   const [isAddMediaModalOpen, setIsAddMediaModalOpen] = useState(false);
+  const [isBulkImportModalOpen, setIsBulkImportModalOpen] = useState(false);
+  const [bulkImportContainerId, setBulkImportContainerId] = useState<
+    number | null
+  >(null);
+  const [bulkImportContainerName, setBulkImportContainerName] = useState("");
+  const [showGuide, setShowGuide] = useState(true);
 
   // Inline quick add states
   const [showQuickAddOption, setShowQuickAddOption] = useState<number | null>(
@@ -349,17 +360,96 @@ const ExamDetail = () => {
       {/* Containers Section */}
       <div className="bg-white rounded-lg shadow p-6">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-bold text-gray-800">
-            Phần thi & Câu hỏi
-          </h2>
+          <div className="flex items-center gap-3">
+            <h2 className="text-lg font-bold text-gray-800">
+              Phần thi & Câu hỏi
+            </h2>
+            <button
+              onClick={() => setShowGuide(!showGuide)}
+              className="p-1 text-blue-600 hover:bg-blue-50 rounded-full transition-colors"
+              title="Xem hướng dẫn"
+            >
+              <Info className="w-5 h-5" />
+            </button>
+          </div>
           <button
             onClick={() => setIsAddContainerModalOpen(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            title="Thêm Part mới (Container)"
           >
             <Plus className="w-5 h-5" />
             Thêm phần thi
           </button>
         </div>
+
+        {/* Guide Panel */}
+        {showGuide && (
+          <div className="mb-6 bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 border-blue-500 p-4 rounded-lg">
+            <div className="flex items-start gap-3">
+              <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <h3 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
+                  📋 Hướng dẫn tổ chức câu hỏi
+                </h3>
+                <div className="text-sm text-gray-700 space-y-2">
+                  <div className="flex items-start gap-2">
+                    <FileText className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <strong className="text-blue-700">
+                        Part đơn giản (Part 1, 2, 5):
+                      </strong>
+                      <br />
+                      <span className="text-gray-600">
+                        1 Container = Cả Part → Bulk import tất cả câu hỏi vào 1
+                        lần
+                      </span>
+                      <br />
+                      <span className="text-xs text-gray-500">
+                        Type:{" "}
+                        <code className="bg-blue-100 px-1 rounded">
+                          toeic_single
+                        </code>
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Layers className="w-4 h-4 text-purple-600 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <strong className="text-purple-700">
+                        Part có nhóm (Part 3, 4, 6, 7):
+                      </strong>
+                      <br />
+                      <span className="text-gray-600">
+                        1 Container = 1 Passage/Conversation → Bulk import 2-5
+                        câu
+                      </span>
+                      <br />
+                      <span className="text-xs text-gray-500">
+                        Type:{" "}
+                        <code className="bg-purple-100 px-1 rounded">
+                          toeic_group
+                        </code>{" "}
+                        | Part 3: 13 containers × 3 câu | Part 4: 10 containers
+                        × 3 câu
+                      </span>
+                    </div>
+                  </div>
+                  <div className="mt-3 pt-2 border-t border-blue-200 text-xs text-gray-600">
+                    💡 <strong>Ví dụ:</strong> Part 3 (Questions 32-70) = Tạo 13
+                    Containers, mỗi Container gắn audio riêng + bulk import 3
+                    câu
+                  </div>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowGuide(false)}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+        )}
 
         {error && (
           <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg">
@@ -466,7 +556,15 @@ const ExamDetail = () => {
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-2">
                             <h3 className="text-lg font-bold text-gray-800">
-                              Part {index + 1}
+                              {container.instruction
+                                ? container.instruction
+                                    .split("\n")[0]
+                                    .substring(0, 80) +
+                                  (container.instruction.split("\n")[0].length >
+                                  80
+                                    ? "..."
+                                    : "")
+                                : `Part ${index + 1}`}
                             </h3>
                             {container.skill && (
                               <span
@@ -475,18 +573,30 @@ const ExamDetail = () => {
                                 {container.skill.toUpperCase()}
                               </span>
                             )}
-                            <span className="px-2 py-0.5 bg-gray-200 text-gray-700 text-xs rounded">
-                              {container.type}
-                            </span>
+                            {container.type === "toeic_group" ? (
+                              <span className="px-2 py-0.5 bg-purple-100 text-purple-700 text-xs font-medium rounded border border-purple-300 flex items-center gap-1">
+                                <Layers className="w-3 h-3" />
+                                Group (Nhóm câu)
+                              </span>
+                            ) : (
+                              <span className="px-2 py-0.5 bg-gray-100 text-gray-700 text-xs font-medium rounded border border-gray-300 flex items-center gap-1">
+                                <FileText className="w-3 h-3" />
+                                Single (Độc lập)
+                              </span>
+                            )}
                             {container.audio_url && (
                               <Music className="w-4 h-4 text-purple-500" />
                             )}
                           </div>
-                          {container.instruction && (
-                            <p className="text-sm text-gray-600 line-clamp-1">
-                              {container.instruction}
-                            </p>
-                          )}
+                          {container.instruction &&
+                            container.instruction.split("\n").length > 1 && (
+                              <p className="text-sm text-gray-600 line-clamp-1">
+                                {container.instruction
+                                  .split("\n")
+                                  .slice(1)
+                                  .join(" ")}
+                              </p>
+                            )}
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
@@ -495,9 +605,33 @@ const ExamDetail = () => {
                             handleAddQuestion(container.container_id)
                           }
                           className="flex items-center gap-1 px-3 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                          title="Thêm từng câu hỏi"
                         >
                           <Plus className="w-4 h-4" />
                           Câu hỏi
+                        </button>
+                        <button
+                          onClick={() => {
+                            setBulkImportContainerId(container.container_id);
+                            // Show instruction or content preview for better context
+                            const displayName = container.instruction
+                              ? container.instruction.substring(0, 50) +
+                                (container.instruction.length > 50 ? "..." : "")
+                              : `Part ${index + 1} - ${container.skill || container.type}`;
+                            setBulkImportContainerName(displayName);
+                            setIsBulkImportModalOpen(true);
+                          }}
+                          className="flex items-center gap-1 px-3 py-1.5 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors shadow-sm"
+                          title={
+                            container.type === "toeic_group"
+                              ? "Import 2-5 câu cho passage này"
+                              : "Import nhiều câu hỏi cùng lúc"
+                          }
+                        >
+                          <Upload className="w-4 h-4" />
+                          {container.type === "toeic_group"
+                            ? "Bulk (Nhóm)"
+                            : "Bulk"}
                         </button>
                         <button
                           onClick={() => handleEditContainer(container)}
@@ -557,6 +691,29 @@ const ExamDetail = () => {
                   {/* Container Content */}
                   {expandedContainers.includes(container.container_id) && (
                     <div className="p-6 bg-white">
+                      {/* Container Type Indicator */}
+                      {container.type === "toeic_group" && (
+                        <div className="mb-4 bg-purple-50 border-l-4 border-purple-500 p-3 rounded">
+                          <div className="flex items-start gap-2 text-sm">
+                            <MessageSquare className="w-4 h-4 text-purple-600 flex-shrink-0 mt-0.5" />
+                            <div className="text-purple-800">
+                              <strong>Container nhóm:</strong> Các câu hỏi trong
+                              phần này chia sẻ chung{" "}
+                              {container.skill === "listening"
+                                ? "audio"
+                                : "passage"}{" "}
+                              bên dưới.
+                              {container.skill === "listening" &&
+                                !container.audio_url && (
+                                  <span className="ml-1 text-orange-600">
+                                    ⚠️ Chưa có audio - hãy Edit container để
+                                    thêm!
+                                  </span>
+                                )}
+                            </div>
+                          </div>
+                        </div>
+                      )}
                       {/* Audio if exists */}
                       {container.audio_url && (
                         <div className="bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 p-4 rounded-lg mb-4">
@@ -877,6 +1034,158 @@ const ExamDetail = () => {
                           </button>
                         </div>
                       )}
+
+                      {/* Children Containers (for Part 3,4,6,7) */}
+                      {container.children && container.children.length > 0 && (
+                        <div className="mt-6 space-y-3">
+                          <div className="flex items-center gap-2 text-sm font-semibold text-gray-700 border-t pt-4">
+                            <Layers className="w-4 h-4" />
+                            <span>Sub-containers (Conversations/Passages)</span>
+                          </div>
+                          {container.children.map(
+                            (child: any, childIndex: number) => {
+                              const childStats = getContainerStats(child);
+                              return (
+                                <div
+                                  key={child.container_id}
+                                  className="ml-8 border-l-4 border-purple-300 pl-4 bg-purple-50/30 rounded-r-lg p-4"
+                                >
+                                  <div className="flex items-start justify-between mb-3">
+                                    <div className="flex-1">
+                                      <h4 className="font-semibold text-gray-800 mb-1">
+                                        {child.instruction ||
+                                          `Container ${childIndex + 1}`}
+                                      </h4>
+                                      <div className="flex items-center gap-2 text-xs text-gray-600">
+                                        <HelpCircle className="w-3.5 h-3.5" />
+                                        <span>
+                                          {childStats.totalQuestions} câu hỏi
+                                        </span>
+                                        {child.audio_url && (
+                                          <Music className="w-3.5 h-3.5 text-purple-500" />
+                                        )}
+                                      </div>
+                                    </div>
+                                    <div className="flex items-center gap-1">
+                                      <button
+                                        onClick={() =>
+                                          handleAddQuestion(child.container_id)
+                                        }
+                                        className="flex items-center gap-1 px-2 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700"
+                                      >
+                                        <Plus className="w-3 h-3" />
+                                        Câu hỏi
+                                      </button>
+                                      <button
+                                        onClick={() => {
+                                          setBulkImportContainerId(
+                                            child.container_id,
+                                          );
+                                          setBulkImportContainerName(
+                                            child.instruction ||
+                                              `Container ${childIndex + 1}`,
+                                          );
+                                          setIsBulkImportModalOpen(true);
+                                        }}
+                                        className="flex items-center gap-1 px-2 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700"
+                                      >
+                                        <Upload className="w-3 h-3" />
+                                        Bulk
+                                      </button>
+                                      <button
+                                        onClick={() =>
+                                          handleEditContainer(child)
+                                        }
+                                        className="p-1 text-yellow-600 hover:bg-yellow-100 rounded"
+                                      >
+                                        <Edit className="w-3.5 h-3.5" />
+                                      </button>
+                                      <button
+                                        onClick={() =>
+                                          handleDeleteContainer(
+                                            child.container_id,
+                                          )
+                                        }
+                                        className="p-1 text-red-600 hover:bg-red-100 rounded"
+                                      >
+                                        <Trash2 className="w-3.5 h-3.5" />
+                                      </button>
+                                    </div>
+                                  </div>
+
+                                  {/* Child container content and questions */}
+                                  {child.audio_url && (
+                                    <div className="mb-3">
+                                      <audio controls className="w-full h-8">
+                                        <source src={child.audio_url} />
+                                      </audio>
+                                    </div>
+                                  )}
+                                  {child.content && (
+                                    <div className="bg-white border p-3 rounded mb-3 text-sm">
+                                      {child.content}
+                                    </div>
+                                  )}
+                                  {child.Container_Questions &&
+                                    child.Container_Questions.length > 0 && (
+                                      <div className="space-y-2">
+                                        {child.Container_Questions.map(
+                                          (cq: any, qIdx: number) => (
+                                            <div
+                                              key={cq.container_question_id}
+                                              className="bg-white border rounded p-3 text-sm"
+                                            >
+                                              <div className="flex items-start justify-between mb-2">
+                                                <span className="font-semibold text-gray-700">
+                                                  Q{qIdx + 1}:{" "}
+                                                  {
+                                                    cq.Question
+                                                      ?.question_content
+                                                  }
+                                                </span>
+                                                <button
+                                                  onClick={() =>
+                                                    handleDeleteQuestion(
+                                                      cq.container_question_id,
+                                                    )
+                                                  }
+                                                  className="text-red-600 hover:bg-red-50 p-1 rounded"
+                                                >
+                                                  <Trash2 className="w-3 h-3" />
+                                                </button>
+                                              </div>
+                                              {cq.Question_Options && (
+                                                <div className="space-y-1 ml-4">
+                                                  {cq.Question_Options.map(
+                                                    (opt: any) => (
+                                                      <div
+                                                        key={
+                                                          opt.question_option_id
+                                                        }
+                                                        className={`text-xs p-2 rounded ${
+                                                          opt.is_correct
+                                                            ? "bg-green-100 font-medium"
+                                                            : "bg-gray-50"
+                                                        }`}
+                                                      >
+                                                        {opt.label}.{" "}
+                                                        {opt.content}
+                                                      </div>
+                                                    ),
+                                                  )}
+                                                </div>
+                                              )}
+                                            </div>
+                                          ),
+                                        )}
+                                      </div>
+                                    )}
+                                </div>
+                              );
+                            },
+                          )}
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
@@ -938,6 +1247,22 @@ const ExamDetail = () => {
           onClose={() => setIsAddMediaModalOpen(false)}
           onSuccess={() => {
             setIsAddMediaModalOpen(false);
+            loadExamData();
+          }}
+        />
+      )}
+
+      {isBulkImportModalOpen && bulkImportContainerId && (
+        <BulkQuestionImportModal
+          isOpen={isBulkImportModalOpen}
+          containerId={bulkImportContainerId}
+          containerName={bulkImportContainerName}
+          onClose={() => {
+            setIsBulkImportModalOpen(false);
+            setBulkImportContainerId(null);
+            setBulkImportContainerName("");
+          }}
+          onImportSuccess={() => {
             loadExamData();
           }}
         />

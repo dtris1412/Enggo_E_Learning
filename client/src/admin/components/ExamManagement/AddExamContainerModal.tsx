@@ -39,15 +39,25 @@ const AddExamContainerModal = ({
   });
 
   const [audioFile, setAudioFile] = useState<File | null>(null);
+  const [isParentContainer, setIsParentContainer] = useState(true);
+  const [parentId, setParentId] = useState<number | null>(null);
+  const [availableParents, setAvailableParents] = useState<any[]>([]);
 
   useEffect(() => {
     if (isOpen && examId) {
-      // Get current containers to set next order
+      // Get current containers to set next order and available parents
       getContainersByExamId(examId).then((containers) => {
         setFormData((prev) => ({
           ...prev,
           order: containers.length + 1,
         }));
+        // Only show containers that can be parents (Part 3,4,6,7 type)
+        const potentialParents = containers.filter(
+          (c: any) =>
+            c.type === "toeic_group" &&
+            (c.skill === "listening" || c.skill === "reading"),
+        );
+        setAvailableParents(potentialParents);
       });
     }
   }, [isOpen, examId]);
@@ -92,6 +102,7 @@ const AddExamContainerModal = ({
       instruction: formData.instruction || undefined,
       audio_url: uploadedAudioUrl || undefined,
       time_limit: formData.time_limit || undefined,
+      parent_id: isParentContainer ? undefined : parentId || undefined,
     });
 
     if (success) {
@@ -106,6 +117,8 @@ const AddExamContainerModal = ({
         time_limit: 0,
       });
       setAudioFile(null);
+      setIsParentContainer(true);
+      setParentId(null);
     }
   };
 
@@ -175,6 +188,62 @@ const AddExamContainerModal = ({
                 <option value="writing_task">Writing Task</option>
                 <option value="speaking_part">Speaking Part</option>
               </select>
+            </div>
+
+            {/* Parent Container Selection */}
+            <div className="bg-blue-50 border border-blue-200 p-4 rounded-lg">
+              <label className="flex items-center gap-2 mb-3">
+                <input
+                  type="checkbox"
+                  checked={isParentContainer}
+                  onChange={(e) => {
+                    setIsParentContainer(e.target.checked);
+                    if (e.target.checked) setParentId(null);
+                  }}
+                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                />
+                <span className="text-sm font-medium text-gray-800">
+                  Tạo Part mới (Parent Container)
+                </span>
+              </label>
+              <p className="text-xs text-gray-600 mb-2">
+                ✓ Check: Tạo Part mới (VD: Part 3, Part 4, Part 6, Part 7)
+                <br />✗ Uncheck: Tạo Container con (VD: Conversation 1, 2, 3...)
+              </p>
+
+              {!isParentContainer && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Chọn Part cha <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    value={parentId || ""}
+                    onChange={(e) =>
+                      setParentId(
+                        e.target.value ? parseInt(e.target.value) : null,
+                      )
+                    }
+                    required={!isParentContainer}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="">-- Chọn Part cha --</option>
+                    {availableParents.map((parent) => (
+                      <option
+                        key={parent.container_id}
+                        value={parent.container_id}
+                      >
+                        {parent.instruction ||
+                          `Part ${parent.order} - ${parent.skill}`}
+                      </option>
+                    ))}
+                  </select>
+                  {availableParents.length === 0 && (
+                    <p className="mt-1 text-xs text-yellow-600">
+                      ⚠️ Chưa có Part nào. Hãy tạo Parent Container trước!
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Content */}

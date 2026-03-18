@@ -145,6 +145,7 @@ interface ExamContextType {
     image_url?: string;
     audio_url?: string;
     time_limit?: number;
+    parent_id?: number;
   }) => Promise<boolean>;
   updateExamContainer: (
     container_id: number,
@@ -489,6 +490,7 @@ export const ExamProvider = ({ children }: { children: ReactNode }) => {
     image_url?: string;
     audio_url?: string;
     time_limit?: number;
+    parent_id?: number;
   }): Promise<boolean> => {
     setLoading(true);
     setError(null);
@@ -1017,10 +1019,31 @@ export const ExamProvider = ({ children }: { children: ReactNode }) => {
       });
 
       const result = await response.json();
+      console.log("Upload exam images response:", result);
+
       if (result.success) {
-        return result.data.urls;
+        // API returns array of {url, publicId, width, height}
+        // or single object for 1 file
+        if (Array.isArray(result.data)) {
+          const urls = result.data.map((item: any) => item.url);
+          console.log("Extracted URLs from array:", urls);
+          return urls;
+        } else if (result.data && result.data.url) {
+          // Single file uploaded - wrap in array
+          console.log("Single file URL:", result.data.url);
+          return [result.data.url];
+        } else if (result.data && result.data.urls) {
+          // Legacy format
+          console.log("URLs from legacy format:", result.data.urls);
+          return result.data.urls;
+        } else {
+          console.error("Unexpected response format:", result);
+          setError("Unexpected response format from server");
+          return null;
+        }
       } else {
         setError(result.message);
+        console.error("Upload failed:", result.message);
         return null;
       }
     } catch (err: any) {

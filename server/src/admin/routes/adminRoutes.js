@@ -286,6 +286,7 @@ import {
   addQuestionToContainer,
   removeQuestionFromContainer,
   updateQuestionOrderInContainer,
+  addMultipleQuestionsToContainer,
 } from "../controllers/containerQuestionController.js";
 
 import {
@@ -1313,6 +1314,12 @@ const initAdminRoutes = (app) => {
     verifyToken,
     requireAdmin,
     addQuestionToContainer,
+  );
+  router.post(
+    "/api/admin/container-questions/bulk",
+    verifyToken,
+    requireAdmin,
+    addMultipleQuestionsToContainer,
   );
   router.delete(
     "/api/admin/container-questions/:container_question_id",

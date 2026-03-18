@@ -22,6 +22,7 @@ const createExamContainer = async (req, res) => {
       image_url,
       audio_url,
       time_limit,
+      parent_id,
     } = req.body;
 
     const result = await createExamContainerService(
@@ -34,6 +35,7 @@ const createExamContainer = async (req, res) => {
       image_url,
       audio_url,
       time_limit,
+      parent_id,
     );
 
     if (!result.success) {
@@ -59,6 +61,7 @@ const updateExamContainer = async (req, res) => {
       image_url,
       audio_url,
       time_limit,
+      parent_id,
     } = req.body;
 
     const result = await updateExamContainerService(
@@ -71,6 +74,7 @@ const updateExamContainer = async (req, res) => {
       image_url,
       audio_url,
       time_limit,
+      parent_id,
     );
 
     if (!result.success) {

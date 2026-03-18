@@ -9,6 +9,15 @@ export default (sequelize, DataTypes) => {
       Exam_Container.hasMany(models.Container_Question, {
         foreignKey: "container_id",
       });
+      // Self-referencing: parent-child containers
+      Exam_Container.belongsTo(Exam_Container, {
+        as: "parent",
+        foreignKey: "parent_id",
+      });
+      Exam_Container.hasMany(Exam_Container, {
+        as: "children",
+        foreignKey: "parent_id",
+      });
     }
   }
   Exam_Container.init(
@@ -22,6 +31,11 @@ export default (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: { model: "exams", key: "exam_id" },
+      },
+      parent_id: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        references: { model: "exam_containers", key: "container_id" },
       },
       skill: {
         type: DataTypes.ENUM("listening", "reading", "writing", "speaking"),

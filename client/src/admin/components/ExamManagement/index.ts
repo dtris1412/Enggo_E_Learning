@@ -5,3 +5,4 @@ export { default as EditExamContainerModal } from "./EditExamContainerModal";
 export { default as AddQuestionModal } from "./AddQuestionModal";
 export { default as AddQuestionOptionModal } from "./AddQuestionOptionModal";
 export { default as AddExamMediaModal } from "./AddExamMediaModal";
+export { default as BulkQuestionImportModal } from "./BulkQuestionImportModal";

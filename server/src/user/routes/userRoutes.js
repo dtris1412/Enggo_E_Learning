@@ -139,6 +139,25 @@ import {
   resetFlashcardSetProgress,
 } from "../controllers/flashcardProgressController.js";
 
+// ===========Exam Controllers===========
+import {
+  getExamsPaginated,
+  getExamById,
+  getExamForTaking,
+  getUserExamHistory,
+} from "../controllers/examController.js";
+
+// ===========User Exam Controllers===========
+import {
+  startExam,
+  saveAnswers,
+  submitExam,
+  getExamResult,
+  getExamAttemptDetail,
+  abandonExam,
+  getOngoingExam,
+} from "../controllers/userExamController.js";
+
 const router = express.Router();
 
 const initUserRoutes = (app) => {
@@ -588,6 +607,86 @@ const initUserRoutes = (app) => {
     verifyToken,
     requireUser,
     resetFlashcardSetProgress,
+  );
+
+  // ===========Exam Routes===========
+  // List all exams (public)
+  router.get("/api/user/exams", getExamsPaginated);
+
+  // Get exam basic info (public)
+  router.get("/api/user/exams/:exam_id", getExamById);
+
+  // Get exam for taking (includes questions but not answers) (auth required)
+  router.get(
+    "/api/user/exams/:exam_id/take",
+    verifyToken,
+    requireUser,
+    getExamForTaking,
+  );
+
+  // Get user exam history (auth required)
+  router.get(
+    "/api/user/exams/history",
+    verifyToken,
+    requireUser,
+    getUserExamHistory,
+  );
+
+  // ===========User Exam Routes (Taking Exams)===========
+  // Start a new exam (auth required)
+  router.post(
+    "/api/user/user-exams/start",
+    verifyToken,
+    requireUser,
+    startExam,
+  );
+
+  // Save answers during exam (auth required)
+  router.post(
+    "/api/user/user-exams/save-answers",
+    verifyToken,
+    requireUser,
+    saveAnswers,
+  );
+
+  // Submit exam for grading (auth required)
+  router.post(
+    "/api/user/user-exams/submit",
+    verifyToken,
+    requireUser,
+    submitExam,
+  );
+
+  // Get exam result (auth required)
+  router.get(
+    "/api/user/user-exams/:user_exam_id/result",
+    verifyToken,
+    requireUser,
+    getExamResult,
+  );
+
+  // Get exam attempt detail (auth required)
+  router.get(
+    "/api/user/user-exams/:user_exam_id/detail",
+    verifyToken,
+    requireUser,
+    getExamAttemptDetail,
+  );
+
+  // Abandon exam (delete unfinished exam) (auth required)
+  router.delete(
+    "/api/user/user-exams/:user_exam_id/abandon",
+    verifyToken,
+    requireUser,
+    abandonExam,
+  );
+
+  // Get ongoing exam (auth required)
+  router.get(
+    "/api/user/user-exams/ongoing",
+    verifyToken,
+    requireUser,
+    getOngoingExam,
   );
 
   app.use("/", router);

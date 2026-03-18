@@ -15,6 +15,7 @@ const createExamContainer = async (
   image_url,
   audio_url,
   time_limit,
+  parent_id = null,
 ) => {
   if (!exam_id || !type || !order) {
     return { success: false, message: "Required fields are missing." };
@@ -23,6 +24,14 @@ const createExamContainer = async (
   const exam = await db.Exam.findByPk(exam_id);
   if (!exam) {
     return { success: false, message: "Exam not found." };
+  }
+
+  // If parent_id provided, verify it exists
+  if (parent_id) {
+    const parentContainer = await db.Exam_Container.findByPk(parent_id);
+    if (!parentContainer) {
+      return { success: false, message: "Parent container not found." };
+    }
   }
 
   const newContainer = await db.Exam_Container.create({
@@ -35,6 +44,7 @@ const createExamContainer = async (
     image_url,
     audio_url,
     time_limit,
+    parent_id,
     created_at: new Date(),
     updated_at: new Date(),
   });
@@ -56,6 +66,7 @@ const updateExamContainer = async (
   image_url,
   audio_url,
   time_limit,
+  parent_id,
 ) => {
   if (!container_id) {
     return { success: false, message: "Container ID is required." };
@@ -64,6 +75,14 @@ const updateExamContainer = async (
   const container = await db.Exam_Container.findByPk(container_id);
   if (!container) {
     return { success: false, message: "Container not found." };
+  }
+
+  // If parent_id provided, verify it exists
+  if (parent_id) {
+    const parentContainer = await db.Exam_Container.findByPk(parent_id);
+    if (!parentContainer) {
+      return { success: false, message: "Parent container not found." };
+    }
   }
 
   await container.update({
@@ -75,6 +94,7 @@ const updateExamContainer = async (
     image_url,
     audio_url,
     time_limit,
+    parent_id,
     updated_at: new Date(),
   });
 
@@ -108,9 +128,38 @@ const getContainersByExamId = async (exam_id) => {
     return { success: false, message: "Exam ID is required." };
   }
 
+  // Only get parent containers (parent_id is null)
   const containers = await db.Exam_Container.findAll({
-    where: { exam_id },
+    where: { exam_id, parent_id: null },
     include: [
+      {
+        model: db.Exam_Container,
+        as: "children",
+        include: [
+          {
+            model: db.Container_Question,
+            include: [
+              {
+                model: db.Question,
+                attributes: ["question_id", "question_content", "explanation"],
+              },
+              {
+                model: db.Question_Option,
+                attributes: [
+                  "question_option_id",
+                  "label",
+                  "content",
+                  "is_correct",
+                  "order_index",
+                ],
+                order: [["order_index", "ASC"]],
+              },
+            ],
+            order: [["order", "ASC"]],
+          },
+        ],
+        order: [["order", "ASC"]],
+      },
       {
         model: db.Container_Question,
         include: [
