@@ -77,6 +77,9 @@ const ExamHistory: React.FC = () => {
   // Filter and sort history
   const filteredHistory = history
     .filter((attempt) => {
+      // Skip if exam was deleted
+      if (!attempt.Exam) return false;
+
       // Search filter
       const matchesSearch =
         searchTerm === "" ||
@@ -314,10 +317,10 @@ const ExamHistory: React.FC = () => {
                           <FileText className="w-6 h-6 text-blue-600 flex-shrink-0 mt-0.5" />
                           <div>
                             <h3 className="text-xl font-semibold text-gray-900 mb-1">
-                              {attempt.Exam.exam_title}
+                              {attempt.Exam?.exam_title || "Deleted Exam"}
                             </h3>
                             <p className="text-sm text-gray-600">
-                              Code: {attempt.Exam.exam_code}
+                              Code: {attempt.Exam?.exam_code || "N/A"}
                             </p>
                           </div>
                         </div>
@@ -425,7 +428,9 @@ const ExamHistory: React.FC = () => {
                       </button>
                       <button
                         onClick={() => navigate(`/exams/${attempt.exam_id}`)}
-                        className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                        className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+                        disabled={!attempt.Exam}
+                        title={!attempt.Exam ? "Exam has been deleted" : ""}
                       >
                         View Exam
                       </button>

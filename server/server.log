@@ -1,0 +1,153 @@
+
+> server@1.0.0 dev
+> nodemon src/server.js
+
+[33m[nodemon] 3.1.11[39m
+[33m[nodemon] to restart at any time, enter `rs`[39m
+[33m[nodemon] watching path(s): *.*[39m
+[33m[nodemon] watching extensions: js,mjs,cjs,json[39m
+[32m[nodemon] starting `node src/server.js`[39m
+Cloudinary config: damxodpnw 957996155972897
+node:events:497
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::8080
+    at Server.setupListenHandle [as _listen2] (node:net:1904:16)
+    at listenInCluster (node:net:1961:12)
+    at Server.listen (node:net:2063:7)
+    at Function.listen (C:\CODE\E_LEARNING\server\node_modules\express\lib\application.js:635:24)
+    at file:///C:/CODE/E_LEARNING/server/src/server.js:62:5
+Emitted 'error' event on Server instance at:
+    at emitErrorNT (node:net:1940:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:82:21) {
+  code: 'EADDRINUSE',
+  errno: -4091,
+  syscall: 'listen',
+  address: '::',
+  port: 8080
+}
+
+Node.js v20.18.0
+[31m[nodemon] app crashed - waiting for file changes before starting...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/server.js`[39m
+Cloudinary config: damxodpnw 957996155972897
+Server running on port 8080
+Environment: development
+✅ Database connected successfully
+   Database: enggo_db
+   Host: 127.0.0.1
+   Environment: development
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/server.js`[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/server.js`[39m
+Cloudinary config: damxodpnw 957996155972897
+Server running on port 8080
+Environment: development
+✅ Database connected successfully
+   Database: enggo_db
+   Host: 127.0.0.1
+   Environment: development
+[verifyToken] Checking authorization for: GET /api/user/subscriptions/active
+Token decoded successfully: { user_id: 4, role: 2 }
+[requireRole] Checking role: {
+  user: { user_id: 4, role: 2 },
+  allowedRoles: [ 2 ],
+  url: '/api/user/subscriptions/active'
+}
+[requireRole] Access granted
+[verifyToken] Checking authorization for: GET /api/user/subscriptions/active
+Token decoded successfully: { user_id: 4, role: 2 }
+[requireRole] Checking role: {
+  user: { user_id: 4, role: 2 },
+  allowedRoles: [ 2 ],
+  url: '/api/user/subscriptions/active'
+}
+[requireRole] Access granted
+[verifyToken] Checking authorization for: POST /api/user/user-exams/start
+Token decoded successfully: { user_id: 4, role: 2 }
+[requireRole] Checking role: {
+  user: { user_id: 4, role: 2 },
+  allowedRoles: [ 2 ],
+  url: '/api/user/user-exams/start'
+}
+[requireRole] Access granted
+[verifyToken] Checking authorization for: GET /api/user/user-exams/ongoing
+Token decoded successfully: { user_id: 4, role: 2 }
+[requireRole] Checking role: {
+  user: { user_id: 4, role: 2 },
+  allowedRoles: [ 2 ],
+  url: '/api/user/user-exams/ongoing'
+}
+[requireRole] Access granted
+[verifyToken] Checking authorization for: GET /api/user/user-exams/ongoing
+Token decoded successfully: { user_id: 4, role: 2 }
+[requireRole] Checking role: {
+  user: { user_id: 4, role: 2 },
+  allowedRoles: [ 2 ],
+  url: '/api/user/user-exams/ongoing'
+}
+[requireRole] Access granted
+[verifyToken] Checking authorization for: GET /api/user/exams/1/take?user_exam_id=16
+Token decoded successfully: { user_id: 4, role: 2 }
+[requireRole] Checking role: {
+  user: { user_id: 4, role: 2 },
+  allowedRoles: [ 2 ],
+  url: '/api/user/exams/1/take?user_exam_id=16'
+}
+[requireRole] Access granted
+[verifyToken] Checking authorization for: GET /api/user/exams/1/take?user_exam_id=16
+Token decoded successfully: { user_id: 4, role: 2 }
+[requireRole] Checking role: {
+  user: { user_id: 4, role: 2 },
+  allowedRoles: [ 2 ],
+  url: '/api/user/exams/1/take?user_exam_id=16'
+}
+[requireRole] Access granted
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/server.js`[39m
+Cloudinary config: damxodpnw 957996155972897
+node:events:497
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::8080
+    at Server.setupListenHandle [as _listen2] (node:net:1904:16)
+    at listenInCluster (node:net:1961:12)
+    at Server.listen (node:net:2063:7)
+    at Function.listen (C:\CODE\E_LEARNING\server\node_modules\express\lib\application.js:635:24)
+    at file:///C:/CODE/E_LEARNING/server/src/server.js:62:5
+Emitted 'error' event on Server instance at:
+    at emitErrorNT (node:net:1940:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:82:21) {
+  code: 'EADDRINUSE',
+  errno: -4091,
+  syscall: 'listen',
+  address: '::',
+  port: 8080
+}
+
+Node.js v20.18.0
+[31m[nodemon] app crashed - waiting for file changes before starting...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/server.js`[39m
+Cloudinary config: damxodpnw 957996155972897
+Server running on port 8080
+Environment: development
+✅ Database connected successfully
+   Database: enggo_db
+   Host: 127.0.0.1
+   Environment: development
+[32m[nodemon] restarting child process[39m
+[32m[nodemon] starting `node src/server.js`[39m
+Cloudinary config: damxodpnw 957996155972897
+Server running on port 8080
+Environment: development
+✅ Database connected successfully
+   Database: enggo_db
+   Host: 127.0.0.1
+   Environment: development
+^C

@@ -291,22 +291,32 @@ export const ExamProvider = ({ children }: { children: ReactNode }) => {
   // Get user exam history
   const getUserExamHistory = async (page = 1, limit = 10) => {
     try {
+      console.log("[Frontend] getUserExamHistory called with:", { page, limit });
+      
       const params = new URLSearchParams();
       params.append("page", page.toString());
       params.append("limit", limit.toString());
 
-      const response = await fetch(
-        `${API_URL}/user/exams/history?${params.toString()}`,
-        {
-          method: "GET",
-          headers: getAuthHeaders(),
-        },
-      );
+      const url = `${API_URL}/user/user-exams/history?${params.toString()}`;
+      console.log("[Frontend] Fetching URL:", url);
+      console.log("[Frontend] Auth headers:", getAuthHeaders());
 
+      const response = await fetch(url, {
+        method: "GET",
+        headers: getAuthHeaders(),
+        cache: "no-cache", // Disable cache
+      });
+
+      console.log("[Frontend] Response status:", response.status);
+      console.log("[Frontend] Response headers:", Object.fromEntries(response.headers.entries()));
+      
       const result = await response.json();
+      console.log("[Frontend] Response data:", result);
+      
       return result;
     } catch (err: any) {
-      console.error("Error fetching exam history:", err);
+      console.error("[Frontend] Error fetching exam history:", err);
+      console.error("[Frontend] Error stack:", err.stack);
       return { success: false, message: err.message };
     }
   };

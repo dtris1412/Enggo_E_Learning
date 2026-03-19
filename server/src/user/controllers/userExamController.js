@@ -6,6 +6,7 @@ import {
   getExamAttemptDetail as getExamAttemptDetailService,
   abandonExam as abandonExamService,
   getOngoingExam as getOngoingExamService,
+  getUserExamHistory as getUserExamHistoryService,
 } from "../services/userExamService.js";
 
 /**
@@ -143,6 +144,39 @@ const getOngoingExam = async (req, res) => {
   }
 };
 
+// Lấy lịch sử thi của user
+const getUserExamHistory = async (req, res) => {
+  try {
+    const user_id = req.user.user_id; // Lấy từ token
+    const { limit, page } = req.query;
+
+    console.log("[Controller] getUserExamHistory called:", {
+      user_id,
+      limit,
+      page,
+      hasUser: !!req.user,
+    });
+
+    const result = await getUserExamHistoryService(user_id, limit, page);
+
+    console.log("[Controller] Service returned:", {
+      success: result.success,
+      message: result.message,
+      dataCount: result.data?.length,
+    });
+
+    if (!result.success) {
+      console.error("[Controller] Returning 400 error:", result);
+      return res.status(400).json(result);
+    }
+
+    res.status(200).json(result);
+  } catch (err) {
+    console.error("Error in getUserExamHistory:", err);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
 export {
   startExam,
   saveAnswers,
@@ -151,4 +185,5 @@ export {
   getExamAttemptDetail,
   abandonExam,
   getOngoingExam,
+  getUserExamHistory,
 };

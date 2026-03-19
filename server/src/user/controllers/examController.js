@@ -2,7 +2,6 @@ import {
   getExamsPaginated as getExamsPaginatedService,
   getExamById as getExamByIdService,
   getExamForTaking as getExamForTakingService,
-  getUserExamHistory as getUserExamHistoryService,
 } from "../services/examService.js";
 
 /**
@@ -69,23 +68,4 @@ const getExamForTaking = async (req, res) => {
   }
 };
 
-// Lấy lịch sử thi của user
-const getUserExamHistory = async (req, res) => {
-  try {
-    const user_id = req.user.user_id; // Lấy từ token
-    const { limit, page } = req.query;
-
-    const result = await getUserExamHistoryService(user_id, limit, page);
-
-    if (!result.success) {
-      return res.status(400).json(result);
-    }
-
-    res.status(200).json(result);
-  } catch (err) {
-    console.error("Error in getUserExamHistory:", err);
-    res.status(500).json({ success: false, message: "Internal server error" });
-  }
-};
-
-export { getExamsPaginated, getExamById, getExamForTaking, getUserExamHistory };
+export { getExamsPaginated, getExamById, getExamForTaking };

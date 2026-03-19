@@ -7,9 +7,11 @@ import {
 
 // Middleware xác thực token
 export const verifyToken = (req, res, next) => {
+  console.log("[verifyToken] Checking authorization for:", req.method, req.url);
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    console.error("[verifyToken] No token provided");
     return res.status(401).json({
       success: false,
       message: "Access denied - No token provided",
@@ -112,7 +114,16 @@ export const optionalVerifyToken = (req, res, next) => {
 // Middleware phân quyền theo role
 export const requireRole = (...allowedRoles) => {
   return (req, res, next) => {
+    console.log("[requireRole] Checking role:", {
+      user: req.user
+        ? { user_id: req.user.user_id, role: req.user.role }
+        : null,
+      allowedRoles,
+      url: req.url,
+    });
+
     if (!req.user) {
+      console.error("[requireRole] No user in request");
       return res.status(401).json({
         success: false,
         message: "Unauthorized - No user information",
@@ -122,6 +133,10 @@ export const requireRole = (...allowedRoles) => {
     const userRole = req.user.role;
 
     if (!allowedRoles.includes(userRole)) {
+      console.error("[requireRole] User role not allowed:", {
+        userRole,
+        allowedRoles,
+      });
       return res.status(403).json({
         success: false,
         message:
@@ -129,6 +144,7 @@ export const requireRole = (...allowedRoles) => {
       });
     }
 
+    console.log("[requireRole] Access granted");
     next();
   };
 };

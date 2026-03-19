@@ -144,7 +144,6 @@ import {
   getExamsPaginated,
   getExamById,
   getExamForTaking,
-  getUserExamHistory,
 } from "../controllers/examController.js";
 
 // ===========User Exam Controllers===========
@@ -156,6 +155,7 @@ import {
   getExamAttemptDetail,
   abandonExam,
   getOngoingExam,
+  getUserExamHistory,
 } from "../controllers/userExamController.js";
 
 const router = express.Router();
@@ -624,15 +624,23 @@ const initUserRoutes = (app) => {
     getExamForTaking,
   );
 
+  // ===========User Exam Routes (Taking Exams)===========
   // Get user exam history (auth required)
   router.get(
-    "/api/user/exams/history",
+    "/api/user/user-exams/history",
+    (req, res, next) => {
+      console.log("=== EXAM HISTORY ROUTE HIT ===", {
+        method: req.method,
+        url: req.url,
+        headers: req.headers.authorization ? "Token present" : "No token",
+      });
+      next();
+    },
     verifyToken,
     requireUser,
     getUserExamHistory,
   );
 
-  // ===========User Exam Routes (Taking Exams)===========
   // Start a new exam (auth required)
   router.post(
     "/api/user/user-exams/start",

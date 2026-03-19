@@ -401,3 +401,119 @@ export const getOngoingExam = async (user_id) => {
     },
   };
 };
+
+// Lấy lịch sử thi của user
+export const getUserExamHistory = async (user_id, limit = 10, page = 1) => {
+  try {
+    console.log("[getUserExamHistory] Called with:", { user_id, limit, page });
+
+    if (!user_id) {
+      return { success: false, message: "User ID is required." };
+    }
+
+    const offset = (Number(page) - 1) * Number(limit);
+
+    const { count, rows } = await db.User_Exam.findAndCountAll({
+      where: { user_id },
+      include: [
+        {
+          model: db.Exam,
+          required: false, // Use LEFT JOIN to get all user_exams
+          attributes: [
+            "exam_id",
+            "exam_title",
+            "exam_code",
+            "exam_type",
+            "total_questions",
+          ],
+          include: [
+            {
+              model: db.Certificate,
+              attributes: ["certificate_id", "certificate_name"],
+            },
+          ],
+        },
+        {
+          model: db.User_Answer,
+          attributes: ["user_answer_id", "is_correct"],
+        },
+      ],
+      attributes: [
+        "user_exam_id",
+        "exam_id",
+        "started_at",
+        "submitted_at",
+        "status",
+        "total_score",
+        "selected_parts",
+      ],
+      limit: Number(limit),
+      offset,
+      order: [["started_at", "DESC"]],
+    });
+
+    console.log("[getUserExamHistory] Query results:", {
+      totalRows: rows.length,
+      count,
+      firstRow: rows[0]
+        ? {
+            user_exam_id: rows[0].user_exam_id,
+            hasExam: !!rows[0].Exam,
+          }
+        : null,
+    });
+
+    // Filter out user exams where the exam has been deleted
+    const validRows = rows.filter((userExam) => userExam.Exam !== null);
+
+    console.log("[getUserExamHistory] After filtering:", {
+      validRowsCount: validRows.length,
+    });
+
+    // Calculate statistics for each exam attempt
+    const examsWithStats = validRows.map((userExam) => {
+      const totalQuestions = userExam.User_Answers?.length || 0;
+      const correctAnswers =
+        userExam.User_Answers?.filter((ans) => ans.is_correct).length || 0;
+      const incorrectAnswers = totalQuestions - correctAnswers;
+      const percentage =
+        totalQuestions > 0 ? (correctAnswers / totalQuestions) * 100 : 0;
+
+      // Convert to plain object and add statistics
+      const examData = userExam.toJSON();
+      examData.statistics = {
+        total_questions: totalQuestions,
+        correct_answers: correctAnswers,
+        incorrect_answers: incorrectAnswers,
+        percentage: percentage.toFixed(2),
+      };
+      // Remove User_Answers from response as we only need the stats
+      delete examData.User_Answers;
+
+      return examData;
+    });
+
+    console.log("[getUserExamHistory] Success:", {
+      examsWithStatsCount: examsWithStats.length,
+    });
+
+    return {
+      success: true,
+      message: "User exam history retrieved successfully",
+      data: examsWithStats,
+      pagination: {
+        total: validRows.length,
+        page: Number(page),
+        limit: Number(limit),
+        totalPages: Math.ceil(validRows.length / Number(limit)),
+      },
+    };
+  } catch (error) {
+    console.error("[getUserExamHistory] ERROR:", error);
+    console.error("[getUserExamHistory] Error stack:", error.stack);
+    return {
+      success: false,
+      message: error.message || "Failed to get exam history",
+    };
+  }
+};
