@@ -141,8 +141,14 @@ const ExamDetail: React.FC = () => {
   const groupContainersBySkill = () => {
     if (!exam?.Exam_Containers) return {};
 
+    // Only show parent containers (parent_id is null or undefined)
+    const parentContainers = exam.Exam_Containers.filter(
+      (container: any) =>
+        container.parent_id === null || container.parent_id === undefined,
+    );
+
     const grouped: Record<string, any[]> = {};
-    exam.Exam_Containers.forEach((container: any) => {
+    parentContainers.forEach((container: any) => {
       const skill = container.skill || "General";
       if (!grouped[skill]) {
         grouped[skill] = [];
@@ -150,6 +156,20 @@ const ExamDetail: React.FC = () => {
       grouped[skill].push(container);
     });
     return grouped;
+  };
+
+  // Count questions including children containers
+  const getContainerQuestionCount = (container: any): number => {
+    let count = container.Container_Questions?.length || 0;
+
+    // Add questions from children
+    if (container.children && container.children.length > 0) {
+      container.children.forEach((child: any) => {
+        count += child.Container_Questions?.length || 0;
+      });
+    }
+
+    return count;
   };
 
   const getSkillColor = (skill: string) => {
@@ -456,7 +476,7 @@ const ExamDetail: React.FC = () => {
                                   </p>
                                 )}
                                 <p className="text-xs text-gray-500 mt-1">
-                                  {container.Container_Questions?.length || 0}{" "}
+                                  {getContainerQuestionCount(container)}{" "}
                                   questions
                                   {container.time_limit &&
                                     ` • ${container.time_limit} minutes`}
@@ -476,11 +496,13 @@ const ExamDetail: React.FC = () => {
                     <p className="text-sm text-blue-800">
                       <span className="font-semibold">Selected:</span>{" "}
                       {selectedContainers.length} part(s) •{" "}
-                      {exam.Exam_Containers.filter((c: any) =>
-                        selectedContainers.includes(c.container_id),
+                      {exam.Exam_Containers.filter(
+                        (c: any) =>
+                          selectedContainers.includes(c.container_id) &&
+                          (c.parent_id === null || c.parent_id === undefined),
                       ).reduce(
                         (sum: number, c: any) =>
-                          sum + (c.Container_Questions?.length || 0),
+                          sum + getContainerQuestionCount(c),
                         0,
                       )}{" "}
                       questions

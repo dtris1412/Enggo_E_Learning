@@ -95,11 +95,37 @@ export const getExamById = async (exam_id) => {
       },
       {
         model: db.Exam_Container,
-        attributes: ["container_id", "skill", "type", "order", "instruction"],
+        attributes: [
+          "container_id",
+          "skill",
+          "type",
+          "order",
+          "instruction",
+          "parent_id",
+          "content",
+        ],
         include: [
           {
             model: db.Container_Question,
             attributes: ["container_question_id"],
+          },
+          {
+            model: db.Exam_Container,
+            as: "children",
+            attributes: [
+              "container_id",
+              "skill",
+              "type",
+              "order",
+              "instruction",
+              "content",
+            ],
+            include: [
+              {
+                model: db.Container_Question,
+                attributes: ["container_question_id"],
+              },
+            ],
           },
         ],
         order: [["order", "ASC"]],
@@ -130,12 +156,21 @@ export const getExamById = async (exam_id) => {
 };
 
 // Lấy thông tin đầy đủ của đề thi để làm bài (không bao gồm is_correct trong options)
-export const getExamForTaking = async (exam_id) => {
+export const getExamForTaking = async (exam_id, user_exam_id = null) => {
   if (!exam_id) {
     return { success: false, message: "Exam ID is required." };
   }
 
-  const exam = await db.Exam.findByPk(exam_id, {
+  // Get selected parts if user_exam_id is provided
+  let selectedParts = null;
+  if (user_exam_id) {
+    const userExam = await db.User_Exam.findByPk(user_exam_id);
+    if (userExam && userExam.selected_parts) {
+      selectedParts = userExam.selected_parts;
+    }
+  }
+
+  const examQuery = {
     include: [
       {
         model: db.Certificate,
@@ -147,6 +182,10 @@ export const getExamForTaking = async (exam_id) => {
       },
       {
         model: db.Exam_Container,
+        where:
+          selectedParts && !selectedParts.includes("all")
+            ? { parent_id: null, container_id: selectedParts }
+            : { parent_id: null }, // Only get parent containers
         attributes: [
           "container_id",
           "skill",
@@ -157,8 +196,54 @@ export const getExamForTaking = async (exam_id) => {
           "image_url",
           "audio_url",
           "time_limit",
+          "parent_id",
         ],
         include: [
+          {
+            model: db.Exam_Container,
+            as: "children",
+            attributes: [
+              "container_id",
+              "skill",
+              "type",
+              "order",
+              "content",
+              "instruction",
+              "image_url",
+              "audio_url",
+              "time_limit",
+              "parent_id",
+            ],
+            include: [
+              {
+                model: db.Container_Question,
+                attributes: [
+                  "container_question_id",
+                  "order",
+                  "image_url",
+                  "score",
+                ],
+                include: [
+                  {
+                    model: db.Question,
+                    attributes: ["question_id", "question_content"],
+                  },
+                  {
+                    model: db.Question_Option,
+                    attributes: [
+                      "question_option_id",
+                      "label",
+                      "content",
+                      "order_index",
+                    ],
+                    order: [["order_index", "ASC"]],
+                  },
+                ],
+                order: [["order", "ASC"]],
+              },
+            ],
+            order: [["order", "ASC"]],
+          },
           {
             model: db.Container_Question,
             attributes: [
@@ -199,7 +284,9 @@ export const getExamForTaking = async (exam_id) => {
       "source",
       "total_questions",
     ],
-  });
+  };
+
+  const exam = await db.Exam.findByPk(exam_id, examQuery);
 
   if (!exam) {
     return { success: false, message: "Exam not found." };

@@ -116,7 +116,10 @@ interface ExamContextType {
     certificate_id?: number,
   ) => Promise<void>;
   getExamById: (exam_id: number) => Promise<Exam | null>;
-  getExamForTaking: (exam_id: number) => Promise<ExamForTaking | null>;
+  getExamForTaking: (
+    exam_id: number,
+    user_exam_id?: number,
+  ) => Promise<ExamForTaking | null>;
   getUserExamHistory: (
     page?: number,
     limit?: number,
@@ -252,32 +255,38 @@ export const ExamProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   // Get exam for taking (with questions but no answers)
-  const getExamForTaking = useCallback(async (exam_id: number) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await fetch(`${API_URL}/user/exams/${exam_id}/take`, {
-        method: "GET",
-        headers: getAuthHeaders(),
-      });
+  const getExamForTaking = useCallback(
+    async (exam_id: number, user_exam_id?: number) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const url = user_exam_id
+          ? `${API_URL}/user/exams/${exam_id}/take?user_exam_id=${user_exam_id}`
+          : `${API_URL}/user/exams/${exam_id}/take`;
+        const response = await fetch(url, {
+          method: "GET",
+          headers: getAuthHeaders(),
+        });
 
-      if (!response.ok) {
-        throw new Error("Failed to fetch exam for taking");
-      }
+        if (!response.ok) {
+          throw new Error("Failed to fetch exam for taking");
+        }
 
-      const result = await response.json();
-      if (result.success) {
-        return result.data;
+        const result = await response.json();
+        if (result.success) {
+          return result.data;
+        }
+        return null;
+      } catch (err: any) {
+        setError(err.message || "Failed to fetch exam for taking");
+        console.error("Error fetching exam for taking:", err);
+        return null;
+      } finally {
+        setLoading(false);
       }
-      return null;
-    } catch (err: any) {
-      setError(err.message || "Failed to fetch exam for taking");
-      console.error("Error fetching exam for taking:", err);
-      return null;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+    },
+    [],
+  );
 
   // Get user exam history
   const getUserExamHistory = async (page = 1, limit = 10) => {

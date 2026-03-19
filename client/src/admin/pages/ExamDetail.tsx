@@ -53,6 +53,9 @@ const ExamDetail = () => {
   const [isEditContainerModalOpen, setIsEditContainerModalOpen] =
     useState(false);
   const [selectedContainer, setSelectedContainer] = useState<any>(null);
+  const [addContainerParentId, setAddContainerParentId] = useState<
+    number | null
+  >(null);
   const [isAddQuestionModalOpen, setIsAddQuestionModalOpen] = useState(false);
   const [selectedContainerId, setSelectedContainerId] = useState<number | null>(
     null,
@@ -114,6 +117,11 @@ const ExamDetail = () => {
   const handleEditContainer = (container: any) => {
     setSelectedContainer(container);
     setIsEditContainerModalOpen(true);
+  };
+
+  const handleAddChildContainer = (parentContainerId: number) => {
+    setAddContainerParentId(parentContainerId);
+    setIsAddContainerModalOpen(true);
   };
 
   const handleAddQuestion = (containerId: number) => {
@@ -600,6 +608,20 @@ const ExamDetail = () => {
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
+                        {/* Add Container button - only for Part 3,4,6,7 that don't have parent */}
+                        {container.type === "toeic_group" &&
+                          !container.parent_id && (
+                            <button
+                              onClick={() =>
+                                handleAddChildContainer(container.container_id)
+                              }
+                              className="flex items-center gap-1 px-3 py-1.5 text-sm bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                              title="Thêm Conversation/Passage con"
+                            >
+                              <Layers className="w-4 h-4" />
+                              Container
+                            </button>
+                          )}
                         <button
                           onClick={() =>
                             handleAddQuestion(container.container_id)
@@ -740,8 +762,201 @@ const ExamDetail = () => {
                         </div>
                       )}
 
-                      {/* Questions */}
-                      {container.Container_Questions &&
+                      {/* Children Containers (for Part 3,4,6,7) - Must be inside expanded content */}
+                      {container.type === "toeic_group" &&
+                        !container.parent_id && (
+                          <>
+                            {container.children &&
+                            container.children.length > 0 ? (
+                              <div className="mb-6 space-y-3">
+                                <div className="flex items-center gap-2 text-sm font-semibold text-purple-700 border-t pt-4 bg-purple-50 px-3 py-2 rounded">
+                                  <Layers className="w-4 h-4" />
+                                  <span>
+                                    Sub-containers (Conversations/Passages)
+                                  </span>
+                                </div>
+                                {container.children.map(
+                                  (child: any, childIndex: number) => {
+                                    const childStats = getContainerStats(child);
+                                    return (
+                                      <div
+                                        key={child.container_id}
+                                        className="border-l-4 border-purple-400 pl-6 bg-gradient-to-r from-purple-50/50 to-transparent rounded-r-lg p-4"
+                                      >
+                                        <div className="flex items-start justify-between mb-3">
+                                          <div className="flex-1">
+                                            <h4 className="font-semibold text-gray-800 mb-1 flex items-center gap-2">
+                                              <MessageSquare className="w-4 h-4 text-purple-600" />
+                                              {child.instruction ||
+                                                `Container ${childIndex + 1}`}
+                                            </h4>
+                                            <div className="flex items-center gap-2 text-xs text-gray-600">
+                                              <HelpCircle className="w-3.5 h-3.5" />
+                                              <span>
+                                                {childStats.totalQuestions} câu
+                                                hỏi
+                                              </span>
+                                              {child.audio_url && (
+                                                <Music className="w-3.5 h-3.5 text-purple-500" />
+                                              )}
+                                            </div>
+                                          </div>
+                                          <div className="flex items-center gap-1">
+                                            <button
+                                              onClick={() =>
+                                                handleAddQuestion(
+                                                  child.container_id,
+                                                )
+                                              }
+                                              className="flex items-center gap-1 px-2 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700"
+                                            >
+                                              <Plus className="w-3 h-3" />
+                                              Câu hỏi
+                                            </button>
+                                            <button
+                                              onClick={() => {
+                                                setBulkImportContainerId(
+                                                  child.container_id,
+                                                );
+                                                setBulkImportContainerName(
+                                                  child.instruction ||
+                                                    `Container ${childIndex + 1}`,
+                                                );
+                                                setIsBulkImportModalOpen(true);
+                                              }}
+                                              className="flex items-center gap-1 px-2 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700"
+                                            >
+                                              <Upload className="w-3 h-3" />
+                                              Bulk
+                                            </button>
+                                            <button
+                                              onClick={() =>
+                                                handleEditContainer(child)
+                                              }
+                                              className="p-1 text-yellow-600 hover:bg-yellow-100 rounded"
+                                            >
+                                              <Edit className="w-3.5 h-3.5" />
+                                            </button>
+                                            <button
+                                              onClick={() =>
+                                                handleDeleteContainer(
+                                                  child.container_id,
+                                                )
+                                              }
+                                              className="p-1 text-red-600 hover:bg-red-100 rounded"
+                                            >
+                                              <Trash2 className="w-3.5 h-3.5" />
+                                            </button>
+                                          </div>
+                                        </div>
+
+                                        {/* Child container content and questions */}
+                                        {child.audio_url && (
+                                          <div className="mb-3">
+                                            <audio
+                                              controls
+                                              className="w-full h-8"
+                                            >
+                                              <source src={child.audio_url} />
+                                            </audio>
+                                          </div>
+                                        )}
+                                        {child.content && (
+                                          <div className="bg-white border p-3 rounded mb-3 text-sm">
+                                            {child.content}
+                                          </div>
+                                        )}
+                                        {child.Container_Questions &&
+                                          child.Container_Questions.length >
+                                            0 && (
+                                            <div className="space-y-2">
+                                              {child.Container_Questions.map(
+                                                (cq: any, qIdx: number) => (
+                                                  <div
+                                                    key={
+                                                      cq.container_question_id
+                                                    }
+                                                    className="bg-white border rounded p-3 text-sm"
+                                                  >
+                                                    <div className="flex items-start justify-between mb-2">
+                                                      <span className="font-semibold text-gray-700">
+                                                        Q{qIdx + 1}:{" "}
+                                                        {
+                                                          cq.Question
+                                                            ?.question_content
+                                                        }
+                                                      </span>
+                                                      <button
+                                                        onClick={() =>
+                                                          handleDeleteQuestion(
+                                                            cq.container_question_id,
+                                                          )
+                                                        }
+                                                        className="text-red-600 hover:bg-red-50 p-1 rounded"
+                                                      >
+                                                        <Trash2 className="w-3 h-3" />
+                                                      </button>
+                                                    </div>
+                                                    {cq.Question_Options && (
+                                                      <div className="space-y-1 ml-4">
+                                                        {cq.Question_Options.map(
+                                                          (opt: any) => (
+                                                            <div
+                                                              key={
+                                                                opt.question_option_id
+                                                              }
+                                                              className={`text-xs p-2 rounded ${
+                                                                opt.is_correct
+                                                                  ? "bg-green-100 font-medium"
+                                                                  : "bg-gray-50"
+                                                              }`}
+                                                            >
+                                                              {opt.label}.{" "}
+                                                              {opt.content}
+                                                            </div>
+                                                          ),
+                                                        )}
+                                                      </div>
+                                                    )}
+                                                  </div>
+                                                ),
+                                              )}
+                                            </div>
+                                          )}
+                                      </div>
+                                    );
+                                  },
+                                )}
+                              </div>
+                            ) : (
+                              <div className="mb-6 text-center py-8 bg-purple-50 rounded-lg border-2 border-dashed border-purple-300">
+                                <Layers className="w-10 h-10 text-purple-400 mx-auto mb-3" />
+                                <p className="text-gray-600 mb-2 font-medium">
+                                  Chưa có Container con (Conversations/Passages)
+                                </p>
+                                <p className="text-sm text-gray-500 mb-4">
+                                  Thêm containers con để nhóm câu hỏi theo từng
+                                  conversation hoặc passage
+                                </p>
+                                <button
+                                  onClick={() =>
+                                    handleAddChildContainer(
+                                      container.container_id,
+                                    )
+                                  }
+                                  className="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                                >
+                                  <Plus className="w-4 h-4" />
+                                  Thêm Container đầu tiên
+                                </button>
+                              </div>
+                            )}
+                          </>
+                        )}
+
+                      {/* Questions of Parent Container */}
+                      {!container.parent_id &&
+                      container.Container_Questions &&
                       container.Container_Questions.length > 0 ? (
                         <div className="space-y-6">
                           {container.Container_Questions.map(
@@ -1034,158 +1249,6 @@ const ExamDetail = () => {
                           </button>
                         </div>
                       )}
-
-                      {/* Children Containers (for Part 3,4,6,7) */}
-                      {container.children && container.children.length > 0 && (
-                        <div className="mt-6 space-y-3">
-                          <div className="flex items-center gap-2 text-sm font-semibold text-gray-700 border-t pt-4">
-                            <Layers className="w-4 h-4" />
-                            <span>Sub-containers (Conversations/Passages)</span>
-                          </div>
-                          {container.children.map(
-                            (child: any, childIndex: number) => {
-                              const childStats = getContainerStats(child);
-                              return (
-                                <div
-                                  key={child.container_id}
-                                  className="ml-8 border-l-4 border-purple-300 pl-4 bg-purple-50/30 rounded-r-lg p-4"
-                                >
-                                  <div className="flex items-start justify-between mb-3">
-                                    <div className="flex-1">
-                                      <h4 className="font-semibold text-gray-800 mb-1">
-                                        {child.instruction ||
-                                          `Container ${childIndex + 1}`}
-                                      </h4>
-                                      <div className="flex items-center gap-2 text-xs text-gray-600">
-                                        <HelpCircle className="w-3.5 h-3.5" />
-                                        <span>
-                                          {childStats.totalQuestions} câu hỏi
-                                        </span>
-                                        {child.audio_url && (
-                                          <Music className="w-3.5 h-3.5 text-purple-500" />
-                                        )}
-                                      </div>
-                                    </div>
-                                    <div className="flex items-center gap-1">
-                                      <button
-                                        onClick={() =>
-                                          handleAddQuestion(child.container_id)
-                                        }
-                                        className="flex items-center gap-1 px-2 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700"
-                                      >
-                                        <Plus className="w-3 h-3" />
-                                        Câu hỏi
-                                      </button>
-                                      <button
-                                        onClick={() => {
-                                          setBulkImportContainerId(
-                                            child.container_id,
-                                          );
-                                          setBulkImportContainerName(
-                                            child.instruction ||
-                                              `Container ${childIndex + 1}`,
-                                          );
-                                          setIsBulkImportModalOpen(true);
-                                        }}
-                                        className="flex items-center gap-1 px-2 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700"
-                                      >
-                                        <Upload className="w-3 h-3" />
-                                        Bulk
-                                      </button>
-                                      <button
-                                        onClick={() =>
-                                          handleEditContainer(child)
-                                        }
-                                        className="p-1 text-yellow-600 hover:bg-yellow-100 rounded"
-                                      >
-                                        <Edit className="w-3.5 h-3.5" />
-                                      </button>
-                                      <button
-                                        onClick={() =>
-                                          handleDeleteContainer(
-                                            child.container_id,
-                                          )
-                                        }
-                                        className="p-1 text-red-600 hover:bg-red-100 rounded"
-                                      >
-                                        <Trash2 className="w-3.5 h-3.5" />
-                                      </button>
-                                    </div>
-                                  </div>
-
-                                  {/* Child container content and questions */}
-                                  {child.audio_url && (
-                                    <div className="mb-3">
-                                      <audio controls className="w-full h-8">
-                                        <source src={child.audio_url} />
-                                      </audio>
-                                    </div>
-                                  )}
-                                  {child.content && (
-                                    <div className="bg-white border p-3 rounded mb-3 text-sm">
-                                      {child.content}
-                                    </div>
-                                  )}
-                                  {child.Container_Questions &&
-                                    child.Container_Questions.length > 0 && (
-                                      <div className="space-y-2">
-                                        {child.Container_Questions.map(
-                                          (cq: any, qIdx: number) => (
-                                            <div
-                                              key={cq.container_question_id}
-                                              className="bg-white border rounded p-3 text-sm"
-                                            >
-                                              <div className="flex items-start justify-between mb-2">
-                                                <span className="font-semibold text-gray-700">
-                                                  Q{qIdx + 1}:{" "}
-                                                  {
-                                                    cq.Question
-                                                      ?.question_content
-                                                  }
-                                                </span>
-                                                <button
-                                                  onClick={() =>
-                                                    handleDeleteQuestion(
-                                                      cq.container_question_id,
-                                                    )
-                                                  }
-                                                  className="text-red-600 hover:bg-red-50 p-1 rounded"
-                                                >
-                                                  <Trash2 className="w-3 h-3" />
-                                                </button>
-                                              </div>
-                                              {cq.Question_Options && (
-                                                <div className="space-y-1 ml-4">
-                                                  {cq.Question_Options.map(
-                                                    (opt: any) => (
-                                                      <div
-                                                        key={
-                                                          opt.question_option_id
-                                                        }
-                                                        className={`text-xs p-2 rounded ${
-                                                          opt.is_correct
-                                                            ? "bg-green-100 font-medium"
-                                                            : "bg-gray-50"
-                                                        }`}
-                                                      >
-                                                        {opt.label}.{" "}
-                                                        {opt.content}
-                                                      </div>
-                                                    ),
-                                                  )}
-                                                </div>
-                                              )}
-                                            </div>
-                                          ),
-                                        )}
-                                      </div>
-                                    )}
-                                </div>
-                              );
-                            },
-                          )}
-                        </div>
-                      )}
                     </div>
                   )}
                 </div>
@@ -1200,9 +1263,14 @@ const ExamDetail = () => {
         <AddExamContainerModal
           isOpen={isAddContainerModalOpen}
           examId={parseInt(examId)}
-          onClose={() => setIsAddContainerModalOpen(false)}
+          initialParentId={addContainerParentId}
+          onClose={() => {
+            setIsAddContainerModalOpen(false);
+            setAddContainerParentId(null);
+          }}
           onSuccess={() => {
             setIsAddContainerModalOpen(false);
+            setAddContainerParentId(null);
             loadExamData();
           }}
         />

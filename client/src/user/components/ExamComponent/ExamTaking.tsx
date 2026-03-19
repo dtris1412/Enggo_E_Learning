@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useExam } from "../../contexts/examContext";
 import { useToast } from "../../../shared/components/Toast/Toast";
@@ -9,10 +9,12 @@ import {
   AlertCircle,
   CheckCircle,
   Volume2,
+  VolumeX,
   ChevronLeft,
   ChevronRight,
-  List,
+  BookOpen,
   X,
+  LayoutGrid,
 } from "lucide-react";
 
 const ExamTaking: React.FC = () => {
@@ -36,10 +38,15 @@ const ExamTaking: React.FC = () => {
   const [timeRemaining, setTimeRemaining] = useState(0);
   const [isSaving, setIsSaving] = useState(false);
   const [showSubmitModal, setShowSubmitModal] = useState(false);
-  const [showQuestionNav, setShowQuestionNav] = useState(false);
+  const [showOverviewModal, setShowOverviewModal] = useState(false);
   const [autoSaveTimer, setAutoSaveTimer] = useState<NodeJS.Timeout | null>(
     null,
   );
+
+  // Audio player ref for persistent playback
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [isAudioPlaying, setIsAudioPlaying] = useState(false);
+  const [currentAudioUrl, setCurrentAudioUrl] = useState<string | null>(null);
 
   // Initialize exam
   useEffect(() => {
@@ -79,7 +86,7 @@ const ExamTaking: React.FC = () => {
         }
 
         // Fetch exam content
-        const examData = await getExamForTaking(parseInt(id));
+        const examData = await getExamForTaking(parseInt(id), examId);
         if (examData) {
           setExam(examData);
           setTimeRemaining(examData.exam_duration * 60); // Convert to seconds
@@ -134,6 +141,36 @@ const ExamTaking: React.FC = () => {
 
     return () => clearInterval(timer);
   }, [userExamId, answers, exam]);
+
+  // Handle audio playback - auto-play when container changes or exam loads
+  useEffect(() => {
+    const container = getCurrentContainer();
+    if (!container) return;
+
+    const audioUrl = getAudioUrl();
+
+    // If audio URL changed, update and auto-play
+    if (audioUrl && audioUrl !== currentAudioUrl) {
+      setCurrentAudioUrl(audioUrl);
+      if (audioRef.current) {
+        audioRef.current.src = audioUrl;
+        audioRef.current.load();
+        audioRef.current.play().catch((error) => {
+          console.log("Audio autoplay prevented:", error);
+          setIsAudioPlaying(false);
+        });
+        setIsAudioPlaying(true);
+      }
+    } else if (!audioUrl && currentAudioUrl) {
+      // No audio for this container
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.src = "";
+      }
+      setCurrentAudioUrl(null);
+      setIsAudioPlaying(false);
+    }
+  }, [currentContainerIndex, exam]);
 
   const handleSave = async (showNotification = true) => {
     if (!userExamId) return;
@@ -197,9 +234,28 @@ const ExamTaking: React.FC = () => {
     }));
   };
 
+  // Flatten containers to include children
+  const getFlattenedContainers = () => {
+    if (!exam || !exam.Exam_Containers) return [];
+
+    const flattened: any[] = [];
+    exam.Exam_Containers.forEach((container: any) => {
+      // For parent containers with children, add children only
+      if (container.children && container.children.length > 0) {
+        flattened.push(...container.children);
+      } else {
+        // For containers without children (Part 1, 2, 5), add the container itself
+        flattened.push(container);
+      }
+    });
+
+    return flattened;
+  };
+
   const getCurrentContainer = () => {
-    if (!exam || !exam.Exam_Containers) return null;
-    return exam.Exam_Containers[currentContainerIndex];
+    const containers = getFlattenedContainers();
+    if (containers.length === 0) return null;
+    return containers[currentContainerIndex];
   };
 
   const getCurrentQuestion = () => {
@@ -210,31 +266,33 @@ const ExamTaking: React.FC = () => {
 
   const handleNextQuestion = () => {
     const container = getCurrentContainer();
+    const containers = getFlattenedContainers();
     if (!container) return;
 
     if (currentQuestionIndex < container.Container_Questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
-    } else if (currentContainerIndex < exam.Exam_Containers.length - 1) {
+    } else if (currentContainerIndex < containers.length - 1) {
       setCurrentContainerIndex(currentContainerIndex + 1);
       setCurrentQuestionIndex(0);
     }
   };
 
   const handlePreviousQuestion = () => {
+    const containers = getFlattenedContainers();
     if (currentQuestionIndex > 0) {
       setCurrentQuestionIndex(currentQuestionIndex - 1);
     } else if (currentContainerIndex > 0) {
       setCurrentContainerIndex(currentContainerIndex - 1);
-      const prevContainer = exam.Exam_Containers[currentContainerIndex - 1];
+      const prevContainer = containers[currentContainerIndex - 1];
       setCurrentQuestionIndex(prevContainer.Container_Questions.length - 1);
     }
   };
 
   const getTotalQuestionsCount = () => {
-    if (!exam || !exam.Exam_Containers) return 0;
-    return exam.Exam_Containers.reduce(
+    const containers = getFlattenedContainers();
+    return containers.reduce(
       (total: number, container: any) =>
-        total + container.Container_Questions.length,
+        total + (container.Container_Questions?.length || 0),
       0,
     );
   };
@@ -244,12 +302,57 @@ const ExamTaking: React.FC = () => {
   };
 
   const getCurrentQuestionNumber = () => {
-    if (!exam || !exam.Exam_Containers) return 0;
+    const containers = getFlattenedContainers();
     let count = 0;
     for (let i = 0; i < currentContainerIndex; i++) {
-      count += exam.Exam_Containers[i].Container_Questions.length;
+      count += containers[i].Container_Questions?.length || 0;
     }
     return count + currentQuestionIndex + 1;
+  };
+
+  const toggleAudio = () => {
+    if (audioRef.current) {
+      if (isAudioPlaying) {
+        audioRef.current.pause();
+        setIsAudioPlaying(false);
+      } else {
+        audioRef.current.play();
+        setIsAudioPlaying(true);
+      }
+    }
+  };
+
+  const goToQuestion = (containerIdx: number, questionIdx: number) => {
+    setCurrentContainerIndex(containerIdx);
+    setCurrentQuestionIndex(questionIdx);
+  };
+
+  // Get parent container for audio (Part 3, 4 store audio in parent)
+  const getParentContainer = () => {
+    if (!exam || !exam.Exam_Containers) return null;
+
+    const currentContainer = getCurrentContainer();
+    if (!currentContainer) return null;
+
+    // If current container has parent_id, find the parent
+    if (currentContainer.parent_id) {
+      return exam.Exam_Containers.find(
+        (c: any) => c.container_id === currentContainer.parent_id,
+      );
+    }
+
+    return null;
+  };
+
+  // Get audio URL from parent or current container
+  const getAudioUrl = () => {
+    const parent = getParentContainer();
+    if (parent && parent.audio_url) {
+      return parent.audio_url;
+    }
+
+    const currentContainer = getCurrentContainer();
+    return currentContainer?.audio_url || null;
   };
 
   if (loading) {
@@ -289,65 +392,96 @@ const ExamTaking: React.FC = () => {
   const currentQuestionNumber = getCurrentQuestionNumber();
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Header - Fixed */}
-      <div className="bg-white border-b shadow-sm sticky top-0 z-10">
-        <div className="container mx-auto px-4 py-4">
+    <div className="min-h-screen bg-gray-50">
+      {/* Hidden audio element for persistent playback */}
+      <audio
+        ref={audioRef}
+        onPlay={() => setIsAudioPlaying(true)}
+        onPause={() => setIsAudioPlaying(false)}
+        onEnded={() => setIsAudioPlaying(false)}
+      />
+
+      {/* Fixed Header */}
+      <div className="bg-white border-b shadow-sm sticky top-0 z-20">
+        <div className="container mx-auto px-6 py-3">
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-lg font-bold text-gray-900">
-                {exam.exam_title}
-              </h1>
-              <p className="text-sm text-gray-600">
-                Question {currentQuestionNumber} of {totalQuestions}
-              </p>
+            {/* Exam Title */}
+            <div className="flex items-center gap-4">
+              <BookOpen className="w-5 h-5 text-blue-600" />
+              <div>
+                <h1 className="text-lg font-semibold text-gray-900">
+                  {exam.exam_title}
+                </h1>
+                <p className="text-xs text-gray-500">
+                  Question {currentQuestionNumber} of {totalQuestions}
+                </p>
+              </div>
             </div>
 
-            <div className="flex items-center gap-4">
+            {/* Header Actions */}
+            <div className="flex items-center gap-3">
+              {/* Audio Control */}
+              {currentAudioUrl && (
+                <button
+                  onClick={toggleAudio}
+                  className={`p-2 rounded-lg transition-colors ${
+                    isAudioPlaying
+                      ? "bg-purple-100 text-purple-700"
+                      : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                  }`}
+                  title={isAudioPlaying ? "Pause Audio" : "Play Audio"}
+                >
+                  {isAudioPlaying ? (
+                    <Volume2 className="w-5 h-5" />
+                  ) : (
+                    <VolumeX className="w-5 h-5" />
+                  )}
+                </button>
+              )}
+
               {/* Timer */}
               <div
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg ${
+                className={`flex items-center gap-2 px-3 py-2 rounded-lg font-mono text-sm font-semibold ${
                   timeRemaining < 300
                     ? "bg-red-100 text-red-700"
                     : "bg-blue-100 text-blue-700"
                 }`}
               >
-                <Clock className="w-5 h-5" />
-                <span className="font-mono font-bold">
-                  {formatTime(timeRemaining)}
+                <Clock className="w-4 h-4" />
+                {formatTime(timeRemaining)}
+              </div>
+
+              {/* Progress Indicator */}
+              <div className="hidden md:flex items-center gap-2 px-3 py-2 bg-green-50 rounded-lg">
+                <CheckCircle className="w-4 h-4 text-green-600" />
+                <span className="text-sm font-medium text-green-700">
+                  {answeredQuestions}/{totalQuestions}
                 </span>
               </div>
 
-              {/* Progress */}
-              <div className="hidden md:flex items-center gap-2 text-sm text-gray-600">
-                <CheckCircle className="w-5 h-5 text-green-500" />
-                <span>
-                  {answeredQuestions}/{totalQuestions} answered
-                </span>
-              </div>
-
-              {/* Question Navigator */}
+              {/* Overview Button */}
               <button
-                onClick={() => setShowQuestionNav(!showQuestionNav)}
+                onClick={() => setShowOverviewModal(true)}
                 className="p-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                title="Question Overview"
               >
-                <List className="w-5 h-5" />
+                <LayoutGrid className="w-5 h-5 text-gray-600" />
               </button>
 
-              {/* Save Button */}
+              {/* Save */}
               <button
                 onClick={() => handleSave(true)}
                 disabled={isSaving}
-                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 flex items-center gap-2"
+                className="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 flex items-center gap-2"
               >
                 <Save className="w-4 h-4" />
                 {isSaving ? "Saving..." : "Save"}
               </button>
 
-              {/* Submit Button */}
+              {/* Submit */}
               <button
                 onClick={() => setShowSubmitModal(true)}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+                className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
               >
                 <Send className="w-4 h-4" />
                 Submit
@@ -357,161 +491,264 @@ const ExamTaking: React.FC = () => {
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="flex-1 container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto">
-          {/* Container Info */}
-          {currentContainer && (
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-3">
-                  <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">
-                    {currentContainer.skill?.toUpperCase()}
-                  </span>
-                  <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm font-medium">
-                    {currentContainer.type}
-                  </span>
-                </div>
-                {currentContainer.audio_url && (
-                  <button className="flex items-center gap-2 px-4 py-2 bg-orange-100 text-orange-700 rounded-lg hover:bg-orange-200 transition-colors">
-                    <Volume2 className="w-4 h-4" />
-                    Play Audio
-                  </button>
-                )}
-              </div>
+      {/* Main Content - Two Column Layout */}
+      <div className="container mx-auto px-6 py-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* LEFT COLUMN - All Images & Content */}
+          <div>
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 sticky top-24 max-h-[calc(100vh-120px)] overflow-y-auto">
+              {currentContainer && (
+                <>
+                  {/* Container Header */}
+                  <div className="mb-4 pb-3 border-b">
+                    <span className="px-3 py-1 bg-blue-50 text-blue-700 text-sm font-semibold rounded uppercase">
+                      {currentContainer.skill || "Section"}
+                    </span>
+                    {currentContainer.instruction && (
+                      <p className="text-base font-medium text-gray-700 mt-2">
+                        {currentContainer.instruction}
+                      </p>
+                    )}
+                  </div>
 
-              {currentContainer.instruction && (
-                <div className="mb-4 p-4 bg-yellow-50 border-l-4 border-yellow-400">
-                  <p className="text-sm font-medium text-gray-900">
-                    {currentContainer.instruction}
-                  </p>
-                </div>
-              )}
-
-              {currentContainer.content && (
-                <div className="mb-4 p-4 bg-gray-50 rounded-lg">
-                  <p className="text-gray-800 whitespace-pre-wrap">
-                    {currentContainer.content}
-                  </p>
-                </div>
-              )}
-
-              {currentContainer.image_url && (
-                <div className="mb-4">
-                  <img
-                    src={currentContainer.image_url}
-                    alt="Container"
-                    className="max-w-full rounded-lg shadow-sm"
-                  />
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Question */}
-          {currentQuestion && (
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <div className="flex items-start gap-4 mb-6">
-                <span className="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold">
-                  {currentQuestionNumber}
-                </span>
-                <div className="flex-1">
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">
-                    {currentQuestion.Question.question_content}
-                  </h3>
-
-                  {currentQuestion.image_url && (
-                    <div className="mb-4">
+                  {/* Container Image - Enlarged */}
+                  {currentContainer.image_url && (
+                    <div className="mb-5">
                       <img
-                        src={currentQuestion.image_url}
-                        alt="Question"
-                        className="max-w-sm rounded-lg shadow-sm"
+                        src={currentContainer.image_url}
+                        alt="Test content"
+                        className="w-full rounded-lg border border-gray-200 shadow-sm"
                       />
                     </div>
                   )}
 
-                  {/* Options */}
-                  <div className="space-y-3">
-                    {currentQuestion.Question_Options.map((option: any) => {
-                      const isSelected =
-                        answers[currentQuestion.container_question_id] ===
-                        option.question_option_id;
+                  {/* Question Image - Enlarged */}
+                  {currentQuestion && currentQuestion.image_url && (
+                    <div className="mb-5">
+                      <p className="text-sm font-medium text-gray-600 mb-2">
+                        Question {currentQuestionNumber} Image:
+                      </p>
+                      <img
+                        src={currentQuestion.image_url}
+                        alt="Question"
+                        className="w-full rounded-lg border border-gray-200 shadow-sm"
+                      />
+                    </div>
+                  )}
 
-                      return (
-                        <button
-                          key={option.question_option_id}
-                          onClick={() =>
-                            handleAnswerSelect(
-                              currentQuestion.container_question_id,
-                              option.question_option_id,
-                            )
-                          }
-                          className={`w-full text-left p-4 rounded-lg border-2 transition-all ${
-                            isSelected
-                              ? "border-blue-500 bg-blue-50"
-                              : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
-                          }`}
-                        >
-                          <div className="flex items-start gap-3">
-                            <span
-                              className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center font-semibold ${
-                                isSelected
-                                  ? "bg-blue-600 text-white"
-                                  : "bg-gray-200 text-gray-700"
-                              }`}
-                            >
-                              {option.label}
-                            </span>
-                            <span className="flex-1 text-gray-900">
-                              {option.content}
-                            </span>
-                          </div>
-                        </button>
-                      );
-                    })}
+                  {/* Content/Paragraph */}
+                  {currentContainer.content && (
+                    <div className="prose prose-base max-w-none">
+                      <div className="text-gray-800 text-base leading-relaxed whitespace-pre-wrap">
+                        {currentContainer.content}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Empty state if no content */}
+                  {!currentContainer.image_url &&
+                    !currentContainer.content &&
+                    !currentQuestion?.image_url && (
+                      <div className="text-center py-12 text-gray-400">
+                        <BookOpen className="w-16 h-16 mx-auto mb-3 opacity-50" />
+                        <p className="text-sm">No visual content</p>
+                      </div>
+                    )}
+                </>
+              )}
+            </div>
+          </div>
+
+          {/* RIGHT COLUMN - Question & Answers */}
+          <div>
+            {currentQuestion && (
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                {/* Question */}
+                <div className="mb-6">
+                  <div className="flex items-start gap-4">
+                    <span className="flex-shrink-0 w-9 h-9 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                      {currentQuestionNumber}
+                    </span>
+                    <h3 className="flex-1 text-lg font-medium text-gray-900 leading-relaxed">
+                      {currentQuestion.Question.question_content}
+                    </h3>
                   </div>
                 </div>
-              </div>
 
-              {/* Navigation */}
-              <div className="flex items-center justify-between pt-6 border-t">
-                <button
-                  onClick={handlePreviousQuestion}
-                  disabled={
-                    currentContainerIndex === 0 && currentQuestionIndex === 0
-                  }
-                  className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                  Previous
-                </button>
+                {/* Answer Options */}
+                <div className="space-y-3">
+                  {currentQuestion.Question_Options.map((option: any) => {
+                    const isSelected =
+                      answers[currentQuestion.container_question_id] ===
+                      option.question_option_id;
 
-                <div className="text-sm text-gray-600">
-                  {answeredQuestions > 0 && (
-                    <span>
-                      {Math.round((answeredQuestions / totalQuestions) * 100)}%
-                      complete
-                    </span>
-                  )}
+                    return (
+                      <button
+                        key={option.question_option_id}
+                        onClick={() =>
+                          handleAnswerSelect(
+                            currentQuestion.container_question_id,
+                            option.question_option_id,
+                          )
+                        }
+                        className={`w-full text-left p-4 rounded-lg border-2 transition-all ${
+                          isSelected
+                            ? "border-blue-500 bg-blue-50 shadow-sm"
+                            : "border-gray-200 hover:border-blue-200 hover:bg-gray-50"
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <span
+                            className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${
+                              isSelected
+                                ? "bg-blue-600 text-white"
+                                : "bg-gray-100 text-gray-700"
+                            }`}
+                          >
+                            {option.label}
+                          </span>
+                          <span className="text-gray-800 text-base">
+                            {option.content}
+                          </span>
+                        </div>
+                      </button>
+                    );
+                  })}
                 </div>
 
-                <button
-                  onClick={handleNextQuestion}
-                  disabled={
-                    currentContainerIndex === exam.Exam_Containers.length - 1 &&
-                    currentQuestionIndex ===
-                      currentContainer.Container_Questions.length - 1
-                  }
-                  className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-                >
-                  Next
-                  <ChevronRight className="w-4 h-4" />
-                </button>
+                {/* Navigation Buttons */}
+                <div className="flex items-center justify-between mt-8 pt-6 border-t">
+                  <button
+                    onClick={handlePreviousQuestion}
+                    disabled={
+                      currentContainerIndex === 0 && currentQuestionIndex === 0
+                    }
+                    className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2 text-sm font-medium text-gray-700"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                    Previous
+                  </button>
+
+                  <div className="text-sm text-gray-500 font-medium">
+                    {Math.round((answeredQuestions / totalQuestions) * 100)}%
+                  </div>
+
+                  <button
+                    onClick={handleNextQuestion}
+                    disabled={
+                      currentContainerIndex ===
+                        getFlattenedContainers().length - 1 &&
+                      currentQuestionIndex ===
+                        (currentContainer?.Container_Questions?.length || 0) - 1
+                    }
+                    className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2 text-sm font-medium"
+                  >
+                    Next
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
+
+      {/* Question Overview Modal */}
+      {showOverviewModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full p-6 max-h-[85vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-bold text-gray-900">
+                Question Overview
+              </h3>
+              <button
+                onClick={() => setShowOverviewModal(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+
+            <div className="space-y-6">
+              {getFlattenedContainers().map(
+                (container: any, containerIdx: number) => {
+                  const containerQuestions =
+                    container.Container_Questions || [];
+                  if (containerQuestions.length === 0) return null;
+
+                  return (
+                    <div key={container.container_id}>
+                      <h4 className="text-sm font-semibold text-gray-900 mb-3">
+                        {container.instruction || `Section ${containerIdx + 1}`}{" "}
+                        - {container.skill?.toUpperCase()}
+                      </h4>
+                      <div className="grid grid-cols-10 gap-2">
+                        {containerQuestions.map(
+                          (question: any, questionIdx: number) => {
+                            const isAnswered =
+                              answers[question.container_question_id] !==
+                                null &&
+                              answers[question.container_question_id] !==
+                                undefined;
+                            const isCurrent =
+                              containerIdx === currentContainerIndex &&
+                              questionIdx === currentQuestionIndex;
+
+                            // Calculate global question number
+                            let globalNum = 0;
+                            for (let i = 0; i < containerIdx; i++) {
+                              globalNum +=
+                                getFlattenedContainers()[i].Container_Questions
+                                  ?.length || 0;
+                            }
+                            globalNum += questionIdx + 1;
+
+                            return (
+                              <button
+                                key={question.container_question_id}
+                                onClick={() => {
+                                  goToQuestion(containerIdx, questionIdx);
+                                  setShowOverviewModal(false);
+                                }}
+                                className={`w-12 h-12 rounded-lg text-sm font-semibold transition-all ${
+                                  isCurrent
+                                    ? "bg-blue-600 text-white shadow-md ring-2 ring-blue-300"
+                                    : isAnswered
+                                      ? "bg-green-100 text-green-700 hover:bg-green-200"
+                                      : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                                }`}
+                                title={`Question ${globalNum}${isAnswered ? " (Answered)" : ""}`}
+                              >
+                                {globalNum}
+                              </button>
+                            );
+                          },
+                        )}
+                      </div>
+                    </div>
+                  );
+                },
+              )}
+            </div>
+
+            {/* Legend */}
+            <div className="flex items-center gap-6 mt-6 pt-6 border-t">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 bg-blue-600 rounded-lg"></div>
+                <span className="text-sm text-gray-600">Current</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 bg-green-100 border border-green-200 rounded-lg"></div>
+                <span className="text-sm text-gray-600">Answered</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 bg-gray-100 border border-gray-200 rounded-lg"></div>
+                <span className="text-sm text-gray-600">Unanswered</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Submit Confirmation Modal */}
       {showSubmitModal && (
@@ -532,18 +769,18 @@ const ExamTaking: React.FC = () => {
                 Are you sure you want to submit your exam? You won't be able to
                 change your answers after submission.
               </p>
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
+              <div className="space-y-2 bg-gray-50 rounded-lg p-4">
+                <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Total Questions:</span>
                   <span className="font-semibold">{totalQuestions}</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Answered:</span>
                   <span className="font-semibold text-green-600">
                     {answeredQuestions}
                   </span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Unanswered:</span>
                   <span className="font-semibold text-red-600">
                     {totalQuestions - answeredQuestions}
@@ -565,70 +802,6 @@ const ExamTaking: React.FC = () => {
               >
                 Submit Exam
               </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Question Navigator Modal */}
-      {showQuestionNav && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full p-6 max-h-[80vh] overflow-y-auto">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-bold text-gray-900">
-                Question Navigator
-              </h3>
-              <button
-                onClick={() => setShowQuestionNav(false)}
-                className="text-gray-400 hover:text-gray-600"
-              >
-                <X className="w-6 h-6" />
-              </button>
-            </div>
-
-            <div className="space-y-4">
-              {exam.Exam_Containers.map(
-                (container: any, containerIdx: number) => (
-                  <div key={container.container_id}>
-                    <h4 className="font-semibold text-gray-900 mb-3">
-                      Part {containerIdx + 1} - {container.skill?.toUpperCase()}
-                    </h4>
-                    <div className="grid grid-cols-10 gap-2">
-                      {container.Container_Questions.map(
-                        (question: any, questionIdx: number) => {
-                          const isAnswered =
-                            answers[question.container_question_id] !== null &&
-                            answers[question.container_question_id] !==
-                              undefined;
-                          const isCurrent =
-                            containerIdx === currentContainerIndex &&
-                            questionIdx === currentQuestionIndex;
-
-                          return (
-                            <button
-                              key={question.container_question_id}
-                              onClick={() => {
-                                setCurrentContainerIndex(containerIdx);
-                                setCurrentQuestionIndex(questionIdx);
-                                setShowQuestionNav(false);
-                              }}
-                              className={`w-10 h-10 rounded-lg font-semibold transition-all ${
-                                isCurrent
-                                  ? "bg-blue-600 text-white ring-2 ring-blue-300"
-                                  : isAnswered
-                                    ? "bg-green-100 text-green-700 hover:bg-green-200"
-                                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                              }`}
-                            >
-                              {questionIdx + 1}
-                            </button>
-                          );
-                        },
-                      )}
-                    </div>
-                  </div>
-                ),
-              )}
             </div>
           </div>
         </div>

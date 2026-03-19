@@ -7,6 +7,7 @@ interface AddExamContainerModalProps {
   examId: number;
   onClose: () => void;
   onSuccess: () => void;
+  initialParentId?: number | null;
 }
 
 const AddExamContainerModal = ({
@@ -14,11 +15,13 @@ const AddExamContainerModal = ({
   examId,
   onClose,
   onSuccess,
+  initialParentId = null,
 }: AddExamContainerModalProps) => {
   const {
     createExamContainer,
     getContainersByExamId,
     uploadExamAudio,
+    uploadExamImages,
     loading,
     error,
   } = useExam();
@@ -35,10 +38,12 @@ const AddExamContainerModal = ({
     content: "",
     instruction: "",
     audio_url: "",
+    image_url: "",
     time_limit: 0,
   });
 
   const [audioFile, setAudioFile] = useState<File | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [isParentContainer, setIsParentContainer] = useState(true);
   const [parentId, setParentId] = useState<number | null>(null);
   const [availableParents, setAvailableParents] = useState<any[]>([]);
@@ -59,8 +64,17 @@ const AddExamContainerModal = ({
         );
         setAvailableParents(potentialParents);
       });
+
+      // If initialParentId is provided, set it and mark as child container
+      if (initialParentId) {
+        setIsParentContainer(false);
+        setParentId(initialParentId);
+      } else {
+        setIsParentContainer(true);
+        setParentId(null);
+      }
     }
-  }, [isOpen, examId]);
+  }, [isOpen, examId, initialParentId]);
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -77,9 +91,15 @@ const AddExamContainerModal = ({
     }));
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAudioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setAudioFile(e.target.files[0]);
+    }
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setImageFile(e.target.files[0]);
     }
   };
 
@@ -87,10 +107,19 @@ const AddExamContainerModal = ({
     e.preventDefault();
 
     let uploadedAudioUrl = formData.audio_url;
+    let uploadedImageUrl = formData.image_url;
 
     // Upload audio file if selected
     if (audioFile) {
       uploadedAudioUrl = (await uploadExamAudio(audioFile)) || "";
+    }
+
+    // Upload image file if selected
+    if (imageFile) {
+      const imageUrls = await uploadExamImages([imageFile]);
+      if (imageUrls && imageUrls.length > 0) {
+        uploadedImageUrl = imageUrls[0];
+      }
     }
 
     const success = await createExamContainer({
@@ -101,6 +130,7 @@ const AddExamContainerModal = ({
       content: formData.content,
       instruction: formData.instruction || undefined,
       audio_url: uploadedAudioUrl || undefined,
+      image_url: uploadedImageUrl || undefined,
       time_limit: formData.time_limit || undefined,
       parent_id: isParentContainer ? undefined : parentId || undefined,
     });
@@ -114,9 +144,11 @@ const AddExamContainerModal = ({
         content: "",
         instruction: "",
         audio_url: "",
+        image_url: "",
         time_limit: 0,
       });
       setAudioFile(null);
+      setImageFile(null);
       setIsParentContainer(true);
       setParentId(null);
     }
@@ -192,24 +224,38 @@ const AddExamContainerModal = ({
 
             {/* Parent Container Selection */}
             <div className="bg-blue-50 border border-blue-200 p-4 rounded-lg">
-              <label className="flex items-center gap-2 mb-3">
-                <input
-                  type="checkbox"
-                  checked={isParentContainer}
-                  onChange={(e) => {
-                    setIsParentContainer(e.target.checked);
-                    if (e.target.checked) setParentId(null);
-                  }}
-                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                />
-                <span className="text-sm font-medium text-gray-800">
-                  Tạo Part mới (Parent Container)
-                </span>
-              </label>
-              <p className="text-xs text-gray-600 mb-2">
-                ✓ Check: Tạo Part mới (VD: Part 3, Part 4, Part 6, Part 7)
-                <br />✗ Uncheck: Tạo Container con (VD: Conversation 1, 2, 3...)
-              </p>
+              {initialParentId ? (
+                <div className="bg-purple-100 border border-purple-300 p-3 rounded mb-3">
+                  <p className="text-sm font-medium text-purple-900">
+                    🎯 Đang tạo Container con (Conversation/Passage)
+                  </p>
+                  <p className="text-xs text-purple-700 mt-1">
+                    Container này sẽ được thêm vào Part đã chọn
+                  </p>
+                </div>
+              ) : (
+                <>
+                  <label className="flex items-center gap-2 mb-3">
+                    <input
+                      type="checkbox"
+                      checked={isParentContainer}
+                      onChange={(e) => {
+                        setIsParentContainer(e.target.checked);
+                        if (e.target.checked) setParentId(null);
+                      }}
+                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    />
+                    <span className="text-sm font-medium text-gray-800">
+                      Tạo Part mới (Parent Container)
+                    </span>
+                  </label>
+                  <p className="text-xs text-gray-600 mb-2">
+                    ✓ Check: Tạo Part mới (VD: Part 3, Part 4, Part 6, Part 7)
+                    <br />✗ Uncheck: Tạo Container con (VD: Conversation 1, 2,
+                    3...)
+                  </p>
+                </>
+              )}
 
               {!isParentContainer && (
                 <div>
@@ -286,12 +332,30 @@ const AddExamContainerModal = ({
               <input
                 type="file"
                 accept=".mp3,.wav,.ogg"
-                onChange={handleFileChange}
+                onChange={handleAudioChange}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
               {audioFile && (
                 <p className="mt-1 text-sm text-gray-500">
                   Selected: {audioFile.name}
+                </p>
+              )}
+            </div>
+
+            {/* Image Upload */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Image (Part 4, 6, 7...)
+              </label>
+              <input
+                type="file"
+                accept=".jpg,.jpeg,.png,.gif,.webp"
+                onChange={handleImageChange}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+              {imageFile && (
+                <p className="mt-1 text-sm text-gray-500">
+                  Selected: {imageFile.name}
                 </p>
               )}
             </div>

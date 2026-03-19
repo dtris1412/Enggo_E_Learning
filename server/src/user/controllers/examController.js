@@ -55,7 +55,8 @@ const getExamById = async (req, res) => {
 const getExamForTaking = async (req, res) => {
   try {
     const { exam_id } = req.params;
-    const result = await getExamForTakingService(exam_id);
+    const { user_exam_id } = req.query;
+    const result = await getExamForTakingService(exam_id, user_exam_id);
 
     if (!result.success) {
       return res.status(400).json(result);

@@ -15,7 +15,13 @@ const EditExamContainerModal = ({
   onClose,
   onSuccess,
 }: EditExamContainerModalProps) => {
-  const { updateExamContainer, uploadExamAudio, loading, error } = useExam();
+  const {
+    updateExamContainer,
+    uploadExamAudio,
+    uploadExamImages,
+    loading,
+    error,
+  } = useExam();
 
   const [formData, setFormData] = useState({
     skill: "" as "listening" | "reading" | "writing" | "speaking" | "",
@@ -29,10 +35,12 @@ const EditExamContainerModal = ({
     content: "",
     instruction: "",
     audio_url: "",
+    image_url: "",
     time_limit: 0,
   });
 
   const [audioFile, setAudioFile] = useState<File | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
 
   useEffect(() => {
     if (container) {
@@ -43,6 +51,7 @@ const EditExamContainerModal = ({
         content: container.content || "",
         instruction: container.instruction || "",
         audio_url: container.audio_url || "",
+        image_url: container.image_url || "",
         time_limit: container.time_limit || 0,
       });
     }
@@ -63,9 +72,15 @@ const EditExamContainerModal = ({
     }));
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAudioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setAudioFile(e.target.files[0]);
+    }
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setImageFile(e.target.files[0]);
     }
   };
 
@@ -73,10 +88,19 @@ const EditExamContainerModal = ({
     e.preventDefault();
 
     let uploadedAudioUrl = formData.audio_url;
+    let uploadedImageUrl = formData.image_url;
 
     // Upload audio file if selected
     if (audioFile) {
       uploadedAudioUrl = (await uploadExamAudio(audioFile)) || "";
+    }
+
+    // Upload image file if selected
+    if (imageFile) {
+      const imageUrls = await uploadExamImages([imageFile]);
+      if (imageUrls && imageUrls.length > 0) {
+        uploadedImageUrl = imageUrls[0];
+      }
     }
 
     const success = await updateExamContainer(container.container_id, {
@@ -86,6 +110,7 @@ const EditExamContainerModal = ({
       content: formData.content,
       instruction: formData.instruction || undefined,
       audio_url: uploadedAudioUrl || undefined,
+      image_url: uploadedImageUrl || undefined,
       time_limit: formData.time_limit || undefined,
     });
 
@@ -209,12 +234,35 @@ const EditExamContainerModal = ({
               <input
                 type="file"
                 accept=".mp3,.wav,.ogg"
-                onChange={handleFileChange}
+                onChange={handleAudioChange}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
               {audioFile && (
                 <p className="mt-1 text-sm text-gray-500">
                   Mới: {audioFile.name}
+                </p>
+              )}
+            </div>
+
+            {/* Image Upload */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Image (Part 4, 6, 7...)
+              </label>
+              {formData.image_url && !imageFile && (
+                <p className="mb-2 text-sm text-green-600">
+                  Image hiện tại: {formData.image_url}
+                </p>
+              )}
+              <input
+                type="file"
+                accept=".jpg,.jpeg,.png,.gif,.webp"
+                onChange={handleImageChange}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+              {imageFile && (
+                <p className="mt-1 text-sm text-gray-500">
+                  Mới: {imageFile.name}
                 </p>
               )}
             </div>
