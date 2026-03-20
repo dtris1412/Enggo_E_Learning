@@ -1,5 +1,6 @@
 import { Route } from "react-router-dom";
 import ProtectedRoute from "../../shared/components/ProtectedRoute";
+import ErrorBoundary from "../../shared/components/ErrorBoundary";
 import PaymentCheckout from "../pages/PaymentCheckout";
 import PaymentResult from "../pages/PaymentResult";
 
@@ -10,8 +11,10 @@ import ExamTaking from "../components/ExamComponent/ExamTaking";
 import ExamResult from "../components/ExamComponent/ExamResult";
 import ExamHistory from "../components/ExamComponent/ExamHistory";
 
+// User Profile
+import Profile from "../pages/Profile";
+
 // Import user pages here
-// import UserProfile from '../pages/Profile';
 // import MyCourses from '../pages/MyCourses';
 // import MyExams from '../pages/MyExams';
 
@@ -69,14 +72,16 @@ export const UserRoutes = () => {
       />
 
       {/* User Profile - Requires authentication */}
-      {/* <Route 
-        path="/profile" 
+      <Route
+        path="/profile"
         element={
           <ProtectedRoute>
-            <UserProfile />
+            <ErrorBoundary>
+              <Profile />
+            </ErrorBoundary>
           </ProtectedRoute>
-        } 
-      /> */}
+        }
+      />
 
       {/* My Courses */}
       {/* <Route 

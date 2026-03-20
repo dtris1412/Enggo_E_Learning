@@ -9,6 +9,14 @@ import {
   checkSubscriptionAccess,
   loadDocumentMiddleware,
 } from "../../middleware/authMiddleware.js";
+
+// ===========User Profile Controllers===========
+import {
+  getUserProfile,
+  updateUserProfile,
+  changePassword,
+} from "../controllers/userController.js";
+
 // ===========Document Controllers===========
 import {
   getDocumentsPaginated,
@@ -161,6 +169,21 @@ import {
 const router = express.Router();
 
 const initUserRoutes = (app) => {
+  // ===========User Profile Routes===========
+  // Get current user profile (auth required)
+  router.get("/api/user/profile", verifyToken, requireUser, getUserProfile);
+
+  // Update current user profile (auth required)
+  router.put("/api/user/profile", verifyToken, requireUser, updateUserProfile);
+
+  // Change password (auth required)
+  router.put(
+    "/api/user/profile/password",
+    verifyToken,
+    requireUser,
+    changePassword,
+  );
+
   // ===========Document Routes===========
   // List all documents (public)
   router.get("/api/user/documents", getDocumentsPaginated);
