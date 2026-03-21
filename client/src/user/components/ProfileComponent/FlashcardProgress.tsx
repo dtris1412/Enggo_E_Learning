@@ -1,47 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { CreditCard, Brain, Target, TrendingUp } from "lucide-react";
 import { Link } from "react-router-dom";
-
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080/api";
-
-interface FlashcardSet {
-  flashcard_set_id: number;
-  set_name: string;
-  description: string;
-  is_public: boolean;
-  total_cards: number;
-  created_at: string;
-}
+import { useFlashcard } from "../../contexts/flashcardContext";
 
 const FlashcardProgress: React.FC = () => {
-  const [flashcardSets, setFlashcardSets] = useState<FlashcardSet[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { flashcardSets, loading, fetchMyFlashcardSets } = useFlashcard();
 
   useEffect(() => {
-    fetchFlashcardSets();
+    fetchMyFlashcardSets("", 1, 10);
   }, []);
-
-  const fetchFlashcardSets = async () => {
-    try {
-      const token = localStorage.getItem("accessToken");
-      const response = await fetch(`${API_URL}/user/flashcard-sets`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success) {
-          setFlashcardSets(data.data || []);
-        }
-      }
-    } catch (error) {
-      console.error("Error fetching flashcard sets:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   if (loading) {
     return (
@@ -56,10 +23,12 @@ const FlashcardProgress: React.FC = () => {
   }
 
   const totalCards = flashcardSets.reduce(
-    (sum, set) => sum + set.total_cards,
+    (sum, set) => sum + (set.total_cards || 0),
     0,
   );
-  const publicSets = flashcardSets.filter((set) => set.is_public).length;
+  const publicSets = flashcardSets.filter(
+    (set) => set.visibility === "public",
+  ).length;
 
   return (
     <div className="bg-white rounded-lg shadow-md p-8">
@@ -133,7 +102,7 @@ const FlashcardProgress: React.FC = () => {
             Tạo bộ flashcard đầu tiên để bắt đầu học tập
           </p>
           <Link
-            to="/flashcard/create"
+            to="/flashcards/create"
             className="inline-block px-6 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition"
           >
             Tạo flashcard
@@ -146,7 +115,7 @@ const FlashcardProgress: React.FC = () => {
               Bộ flashcard của bạn
             </h3>
             <Link
-              to="/flashcard"
+              to="/flashcards/my-library"
               className="text-sm text-blue-600 hover:text-blue-700 hover:underline"
             >
               Xem tất cả →
@@ -154,16 +123,18 @@ const FlashcardProgress: React.FC = () => {
           </div>
 
           {flashcardSets.slice(0, 5).map((set) => (
-            <Link
+            <div
               key={set.flashcard_set_id}
-              to={`/flashcard/${set.flashcard_set_id}`}
-              className="block border border-gray-200 rounded-lg p-4 hover:shadow-md hover:border-purple-300 transition"
+              className="border border-gray-200 rounded-lg p-4 hover:shadow-md hover:border-purple-300 transition"
             >
               <div className="flex justify-between items-start mb-2">
                 <div className="flex-1">
-                  <h4 className="font-semibold text-gray-800 hover:text-purple-600 mb-1">
-                    {set.set_name}
-                  </h4>
+                  <Link
+                    to={`/flashcards/${set.flashcard_set_id}`}
+                    className="font-semibold text-gray-800 hover:text-purple-600 mb-1 inline-block"
+                  >
+                    {set.title}
+                  </Link>
                   {set.description && (
                     <p className="text-sm text-gray-600 line-clamp-2">
                       {set.description}
@@ -172,16 +143,16 @@ const FlashcardProgress: React.FC = () => {
                 </div>
                 <span
                   className={`ml-4 px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
-                    set.is_public
+                    set.visibility === "public"
                       ? "bg-green-100 text-green-700"
                       : "bg-gray-100 text-gray-700"
                   }`}
                 >
-                  {set.is_public ? "Công khai" : "Riêng tư"}
+                  {set.visibility === "public" ? "Công khai" : "Riêng tư"}
                 </span>
               </div>
 
-              <div className="flex items-center gap-4 text-sm text-gray-500">
+              <div className="flex items-center gap-4 text-sm text-gray-500 mb-3">
                 <span className="flex items-center gap-1">
                   <CreditCard className="w-4 h-4" />
                   {set.total_cards} thẻ
@@ -191,13 +162,28 @@ const FlashcardProgress: React.FC = () => {
                   {new Date(set.created_at).toLocaleDateString("vi-VN")}
                 </span>
               </div>
-            </Link>
+
+              <div className="flex gap-2">
+                <Link
+                  to={`/flashcards/${set.flashcard_set_id}/learn`}
+                  className="px-3 py-1.5 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition text-sm flex items-center gap-1"
+                >
+                  Học ngay
+                </Link>
+                <Link
+                  to={`/flashcards/${set.flashcard_set_id}`}
+                  className="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition text-sm"
+                >
+                  Chi tiết
+                </Link>
+              </div>
+            </div>
           ))}
 
           {flashcardSets.length > 5 && (
             <div className="text-center pt-4">
               <Link
-                to="/flashcard"
+                to="/flashcards/my-library"
                 className="text-blue-600 hover:text-blue-700 hover:underline text-sm"
               >
                 Xem thêm {flashcardSets.length - 5} bộ flashcard khác →
@@ -212,16 +198,28 @@ const FlashcardProgress: React.FC = () => {
         <h4 className="font-semibold text-gray-800 mb-3">Thao tác nhanh</h4>
         <div className="flex flex-wrap gap-3">
           <Link
-            to="/flashcard/create"
+            to="/flashcards/create"
             className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition text-sm"
           >
             Tạo flashcard mới
           </Link>
           <Link
-            to="/flashcard"
+            to="/flashcards/my-library"
+            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition text-sm"
+          >
+            Thư viện của tôi
+          </Link>
+          <Link
+            to="/flashcards"
             className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition text-sm"
           >
-            Thư viện flashcard
+            Khám phá flashcard
+          </Link>
+          <Link
+            to="/flashcards/notifications"
+            className="px-4 py-2 bg-orange-100 text-orange-700 rounded-lg hover:bg-orange-200 transition text-sm"
+          >
+            Ôn tập hôm nay
           </Link>
         </div>
       </div>

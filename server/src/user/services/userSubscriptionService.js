@@ -10,6 +10,15 @@ export const getUserActiveSubscription = async (userId) => {
         user_id: userId,
         status: "active",
       },
+      attributes: [
+        "user_subscription_id",
+        "user_id",
+        "subscription_price_id",
+        "order_id",
+        "started_at",
+        "expired_at",
+        "status",
+      ],
       include: [
         {
           model: User,
@@ -22,6 +31,7 @@ export const getUserActiveSubscription = async (userId) => {
             "billing_type",
             "price",
             "discount_percentage",
+            "duration_days",
           ],
           include: [
             {
@@ -31,6 +41,7 @@ export const getUserActiveSubscription = async (userId) => {
                 "name",
                 "code",
                 "monthly_ai_token_quota",
+                "features",
               ],
             },
           ],

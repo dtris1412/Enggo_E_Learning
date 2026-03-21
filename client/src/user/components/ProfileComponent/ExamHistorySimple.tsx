@@ -8,26 +8,37 @@ import {
   CheckCircle,
   XCircle,
 } from "lucide-react";
-
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080/api";
+import { useExam } from "../../contexts/examContext";
 
 interface ExamAttempt {
   user_exam_id: number;
   exam_id: number;
-  exam_name: string;
-  score: number;
-  total_questions: number;
-  time_spent: number;
-  completed_at: string;
-  passed: boolean;
-  statistics?: {
-    percentage: number;
+  started_at: string;
+  submitted_at: string;
+  status: string;
+  total_score: number;
+  selected_parts: string[];
+  Exam: {
+    exam_id: number;
+    exam_title: string;
+    exam_code: string;
+    exam_type: string;
+    total_questions: number;
+    Certificate: {
+      certificate_id: number;
+      certificate_name: string;
+    };
+  };
+  statistics: {
+    total_questions: number;
     correct_answers: number;
-    wrong_answers: number;
+    incorrect_answers: number;
+    percentage: string;
   };
 }
 
 const ExamHistorySimple: React.FC = () => {
+  const { getUserExamHistory } = useExam();
   const [history, setHistory] = useState<ExamAttempt[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -38,22 +49,13 @@ const ExamHistorySimple: React.FC = () => {
 
   const fetchExamHistory = async () => {
     try {
-      const token = localStorage.getItem("accessToken");
-      const response = await fetch(`${API_URL}/user/exams/history`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      setLoading(true);
+      const result = await getUserExamHistory(1, 10);
 
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success) {
-          setHistory(data.data || []);
-        } else {
-          setError(data.message || "Failed to load exam history");
-        }
+      if (result.success) {
+        setHistory(result.data || []);
       } else {
-        setError("Failed to load exam history");
+        setError(result.message || "Failed to load exam history");
       }
     } catch (err) {
       console.error("Error fetching exam history:", err);
@@ -65,9 +67,9 @@ const ExamHistorySimple: React.FC = () => {
 
   const getScorePercentage = (attempt: ExamAttempt): number => {
     if (attempt.statistics?.percentage) {
-      return attempt.statistics.percentage;
+      return parseFloat(attempt.statistics.percentage);
     }
-    return (attempt.score / attempt.total_questions) * 100;
+    return 0;
   };
 
   const getScoreColor = (percentage: number) => {
@@ -170,14 +172,14 @@ const ExamHistorySimple: React.FC = () => {
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <h3 className="text-lg font-semibold text-gray-800 mb-2">
-                        {attempt.exam_name}
+                        {attempt.Exam.exam_title}
                       </h3>
 
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                         <div className="flex items-center gap-2 text-gray-600">
                           <Calendar className="w-4 h-4" />
                           <span>
-                            {new Date(attempt.completed_at).toLocaleDateString(
+                            {new Date(attempt.submitted_at).toLocaleDateString(
                               "vi-VN",
                             )}
                           </span>
@@ -186,7 +188,8 @@ const ExamHistorySimple: React.FC = () => {
                         <div className="flex items-center gap-2 text-gray-600">
                           <Award className="w-4 h-4" />
                           <span>
-                            {attempt.score}/{attempt.total_questions} câu
+                            {attempt.statistics.correct_answers}/
+                            {attempt.statistics.total_questions} câu
                           </span>
                         </div>
 

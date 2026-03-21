@@ -5,17 +5,16 @@ import { Link } from "react-router-dom";
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080/api";
 
 interface EnrolledCourse {
-  user_course_id: number;
+  course_id: number;
+  course_title: string;
+  description: string;
+  course_level: string;
+  access_type: string;
+  estimate_duration: number;
   progress_percentage: number;
-  status: string;
+  completed_lessons: number;
+  total_lessons: number;
   started_at: string;
-  completed_at: string | null;
-  Course: {
-    course_id: number;
-    course_name: string;
-    course_thumbnail: string;
-    course_level: string;
-  };
 }
 
 const LearningProgress: React.FC = () => {
@@ -67,8 +66,10 @@ const LearningProgress: React.FC = () => {
     );
   }
 
-  const completedCourses = courses.filter((c) => c.status === "completed");
-  const inProgressCourses = courses.filter((c) => c.status === "in_progress");
+  const completedCourses = courses.filter((c) => c.progress_percentage === 100);
+  const inProgressCourses = courses.filter(
+    (c) => c.progress_percentage > 0 && c.progress_percentage < 100,
+  );
   const averageProgress =
     courses.length > 0
       ? courses.reduce((sum, c) => sum + c.progress_percentage, 0) /
@@ -174,35 +175,34 @@ const LearningProgress: React.FC = () => {
           <h3 className="font-semibold text-gray-800 mb-4">Khóa học của bạn</h3>
           {courses.map((course) => (
             <div
-              key={course.user_course_id}
+              key={course.course_id}
               className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition"
             >
               <div className="flex gap-4">
-                <img
-                  src={course.Course.course_thumbnail || "/placeholder.jpg"}
-                  alt={course.Course.course_name}
-                  className="w-24 h-24 rounded-lg object-cover"
-                />
+                {/* Placeholder thumbnail */}
+                <div className="w-24 h-24 rounded-lg bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center">
+                  <BookOpen className="w-12 h-12 text-white" />
+                </div>
                 <div className="flex-1">
                   <div className="flex justify-between items-start mb-2">
                     <div>
                       <h4 className="font-semibold text-gray-800 hover:text-blue-600">
-                        <Link to={`/courses/${course.Course.course_id}`}>
-                          {course.Course.course_name}
+                        <Link to={`/courses/${course.course_id}`}>
+                          {course.course_title}
                         </Link>
                       </h4>
                       <span className="text-xs text-gray-500">
-                        {course.Course.course_level}
+                        {course.course_level}
                       </span>
                     </div>
                     <span
                       className={`px-3 py-1 rounded-full text-xs font-medium ${
-                        course.status === "completed"
+                        course.progress_percentage === 100
                           ? "bg-green-100 text-green-700"
                           : "bg-blue-100 text-blue-700"
                       }`}
                     >
-                      {course.status === "completed"
+                      {course.progress_percentage === 100
                         ? "Hoàn thành"
                         : "Đang học"}
                     </span>
@@ -210,7 +210,10 @@ const LearningProgress: React.FC = () => {
 
                   <div className="mb-2">
                     <div className="flex justify-between items-center text-sm mb-1">
-                      <span className="text-gray-600">Tiến độ</span>
+                      <span className="text-gray-600">
+                        Tiến độ ({course.completed_lessons}/
+                        {course.total_lessons} bài)
+                      </span>
                       <span className="font-medium text-gray-700">
                         {course.progress_percentage.toFixed(0)}%
                       </span>
@@ -228,13 +231,8 @@ const LearningProgress: React.FC = () => {
                       Bắt đầu:{" "}
                       {new Date(course.started_at).toLocaleDateString("vi-VN")}
                     </span>
-                    {course.completed_at && (
-                      <span>
-                        Hoàn thành:{" "}
-                        {new Date(course.completed_at).toLocaleDateString(
-                          "vi-VN",
-                        )}
-                      </span>
+                    {course.progress_percentage === 100 && (
+                      <span className="text-green-600">✓ Đã hoàn thành</span>
                     )}
                   </div>
                 </div>

@@ -1,7 +1,8 @@
 import { useEffect } from "react";
 import { useSubscription } from "../contexts/subscriptionContext";
 import PricingCard from "../components/SubscriptionComponent/PricingCard";
-import { Loader2 } from "lucide-react";
+import { Loader2, Scale } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const SubscriptionPlans = () => {
   const {
@@ -35,6 +36,15 @@ const SubscriptionPlans = () => {
           <p className="text-base text-gray-400 max-w-2xl mx-auto">
             Nâng cấp để trải nghiệm đầy đủ tính năng và học tập hiệu quả hơn
           </p>
+          <div className="mt-4">
+            <Link
+              to="/subscription-compare"
+              className="inline-flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:shadow-lg hover:from-blue-700 hover:to-purple-700 transition-all"
+            >
+              <Scale className="w-4 h-4" />
+              <span className="font-medium">So sánh chi tiết các gói</span>
+            </Link>
+          </div>
         </div>
 
         {/* Billing Type Selector */}

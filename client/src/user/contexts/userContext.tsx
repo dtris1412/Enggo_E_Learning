@@ -19,6 +19,8 @@ interface UserProfile {
   avatar: string | null;
   user_status: boolean;
   role: number;
+  google_id: string | null;
+  facebook_id: string | null;
   created_at: string;
   updated_at: string;
 }

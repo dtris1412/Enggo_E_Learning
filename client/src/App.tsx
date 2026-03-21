@@ -63,6 +63,7 @@ import ForgotPassword from "./user/pages/ForgotPassword.tsx";
 import VerifyOTP from "./user/pages/VerifyOTP.tsx";
 import ResetPassword from "./user/pages/ResetPassword.tsx";
 import SubscriptionPlans from "./user/pages/SubscriptionPlans.tsx";
+import CompareSubscriptions from "./user/pages/CompareSubscriptions.tsx";
 
 function App() {
   return (
@@ -238,6 +239,18 @@ function App() {
                                                                                       path="/subscription"
                                                                                       element={
                                                                                         <SubscriptionPlans />
+                                                                                      }
+                                                                                    />
+                                                                                    <Route
+                                                                                      path="/subscription-plans"
+                                                                                      element={
+                                                                                        <SubscriptionPlans />
+                                                                                      }
+                                                                                    />
+                                                                                    <Route
+                                                                                      path="/subscription-compare"
+                                                                                      element={
+                                                                                        <CompareSubscriptions />
                                                                                       }
                                                                                     />
 

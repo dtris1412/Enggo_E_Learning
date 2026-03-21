@@ -6,19 +6,19 @@ import LearningProgress from "../components/ProfileComponent/LearningProgress";
 import FlashcardProgress from "../components/ProfileComponent/FlashcardProgress";
 import ExamHistorySimple from "../components/ProfileComponent/ExamHistorySimple";
 import SubscriptionInfo from "../components/ProfileComponent/SubscriptionInfo";
+import { useUserProfile } from "../contexts/userContext";
 
 const Profile: React.FC = () => {
   const [activeTab, setActiveTab] = useState("profile");
+  const { profile } = useUserProfile();
+
+  // Check if user is logged in via social providers (Google or Facebook)
+  const isSocialLogin = profile?.google_id || profile?.facebook_id;
 
   const renderContent = () => {
     switch (activeTab) {
       case "profile":
-        return (
-          <div className="space-y-6">
-            <ProfileInfo />
-            <ChangePassword />
-          </div>
-        );
+        return <ProfileInfo />;
       case "learning":
         return <LearningProgress />;
       case "exam-history":

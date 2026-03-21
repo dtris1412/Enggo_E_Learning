@@ -8,6 +8,21 @@ import {
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080/api";
 
+interface SubscriptionPrice {
+  subscription_price_id: number;
+  billing_type: string;
+  duration_days: number;
+  price: number;
+  discount_percentage: number;
+  Subscription_Plan?: {
+    subscription_plan_id: number;
+    name: string;
+    code: string;
+    monthly_ai_token_quota: number;
+    features: Record<string, any>;
+  };
+}
+
 interface Order {
   order_id: string;
   user_id: number;
@@ -16,16 +31,49 @@ interface Order {
   amount: number;
   content: string;
   order_date: string;
-  Subscription_Price?: any;
+  Subscription_Price?: SubscriptionPrice;
+  Payments?: Payment[];
+}
+
+interface Payment {
+  payment_id: number;
+  payment_method: string;
+  provider: string;
+  transaction_code: string;
+  amount: number;
+  payment_date: string;
+  status: "pending" | "completed" | "failed";
+  content: string;
+  Order?: Order;
+}
+
+interface PaginationInfo {
+  total: number;
+  page: number;
+  limit: number;
+  pages: number;
 }
 
 interface PaymentContextType {
   currentOrder: Order | null;
   loading: boolean;
   error: string | null;
+  payments: Payment[];
+  orders: Order[];
+  pagination: PaginationInfo | null;
   createOrder: (subscriptionPriceId: number) => Promise<Order | null>;
   createMomoPayment: (orderId: string) => Promise<void>;
   createVnpayPayment: (orderId: string, bankCode?: string) => Promise<void>;
+  getUserPayments: (
+    page?: number,
+    limit?: number,
+    status?: string,
+  ) => Promise<void>;
+  getUserOrders: (
+    page?: number,
+    limit?: number,
+    status?: string,
+  ) => Promise<void>;
   clearOrder: () => void;
   clearError: () => void;
 }
@@ -44,6 +92,11 @@ export const PaymentProvider = ({ children }: { children: ReactNode }) => {
   const [currentOrder, setCurrentOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [payments, setPayments] = useState<Payment[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [pagination, setPagination] = useState<PaginationInfo | null>(null);
+
+  console.log("PaymentProvider rendered"); // Debug log
 
   const getAuthToken = () => {
     return localStorage.getItem("accessToken");
@@ -191,6 +244,116 @@ export const PaymentProvider = ({ children }: { children: ReactNode }) => {
     [],
   );
 
+  // Get user payments with pagination and optional status filter
+  const getUserPayments = useCallback(
+    async (page: number = 1, limit: number = 10, status: string = "") => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const token = getAuthToken();
+        if (!token) {
+          throw new Error("Bạn cần đăng nhập để xem lịch sử thanh toán");
+        }
+
+        const params = new URLSearchParams({
+          page: page.toString(),
+          limit: limit.toString(),
+        });
+
+        if (status) {
+          params.append("status", status);
+        }
+
+        const response = await fetch(`${API_URL}/user/payments?${params}`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(
+            errorData.message || "Không thể tải lịch sử thanh toán",
+          );
+        }
+
+        const data = await response.json();
+
+        if (data.success) {
+          setPayments(data.data);
+          setPagination(data.pagination);
+        } else {
+          throw new Error(data.message || "Không thể tải lịch sử thanh toán");
+        }
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : "Lỗi không xác định";
+        setError(errorMessage);
+        console.error("Error fetching user payments:", err);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [],
+  );
+
+  // Get user orders with pagination and optional status filter
+  const getUserOrders = useCallback(
+    async (page: number = 1, limit: number = 10, status: string = "") => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const token = getAuthToken();
+        if (!token) {
+          throw new Error("Bạn cần đăng nhập để xem lịch sử đơn hàng");
+        }
+
+        const params = new URLSearchParams({
+          page: page.toString(),
+          limit: limit.toString(),
+        });
+
+        if (status) {
+          params.append("status", status);
+        }
+
+        const response = await fetch(`${API_URL}/user/orders?${params}`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(
+            errorData.message || "Không thể tải lịch sử đơn hàng",
+          );
+        }
+
+        const data = await response.json();
+
+        if (data.success) {
+          setOrders(data.data);
+          setPagination(data.pagination);
+        } else {
+          throw new Error(data.message || "Không thể tải lịch sử đơn hàng");
+        }
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : "Lỗi không xác định";
+        setError(errorMessage);
+        console.error("Error fetching user orders:", err);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [],
+  );
+
   const clearOrder = useCallback(() => {
     setCurrentOrder(null);
   }, []);
@@ -203,9 +366,14 @@ export const PaymentProvider = ({ children }: { children: ReactNode }) => {
     currentOrder,
     loading,
     error,
+    payments,
+    orders,
+    pagination,
     createOrder,
     createMomoPayment,
     createVnpayPayment,
+    getUserPayments,
+    getUserOrders,
     clearOrder,
     clearError,
   };

@@ -291,8 +291,11 @@ export const ExamProvider = ({ children }: { children: ReactNode }) => {
   // Get user exam history
   const getUserExamHistory = async (page = 1, limit = 10) => {
     try {
-      console.log("[Frontend] getUserExamHistory called with:", { page, limit });
-      
+      console.log("[Frontend] getUserExamHistory called with:", {
+        page,
+        limit,
+      });
+
       const params = new URLSearchParams();
       params.append("page", page.toString());
       params.append("limit", limit.toString());
@@ -308,11 +311,14 @@ export const ExamProvider = ({ children }: { children: ReactNode }) => {
       });
 
       console.log("[Frontend] Response status:", response.status);
-      console.log("[Frontend] Response headers:", Object.fromEntries(response.headers.entries()));
-      
+      console.log(
+        "[Frontend] Response headers:",
+        Object.fromEntries(response.headers.entries()),
+      );
+
       const result = await response.json();
       console.log("[Frontend] Response data:", result);
-      
+
       return result;
     } catch (err: any) {
       console.error("[Frontend] Error fetching exam history:", err);

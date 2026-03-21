@@ -14,6 +14,7 @@ interface SubscriptionPrice {
   duration_days: number;
   price: number;
   discount_percentage: number;
+  Subscription_Plan?: SubscriptionPlan;
 }
 
 interface SubscriptionPlan {
@@ -23,11 +24,20 @@ interface SubscriptionPlan {
   monthly_ai_token_quota: number;
   code: string;
   is_active: boolean;
-  Subscription_Prices: SubscriptionPrice[];
+  Subscription_Prices?: SubscriptionPrice[];
+}
+
+interface ActiveSubscription {
+  user_subscription_id: number;
+  started_at: string;
+  expired_at: string;
+  status: "active" | "expired" | "canceled";
+  Subscription_Price?: SubscriptionPrice;
 }
 
 interface SubscriptionContextType {
   plans: SubscriptionPlan[];
+  activeSubscription: ActiveSubscription | null;
   loading: boolean;
   error: string | null;
   billingType: "monthly" | "yearly" | "weekly";
@@ -35,6 +45,10 @@ interface SubscriptionContextType {
   fetchSubscriptionPlans: (
     billing_type?: "monthly" | "yearly" | "weekly",
   ) => Promise<void>;
+  getActiveSubscription: () => Promise<void>;
+  cancelSubscription: (
+    subscriptionId: number,
+  ) => Promise<{ success: boolean; message?: string }>;
 }
 
 const SubscriptionContext = createContext<SubscriptionContextType | undefined>(
@@ -53,11 +67,21 @@ export const useSubscription = () => {
 
 export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
   const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
+  const [activeSubscription, setActiveSubscription] =
+    useState<ActiveSubscription | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [billingType, setBillingType] = useState<
     "monthly" | "yearly" | "weekly"
   >("monthly");
+
+  const getAuthHeaders = () => {
+    const token = localStorage.getItem("accessToken");
+    return {
+      "Content-Type": "application/json",
+      ...(token && { Authorization: `Bearer ${token}` }),
+    };
+  };
 
   const fetchSubscriptionPlans = useCallback(
     async (billing_type?: "monthly" | "yearly" | "weekly") => {
@@ -110,13 +134,73 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
     [],
   );
 
+  const getActiveSubscription = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const response = await fetch(`${API_URL}/user/subscriptions/active`, {
+        headers: getAuthHeaders(),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        setActiveSubscription(data.data);
+      } else {
+        setActiveSubscription(null);
+      }
+    } catch (err) {
+      console.error("Error fetching active subscription:", err);
+      setActiveSubscription(null);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const cancelSubscription = useCallback(
+    async (
+      subscriptionId: number,
+    ): Promise<{ success: boolean; message?: string }> => {
+      try {
+        const response = await fetch(
+          `${API_URL}/user/subscriptions/${subscriptionId}/cancel`,
+          {
+            method: "PUT",
+            headers: getAuthHeaders(),
+          },
+        );
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+          // Refresh active subscription after cancellation
+          await getActiveSubscription();
+          return { success: true, message: data.message };
+        } else {
+          return { success: false, message: data.message };
+        }
+      } catch (err) {
+        console.error("Error canceling subscription:", err);
+        return {
+          success: false,
+          message: "An error occurred while canceling subscription",
+        };
+      }
+    },
+    [getActiveSubscription],
+  );
+
   const value = {
     plans,
+    activeSubscription,
     loading,
     error,
     billingType,
     setBillingType,
     fetchSubscriptionPlans,
+    getActiveSubscription,
+    cancelSubscription,
   };
 
   return (

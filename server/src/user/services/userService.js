@@ -20,6 +20,8 @@ const getUserProfile = async (user_id) => {
       "avatar",
       "user_status",
       "role",
+      "google_id",
+      "facebook_id",
       "created_at",
       "updated_at",
     ],
