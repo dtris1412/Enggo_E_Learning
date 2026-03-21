@@ -107,7 +107,7 @@ const Header = () => {
     { path: "/about", label: "Giới thiệu" },
     { path: "/courses", label: "Chương trình học" },
     { path: "/blog", label: "Blog" },
-    { path: "/tests", label: "Thi thử online" },
+    { path: "/exams", label: "Thi thử online" },
   ];
 
   // Learning Corner dropdown items (only shown when user is logged in)

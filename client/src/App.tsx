@@ -56,7 +56,6 @@ import FlashcardDetailPage from "./user/pages/FlashcardDetail.tsx";
 import FlashcardLearn from "./user/pages/FlashcardLearn.tsx";
 import FlashcardLibrary from "./user/pages/FlashcardLibrary.tsx";
 import FlashcardNotifications from "./user/pages/FlashcardNotifications.tsx";
-import OnlineTests from "./user/pages/OnlineTests.tsx";
 import Login from "./user/pages/Login.tsx";
 import Register from "./user/pages/Register.tsx";
 import ForgotPassword from "./user/pages/ForgotPassword.tsx";
@@ -227,12 +226,6 @@ function App() {
                                                                                       path="/flashcards/notifications"
                                                                                       element={
                                                                                         <FlashcardNotifications />
-                                                                                      }
-                                                                                    />
-                                                                                    <Route
-                                                                                      path="/tests"
-                                                                                      element={
-                                                                                        <OnlineTests />
                                                                                       }
                                                                                     />
                                                                                     <Route
