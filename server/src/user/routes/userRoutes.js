@@ -166,6 +166,16 @@ import {
   getUserExamHistory,
 } from "../controllers/userExamController.js";
 
+// ===========AI Assistant Controllers===========
+import {
+  contextAssist,
+  globalChat,
+  analyzeData,
+  generateFlashcard,
+  generateFlashcardSetController,
+  getAIHistory,
+} from "../controllers/aiController.js";
+
 const router = express.Router();
 
 const initUserRoutes = (app) => {
@@ -719,6 +729,40 @@ const initUserRoutes = (app) => {
     requireUser,
     getOngoingExam,
   );
+
+  // ===========AI Assistant Routes===========
+  // 1️⃣ Context Assistant - AI with context (exam, question, flashcard)
+  router.post(
+    "/api/user/ai/context-assist",
+    verifyToken,
+    requireUser,
+    contextAssist,
+  );
+
+  // 2️⃣ Global AI Chat - General chat with optional context
+  router.post("/api/user/ai/chat", verifyToken, requireUser, globalChat);
+
+  // 3️⃣ AI Analyzer - Analyze user data (exam performance, learning path, etc.)
+  router.post("/api/user/ai/analyze", verifyToken, requireUser, analyzeData);
+
+  // 🔧 Generate flashcard from content
+  router.post(
+    "/api/user/ai/generate-flashcard",
+    verifyToken,
+    requireUser,
+    generateFlashcard,
+  );
+
+  // ✨ Generate complete flashcard set from topic
+  router.post(
+    "/api/user/ai/generate-flashcard-set",
+    verifyToken,
+    requireUser,
+    generateFlashcardSetController,
+  );
+
+  // 📊 Get AI interaction history
+  router.get("/api/user/ai/history", verifyToken, requireUser, getAIHistory);
 
   app.use("/", router);
 };

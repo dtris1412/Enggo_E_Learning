@@ -18,9 +18,9 @@ export default (sequelize, DataTypes) => {
       User_Exam.hasMany(models.Speaking_Record, {
         foreignKey: "user_exam_id",
       });
-      User_Exam.hasMany(models.AI_Interaction, {
-        foreignKey: "user_exam_id",
-      });
+      // User_Exam.hasMany(models.AI_Interaction, {
+      //   foreignKey: "user_exam_id",
+      // });
       User_Exam.hasMany(models.Flashcard_Set, {
         foreignKey: "user_exam_id",
       });

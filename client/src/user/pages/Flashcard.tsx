@@ -8,6 +8,7 @@ import {
   Search,
   TrendingUp,
   BookOpen,
+  Sparkles,
 } from "lucide-react";
 import FlashcardSidebar from "../components/FlashcardComponent/FlashcardSidebar";
 
@@ -274,6 +275,15 @@ const Flashcard: React.FC = () => {
     navigate("/flashcards/create");
   };
 
+  const handleCreateWithAI = () => {
+    if (!isLoggedIn) {
+      alert("Vui lòng đăng nhập để sử dụng tính năng AI");
+      navigate("/login");
+      return;
+    }
+    navigate("/flashcards/ai-generate");
+  };
+
   // Helper function to get progress bar color based on SM-2 stats
   const getProgressBarColor = (
     set: FlashcardSetItem,
@@ -357,14 +367,24 @@ const Flashcard: React.FC = () => {
                     />
                   </div>
                   {isLoggedIn && (
-                    <button
-                      type="button"
-                      onClick={handleCreateNew}
-                      className="bg-white text-indigo-700 hover:bg-gray-100 font-semibold px-6 py-3 rounded-lg transition-colors inline-flex items-center gap-2 whitespace-nowrap"
-                    >
-                      <Plus className="w-5 h-5" />
-                      Tạo mới
-                    </button>
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={handleCreateNew}
+                        className="bg-white text-indigo-700 hover:bg-gray-100 font-semibold px-6 py-3 rounded-lg transition-colors inline-flex items-center gap-2 whitespace-nowrap"
+                      >
+                        <Plus className="w-5 h-5" />
+                        Tạo mới
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleCreateWithAI}
+                        className="bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700 font-semibold px-6 py-3 rounded-lg transition-colors inline-flex items-center gap-2 whitespace-nowrap"
+                      >
+                        <Sparkles className="w-5 h-5" />
+                        Tạo bằng AI
+                      </button>
+                    </div>
                   )}
                 </div>
               </form>

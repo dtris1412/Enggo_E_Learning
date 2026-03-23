@@ -56,6 +56,7 @@ import FlashcardDetailPage from "./user/pages/FlashcardDetail.tsx";
 import FlashcardLearn from "./user/pages/FlashcardLearn.tsx";
 import FlashcardLibrary from "./user/pages/FlashcardLibrary.tsx";
 import FlashcardNotifications from "./user/pages/FlashcardNotifications.tsx";
+import AIFlashcardGenerator from "./user/components/FlashcardComponent/AIFlashcardGenerator.tsx";
 import Login from "./user/pages/Login.tsx";
 import Register from "./user/pages/Register.tsx";
 import ForgotPassword from "./user/pages/ForgotPassword.tsx";
@@ -63,6 +64,7 @@ import VerifyOTP from "./user/pages/VerifyOTP.tsx";
 import ResetPassword from "./user/pages/ResetPassword.tsx";
 import SubscriptionPlans from "./user/pages/SubscriptionPlans.tsx";
 import CompareSubscriptions from "./user/pages/CompareSubscriptions.tsx";
+import GlobalAIChatWidget from "./shared/components/GlobalAIChatWidget.tsx";
 
 function App() {
   return (
@@ -199,6 +201,12 @@ function App() {
                                                                                       }
                                                                                     />
                                                                                     <Route
+                                                                                      path="/flashcards/ai-generate"
+                                                                                      element={
+                                                                                        <AIFlashcardGenerator />
+                                                                                      }
+                                                                                    />
+                                                                                    <Route
                                                                                       path="/flashcards/:flashcard_set_id/edit"
                                                                                       element={
                                                                                         <FlashcardEdit />
@@ -290,6 +298,7 @@ function App() {
                                                                                   </Routes>
                                                                                 </main>
                                                                                 <Footer />
+                                                                                <GlobalAIChatWidget />
                                                                               </div>
                                                                             }
                                                                           />

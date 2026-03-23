@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useExam } from "../../contexts/examContext";
 import { useToast } from "../../../shared/components/Toast/Toast";
+import ContextAssistant from "../../../shared/components/ContextAssistant";
 import {
   Clock,
   Save,
@@ -615,6 +616,15 @@ const ExamTaking: React.FC = () => {
                     );
                   })}
                 </div>
+
+                {/* AI Context Assistant */}
+                <ContextAssistant
+                  type="exam"
+                  examId={userExamId || undefined}
+                  questionId={currentQuestion.container_question_id}
+                  questionText={currentQuestion.Question.question_content}
+                  position="inline"
+                />
 
                 {/* Navigation Buttons */}
                 <div className="flex items-center justify-between mt-8 pt-6 border-t">

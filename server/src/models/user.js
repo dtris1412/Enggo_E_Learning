@@ -9,9 +9,9 @@ export default (sequelize, DataTypes) => {
       User.hasMany(models.User_Exam, {
         foreignKey: "user_id",
       });
-      User.hasMany(models.AI_Interaction, {
-        foreignKey: "user_id",
-      });
+      // User.hasMany(models.AI_Interaction, {
+      //   foreignKey: "user_id",
+      // });
       User.hasMany(models.Flashcard_Set, {
         foreignKey: "user_id",
       });

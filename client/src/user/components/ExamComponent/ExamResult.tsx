@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useExam } from "../../contexts/examContext";
 import { useToast } from "../../../shared/components/Toast/Toast";
+import { autoAnalyzeAfterExam } from "../../../shared/hooks/useAIAnalyzer";
 import {
   CheckCircle,
   XCircle,
@@ -37,6 +38,14 @@ const ExamResult: React.FC = () => {
         const resultData = await getExamResult(parseInt(userExamId));
         if (resultData.success) {
           setResult(resultData.data);
+
+          // Auto-analyze exam performance with AI
+          autoAnalyzeAfterExam(resultData.data).then((analysis) => {
+            if (analysis) {
+              console.log("AI Analysis completed:", analysis);
+              // Có thể lưu analysis vào state hoặc hiển thị notification
+            }
+          });
         } else {
           showToast("error", resultData.message || "Failed to load result");
           navigate("/exams");
