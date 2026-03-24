@@ -310,6 +310,14 @@ import {
   getRecentSubscriptions,
 } from "../controllers/dashboardController.js";
 
+// ===========System AI Quota Controllers===========
+import {
+  getQuota,
+  updateCredit,
+  updateConfig,
+  getStats,
+} from "../controllers/systemAIQuotaController.js";
+
 const router = express.Router();
 
 const initAdminRoutes = (app) => {
@@ -1373,6 +1381,22 @@ const initAdminRoutes = (app) => {
     requireAdmin,
     deleteExamMedia,
   );
+
+  //===========System AI Quota Routes===========
+  router.get("/api/admin/ai-quota", verifyToken, requireAdmin, getQuota);
+  router.put(
+    "/api/admin/ai-quota/credit",
+    verifyToken,
+    requireAdmin,
+    updateCredit,
+  );
+  router.put(
+    "/api/admin/ai-quota/config",
+    verifyToken,
+    requireAdmin,
+    updateConfig,
+  );
+  router.get("/api/admin/ai-quota/stats", verifyToken, requireAdmin, getStats);
 
   app.use("/", router);
 };

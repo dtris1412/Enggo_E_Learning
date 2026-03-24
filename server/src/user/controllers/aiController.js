@@ -1,12 +1,79 @@
 import { askOpenAI, generateFlashcardSet } from "../services/aiService.js";
 import db from "../../models/index.js";
+import {
+  deductTokenUsage,
+  getSystemQuota,
+} from "../../admin/services/systemAIQuotaService.js";
+
 const {
   AI_Interaction,
   User_Exam,
   Container_Question,
   Flashcard_Set,
   Flashcard,
+  User_Token_Wallet,
+  User_Token_Transaction,
 } = db;
+
+/**
+ * Helper: Xử lý trừ token cho user và system sau khi gọi AI
+ * @param {number} userId - ID user (nullable)
+ * @param {number} totalTokens - Tổng token OpenAI đã dùng
+ * @returns {Promise<Object>} Token info
+ */
+const processTokenDeduction = async (userId, totalTokens) => {
+  try {
+    // Lấy quota hệ thống để biết ai_token_unit
+    const quota = await getSystemQuota();
+    const aiTokenUnit = quota.ai_token_unit;
+
+    // Tính số AI token cần trừ
+    const aiTokensUsed = Math.ceil(totalTokens / aiTokenUnit);
+
+    // Nếu có user_id, trừ token user
+    if (userId) {
+      const wallet = await User_Token_Wallet.findOne({
+        where: { user_id: userId },
+      });
+
+      if (wallet) {
+        // Kiểm tra đủ token không
+        if (wallet.token_balance < aiTokensUsed) {
+          throw new Error(
+            `Insufficient AI tokens. Required: ${aiTokensUsed}, Available: ${wallet.token_balance}`,
+          );
+        }
+
+        // Trừ token user
+        await wallet.update({
+          token_balance: wallet.token_balance - aiTokensUsed,
+          updated_at: new Date(),
+        });
+
+        // Ghi log transaction
+        await User_Token_Transaction.create({
+          user_id: userId,
+          amount: -aiTokensUsed,
+          transaction_type: "usage",
+          reference_id: null,
+          created_at: new Date(),
+        });
+      }
+    }
+
+    // Trừ token hệ thống
+    await deductTokenUsage(totalTokens, aiTokensUsed);
+
+    return {
+      openai_tokens_used: totalTokens,
+      ai_tokens_used: aiTokensUsed,
+      ai_token_unit: aiTokenUnit,
+    };
+  } catch (error) {
+    console.error("Token deduction error:", error);
+    throw error;
+  }
+};
 
 export const contextAssist = async (req, res) => {
   try {
@@ -41,10 +108,25 @@ export const contextAssist = async (req, res) => {
     }
 
     // Gọi AI với context
-    const reply = await askOpenAI({
+    const aiResponse = await askOpenAI({
       message: `${context}\n\nUser question: ${message}`,
       type: type || "chat",
     });
+
+    // Xử lý trừ token
+    let tokenInfo;
+    try {
+      tokenInfo = await processTokenDeduction(
+        user_id,
+        aiResponse.usage.total_tokens,
+      );
+    } catch (tokenError) {
+      console.error("Token deduction error:", tokenError);
+      return res.status(402).json({
+        error: "Token quota exceeded",
+        detail: tokenError.message,
+      });
+    }
 
     // Lưu interaction vào DB
     if (user_id && exam_id && question_id) {
@@ -53,15 +135,19 @@ export const contextAssist = async (req, res) => {
         user_exam_id: exam_id,
         container_question_id: question_id,
         promt: message,
-        response: reply,
+        response: aiResponse.content,
         model_name: "gpt-4o-mini",
-        token_usage: 0, // TODO: Tính toán token usage thực tế
+        token_usage: aiResponse.usage.total_tokens,
         created_at: new Date(),
         updated_at: new Date(),
       });
     }
 
-    res.json({ reply, context_provided: !!context });
+    res.json({
+      reply: aiResponse.content,
+      context_provided: !!context,
+      token_info: tokenInfo,
+    });
   } catch (error) {
     console.error("Context assist error:", error);
     res.status(500).json({ error: "AI service error", detail: error.message });
@@ -76,6 +162,7 @@ export const contextAssist = async (req, res) => {
 export const globalChat = async (req, res) => {
   try {
     const { message, context } = req.body;
+    const user_id = req.user?.user_id;
 
     if (!message) {
       return res.status(400).json({ error: "Message is required" });
@@ -86,12 +173,27 @@ export const globalChat = async (req, res) => {
       ? `Context: ${JSON.stringify(context)}\n\nUser: ${message}`
       : message;
 
-    const reply = await askOpenAI({
+    const aiResponse = await askOpenAI({
       message: fullMessage,
       type: "chat",
     });
 
-    res.json({ reply });
+    // Xử lý trừ token
+    let tokenInfo;
+    try {
+      tokenInfo = await processTokenDeduction(
+        user_id,
+        aiResponse.usage.total_tokens,
+      );
+    } catch (tokenError) {
+      console.error("Token deduction error:", tokenError);
+      return res.status(402).json({
+        error: "Token quota exceeded",
+        detail: tokenError.message,
+      });
+    }
+
+    res.json({ reply: aiResponse.content, token_info: tokenInfo });
   } catch (error) {
     console.error("Global chat error:", error);
     res.status(500).json({ error: "AI service error", detail: error.message });
@@ -140,9 +242,28 @@ export const analyzeData = async (req, res) => {
         return res.status(400).json({ error: "Invalid analysis_type" });
     }
 
-    const analysis = await askOpenAI({ message: prompt, type });
+    const aiResponse = await askOpenAI({ message: prompt, type });
 
-    res.json({ analysis_type, analysis });
+    // Xử lý trừ token
+    let tokenInfo;
+    try {
+      tokenInfo = await processTokenDeduction(
+        user_id,
+        aiResponse.usage.total_tokens,
+      );
+    } catch (tokenError) {
+      console.error("Token deduction error:", tokenError);
+      return res.status(402).json({
+        error: "Token quota exceeded",
+        detail: tokenError.message,
+      });
+    }
+
+    res.json({
+      analysis_type,
+      analysis: aiResponse.content,
+      token_info: tokenInfo,
+    });
   } catch (error) {
     console.error("Analyze data error:", error);
     res.status(500).json({ error: "AI service error", detail: error.message });
@@ -157,6 +278,7 @@ export const analyzeData = async (req, res) => {
 export const generateFlashcard = async (req, res) => {
   try {
     const { content, topic } = req.body;
+    const user_id = req.user?.user_id;
 
     if (!content) {
       return res.status(400).json({ error: "Content is required" });
@@ -166,12 +288,27 @@ export const generateFlashcard = async (req, res) => {
       ? `Tạo flashcard về chủ đề "${topic}" từ nội dung sau:\n${content}`
       : `Tạo flashcard từ nội dung sau:\n${content}`;
 
-    const flashcards = await askOpenAI({
+    const aiResponse = await askOpenAI({
       message: prompt,
       type: "flashcard",
     });
 
-    res.json({ flashcards });
+    // Xử lý trừ token
+    let tokenInfo;
+    try {
+      tokenInfo = await processTokenDeduction(
+        user_id,
+        aiResponse.usage.total_tokens,
+      );
+    } catch (tokenError) {
+      console.error("Token deduction error:", tokenError);
+      return res.status(402).json({
+        error: "Token quota exceeded",
+        detail: tokenError.message,
+      });
+    }
+
+    res.json({ flashcards: aiResponse.content, token_info: tokenInfo });
   } catch (error) {
     console.error("Generate flashcard error:", error);
     res.status(500).json({ error: "AI service error", detail: error.message });
@@ -227,6 +364,7 @@ export const generateFlashcardSetController = async (req, res) => {
     } = req.body;
 
     let dataToUse;
+    let tokenUsage = null;
 
     // If generatedData is provided (user edited and wants to save), use it
     if (saveToDatabase && generatedData) {
@@ -237,12 +375,35 @@ export const generateFlashcardSetController = async (req, res) => {
         return res.status(400).json({ error: "Topic is required" });
       }
 
-      dataToUse = await generateFlashcardSet({
+      const generatedResult = await generateFlashcardSet({
         topic,
         cardCount,
         difficulty,
         additionalContext,
       });
+
+      // Extract usage and data
+      tokenUsage = generatedResult.usage;
+      dataToUse = {
+        set_info: generatedResult.set_info,
+        flashcards: generatedResult.flashcards,
+      };
+
+      // Xử lý trừ token nếu có usage
+      if (tokenUsage) {
+        try {
+          const tokenInfo = await processTokenDeduction(
+            user_id,
+            tokenUsage.total_tokens,
+          );
+        } catch (tokenError) {
+          console.error("Token deduction error:", tokenError);
+          return res.status(402).json({
+            error: "Token quota exceeded",
+            detail: tokenError.message,
+          });
+        }
+      }
     }
 
     // If user wants to save to database

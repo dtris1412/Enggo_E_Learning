@@ -44,7 +44,19 @@ export const askOpenAI = async ({
         },
       },
     );
-    return response.data.choices[0].message.content.trim();
+
+    const content = response.data.choices[0].message.content.trim();
+    const usage = response.data.usage;
+
+    // Return both content and usage for token tracking
+    return {
+      content,
+      usage: {
+        prompt_tokens: usage?.prompt_tokens || 0,
+        completion_tokens: usage?.completion_tokens || 0,
+        total_tokens: usage?.total_tokens || 0,
+      },
+    };
   } catch (error) {
     // Handle OpenAI API errors
     if (error.response) {
@@ -200,7 +212,15 @@ ${additionalContext ? `\n💡 Yêu cầu thêm: ${additionalContext}` : ""}
         throw new Error("Invalid response structure from AI");
       }
 
-      return parsedData;
+      // Return both data and usage for token tracking
+      return {
+        ...parsedData,
+        usage: {
+          prompt_tokens: usage?.prompt_tokens || 0,
+          completion_tokens: usage?.completion_tokens || 0,
+          total_tokens: usage?.total_tokens || 0,
+        },
+      };
     } catch (parseError) {
       console.error("Error parsing AI response:", parseError);
       console.error("AI Response:", aiResponse);

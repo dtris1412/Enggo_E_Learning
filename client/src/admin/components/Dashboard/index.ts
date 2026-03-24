@@ -10,6 +10,7 @@ import FeaturedBanner from "./FeaturedBanner";
 import TopCourses from "./TopCourses";
 import TopRoadmaps from "./TopRoadmaps";
 import TopLearnedFlashcards from "./TopLearnedFlashcards";
+import SystemAIQuotaCard from "./SystemAIQuotaCard";
 
 export {
   StatCard,
@@ -24,4 +25,5 @@ export {
   TopCourses,
   TopRoadmaps,
   TopLearnedFlashcards,
+  SystemAIQuotaCard,
 };

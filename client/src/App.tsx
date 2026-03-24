@@ -32,6 +32,7 @@ import { SubscriptionProvider } from "./admin/contexts/subscriptionContext.tsx";
 import { OrderPaymentProvider } from "./admin/contexts/orderPaymentContext.tsx";
 import { UserSubscriptionTrackingProvider } from "./admin/contexts/userSubscriptionTrackingContext.tsx";
 import { DashboardProvider } from "./admin/contexts/dashboardContext.tsx";
+import { SystemAIQuotaProvider } from "./admin/contexts/systemAIQuotaContext.tsx";
 import { AdminRoutes } from "./admin/routes/AdminRoutes";
 import { UserRoutes } from "./user/routes/UserRoutes";
 import AuthCallback from "./shared/pages/AuthCallback";
@@ -100,211 +101,213 @@ function App() {
                                                               <OrderPaymentProvider>
                                                                 <UserSubscriptionTrackingProvider>
                                                                   <DashboardProvider>
-                                                                    <ToastProvider>
-                                                                      <Router>
-                                                                        <Routes>
-                                                                          {/* Admin Routes - No Header/Footer */}
-                                                                          {AdminRoutes()}
+                                                                    <SystemAIQuotaProvider>
+                                                                      <ToastProvider>
+                                                                        <Router>
+                                                                          <Routes>
+                                                                            {/* Admin Routes - No Header/Footer */}
+                                                                            {AdminRoutes()}
 
-                                                                          {/* Public & User Routes - With Header/Footer */}
-                                                                          <Route
-                                                                            path="*"
-                                                                            element={
-                                                                              <div className="min-h-screen bg-white text-gray-900 flex flex-col">
-                                                                                <Header />
-                                                                                <main className="flex-grow">
-                                                                                  <Routes>
-                                                                                    {/* Public Routes */}
-                                                                                    <Route
-                                                                                      path="/"
-                                                                                      element={
-                                                                                        <Home />
-                                                                                      }
-                                                                                    />
-                                                                                    <Route
-                                                                                      path="/about"
-                                                                                      element={
-                                                                                        <About />
-                                                                                      }
-                                                                                    />
-                                                                                    <Route
-                                                                                      path="/courses"
-                                                                                      element={
-                                                                                        <Courses />
-                                                                                      }
-                                                                                    />
-                                                                                    <Route
-                                                                                      path="/courses/:id"
-                                                                                      element={
-                                                                                        <CourseDetail />
-                                                                                      }
-                                                                                    />
-                                                                                    <Route
-                                                                                      path="/roadmaps/:id"
-                                                                                      element={
-                                                                                        <RoadmapDetail />
-                                                                                      }
-                                                                                    />
-                                                                                    <Route
-                                                                                      path="/learning/:courseId"
-                                                                                      element={
-                                                                                        <LearningSpace />
-                                                                                      }
-                                                                                    />
-                                                                                    <Route
-                                                                                      path="/my-learning"
-                                                                                      element={
-                                                                                        <MyLearning />
-                                                                                      }
-                                                                                    />
-                                                                                    <Route
-                                                                                      path="/blog"
-                                                                                      element={
-                                                                                        <BlogLayoutPage />
-                                                                                      }
-                                                                                    >
+                                                                            {/* Public & User Routes - With Header/Footer */}
+                                                                            <Route
+                                                                              path="*"
+                                                                              element={
+                                                                                <div className="min-h-screen bg-white text-gray-900 flex flex-col">
+                                                                                  <Header />
+                                                                                  <main className="flex-grow">
+                                                                                    <Routes>
+                                                                                      {/* Public Routes */}
                                                                                       <Route
-                                                                                        index
+                                                                                        path="/"
                                                                                         element={
-                                                                                          <Blog />
+                                                                                          <Home />
                                                                                         }
                                                                                       />
                                                                                       <Route
-                                                                                        path=":slug"
+                                                                                        path="/about"
                                                                                         element={
-                                                                                          <BlogDetail />
+                                                                                          <About />
                                                                                         }
                                                                                       />
-                                                                                    </Route>
-                                                                                    <Route
-                                                                                      path="/documents"
-                                                                                      element={
-                                                                                        <Document />
-                                                                                      }
-                                                                                    />
-                                                                                    <Route
-                                                                                      path="/documents/:id"
-                                                                                      element={
-                                                                                        <DocumentDetail />
-                                                                                      }
-                                                                                    />
-                                                                                    <Route
-                                                                                      path="/flashcards"
-                                                                                      element={
-                                                                                        <Flashcard />
-                                                                                      }
-                                                                                    />
-                                                                                    <Route
-                                                                                      path="/flashcards/create"
-                                                                                      element={
-                                                                                        <FlashcardCreate />
-                                                                                      }
-                                                                                    />
-                                                                                    <Route
-                                                                                      path="/flashcards/ai-generate"
-                                                                                      element={
-                                                                                        <AIFlashcardGenerator />
-                                                                                      }
-                                                                                    />
-                                                                                    <Route
-                                                                                      path="/flashcards/:flashcard_set_id/edit"
-                                                                                      element={
-                                                                                        <FlashcardEdit />
-                                                                                      }
-                                                                                    />
-                                                                                    <Route
-                                                                                      path="/flashcards/:flashcard_set_id"
-                                                                                      element={
-                                                                                        <FlashcardDetailPage />
-                                                                                      }
-                                                                                    />
-                                                                                    <Route
-                                                                                      path="/flashcards/:flashcard_set_id/learn"
-                                                                                      element={
-                                                                                        <FlashcardLearn />
-                                                                                      }
-                                                                                    />
-                                                                                    <Route
-                                                                                      path="/flashcards/my-library"
-                                                                                      element={
-                                                                                        <FlashcardLibrary />
-                                                                                      }
-                                                                                    />
-                                                                                    <Route
-                                                                                      path="/flashcards/notifications"
-                                                                                      element={
-                                                                                        <FlashcardNotifications />
-                                                                                      }
-                                                                                    />
-                                                                                    <Route
-                                                                                      path="/subscription"
-                                                                                      element={
-                                                                                        <SubscriptionPlans />
-                                                                                      }
-                                                                                    />
-                                                                                    <Route
-                                                                                      path="/subscription-plans"
-                                                                                      element={
-                                                                                        <SubscriptionPlans />
-                                                                                      }
-                                                                                    />
-                                                                                    <Route
-                                                                                      path="/subscription-compare"
-                                                                                      element={
-                                                                                        <CompareSubscriptions />
-                                                                                      }
-                                                                                    />
+                                                                                      <Route
+                                                                                        path="/courses"
+                                                                                        element={
+                                                                                          <Courses />
+                                                                                        }
+                                                                                      />
+                                                                                      <Route
+                                                                                        path="/courses/:id"
+                                                                                        element={
+                                                                                          <CourseDetail />
+                                                                                        }
+                                                                                      />
+                                                                                      <Route
+                                                                                        path="/roadmaps/:id"
+                                                                                        element={
+                                                                                          <RoadmapDetail />
+                                                                                        }
+                                                                                      />
+                                                                                      <Route
+                                                                                        path="/learning/:courseId"
+                                                                                        element={
+                                                                                          <LearningSpace />
+                                                                                        }
+                                                                                      />
+                                                                                      <Route
+                                                                                        path="/my-learning"
+                                                                                        element={
+                                                                                          <MyLearning />
+                                                                                        }
+                                                                                      />
+                                                                                      <Route
+                                                                                        path="/blog"
+                                                                                        element={
+                                                                                          <BlogLayoutPage />
+                                                                                        }
+                                                                                      >
+                                                                                        <Route
+                                                                                          index
+                                                                                          element={
+                                                                                            <Blog />
+                                                                                          }
+                                                                                        />
+                                                                                        <Route
+                                                                                          path=":slug"
+                                                                                          element={
+                                                                                            <BlogDetail />
+                                                                                          }
+                                                                                        />
+                                                                                      </Route>
+                                                                                      <Route
+                                                                                        path="/documents"
+                                                                                        element={
+                                                                                          <Document />
+                                                                                        }
+                                                                                      />
+                                                                                      <Route
+                                                                                        path="/documents/:id"
+                                                                                        element={
+                                                                                          <DocumentDetail />
+                                                                                        }
+                                                                                      />
+                                                                                      <Route
+                                                                                        path="/flashcards"
+                                                                                        element={
+                                                                                          <Flashcard />
+                                                                                        }
+                                                                                      />
+                                                                                      <Route
+                                                                                        path="/flashcards/create"
+                                                                                        element={
+                                                                                          <FlashcardCreate />
+                                                                                        }
+                                                                                      />
+                                                                                      <Route
+                                                                                        path="/flashcards/ai-generate"
+                                                                                        element={
+                                                                                          <AIFlashcardGenerator />
+                                                                                        }
+                                                                                      />
+                                                                                      <Route
+                                                                                        path="/flashcards/:flashcard_set_id/edit"
+                                                                                        element={
+                                                                                          <FlashcardEdit />
+                                                                                        }
+                                                                                      />
+                                                                                      <Route
+                                                                                        path="/flashcards/:flashcard_set_id"
+                                                                                        element={
+                                                                                          <FlashcardDetailPage />
+                                                                                        }
+                                                                                      />
+                                                                                      <Route
+                                                                                        path="/flashcards/:flashcard_set_id/learn"
+                                                                                        element={
+                                                                                          <FlashcardLearn />
+                                                                                        }
+                                                                                      />
+                                                                                      <Route
+                                                                                        path="/flashcards/my-library"
+                                                                                        element={
+                                                                                          <FlashcardLibrary />
+                                                                                        }
+                                                                                      />
+                                                                                      <Route
+                                                                                        path="/flashcards/notifications"
+                                                                                        element={
+                                                                                          <FlashcardNotifications />
+                                                                                        }
+                                                                                      />
+                                                                                      <Route
+                                                                                        path="/subscription"
+                                                                                        element={
+                                                                                          <SubscriptionPlans />
+                                                                                        }
+                                                                                      />
+                                                                                      <Route
+                                                                                        path="/subscription-plans"
+                                                                                        element={
+                                                                                          <SubscriptionPlans />
+                                                                                        }
+                                                                                      />
+                                                                                      <Route
+                                                                                        path="/subscription-compare"
+                                                                                        element={
+                                                                                          <CompareSubscriptions />
+                                                                                        }
+                                                                                      />
 
-                                                                                    {/* Auth Routes */}
-                                                                                    <Route
-                                                                                      path="/login"
-                                                                                      element={
-                                                                                        <Login />
-                                                                                      }
-                                                                                    />
-                                                                                    <Route
-                                                                                      path="/register"
-                                                                                      element={
-                                                                                        <Register />
-                                                                                      }
-                                                                                    />
-                                                                                    <Route
-                                                                                      path="/forgot-password"
-                                                                                      element={
-                                                                                        <ForgotPassword />
-                                                                                      }
-                                                                                    />
-                                                                                    <Route
-                                                                                      path="/verify-otp"
-                                                                                      element={
-                                                                                        <VerifyOTP />
-                                                                                      }
-                                                                                    />
-                                                                                    <Route
-                                                                                      path="/reset-password"
-                                                                                      element={
-                                                                                        <ResetPassword />
-                                                                                      }
-                                                                                    />
-                                                                                    <Route
-                                                                                      path="/auth/callback"
-                                                                                      element={
-                                                                                        <AuthCallback />
-                                                                                      }
-                                                                                    />
+                                                                                      {/* Auth Routes */}
+                                                                                      <Route
+                                                                                        path="/login"
+                                                                                        element={
+                                                                                          <Login />
+                                                                                        }
+                                                                                      />
+                                                                                      <Route
+                                                                                        path="/register"
+                                                                                        element={
+                                                                                          <Register />
+                                                                                        }
+                                                                                      />
+                                                                                      <Route
+                                                                                        path="/forgot-password"
+                                                                                        element={
+                                                                                          <ForgotPassword />
+                                                                                        }
+                                                                                      />
+                                                                                      <Route
+                                                                                        path="/verify-otp"
+                                                                                        element={
+                                                                                          <VerifyOTP />
+                                                                                        }
+                                                                                      />
+                                                                                      <Route
+                                                                                        path="/reset-password"
+                                                                                        element={
+                                                                                          <ResetPassword />
+                                                                                        }
+                                                                                      />
+                                                                                      <Route
+                                                                                        path="/auth/callback"
+                                                                                        element={
+                                                                                          <AuthCallback />
+                                                                                        }
+                                                                                      />
 
-                                                                                    {/* User Routes - Protected */}
-                                                                                    {UserRoutes()}
-                                                                                  </Routes>
-                                                                                </main>
-                                                                                <Footer />
-                                                                                <GlobalAIChatWidget />
-                                                                              </div>
-                                                                            }
-                                                                          />
-                                                                        </Routes>
-                                                                      </Router>
-                                                                    </ToastProvider>
+                                                                                      {/* User Routes - Protected */}
+                                                                                      {UserRoutes()}
+                                                                                    </Routes>
+                                                                                  </main>
+                                                                                  <Footer />
+                                                                                  <GlobalAIChatWidget />
+                                                                                </div>
+                                                                              }
+                                                                            />
+                                                                          </Routes>
+                                                                        </Router>
+                                                                      </ToastProvider>
+                                                                    </SystemAIQuotaProvider>
                                                                   </DashboardProvider>
                                                                 </UserSubscriptionTrackingProvider>
                                                               </OrderPaymentProvider>

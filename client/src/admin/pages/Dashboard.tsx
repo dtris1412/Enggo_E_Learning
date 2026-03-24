@@ -5,7 +5,7 @@ import {
   StatCard,
   RecentSubscriptionsList,
   TestCompletionChart,
-  AIPlaceholders,
+  SystemAIQuotaCard,
   RecentCompletedExams,
   TopDocuments,
   TopBlogs,
@@ -150,7 +150,7 @@ const Dashboard = () => {
         />
       </div>
 
-      {/* Row 4: 4th Stat Card + AI Placeholder */}
+      {/* Row 4: 4th Stat Card + AI Quota System */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <StatCard
           title={stats[3].title}
@@ -159,7 +159,7 @@ const Dashboard = () => {
           changeType={stats[3].changeType}
           icon={stats[3].icon}
         />
-        <AIPlaceholders />
+        <SystemAIQuotaCard />
       </div>
 
       {/* Row 5: Top Courses (1/2) + Top Roadmaps (1/2) */}
