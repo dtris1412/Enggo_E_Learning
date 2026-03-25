@@ -45,6 +45,9 @@ export default (sequelize, DataTypes) => {
       User.hasMany(models.User_Course, {
         foreignKey: "user_id",
       });
+      User.hasMany(models.User_Exam_Stat, {
+        foreignKey: "user_id",
+      });
     }
   }
   User.init(

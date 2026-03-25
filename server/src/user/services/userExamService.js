@@ -1,4 +1,8 @@
 import db from "../../models/index.js";
+import {
+  computeAndSaveUserExamStats,
+  computeAndSaveExamQuestionStats,
+} from "./examStatsService.js";
 
 /**
  * USER EXAM SERVICE
@@ -198,6 +202,13 @@ export const submitExam = async (user_exam_id) => {
     total_score: totalScore,
     updated_at: new Date(),
   });
+
+  // Tổng hợp thống kê vào user_exam_stats và exam_question_stats
+  // Chạy bất đồng bộ, không block response
+  Promise.all([
+    computeAndSaveUserExamStats(user_exam_id),
+    computeAndSaveExamQuestionStats(user_exam_id),
+  ]).catch((err) => console.error("[submitExam] Error computing stats:", err));
 
   return {
     success: true,

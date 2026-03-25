@@ -5,8 +5,10 @@ import ChangePassword from "../components/ProfileComponent/ChangePassword";
 import LearningProgress from "../components/ProfileComponent/LearningProgress";
 import FlashcardProgress from "../components/ProfileComponent/FlashcardProgress";
 import ExamHistorySimple from "../components/ProfileComponent/ExamHistorySimple";
+import ExamAnalytics from "../components/ProfileComponent/ExamAnalytics";
 import SubscriptionInfo from "../components/ProfileComponent/SubscriptionInfo";
 import { useUserProfile } from "../contexts/userContext";
+import { ExamAnalyticsProvider } from "../contexts/examAnalyticsContext";
 
 const Profile: React.FC = () => {
   const [activeTab, setActiveTab] = useState("profile");
@@ -25,30 +27,37 @@ const Profile: React.FC = () => {
         return <ExamHistorySimple />;
       case "flashcard":
         return <FlashcardProgress />;
+      case "exam-analytics":
+        return <ExamAnalytics />;
       default:
         return <ProfileInfo />;
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* Left Sidebar - Navigation */}
-          <div className="lg:col-span-3">
-            <ProfileSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
-          </div>
+    <ExamAnalyticsProvider>
+      <div className="min-h-screen bg-gray-50 py-8">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            {/* Left Sidebar - Navigation */}
+            <div className="lg:col-span-3">
+              <ProfileSidebar
+                activeTab={activeTab}
+                setActiveTab={setActiveTab}
+              />
+            </div>
 
-          {/* Main Content */}
-          <div className="lg:col-span-6">{renderContent()}</div>
+            {/* Main Content */}
+            <div className="lg:col-span-6">{renderContent()}</div>
 
-          {/* Right Sidebar - Subscription Info */}
-          <div className="lg:col-span-3">
-            <SubscriptionInfo />
+            {/* Right Sidebar - Subscription Info */}
+            <div className="lg:col-span-3">
+              <SubscriptionInfo />
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </ExamAnalyticsProvider>
   );
 };
 

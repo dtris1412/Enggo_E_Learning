@@ -1,5 +1,11 @@
 import React from "react";
-import { User, BookOpen, ClipboardList, CreditCard } from "lucide-react";
+import {
+  User,
+  BookOpen,
+  ClipboardList,
+  CreditCard,
+  BarChart2,
+} from "lucide-react";
 
 interface ProfileSidebarProps {
   activeTab: string;
@@ -30,6 +36,11 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({
       id: "flashcard",
       label: "Flashcard",
       icon: CreditCard,
+    },
+    {
+      id: "exam-analytics",
+      label: "Phân tích AI",
+      icon: BarChart2,
     },
   ];
 

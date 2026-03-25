@@ -166,6 +166,13 @@ import {
   getUserExamHistory,
 } from "../controllers/userExamController.js";
 
+// ===========Exam Analytics Controllers===========
+import {
+  getMyExamStats,
+  getMyOverallStats,
+  getAIExamAnalysis,
+} from "../controllers/examAnalyticsController.js";
+
 // ===========AI Assistant Controllers===========
 import {
   contextAssist,
@@ -712,6 +719,31 @@ const initUserRoutes = (app) => {
     verifyToken,
     requireUser,
     getExamAttemptDetail,
+  );
+
+  // ===========Exam Analytics Routes===========
+  // Get overall stats across all exams
+  router.get(
+    "/api/user/exam-stats",
+    verifyToken,
+    requireUser,
+    getMyOverallStats,
+  );
+
+  // Get stats for a specific exam attempt
+  router.get(
+    "/api/user/user-exams/:user_exam_id/stats",
+    verifyToken,
+    requireUser,
+    getMyExamStats,
+  );
+
+  // AI analysis for a specific exam attempt (uses AI token)
+  router.post(
+    "/api/user/user-exams/:user_exam_id/ai-analysis",
+    verifyToken,
+    requireUser,
+    getAIExamAnalysis,
   );
 
   // Abandon exam (delete unfinished exam) (auth required)

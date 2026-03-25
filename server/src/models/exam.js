@@ -18,6 +18,9 @@ export default (sequelize, DataTypes) => {
       Exam.hasMany(models.Flashcard_Set, {
         foreignKey: "exam_id",
       });
+      Exam.hasMany(models.User_Exam_Stat, {
+        foreignKey: "exam_id",
+      });
     }
   }
   Exam.init(

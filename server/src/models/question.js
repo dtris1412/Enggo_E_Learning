@@ -6,6 +6,9 @@ export default (sequelize, DataTypes) => {
       Question.hasMany(models.Container_Question, {
         foreignKey: "question_id",
       });
+      Question.hasMany(models.Exam_Question_Stat, {
+        foreignKey: "question_id",
+      });
     }
   }
   Question.init(
