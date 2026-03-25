@@ -53,6 +53,7 @@ interface Question {
   question_id: number;
   question_content: string;
   explanation?: string;
+  question_type: string;
   created_at: string;
   updated_at?: string;
 }
@@ -157,6 +158,7 @@ interface ExamContextType {
   createQuestion: (questionData: {
     question_content: string;
     explanation?: string;
+    question_type: string;
   }) => Promise<number | null>;
   updateQuestion: (
     question_id: number,
@@ -589,6 +591,7 @@ export const ExamProvider = ({ children }: { children: ReactNode }) => {
   const createQuestion = async (questionData: {
     question_content: string;
     explanation?: string;
+    question_type: string;
   }): Promise<number | null> => {
     setLoading(true);
     setError(null);

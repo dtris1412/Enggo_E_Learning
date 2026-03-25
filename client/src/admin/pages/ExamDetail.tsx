@@ -1296,6 +1296,7 @@ const ExamDetail = () => {
         <AddQuestionModal
           isOpen={isAddQuestionModalOpen}
           containerId={selectedContainerId}
+          examType={exam?.exam_type}
           onClose={() => {
             setIsAddQuestionModalOpen(false);
             setSelectedContainerId(null);
@@ -1325,6 +1326,7 @@ const ExamDetail = () => {
           isOpen={isBulkImportModalOpen}
           containerId={bulkImportContainerId}
           containerName={bulkImportContainerName}
+          examType={exam?.exam_type as "TOEIC" | "IELTS" | undefined}
           onClose={() => {
             setIsBulkImportModalOpen(false);
             setBulkImportContainerId(null);

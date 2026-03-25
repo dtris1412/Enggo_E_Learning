@@ -183,6 +183,8 @@ const addMultipleQuestionsToContainer = async (container_id, questionsData) => {
         {
           question_content: questionData.question_content.trim(),
           explanation: questionData.explanation?.trim() || null,
+          question_type:
+            questionData.question_type || "reading_multiple_choice",
           created_at: new Date(),
           updated_at: new Date(),
         },

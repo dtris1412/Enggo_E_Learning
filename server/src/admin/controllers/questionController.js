@@ -11,8 +11,12 @@ import {
 
 const createQuestion = async (req, res) => {
   try {
-    const { question_content, explanation } = req.body;
-    const result = await createQuestionService(question_content, explanation);
+    const { question_content, explanation, question_type } = req.body;
+    const result = await createQuestionService(
+      question_content,
+      explanation,
+      question_type,
+    );
 
     if (!result.success) {
       return res.status(400).json(result);
@@ -28,12 +32,13 @@ const createQuestion = async (req, res) => {
 const updateQuestion = async (req, res) => {
   try {
     const { question_id } = req.params;
-    const { question_content, explanation } = req.body;
+    const { question_content, explanation, question_type } = req.body;
 
     const result = await updateQuestionService(
       question_id,
       question_content,
       explanation,
+      question_type,
     );
 
     if (!result.success) {

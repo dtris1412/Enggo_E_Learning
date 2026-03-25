@@ -12,6 +12,10 @@ import {
   HelpCircle,
 } from "lucide-react";
 import { useExam } from "../../contexts/examContext";
+import {
+  ExamType,
+  getQuestionTypesByExamType,
+} from "../../constants/questionTypes";
 
 interface BulkQuestion {
   id: string;
@@ -25,6 +29,7 @@ interface BulkQuestion {
   option_c: string;
   option_d: string;
   correct_answer: string;
+  question_type: string;
 }
 
 interface BulkQuestionImportModalProps {
@@ -33,6 +38,7 @@ interface BulkQuestionImportModalProps {
   containerId: number;
   containerName: string;
   onImportSuccess: () => void;
+  examType?: ExamType;
 }
 
 const BulkQuestionImportModal: React.FC<BulkQuestionImportModalProps> = ({
@@ -41,8 +47,12 @@ const BulkQuestionImportModal: React.FC<BulkQuestionImportModalProps> = ({
   containerId,
   containerName,
   onImportSuccess,
+  examType,
 }) => {
   const { uploadExamImages } = useExam();
+  const questionTypeOptions = getQuestionTypesByExamType(examType);
+  const defaultQuestionType =
+    questionTypeOptions[0]?.value ?? "reading_multiple_choice";
 
   const [questions, setQuestions] = useState<BulkQuestion[]>([
     {
@@ -57,6 +67,7 @@ const BulkQuestionImportModal: React.FC<BulkQuestionImportModalProps> = ({
       option_c: "",
       option_d: "",
       correct_answer: "",
+      question_type: defaultQuestionType,
     },
   ]);
   const [loading, setLoading] = useState(false);
@@ -84,6 +95,7 @@ const BulkQuestionImportModal: React.FC<BulkQuestionImportModalProps> = ({
         option_c: "",
         option_d: "",
         correct_answer: "",
+        question_type: defaultQuestionType,
       },
     ]);
   };
@@ -98,6 +110,7 @@ const BulkQuestionImportModal: React.FC<BulkQuestionImportModalProps> = ({
       question_content: "",
       explanation: "",
       order: (lastOrder + i + 1).toString(),
+      question_type: defaultQuestionType,
       image_url: "",
       score: "1.0",
       option_a: "",
@@ -214,6 +227,9 @@ const BulkQuestionImportModal: React.FC<BulkQuestionImportModalProps> = ({
           option_c: (cells[7] || "").trim().replace(/^"|"$/g, ""),
           option_d: (cells[8] || "").trim().replace(/^"|"$/g, ""),
           correct_answer: (cells[9] || "").trim().toUpperCase(),
+          question_type:
+            (cells[10] || defaultQuestionType).trim().replace(/^"|"$/g, "") ||
+            defaultQuestionType,
         } as BulkQuestion;
       });
 
@@ -231,10 +247,12 @@ const BulkQuestionImportModal: React.FC<BulkQuestionImportModalProps> = ({
 
   // Export template CSV
   const downloadTemplate = () => {
-    const csvContent = `Question Content,Explanation,Order,Image URL,Score,Option A,Option B,Option C,Option D,Correct Answer
-"What is the capital of France?","Paris is the capital and largest city of France.",1,,1.0,London,Paris,Berlin,Madrid,B
-"Which planet is known as the Red Planet?","Mars is called the Red Planet because of its reddish appearance.",2,,1.0,Venus,Mars,Jupiter,Saturn,B
-"What is 2 + 2?","Basic arithmetic: 2 plus 2 equals 4.",3,,1.0,3,4,5,6,B`;
+    const defaultType =
+      questionTypeOptions[0]?.value ?? "reading_multiple_choice";
+    const csvContent = `Question Content,Explanation,Order,Image URL,Score,Option A,Option B,Option C,Option D,Correct Answer,Question Type
+"What is the capital of France?","Paris is the capital and largest city of France.",1,,1.0,London,Paris,Berlin,Madrid,B,${defaultType}
+"Which planet is known as the Red Planet?","Mars is called the Red Planet because of its reddish appearance.",2,,1.0,Venus,Mars,Jupiter,Saturn,B,${defaultType}
+"What is 2 + 2?","Basic arithmetic: 2 plus 2 equals 4.",3,,1.0,3,4,5,6,B,${defaultType}`;
 
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const link = document.createElement("a");
@@ -404,6 +422,7 @@ const BulkQuestionImportModal: React.FC<BulkQuestionImportModalProps> = ({
           order: parseInt(q.order) || 1,
           image_url: finalImageUrl,
           score: parseFloat(q.score) || 1.0,
+          question_type: q.question_type || defaultQuestionType,
           options,
         };
       });
@@ -637,6 +656,9 @@ const BulkQuestionImportModal: React.FC<BulkQuestionImportModalProps> = ({
                     <th className="border border-gray-300 px-2 py-2 text-left font-semibold text-gray-700 w-24">
                       Đ.Án Đúng <span className="text-red-500">*</span>
                     </th>
+                    <th className="border border-gray-300 px-2 py-2 text-left font-semibold text-gray-700 min-w-[180px]">
+                      Loại câu hỏi <span className="text-red-500">*</span>
+                    </th>
                     <th className="border border-gray-300 px-2 py-2 text-center font-semibold text-gray-700 w-16">
                       Xóa
                     </th>
@@ -850,6 +872,27 @@ const BulkQuestionImportModal: React.FC<BulkQuestionImportModalProps> = ({
                           <option value="B">B</option>
                           <option value="C">C</option>
                           <option value="D">D</option>
+                        </select>
+                      </td>
+
+                      {/* Question Type */}
+                      <td className="border border-gray-300 p-1">
+                        <select
+                          value={question.question_type}
+                          onChange={(e) =>
+                            updateQuestion(
+                              question.id,
+                              "question_type",
+                              e.target.value,
+                            )
+                          }
+                          className="w-full px-2 py-1 text-sm border-0 focus:ring-2 focus:ring-blue-500 rounded"
+                        >
+                          {questionTypeOptions.map((opt) => (
+                            <option key={opt.value} value={opt.value}>
+                              {opt.label}
+                            </option>
+                          ))}
                         </select>
                       </td>
 

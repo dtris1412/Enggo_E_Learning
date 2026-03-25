@@ -1,10 +1,16 @@
 import { useState } from "react";
 import { X } from "lucide-react";
 import { useExam } from "../../contexts/examContext";
+import {
+  getQuestionTypesByExamType,
+  type QuestionType,
+  type ExamType,
+} from "../../constants/questionTypes";
 
 interface AddQuestionModalProps {
   isOpen: boolean;
   containerId: number;
+  examType?: ExamType;
   onClose: () => void;
   onSuccess: (questionId: number, containerQuestionId: number) => void;
 }
@@ -12,6 +18,7 @@ interface AddQuestionModalProps {
 const AddQuestionModal = ({
   isOpen,
   containerId,
+  examType,
   onClose,
   onSuccess,
 }: AddQuestionModalProps) => {
@@ -23,9 +30,12 @@ const AddQuestionModal = ({
     error,
   } = useExam();
 
+  const questionTypeOptions = getQuestionTypesByExamType(examType);
+
   const [formData, setFormData] = useState({
     question_content: "",
     explanation: "",
+    question_type: questionTypeOptions[0]?.value || ("" as QuestionType),
     order: 1,
     score: 1.0,
     image_url: "",
@@ -34,7 +44,9 @@ const AddQuestionModal = ({
   const [imageFile, setImageFile] = useState<File | null>(null);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -71,6 +83,7 @@ const AddQuestionModal = ({
     const questionId = await createQuestion({
       question_content: formData.question_content,
       explanation: formData.explanation || undefined,
+      question_type: formData.question_type,
     });
 
     if (questionId) {
@@ -88,6 +101,7 @@ const AddQuestionModal = ({
         setFormData({
           question_content: "",
           explanation: "",
+          question_type: questionTypeOptions[0]?.value || ("" as QuestionType),
           order: 1,
           score: 1.0,
           image_url: "",
@@ -136,6 +150,32 @@ const AddQuestionModal = ({
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Nhập nội dung câu hỏi..."
               />
+            </div>
+
+            {/* Question Type */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Loại câu hỏi <span className="text-red-500">*</span>
+              </label>
+              <select
+                name="question_type"
+                value={formData.question_type}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                {questionTypeOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                    {option.description && ` - ${option.description}`}
+                  </option>
+                ))}
+              </select>
+              {!examType && (
+                <p className="mt-1 text-xs text-amber-600">
+                  ⚠️ Exam type không xác định. Hiển thị tất cả loại câu hỏi.
+                </p>
+              )}
             </div>
 
             {/* Explanation */}
