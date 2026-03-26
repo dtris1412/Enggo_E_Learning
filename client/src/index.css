@@ -64,8 +64,20 @@
   }
 }
 
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
 @layer utilities {
   .animate-shimmer {
     animation: shimmer 3s ease-in-out infinite;
+  }
+  .animate-marquee {
+    animation: marquee 28s linear infinite;
   }
 }
