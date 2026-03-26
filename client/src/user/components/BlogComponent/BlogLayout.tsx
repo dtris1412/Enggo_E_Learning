@@ -1,81 +1,72 @@
 import React, { ReactNode } from "react";
-import { Search } from "lucide-react";
+import { Link } from "react-router-dom";
+import {
+  Search,
+  Map,
+  BookOpen,
+  ClipboardList,
+  Layers,
+  FileText,
+} from "lucide-react";
+
+interface Category {
+  id: string;
+  name: string;
+}
 
 interface BlogLayoutProps {
   children: ReactNode;
   onSearch?: (term: string) => void;
+  categories?: Category[];
+  selectedCategory?: string;
+  onCategoryChange?: (id: string) => void;
 }
 
-const BlogLayout: React.FC<BlogLayoutProps> = ({ children, onSearch }) => {
+const EXPLORE_LINKS = [
+  {
+    icon: Map,
+    label: "Lộ trình học tập",
+    to: "/roadmaps",
+    iconClass: "text-blue-600 bg-blue-50",
+  },
+  {
+    icon: BookOpen,
+    label: "Khóa học",
+    to: "/courses",
+    iconClass: "text-emerald-600 bg-emerald-50",
+  },
+  {
+    icon: ClipboardList,
+    label: "Đề thi",
+    to: "/exams",
+    iconClass: "text-violet-600 bg-violet-50",
+  },
+  {
+    icon: Layers,
+    label: "Flashcard",
+    to: "/flashcards",
+    iconClass: "text-rose-600 bg-rose-50",
+  },
+  {
+    icon: FileText,
+    label: "Tài liệu",
+    to: "/documents",
+    iconClass: "text-amber-600 bg-amber-50",
+  },
+];
+
+const BlogLayout: React.FC<BlogLayoutProps> = ({
+  children,
+  onSearch,
+  categories,
+  selectedCategory,
+  onCategoryChange,
+}) => {
   const [searchTerm, setSearchTerm] = React.useState("");
-
-  const sidebarSections = [
-    {
-      title: "Tìm hiểu về STUDY4",
-      items: ["Tính năng trên STUDY4", "Khóa học trên STUDY4"],
-    },
-    {
-      title: "Review của học viên STUDY4",
-      items: ["Học viên IELTS", "Học viên TOEIC", "Học viên HSK"],
-    },
-    {
-      title: "Luyện thi IELTS",
-      items: [
-        "IELTS Listening",
-        "IELTS Reading",
-        "IELTS Speaking",
-        "IELTS Writing",
-        "IELTS Materials",
-        "Thông tin kỳ thi IELTS",
-        "Kinh nghiệm thi IELTS",
-        "The Reading Hub",
-      ],
-    },
-  ];
-
-  const recommendedCourses = [
-    {
-      icon: "🎧",
-      title: "KHÓA HỌC IELTS INTENSIVE LISTENING",
-      color: "text-purple-600",
-    },
-    {
-      icon: "📖",
-      title: "KHÓA HỌC IELTS INTENSIVE READING (ACADEMIC)",
-      color: "text-blue-600",
-    },
-    {
-      icon: "🎤",
-      title: "KHÓA HỌC IELTS INTENSIVE SPEAKING",
-      color: "text-pink-600",
-    },
-    {
-      icon: "✍️",
-      title: "KHÓA HỌC IELTS INTENSIVE WRITING (ACADEMIC)",
-      color: "text-orange-600",
-    },
-    {
-      icon: "📚",
-      title: "KHÓA HỌC IELTS GENERAL READING",
-      color: "text-blue-600",
-    },
-    {
-      icon: "📝",
-      title: "KHÓA HỌC IELTS GENERAL WRITING",
-      color: "text-orange-600",
-    },
-    {
-      icon: "📘",
-      title: "KHÓA HỌC IELTS FUNDAMENTALS (cơ bản)",
-      color: "text-yellow-600",
-    },
-  ];
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    if (onSearch) {
-      onSearch(searchTerm);
-    }
+    if (onSearch) onSearch(searchTerm);
   };
 
   return (
@@ -90,41 +81,39 @@ const BlogLayout: React.FC<BlogLayoutProps> = ({ children, onSearch }) => {
       {/* Main Content - 3 columns layout */}
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="grid grid-cols-12 gap-6">
-          {/* Left Sidebar - Chuyên mục */}
+          {/* Left Sidebar - Chuyên mục / Filter */}
           <aside className="col-span-12 lg:col-span-2">
             <div className="bg-white rounded-lg p-4 lg:sticky lg:top-4 shadow-sm">
               <h3 className="font-bold text-gray-800 mb-4 text-sm">
                 Chuyên mục
               </h3>
-
-              <div className="space-y-3">
-                {sidebarSections.map((section, idx) => (
-                  <div key={idx}>
-                    <h4 className="font-semibold text-xs text-gray-700 mb-1.5">
-                      {section.title}
-                    </h4>
-                    <ul className="space-y-0.5 ml-2">
-                      {section.items.map((item, itemIdx) => (
-                        <li key={itemIdx}>
-                          <a
-                            href="#"
-                            className="text-xs text-gray-600 hover:text-gray-900 block py-0.5 transition-colors"
-                          >
-                            {item}
-                          </a>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
-              </div>
+              {categories && onCategoryChange ? (
+                <ul className="space-y-1">
+                  {categories.map((cat) => (
+                    <li key={cat.id}>
+                      <button
+                        onClick={() => onCategoryChange(cat.id)}
+                        className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
+                          selectedCategory === cat.id
+                            ? "bg-gray-800 text-white font-semibold"
+                            : "text-gray-600 hover:bg-gray-100"
+                        }`}
+                      >
+                        {cat.name}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-xs text-gray-400">Không có chuyên mục</p>
+              )}
             </div>
           </aside>
 
           {/* Middle Content - Dynamic */}
           <main className="col-span-12 lg:col-span-7">{children}</main>
 
-          {/* Right Sidebar - Tìm kiếm & Tìm hiểu thêm */}
+          {/* Right Sidebar */}
           <aside className="col-span-12 lg:col-span-3">
             <div className="space-y-4 lg:sticky lg:top-4">
               {/* Search Box */}
@@ -138,7 +127,7 @@ const BlogLayout: React.FC<BlogLayoutProps> = ({ children, onSearch }) => {
                       type="text"
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      placeholder="Nhập từ khóa bạn muốn tìm kiếm..."
+                      placeholder="Nhập từ khóa..."
                       className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400"
                     />
                     <button
@@ -151,25 +140,27 @@ const BlogLayout: React.FC<BlogLayoutProps> = ({ children, onSearch }) => {
                 </form>
               </div>
 
-              {/* Recommended Courses */}
+              {/* Tìm hiểu thêm */}
               <div className="bg-white rounded-lg p-4 shadow-sm">
                 <h3 className="font-bold text-gray-800 mb-3 text-sm">
                   Tìm hiểu thêm
                 </h3>
-                <div className="space-y-1.5">
-                  {recommendedCourses.map((course, idx) => (
-                    <a
-                      key={idx}
-                      href="#"
-                      className="flex items-start gap-2 p-2 hover:bg-gray-50 rounded-md transition-colors group"
+                <div className="space-y-1">
+                  {EXPLORE_LINKS.map((item) => (
+                    <Link
+                      key={item.to}
+                      to={item.to}
+                      className="flex items-center gap-3 p-2.5 hover:bg-gray-50 rounded-lg transition-colors group"
                     >
-                      <span className="text-base flex-shrink-0">
-                        {course.icon}
+                      <div
+                        className={`w-8 h-8 rounded-lg ${item.iconClass} flex items-center justify-center shrink-0`}
+                      >
+                        <item.icon className="w-4 h-4" />
+                      </div>
+                      <span className="text-sm text-gray-700 group-hover:text-gray-900 font-medium">
+                        {item.label}
                       </span>
-                      <span className="text-xs text-gray-700 group-hover:text-gray-900">
-                        {course.title}
-                      </span>
-                    </a>
+                    </Link>
                   ))}
                 </div>
               </div>
