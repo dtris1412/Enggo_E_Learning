@@ -13,10 +13,14 @@ import {
   Target,
   BookOpen,
   RefreshCw,
+  Map,
+  ArrowRight,
 } from "lucide-react";
 import {
   useExamAnalytics,
   WeaknessType,
+  SuggestedRoadmap,
+  SuggestedCourse,
 } from "../../contexts/examAnalyticsContext";
 import { useExam } from "../../contexts/examContext";
 
@@ -640,6 +644,112 @@ const ExamAnalytics: React.FC = () => {
                   Đã dùng {aiAnalysis.token_usage.ai_tokens_used} AI token (
                   {aiAnalysis.token_usage.openai_tokens_used} OpenAI tokens)
                 </p>
+
+                {/* Suggested Roadmaps */}
+                {aiAnalysis.suggested_roadmaps?.length > 0 && (
+                  <div className="border border-emerald-100 rounded-xl bg-emerald-50 p-5">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Map className="w-4 h-4 text-emerald-600" />
+                      <p className="font-semibold text-emerald-800 text-sm">
+                        Lộ trình được đề xuất
+                      </p>
+                    </div>
+                    <div className="grid gap-2">
+                      {aiAnalysis.suggested_roadmaps.map(
+                        (r: SuggestedRoadmap) => (
+                          <a
+                            key={r.roadmap_id}
+                            href={`/roadmaps/${r.roadmap_id}`}
+                            className="flex items-center justify-between bg-white border border-emerald-100 rounded-lg px-4 py-3 hover:border-emerald-400 hover:shadow-sm transition group"
+                          >
+                            <div className="min-w-0">
+                              <p className="font-medium text-sm text-gray-800 truncate group-hover:text-emerald-700">
+                                {r.roadmap_title}
+                              </p>
+                              <p className="text-xs text-gray-400 mt-0.5">
+                                {r.certificate_name && (
+                                  <span className="mr-2">
+                                    {r.certificate_name}
+                                  </span>
+                                )}
+                                <span
+                                  className={`px-1.5 py-0.5 rounded-full text-xs font-medium ${
+                                    r.roadmap_level === "Beginner"
+                                      ? "bg-green-100 text-green-700"
+                                      : r.roadmap_level === "Intermediate"
+                                        ? "bg-yellow-100 text-yellow-700"
+                                        : "bg-red-100 text-red-700"
+                                  }`}
+                                >
+                                  {r.roadmap_level}
+                                </span>
+                                {r.estimated_duration && (
+                                  <span className="ml-2">
+                                    ~{r.estimated_duration}h
+                                  </span>
+                                )}
+                              </p>
+                            </div>
+                            <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-emerald-600 flex-shrink-0 ml-2" />
+                          </a>
+                        ),
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Suggested Courses */}
+                {aiAnalysis.suggested_courses?.length > 0 && (
+                  <div className="border border-indigo-100 rounded-xl bg-indigo-50 p-5">
+                    <div className="flex items-center gap-2 mb-3">
+                      <BookOpen className="w-4 h-4 text-indigo-600" />
+                      <p className="font-semibold text-indigo-800 text-sm">
+                        Khóa học được đề xuất
+                      </p>
+                    </div>
+                    <div className="grid gap-2">
+                      {aiAnalysis.suggested_courses.map(
+                        (c: SuggestedCourse) => (
+                          <a
+                            key={c.course_id}
+                            href={`/courses/${c.course_id}`}
+                            className="flex items-center justify-between bg-white border border-indigo-100 rounded-lg px-4 py-3 hover:border-indigo-400 hover:shadow-sm transition group"
+                          >
+                            <div className="min-w-0">
+                              <p className="font-medium text-sm text-gray-800 truncate group-hover:text-indigo-700">
+                                {c.course_title}
+                              </p>
+                              <p className="text-xs text-gray-400 mt-0.5">
+                                <span
+                                  className={`px-1.5 py-0.5 rounded-full text-xs font-medium mr-2 ${
+                                    c.course_level === "beginner"
+                                      ? "bg-green-100 text-green-700"
+                                      : c.course_level === "intermediate"
+                                        ? "bg-yellow-100 text-yellow-700"
+                                        : "bg-red-100 text-red-700"
+                                  }`}
+                                >
+                                  {c.course_level}
+                                </span>
+                                {c.tag && (
+                                  <span className="text-indigo-500">
+                                    #{c.tag}
+                                  </span>
+                                )}
+                                {c.estimate_duration && (
+                                  <span className="ml-2">
+                                    ~{c.estimate_duration}h
+                                  </span>
+                                )}
+                              </p>
+                            </div>
+                            <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-indigo-600 flex-shrink-0 ml-2" />
+                          </a>
+                        ),
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 

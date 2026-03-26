@@ -45,6 +45,22 @@ export interface RecurringWeakness {
   total_wrong: number;
 }
 
+export interface SuggestedRoadmap {
+  roadmap_id: number;
+  roadmap_title: string;
+  roadmap_level: "Beginner" | "Intermediate" | "Advanced";
+  estimated_duration: number | null;
+  certificate_name: string | null;
+}
+
+export interface SuggestedCourse {
+  course_id: number;
+  course_title: string;
+  course_level: string;
+  estimate_duration: number | null;
+  tag: string | null;
+}
+
 export interface AIAnalysisResult {
   exam_info: {
     exam_id: number;
@@ -64,6 +80,8 @@ export interface AIAnalysisResult {
     progress_trend: string;
     recurring_weaknesses: RecurringWeakness[];
   };
+  suggested_roadmaps: SuggestedRoadmap[];
+  suggested_courses: SuggestedCourse[];
   ai_analysis: string;
   token_usage: {
     openai_tokens_used: number;
