@@ -1,13 +1,16 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { CreditCard, Brain, Target, TrendingUp } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useFlashcard } from "../../contexts/flashcardContext";
 
+const ITEMS_PER_PAGE = 4;
+
 const FlashcardProgress: React.FC = () => {
   const { flashcardSets, loading, fetchMyFlashcardSets } = useFlashcard();
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
-    fetchMyFlashcardSets("", 1, 10);
+    fetchMyFlashcardSets("", 1, 100);
   }, []);
 
   if (loading) {
@@ -29,6 +32,12 @@ const FlashcardProgress: React.FC = () => {
   const publicSets = flashcardSets.filter(
     (set) => set.visibility === "public",
   ).length;
+
+  const totalPages = Math.ceil(flashcardSets.length / ITEMS_PER_PAGE);
+  const paginatedSets = flashcardSets.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE,
+  );
 
   return (
     <div className="bg-white rounded-lg shadow-md p-8">
@@ -110,19 +119,11 @@ const FlashcardProgress: React.FC = () => {
         </div>
       ) : (
         <div className="space-y-4">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="font-semibold text-gray-800">
-              Bộ flashcard của bạn
-            </h3>
-            <Link
-              to="/flashcards/my-library"
-              className="text-sm text-blue-600 hover:text-blue-700 hover:underline"
-            >
-              Xem tất cả →
-            </Link>
-          </div>
+          <h3 className="font-semibold text-gray-800 mb-4">
+            Bộ flashcard của bạn
+          </h3>
 
-          {flashcardSets.slice(0, 5).map((set) => (
+          {paginatedSets.map((set) => (
             <div
               key={set.flashcard_set_id}
               className="border border-gray-200 rounded-lg p-4 hover:shadow-md hover:border-purple-300 transition"
@@ -180,14 +181,46 @@ const FlashcardProgress: React.FC = () => {
             </div>
           ))}
 
-          {flashcardSets.length > 5 && (
-            <div className="text-center pt-4">
-              <Link
-                to="/flashcards/my-library"
-                className="text-blue-600 hover:text-blue-700 hover:underline text-sm"
-              >
-                Xem thêm {flashcardSets.length - 5} bộ flashcard khác →
-              </Link>
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+              <p className="text-sm text-gray-500">
+                Trang {currentPage}/{totalPages} &bull; {flashcardSets.length}{" "}
+                bộ flashcard
+              </p>
+              <div className="flex gap-1">
+                <button
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  className="px-3 py-1.5 rounded-lg text-sm border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition"
+                >
+                  ‹ Trước
+                </button>
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                  (p) => (
+                    <button
+                      key={p}
+                      onClick={() => setCurrentPage(p)}
+                      className={`px-3 py-1.5 rounded-lg text-sm border transition ${
+                        currentPage === p
+                          ? "bg-purple-500 text-white border-purple-500"
+                          : "border-gray-200 text-gray-600 hover:bg-gray-50"
+                      }`}
+                    >
+                      {p}
+                    </button>
+                  ),
+                )}
+                <button
+                  onClick={() =>
+                    setCurrentPage((p) => Math.min(totalPages, p + 1))
+                  }
+                  disabled={currentPage === totalPages}
+                  className="px-3 py-1.5 rounded-lg text-sm border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition"
+                >
+                  Sau ›
+                </button>
+              </div>
             </div>
           )}
         </div>

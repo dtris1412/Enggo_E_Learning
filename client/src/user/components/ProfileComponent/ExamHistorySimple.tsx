@@ -42,6 +42,8 @@ const ExamHistorySimple: React.FC = () => {
   const [history, setHistory] = useState<ExamAttempt[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 5;
 
   useEffect(() => {
     fetchExamHistory();
@@ -50,7 +52,7 @@ const ExamHistorySimple: React.FC = () => {
   const fetchExamHistory = async () => {
     try {
       setLoading(true);
-      const result = await getUserExamHistory(1, 10);
+      const result = await getUserExamHistory(1, 100);
 
       if (result.success) {
         setHistory(result.data || []);
@@ -109,6 +111,12 @@ const ExamHistorySimple: React.FC = () => {
         totalExams
       : 0;
 
+  const totalPages = Math.ceil(totalExams / ITEMS_PER_PAGE);
+  const paginatedHistory = history.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE,
+  );
+
   return (
     <div className="space-y-6">
       {/* Summary Statistics */}
@@ -160,7 +168,7 @@ const ExamHistorySimple: React.FC = () => {
           </div>
         ) : (
           <div className="space-y-4">
-            {history.slice(0, 10).map((attempt) => {
+            {paginatedHistory.map((attempt) => {
               const percentage = getScorePercentage(attempt);
               const isPassed = percentage >= 60;
 
@@ -171,11 +179,11 @@ const ExamHistorySimple: React.FC = () => {
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                      <h3 className="text-base font-semibold text-gray-800 mb-2">
                         {attempt.Exam.exam_title}
                       </h3>
 
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
                         <div className="flex items-center gap-2 text-gray-600">
                           <Calendar className="w-4 h-4" />
                           <span>
@@ -229,14 +237,65 @@ const ExamHistorySimple: React.FC = () => {
               );
             })}
 
-            {totalExams > 10 && (
-              <div className="text-center pt-4">
-                <Link
-                  to="/exams/history"
-                  className="inline-block px-6 py-2 text-blue-600 hover:bg-blue-50 rounded-lg transition"
-                >
-                  Xem tất cả ({totalExams} bài thi)
-                </Link>
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                <p className="text-sm text-gray-500">
+                  Trang {currentPage}/{totalPages} &bull; {totalExams} bài thi
+                </p>
+                <div className="flex gap-1">
+                  <button
+                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                    disabled={currentPage === 1}
+                    className="px-3 py-1.5 rounded-lg text-sm border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition"
+                  >
+                    ‹ Trước
+                  </button>
+                  {Array.from({ length: totalPages }, (_, i) => i + 1)
+                    .filter(
+                      (p) =>
+                        p === 1 ||
+                        p === totalPages ||
+                        Math.abs(p - currentPage) <= 1,
+                    )
+                    .reduce<(number | "...")[]>((acc, p, i, arr) => {
+                      if (i > 0 && (arr[i - 1] as number) < p - 1)
+                        acc.push("...");
+                      acc.push(p);
+                      return acc;
+                    }, [])
+                    .map((p, i) =>
+                      p === "..." ? (
+                        <span
+                          key={`ellipsis-${i}`}
+                          className="px-2 py-1.5 text-sm text-gray-400"
+                        >
+                          ...
+                        </span>
+                      ) : (
+                        <button
+                          key={p}
+                          onClick={() => setCurrentPage(p as number)}
+                          className={`px-3 py-1.5 rounded-lg text-sm border transition ${
+                            currentPage === p
+                              ? "bg-blue-500 text-white border-blue-500"
+                              : "border-gray-200 text-gray-600 hover:bg-gray-50"
+                          }`}
+                        >
+                          {p}
+                        </button>
+                      ),
+                    )}
+                  <button
+                    onClick={() =>
+                      setCurrentPage((p) => Math.min(totalPages, p + 1))
+                    }
+                    disabled={currentPage === totalPages}
+                    className="px-3 py-1.5 rounded-lg text-sm border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition"
+                  >
+                    Sau ›
+                  </button>
+                </div>
               </div>
             )}
           </div>

@@ -17,9 +17,12 @@ interface EnrolledCourse {
   started_at: string;
 }
 
+const ITEMS_PER_PAGE = 4;
+
 const LearningProgress: React.FC = () => {
   const [courses, setCourses] = useState<EnrolledCourse[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     fetchEnrolledCourses();
@@ -75,6 +78,12 @@ const LearningProgress: React.FC = () => {
       ? courses.reduce((sum, c) => sum + c.progress_percentage, 0) /
         courses.length
       : 0;
+
+  const totalPages = Math.ceil(courses.length / ITEMS_PER_PAGE);
+  const paginatedCourses = courses.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE,
+  );
 
   return (
     <div className="bg-white rounded-lg shadow-md p-8">
@@ -173,7 +182,7 @@ const LearningProgress: React.FC = () => {
       ) : (
         <div className="space-y-4">
           <h3 className="font-semibold text-gray-800 mb-4">Khóa học của bạn</h3>
-          {courses.map((course) => (
+          {paginatedCourses.map((course) => (
             <div
               key={course.course_id}
               className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition"
@@ -239,6 +248,49 @@ const LearningProgress: React.FC = () => {
               </div>
             </div>
           ))}
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+              <p className="text-sm text-gray-500">
+                Trang {currentPage}/{totalPages} &bull; {courses.length} khóa
+                học
+              </p>
+              <div className="flex gap-1">
+                <button
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  className="px-3 py-1.5 rounded-lg text-sm border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition"
+                >
+                  ‹ Trước
+                </button>
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                  (p) => (
+                    <button
+                      key={p}
+                      onClick={() => setCurrentPage(p)}
+                      className={`px-3 py-1.5 rounded-lg text-sm border transition ${
+                        currentPage === p
+                          ? "bg-blue-500 text-white border-blue-500"
+                          : "border-gray-200 text-gray-600 hover:bg-gray-50"
+                      }`}
+                    >
+                      {p}
+                    </button>
+                  ),
+                )}
+                <button
+                  onClick={() =>
+                    setCurrentPage((p) => Math.min(totalPages, p + 1))
+                  }
+                  disabled={currentPage === totalPages}
+                  className="px-3 py-1.5 rounded-lg text-sm border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition"
+                >
+                  Sau ›
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>
