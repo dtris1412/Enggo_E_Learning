@@ -1,4 +1,15 @@
-import { askOpenAI, generateFlashcardSet } from "../services/aiService.js";
+import {
+  askOpenAI,
+  generateFlashcardSet,
+  checkScope,
+} from "../services/aiService.js";
+import {
+  buildContextKey,
+  buildChatKey,
+  getCachedAIResponse,
+  setCachedAIResponse,
+  TTL,
+} from "../services/aiCacheService.js";
 import db from "../../models/index.js";
 import {
   deductTokenUsage,
@@ -84,7 +95,14 @@ export const contextAssist = async (req, res) => {
       return res.status(400).json({ error: "Message is required" });
     }
 
-    // Xây dựng context từ dữ liệu
+    // ── 1. Kiểm tra cache ──────────────────────────────────────────────
+    const cacheKey = buildContextKey(exam_id, question_id, message);
+    const cached = await getCachedAIResponse(cacheKey);
+    if (cached) {
+      return res.json({ ...cached, from_cache: true });
+    }
+
+    // ── 2. Xây dựng context từ dữ liệu ────────────────────────────────
     let context = "";
     if (exam_id) {
       const exam = await User_Exam.findOne({
@@ -107,13 +125,13 @@ export const contextAssist = async (req, res) => {
       context += `User history: ${JSON.stringify(user_history)}\n`;
     }
 
-    // Gọi AI với context
+    // ── 3. Gọi AI với type=explanation để dùng system prompt đúng ──────
     const aiResponse = await askOpenAI({
-      message: `${context}\n\nUser question: ${message}`,
-      type: type || "chat",
+      message: context ? `${context}\n\nUser question: ${message}` : message,
+      type: "explanation",
     });
 
-    // Xử lý trừ token
+    // ── 4. Xử lý trừ token ────────────────────────────────────────────
     let tokenInfo;
     try {
       tokenInfo = await processTokenDeduction(
@@ -128,7 +146,7 @@ export const contextAssist = async (req, res) => {
       });
     }
 
-    // Lưu interaction vào DB
+    // ── 5. Lưu DB interaction ─────────────────────────────────────────
     if (user_id && exam_id && question_id) {
       await AI_Interaction.create({
         user_id,
@@ -143,11 +161,15 @@ export const contextAssist = async (req, res) => {
       });
     }
 
-    res.json({
+    // ── 6. Lưu cache ──────────────────────────────────────────────────
+    const responsePayload = {
       reply: aiResponse.content,
       context_provided: !!context,
       token_info: tokenInfo,
-    });
+    };
+    await setCachedAIResponse(cacheKey, responsePayload, TTL.EXPLANATION);
+
+    res.json({ ...responsePayload, from_cache: false });
   } catch (error) {
     console.error("Context assist error:", error);
     res.status(500).json({ error: "AI service error", detail: error.message });
@@ -168,17 +190,34 @@ export const globalChat = async (req, res) => {
       return res.status(400).json({ error: "Message is required" });
     }
 
-    // Inject context nếu có
+    // ── 1. Kiểm tra phạm vi (fast check bằng regex) ───────────────────
+    const { isOutOfScope, reason } = checkScope(message);
+    if (isOutOfScope) {
+      return res.json({
+        reply: reason,
+        from_cache: false,
+        out_of_scope: true,
+      });
+    }
+
+    // ── 2. Kiểm tra cache ──────────────────────────────────────────────
+    const cacheKey = buildChatKey(message);
+    const cached = await getCachedAIResponse(cacheKey);
+    if (cached) {
+      return res.json({ ...cached, from_cache: true });
+    }
+
+    // ── 3. Gọi AI (system prompt giới hạn tiếng Anh được inject tự động) ─
     const fullMessage = context
       ? `Context: ${JSON.stringify(context)}\n\nUser: ${message}`
       : message;
 
     const aiResponse = await askOpenAI({
       message: fullMessage,
-      type: "chat",
+      type: "chat", // → tự dùng ENGLISH_ASSISTANT_SYSTEM_PROMPT
     });
 
-    // Xử lý trừ token
+    // ── 4. Xử lý trừ token ────────────────────────────────────────────
     let tokenInfo;
     try {
       tokenInfo = await processTokenDeduction(
@@ -193,7 +232,22 @@ export const globalChat = async (req, res) => {
       });
     }
 
-    res.json({ reply: aiResponse.content, token_info: tokenInfo });
+    // ── 5. Lưu cache (chỉ cache nếu AI không từ chối) ─────────────────
+    const isAIRefusal =
+      aiResponse.content.includes("mình chỉ hỗ trợ") ||
+      aiResponse.content.includes("only support") ||
+      aiResponse.content.includes("nằm ngoài phạm vi");
+
+    const responsePayload = {
+      reply: aiResponse.content,
+      token_info: tokenInfo,
+    };
+
+    if (!isAIRefusal) {
+      await setCachedAIResponse(cacheKey, responsePayload, TTL.CHAT);
+    }
+
+    res.json({ ...responsePayload, from_cache: false });
   } catch (error) {
     console.error("Global chat error:", error);
     res.status(500).json({ error: "AI service error", detail: error.message });

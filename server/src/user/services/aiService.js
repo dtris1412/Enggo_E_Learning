@@ -4,36 +4,141 @@ import dotenv from "dotenv";
 dotenv.config();
 const apiKey = process.env.OPENAI_API_KEY;
 
+// ─────────────────────────────────────────────
+// Scope Validation - Chỉ trả lời học thuật tiếng Anh
+// ─────────────────────────────────────────────
+
+/**
+ * Danh sách pattern NGOÀI phạm vi hỗ trợ.
+ * Kiểm tra nhanh bằng regex trước khi gọi AI, tiết kiệm token.
+ */
+const OUT_OF_SCOPE_PATTERNS = [
+  // Sức khỏe / y tế
+  /\b(bị bệnh|triệu chứng|đau bụng|sốt|ốm|thuốc|bác sĩ|bệnh viện|khám bệnh|chữa bệnh|điều trị|dị ứng|ho|cảm cúm)\b/i,
+  /\b(sick|symptom|disease|medicine|doctor|hospital|treatment|fever|cough|allergy|surgery)\b/i,
+
+  // Tài chính / vay vốn
+  /\b(vay vốn|vay tiền|lãi suất|ngân hàng|đầu tư chứng khoán|cổ phiếu|tiền tệ|tỷ giá|crypto|bitcoin)\b/i,
+  /\b(loan|borrow money|interest rate|stock market|investment|cryptocurrency)\b/i,
+
+  // Ngoại hình / cá nhân
+  /\b(tôi có đẹp|tôi có xinh|tôi trông|tôi béo|tôi gầy|chế độ ăn|giảm cân|tăng cân)\b/i,
+  /\b(am i beautiful|am i handsome|do i look|lose weight|gain weight|diet plan)\b/i,
+
+  // Pháp lý / chính trị
+  /\b(luật sư|kiện tụng|chính trị|bầu cử|đảng phái|quốc hội)\b/i,
+  /\b(lawyer|lawsuit|politics|election|government policy)\b/i,
+
+  // Nấu ăn / công thức
+  /\b(công thức nấu|cách nấu|nguyên liệu nấu|món ăn|thực đơn)\b/i,
+  /\b(cooking recipe|how to cook|ingredients for|food recipe)\b/i,
+];
+
+/**
+ * Kiểm tra xem message có nằm ngoài phạm vi học thuật tiếng Anh không.
+ * @param {string} message
+ * @returns {{ isOutOfScope: boolean, reason: string|null }}
+ */
+export const checkScope = (message) => {
+  for (const pattern of OUT_OF_SCOPE_PATTERNS) {
+    if (pattern.test(message)) {
+      return {
+        isOutOfScope: true,
+        reason:
+          "Xin lỗi, mình chỉ hỗ trợ các câu hỏi liên quan đến học tập tiếng Anh " +
+          "(ngữ pháp, từ vựng, luyện thi IELTS/TOEIC, đọc hiểu, viết, phát âm,...). " +
+          "Vui lòng đặt câu hỏi về tiếng Anh nhé! 😊",
+      };
+    }
+  }
+  return { isOutOfScope: false, reason: null };
+};
+
+// System prompt cho globalChat - buộc AI từ chối câu ngoài phạm vi
+const ENGLISH_ASSISTANT_SYSTEM_PROMPT = `Bạn là trợ lý học tiếng Anh chuyên nghiệp cho nền tảng học tập Enggo.
+
+PHẠM VI HỖ TRỢ (chỉ trả lời các chủ đề này):
+✅ Ngữ pháp tiếng Anh (Grammar)
+✅ Từ vựng, idioms, collocations, phrasal verbs
+✅ Luyện thi IELTS, TOEIC, TOEFL
+✅ Kỹ năng đọc hiểu, viết, nghe, nói
+✅ Phát âm, IPA
+✅ Giải thích câu hỏi/đáp án trong bài kiểm tra tiếng Anh
+✅ Dịch thuật Anh-Việt liên quan đến học tập
+✅ Gợi ý từ đồng nghĩa, trái nghĩa, cách dùng từ
+
+NGOÀI PHẠM VI (từ chối lịch sự):
+❌ Câu hỏi về sức khỏe, y tế
+❌ Câu hỏi về tài chính, đầu tư, vay vốn
+❌ Câu hỏi về chính trị, pháp luật
+❌ Câu hỏi cá nhân không liên quan học tập
+❌ Công thức nấu ăn, giải trí thuần túy
+
+Nếu câu hỏi NGOÀI phạm vi, hãy trả lời:
+"Xin lỗi, mình chỉ hỗ trợ các câu hỏi liên quan đến học tập tiếng Anh. Bạn có câu hỏi về tiếng Anh nào không? 😊"
+
+Trả lời bằng tiếng Việt trừ khi user hỏi bằng tiếng Anh. Ngắn gọn, rõ ràng, dễ hiểu cho học viên Việt Nam.`;
+
+// System prompt cho contextAssist - giải thích đáp án bài thi
+const EXAM_EXPLANATION_SYSTEM_PROMPT = `Bạn là trợ lý giải thích đáp án tiếng Anh chuyên nghiệp cho nền tảng Enggo.
+
+NHIỆM VỤ: Giải thích tại sao đáp án là đúng/sai trong bài kiểm tra tiếng Anh.
+
+QUY TẮC:
+- Giải thích ngắn gọn, rõ ràng (3-5 câu)
+- Nêu rõ quy tắc ngữ pháp / từ vựng áp dụng
+- Đưa ví dụ minh họa nếu cần
+- Giải thích bằng tiếng Việt, giữ nguyên thuật ngữ tiếng Anh quan trọng
+- KHÔNG đề cập thông tin cá nhân của user
+- KHÔNG trả lời câu hỏi ngoài phạm vi giải thích bài thi tiếng Anh`;
+
 /**
  * Hàm gọi OpenAI, có thể mở rộng cho nhiều nhiệm vụ khác nhau
  * @param {Object} params
  * @param {string} params.message - Nội dung chính
- * @param {string} [params.type] - Loại nhiệm vụ (chat, flashcard, grading...)
+ * @param {string} [params.type] - Loại nhiệm vụ (chat, flashcard, grading, explanation)
  * @param {string} [params.context] - Ngữ cảnh bổ sung
+ * @param {string} [params.systemPrompt] - System prompt tùy chỉnh (override mặc định)
  * @param {Object} [params.options] - Tuỳ chọn model, max_tokens, temperature...
- * @returns {Promise<string>} - Kết quả trả về từ AI
+ * @returns {Promise<{content, usage}>}
  */
 export const askOpenAI = async ({
   message,
   type = "chat",
   context = "",
+  systemPrompt = null,
   options = {},
 }) => {
   let prompt = message;
-  // Tuỳ loại nhiệm vụ, xây dựng prompt phù hợp
+  let resolvedSystemPrompt = systemPrompt;
+
+  // Tuỳ loại nhiệm vụ, xây dựng prompt + system prompt phù hợp
   if (type === "flashcard") {
     prompt = `Hãy tạo flashcard từ nội dung sau:\n${message}`;
   } else if (type === "grading") {
     prompt = `Hãy chấm điểm và nhận xét bài làm sau:\n${message}`;
+  } else if (type === "explanation") {
+    // Giải thích đáp án bài thi tiếng Anh
+    if (!resolvedSystemPrompt)
+      resolvedSystemPrompt = EXAM_EXPLANATION_SYSTEM_PROMPT;
+  } else if (type === "chat") {
+    // Global chat - dùng system prompt giới hạn phạm vi
+    if (!resolvedSystemPrompt)
+      resolvedSystemPrompt = ENGLISH_ASSISTANT_SYSTEM_PROMPT;
   }
-  // Có thể mở rộng thêm các loại khác ở đây
+
+  const messages = [];
+  if (resolvedSystemPrompt) {
+    messages.push({ role: "system", content: resolvedSystemPrompt });
+  }
+  messages.push({ role: "user", content: prompt });
 
   try {
     const response = await axios.post(
       "https://api.openai.com/v1/chat/completions",
       {
         model: options.model || "gpt-4o-mini",
-        messages: [{ role: "user", content: prompt }],
+        messages, // dùng messages array đã có system prompt
         max_tokens: options.max_tokens || 500,
         temperature: options.temperature || 0.7,
       },
