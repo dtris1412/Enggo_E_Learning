@@ -369,9 +369,9 @@ const ProfileInfo: React.FC = () => {
     return (
       <div className="bg-white rounded-lg shadow-md p-8">
         <div className="animate-pulse space-y-4">
-          <div className="h-32 w-32 bg-gray-300 rounded-full mx-auto"></div>
-          <div className="h-6 bg-gray-300 rounded w-3/4 mx-auto"></div>
-          <div className="h-4 bg-gray-300 rounded w-1/2 mx-auto"></div>
+          <div className="h-32 w-32 bg-slate-300 rounded-full mx-auto"></div>
+          <div className="h-6 bg-slate-300 rounded w-3/4 mx-auto"></div>
+          <div className="h-4 bg-slate-300 rounded w-1/2 mx-auto"></div>
         </div>
       </div>
     );
@@ -380,7 +380,7 @@ const ProfileInfo: React.FC = () => {
   if (!profile) {
     return (
       <div className="bg-white rounded-lg shadow-md p-8">
-        <p className="text-center text-gray-500">
+        <p className="text-center text-slate-500">
           Không tìm thấy thông tin người dùng
         </p>
       </div>
@@ -393,7 +393,7 @@ const ProfileInfo: React.FC = () => {
       <div className="relative h-40 bg-gradient-to-r from-orange-400 via-blue-500 to-cyan-400 rounded-t-lg">
         <div className="absolute -bottom-16 left-1/2 -translate-x-1/2">
           <div className="relative">
-            <div className="w-32 h-32 rounded-full border-4 border-white bg-gray-100 flex items-center justify-center overflow-hidden shadow-lg">
+            <div className="w-32 h-32 rounded-full border-4 border-white bg-slate-100 flex items-center justify-center overflow-hidden shadow-lg">
               {previewUrl ? (
                 <img
                   src={previewUrl}
@@ -401,7 +401,7 @@ const ProfileInfo: React.FC = () => {
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <UserIcon className="w-16 h-16 text-gray-400" />
+                <UserIcon className="w-16 h-16 text-slate-400" />
               )}
             </div>
             {activeTab === "edit" && (
@@ -428,10 +428,10 @@ const ProfileInfo: React.FC = () => {
 
       {/* User Info Header */}
       <div className="pt-20 px-8 pb-6 text-center">
-        <h2 className="text-2xl font-bold text-gray-800">
+        <h2 className="text-2xl font-bold text-slate-800">
           {profile.user_name || profile.user_name}
         </h2>
-        <p className="text-gray-500 text-sm mt-1">
+        <p className="text-slate-500 text-sm mt-1">
           {profile.role === 1 ? "Admin" : "Học viên"}
         </p>
         <div className="inline-flex items-center mt-2 px-3 py-1 rounded-full text-sm">
@@ -449,7 +449,7 @@ const ProfileInfo: React.FC = () => {
       </div>
 
       {/* Horizontal Tabs */}
-      <div className="border-b border-gray-200 px-8">
+      <div className="border-b border-slate-200 px-8">
         <nav className="flex gap-8">
           <button
             onClick={() => {
@@ -459,7 +459,7 @@ const ProfileInfo: React.FC = () => {
             className={`pb-4 px-2 font-medium text-sm transition-colors relative ${
               activeTab === "view"
                 ? "text-blue-600"
-                : "text-gray-500 hover:text-gray-700"
+                : "text-slate-500 hover:text-slate-700"
             }`}
           >
             Thông tin
@@ -475,7 +475,7 @@ const ProfileInfo: React.FC = () => {
             className={`pb-4 px-2 font-medium text-sm transition-colors relative ${
               activeTab === "edit"
                 ? "text-blue-600"
-                : "text-gray-500 hover:text-gray-700"
+                : "text-slate-500 hover:text-slate-700"
             }`}
           >
             Chỉnh sửa
@@ -492,7 +492,7 @@ const ProfileInfo: React.FC = () => {
               className={`pb-4 px-2 font-medium text-sm transition-colors relative ${
                 activeTab === "password"
                   ? "text-blue-600"
-                  : "text-gray-500 hover:text-gray-700"
+                  : "text-slate-500 hover:text-slate-700"
               }`}
             >
               Đổi mật khẩu
@@ -523,13 +523,13 @@ const ProfileInfo: React.FC = () => {
         {activeTab === "view" && (
           <div className="space-y-4">
             {/* Email */}
-            <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
+            <div className="flex items-start gap-3 p-4 bg-slate-50 rounded-lg">
               <div className="p-2 bg-blue-100 rounded-lg">
                 <Mail className="w-5 h-5 text-blue-600" />
               </div>
               <div className="flex-1">
-                <p className="text-sm text-gray-500 mb-1">Email</p>
-                <p className="text-gray-800 font-medium">
+                <p className="text-sm text-slate-500 mb-1">Email</p>
+                <p className="text-slate-800 font-medium">
                   {profile.user_email}
                 </p>
               </div>
@@ -537,13 +537,13 @@ const ProfileInfo: React.FC = () => {
 
             {/* Phone */}
             {profile.user_phone && (
-              <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
+              <div className="flex items-start gap-3 p-4 bg-slate-50 rounded-lg">
                 <div className="p-2 bg-green-100 rounded-lg">
                   <Phone className="w-5 h-5 text-green-600" />
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm text-gray-500 mb-1">Số điện thoại</p>
-                  <p className="text-gray-800 font-medium">
+                  <p className="text-sm text-slate-500 mb-1">Số điện thoại</p>
+                  <p className="text-slate-800 font-medium">
                     {profile.user_phone}
                   </p>
                 </div>
@@ -552,13 +552,13 @@ const ProfileInfo: React.FC = () => {
 
             {/* Address */}
             {profile.user_address && (
-              <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
+              <div className="flex items-start gap-3 p-4 bg-slate-50 rounded-lg">
                 <div className="p-2 bg-purple-100 rounded-lg">
                   <MapPin className="w-5 h-5 text-purple-600" />
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm text-gray-500 mb-1">Địa chỉ</p>
-                  <p className="text-gray-800 font-medium">
+                  <p className="text-sm text-slate-500 mb-1">Địa chỉ</p>
+                  <p className="text-slate-800 font-medium">
                     {profile.user_address}
                   </p>
                 </div>
@@ -566,13 +566,13 @@ const ProfileInfo: React.FC = () => {
             )}
 
             {/* Created Date */}
-            <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
+            <div className="flex items-start gap-3 p-4 bg-slate-50 rounded-lg">
               <div className="p-2 bg-orange-100 rounded-lg">
                 <Calendar className="w-5 h-5 text-orange-600" />
               </div>
               <div className="flex-1">
-                <p className="text-sm text-gray-500 mb-1">Ngày tham gia</p>
-                <p className="text-gray-800 font-medium">
+                <p className="text-sm text-slate-500 mb-1">Ngày tham gia</p>
+                <p className="text-slate-800 font-medium">
                   {new Date(profile.created_at).toLocaleDateString("vi-VN", {
                     year: "numeric",
                     month: "long",
@@ -603,7 +603,7 @@ const ProfileInfo: React.FC = () => {
         {activeTab === "edit" && (
           <form onSubmit={handleSubmit} className="space-y-6">
             {selectedFile && (
-              <div className="flex items-center justify-center gap-2 text-sm text-gray-600 bg-blue-50 p-3 rounded-lg">
+              <div className="flex items-center justify-center gap-2 text-sm text-slate-600 bg-blue-50 p-3 rounded-lg">
                 <span>Ảnh mới đã chọn: {selectedFile.name}</span>
                 <button
                   type="button"
@@ -624,33 +624,33 @@ const ProfileInfo: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Username (readonly) */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-slate-700 mb-2">
                   Tên đăng nhập
                 </label>
                 <input
                   type="text"
                   value={profile.user_name}
                   disabled
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed"
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg bg-slate-50 text-slate-500 cursor-not-allowed"
                 />
               </div>
 
               {/* Email (readonly) */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-slate-700 mb-2">
                   Email
                 </label>
                 <input
                   type="email"
                   value={profile.user_email}
                   disabled
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed"
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg bg-slate-50 text-slate-500 cursor-not-allowed"
                 />
               </div>
 
               {/* Full Name */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-slate-700 mb-2">
                   Họ và tên
                 </label>
                 <input
@@ -658,14 +658,14 @@ const ProfileInfo: React.FC = () => {
                   name="full_name"
                   value={formData.full_name}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Nhập họ và tên"
                 />
               </div>
 
               {/* Phone */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-slate-700 mb-2">
                   Số điện thoại
                 </label>
                 <input
@@ -676,7 +676,7 @@ const ProfileInfo: React.FC = () => {
                   className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
                     errors.user_phone
                       ? "border-red-500 focus:ring-red-500"
-                      : "border-gray-300 focus:ring-blue-500"
+                      : "border-slate-300 focus:ring-blue-500"
                   }`}
                   placeholder="Nhập số điện thoại"
                 />
@@ -690,7 +690,7 @@ const ProfileInfo: React.FC = () => {
 
             {/* Address */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-slate-700 mb-2">
                 Địa chỉ
               </label>
               <textarea
@@ -698,7 +698,7 @@ const ProfileInfo: React.FC = () => {
                 value={formData.user_address}
                 onChange={handleChange}
                 rows={3}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Nhập địa chỉ"
               />
             </div>
@@ -708,7 +708,7 @@ const ProfileInfo: React.FC = () => {
               <button
                 type="submit"
                 disabled={updating}
-                className="flex items-center gap-2 px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition disabled:bg-gray-400 disabled:cursor-not-allowed"
+                className="flex items-center gap-2 px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition disabled:bg-slate-400 disabled:cursor-not-allowed"
               >
                 <Save className="w-4 h-4" />
                 {updating ? "Đang lưu..." : "Lưu thay đổi"}
@@ -717,7 +717,7 @@ const ProfileInfo: React.FC = () => {
                 type="button"
                 onClick={handleCancel}
                 disabled={updating}
-                className="flex items-center gap-2 px-6 py-3 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition disabled:bg-gray-200 disabled:cursor-not-allowed"
+                className="flex items-center gap-2 px-6 py-3 bg-slate-300 text-slate-700 rounded-lg hover:bg-slate-400 transition disabled:bg-slate-200 disabled:cursor-not-allowed"
               >
                 <X className="w-4 h-4" />
                 Hủy
@@ -734,10 +734,10 @@ const ProfileInfo: React.FC = () => {
                 <Shield className="w-6 h-6 text-blue-600" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-gray-800">
+                <h3 className="text-lg font-semibold text-slate-800">
                   Đổi mật khẩu
                 </h3>
-                <p className="text-gray-500 text-sm">
+                <p className="text-slate-500 text-sm">
                   Cập nhật mật khẩu của bạn để bảo mật tài khoản
                 </p>
               </div>
@@ -745,25 +745,25 @@ const ProfileInfo: React.FC = () => {
 
             {/* Current Password */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-slate-700 mb-2">
                 Mật khẩu hiện tại <span className="text-red-500">*</span>
               </label>
               <div className="relative">
                 <div className="absolute left-3 top-1/2 -translate-y-1/2">
-                  <Lock className="w-5 h-5 text-gray-400" />
+                  <Lock className="w-5 h-5 text-slate-400" />
                 </div>
                 <input
                   type={showPasswords.current ? "text" : "password"}
                   name="current_password"
                   value={passwordData.current_password}
                   onChange={handlePasswordChange}
-                  className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full pl-10 pr-10 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Nhập mật khẩu hiện tại"
                 />
                 <button
                   type="button"
                   onClick={() => togglePasswordVisibility("current")}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
                 >
                   {showPasswords.current ? (
                     <EyeOff className="w-5 h-5" />
@@ -776,25 +776,25 @@ const ProfileInfo: React.FC = () => {
 
             {/* New Password */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-slate-700 mb-2">
                 Mật khẩu mới <span className="text-red-500">*</span>
               </label>
               <div className="relative">
                 <div className="absolute left-3 top-1/2 -translate-y-1/2">
-                  <Lock className="w-5 h-5 text-gray-400" />
+                  <Lock className="w-5 h-5 text-slate-400" />
                 </div>
                 <input
                   type={showPasswords.new ? "text" : "password"}
                   name="new_password"
                   value={passwordData.new_password}
                   onChange={handlePasswordChange}
-                  className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full pl-10 pr-10 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Nhập mật khẩu mới (tối thiểu 6 ký tự)"
                 />
                 <button
                   type="button"
                   onClick={() => togglePasswordVisibility("new")}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
                 >
                   {showPasswords.new ? (
                     <EyeOff className="w-5 h-5" />
@@ -807,25 +807,25 @@ const ProfileInfo: React.FC = () => {
 
             {/* Confirm Password */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-slate-700 mb-2">
                 Xác nhận mật khẩu mới <span className="text-red-500">*</span>
               </label>
               <div className="relative">
                 <div className="absolute left-3 top-1/2 -translate-y-1/2">
-                  <Lock className="w-5 h-5 text-gray-400" />
+                  <Lock className="w-5 h-5 text-slate-400" />
                 </div>
                 <input
                   type={showPasswords.confirm ? "text" : "password"}
                   name="confirm_password"
                   value={passwordData.confirm_password}
                   onChange={handlePasswordChange}
-                  className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full pl-10 pr-10 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Nhập lại mật khẩu mới"
                 />
                 <button
                   type="button"
                   onClick={() => togglePasswordVisibility("confirm")}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
                 >
                   {showPasswords.confirm ? (
                     <EyeOff className="w-5 h-5" />
@@ -841,7 +841,7 @@ const ProfileInfo: React.FC = () => {
               <button
                 type="submit"
                 disabled={updating}
-                className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition disabled:bg-gray-400 disabled:cursor-not-allowed"
+                className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition disabled:bg-slate-400 disabled:cursor-not-allowed"
               >
                 <Lock className="w-4 h-4" />
                 {updating ? "Đang xử lý..." : "Đổi mật khẩu"}

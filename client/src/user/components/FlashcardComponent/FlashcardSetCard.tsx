@@ -27,8 +27,8 @@ const FlashcardSetCard: React.FC<FlashcardSetCardProps> = ({
 
   const getVisibilityColor = (visibility: string) => {
     return visibility === "public"
-      ? "bg-green-100 text-green-800"
-      : "bg-gray-100 text-gray-800";
+      ? "bg-emerald-100 text-emerald-800"
+      : "bg-slate-100 text-slate-700";
   };
 
   const getCreatedByColor = (type: string) => {
@@ -55,12 +55,12 @@ const FlashcardSetCard: React.FC<FlashcardSetCardProps> = ({
   return (
     <div
       onClick={handleCardClick}
-      className="bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer border border-gray-200 overflow-hidden group hover:border-indigo-300"
+      className="bg-white rounded-2xl hover:shadow-xl transition-all duration-300 cursor-pointer border border-slate-200 overflow-hidden group hover:-translate-y-1"
     >
       <div className="flex items-center gap-4 p-4">
         {/* Icon */}
         <div className="flex-shrink-0">
-          <div className="p-4 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-lg">
+          <div className="p-4 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl">
             <BookMarked className="w-8 h-8 text-white" />
           </div>
         </div>
@@ -69,7 +69,7 @@ const FlashcardSetCard: React.FC<FlashcardSetCardProps> = ({
         <div className="flex-1 min-w-0">
           {/* Title & Badges */}
           <div className="flex items-start justify-between gap-4 mb-2">
-            <h3 className="text-lg font-bold text-gray-900 line-clamp-1 group-hover:text-indigo-600 transition-colors">
+            <h3 className="text-lg font-black text-slate-900 line-clamp-1 group-hover:text-blue-600 transition-colors">
               {flashcardSet.title}
             </h3>
             <div className="flex items-center gap-2 flex-shrink-0">
@@ -102,13 +102,13 @@ const FlashcardSetCard: React.FC<FlashcardSetCardProps> = ({
 
           {/* Description */}
           {flashcardSet.description && (
-            <p className="text-sm text-gray-600 mb-2 line-clamp-1">
+            <p className="text-sm text-slate-500 mb-2 line-clamp-1">
               {flashcardSet.description}
             </p>
           )}
 
           {/* Meta Info */}
-          <div className="flex items-center gap-6 text-xs text-gray-500">
+          <div className="flex items-center gap-6 text-xs text-slate-500">
             <div className="flex items-center gap-1">
               <BookMarked className="w-3.5 h-3.5" />
               <span className="font-medium">{flashcardSet.total_cards}</span>
@@ -131,7 +131,7 @@ const FlashcardSetCard: React.FC<FlashcardSetCardProps> = ({
 
         {/* Action Button */}
         <div className="flex-shrink-0">
-          <button className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-6 rounded-lg transition-colors duration-200 text-sm">
+          <button className="bg-gradient-to-r from-amber-400 to-orange-500 text-slate-900 font-bold py-2 px-6 rounded-xl transition-all duration-200 text-sm hover:shadow-md">
             Học
           </button>
         </div>

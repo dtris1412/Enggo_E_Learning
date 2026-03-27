@@ -34,14 +34,14 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
   };
 
   const getFileIcon = (fileType: string | null) => {
-    if (!fileType) return <FileText className="w-12 h-12 text-gray-400" />;
+    if (!fileType) return <FileText className="w-12 h-12 text-slate-400" />;
     if (fileType.includes("pdf"))
       return <FileText className="w-12 h-12 text-red-500" />;
     if (fileType.includes("word") || fileType.includes("docx"))
       return <FileText className="w-12 h-12 text-blue-500" />;
     if (fileType.includes("audio"))
       return <FileText className="w-12 h-12 text-green-500" />;
-    return <FileText className="w-12 h-12 text-gray-400" />;
+    return <FileText className="w-12 h-12 text-slate-400" />;
   };
 
   const getTypeColor = (type: string) => {
@@ -53,7 +53,7 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
       case "guideline":
         return "bg-green-100 text-green-800";
       default:
-        return "bg-gray-100 text-gray-800";
+        return "bg-slate-100 text-slate-800";
     }
   };
 
@@ -71,10 +71,10 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
   return (
     <div
       onClick={handleCardClick}
-      className="bg-white rounded-lg shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer border border-gray-200 overflow-hidden group"
+      className="bg-white rounded-2xl hover:shadow-xl transition-all duration-300 cursor-pointer border border-slate-200 overflow-hidden group hover:-translate-y-1"
     >
       {/* Header with Icon */}
-      <div className="p-6 bg-gradient-to-br from-gray-50 to-white">
+      <div className="p-6 bg-gradient-to-br from-slate-50 to-white">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-4">
             {getFileIcon(document.file_type)}
@@ -101,18 +101,18 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
 
       {/* Content */}
       <div className="p-6 pt-4">
-        <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
+        <h3 className="text-lg font-black text-slate-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
           {document.document_name}
         </h3>
 
         {document.document_description && (
-          <p className="text-sm text-gray-600 mb-4 line-clamp-2">
+          <p className="text-sm text-slate-500 mb-4 line-clamp-2">
             {document.document_description}
           </p>
         )}
 
         {/* Stats */}
-        <div className="flex items-center gap-4 text-sm text-gray-500 mb-4">
+        <div className="flex items-center gap-4 text-sm text-slate-500 mb-4">
           <div className="flex items-center gap-1">
             <Eye className="w-4 h-4" />
             <span>{document.view_count || 0}</span>
@@ -128,8 +128,8 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-          <div className="text-sm text-gray-500">
+        <div className="flex items-center justify-between pt-4 border-t border-slate-100">
+          <div className="text-sm text-slate-500">
             <span className="font-medium">{document.file_type || "N/A"}</span>
             {" • "}
             <span>{formatFileSize(document.document_size)}</span>
@@ -137,10 +137,10 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
 
           <button
             onClick={handleDownloadClick}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-400 to-orange-500 text-slate-900 rounded-xl transition-all text-sm font-bold hover:shadow-md"
           >
             <Download className="w-4 h-4" />
-            Download
+            Tải xuống
           </button>
         </div>
       </div>

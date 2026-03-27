@@ -67,7 +67,7 @@ const CourseList: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-slate-50">
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -86,14 +86,14 @@ const CourseList: React.FC = () => {
           <div className="flex flex-col lg:flex-row gap-4 mb-4">
             <div className="flex-1">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 h-5 w-5" />
                 <input
                   type="text"
                   placeholder="Tìm kiếm khóa học..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   onKeyPress={handleKeyPress}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
             </div>
@@ -105,7 +105,7 @@ const CourseList: React.FC = () => {
             </button>
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className="border border-gray-300 text-gray-700 px-6 py-2 rounded-lg font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
+              className="border border-slate-300 text-slate-700 px-6 py-2 rounded-lg font-medium hover:bg-slate-50 transition-colors flex items-center justify-center gap-2"
             >
               <Filter className="h-5 w-5" />
               Bộ lọc
@@ -114,15 +114,15 @@ const CourseList: React.FC = () => {
 
           {/* Filters */}
           {showFilters && (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-gray-200">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-slate-200">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-slate-700 mb-2">
                   Trình độ
                 </label>
                 <select
                   value={courseLevel}
                   onChange={(e) => setCourseLevel(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                   <option value="">Tất cả</option>
                   <option value="Beginner">Beginner</option>
@@ -132,13 +132,13 @@ const CourseList: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-slate-700 mb-2">
                   Loại khóa học
                 </label>
                 <select
                   value={accessType}
                   onChange={(e) => setAccessType(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                   <option value="">Tất cả</option>
                   <option value="free">Miễn phí</option>
@@ -147,7 +147,7 @@ const CourseList: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-slate-700 mb-2">
                   Sắp xếp
                 </label>
                 <select
@@ -157,7 +157,7 @@ const CourseList: React.FC = () => {
                     setSortBy(newSortBy);
                     setSortOrder(newSortOrder);
                   }}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                   <option value="created_at-DESC">Mới nhất</option>
                   <option value="created_at-ASC">Cũ nhất</option>
@@ -177,7 +177,7 @@ const CourseList: React.FC = () => {
 
         {/* Results Info */}
         <div className="mb-6 flex items-center justify-between">
-          <p className="text-gray-600">
+          <p className="text-slate-600">
             Tìm thấy <span className="font-semibold">{totalCourses}</span> khóa
             học
           </p>
@@ -202,7 +202,7 @@ const CourseList: React.FC = () => {
           <>
             {courses.length === 0 ? (
               <div className="text-center py-20">
-                <p className="text-gray-500 text-lg">
+                <p className="text-slate-500 text-lg">
                   Không tìm thấy khóa học nào
                 </p>
               </div>
@@ -220,7 +220,7 @@ const CourseList: React.FC = () => {
                 <button
                   onClick={() => handlePageChange(currentPage - 1)}
                   disabled={currentPage === 1}
-                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-4 py-2 border border-slate-300 rounded-lg hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Trước
                 </button>
@@ -234,7 +234,7 @@ const CourseList: React.FC = () => {
                         className={`px-4 py-2 rounded-lg ${
                           currentPage === page
                             ? "bg-blue-600 text-white"
-                            : "border border-gray-300 hover:bg-gray-50"
+                            : "border border-slate-300 hover:bg-slate-50"
                         }`}
                       >
                         {page}
@@ -246,7 +246,7 @@ const CourseList: React.FC = () => {
                 <button
                   onClick={() => handlePageChange(currentPage + 1)}
                   disabled={currentPage === totalPages}
-                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-4 py-2 border border-slate-300 rounded-lg hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Sau
                 </button>

@@ -316,17 +316,17 @@ const Flashcard: React.FC = () => {
     <Link
       key={set.flashcard_set_id}
       to={`/flashcards/${set.flashcard_set_id}`}
-      className="block hover:bg-gray-50 border-b border-gray-200 last:border-b-0 transition-colors"
+      className="block hover:bg-slate-50 border-b border-slate-200 last:border-b-0 transition-colors"
     >
       <div className="px-6 py-3.5 flex items-center gap-4">
         <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-lg flex items-center justify-center">
           <Layers className="w-5 h-5 text-white" />
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className="font-bold text-gray-900 text-sm mb-0.5 truncate">
+          <h3 className="font-bold text-slate-900 text-sm mb-0.5 truncate">
             {set.title}
           </h3>
-          <p className="text-xs text-gray-600">
+          <p className="text-xs text-slate-600">
             {set.total_cards} cards
             {set.User?.user_name && ` • by ${set.User.user_name}`}
           </p>
@@ -341,7 +341,7 @@ const Flashcard: React.FC = () => {
       <FlashcardSidebar />
 
       {/* Main Content */}
-      <div className="flex-1 bg-gray-50">
+      <div className="flex-1 bg-slate-50">
         {/* Hero Section */}
         <div className="bg-gradient-to-r from-indigo-700 via-purple-600 to-pink-600">
           <div className="container mx-auto px-4 py-12">
@@ -357,13 +357,13 @@ const Flashcard: React.FC = () => {
               <form onSubmit={handleSearch} className="mb-4">
                 <div className="flex gap-3">
                   <div className="flex-1 relative">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                     <input
                       type="text"
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                       placeholder="Tìm kiếm flashcard sets..."
-                      className="w-full pl-12 pr-4 py-3 rounded-lg border-0 focus:ring-2 focus:ring-white/50 text-gray-900"
+                      className="w-full pl-12 pr-4 py-3 rounded-lg border-0 focus:ring-2 focus:ring-white/50 text-slate-900"
                     />
                   </div>
                   {isLoggedIn && (
@@ -371,7 +371,7 @@ const Flashcard: React.FC = () => {
                       <button
                         type="button"
                         onClick={handleCreateNew}
-                        className="bg-white text-indigo-700 hover:bg-gray-100 font-semibold px-6 py-3 rounded-lg transition-colors inline-flex items-center gap-2 whitespace-nowrap"
+                        className="bg-white text-indigo-700 hover:bg-slate-100 font-semibold px-6 py-3 rounded-lg transition-colors inline-flex items-center gap-2 whitespace-nowrap"
                       >
                         <Plus className="w-5 h-5" />
                         Tạo mới
@@ -398,7 +398,7 @@ const Flashcard: React.FC = () => {
           {isLoggedIn && jumpBackInSets.length > 0 && (
             <section className="mb-12">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-gray-900">
+                <h2 className="text-2xl font-bold text-slate-900">
                   Jump back in
                 </h2>
               </div>
@@ -408,10 +408,10 @@ const Flashcard: React.FC = () => {
                 {canScrollLeft && (
                   <button
                     onClick={() => scroll("left")}
-                    className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white shadow-lg rounded-full p-2 hover:bg-gray-100 transition-all opacity-0 group-hover:opacity-100"
+                    className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white shadow-lg rounded-full p-2 hover:bg-slate-100 transition-all opacity-0 group-hover:opacity-100"
                     style={{ left: "-16px" }}
                   >
-                    <ChevronLeft className="w-6 h-6 text-gray-700" />
+                    <ChevronLeft className="w-6 h-6 text-slate-700" />
                   </button>
                 )}
 
@@ -470,7 +470,7 @@ const Flashcard: React.FC = () => {
                             <div className="mt-auto">
                               <div
                                 className={`flex items-center justify-between text-sm mb-2 ${
-                                  isTracked ? "text-gray-300" : "text-blue-100"
+                                  isTracked ? "text-slate-300" : "text-blue-100"
                                 }`}
                               >
                                 <span>
@@ -528,10 +528,10 @@ const Flashcard: React.FC = () => {
                 {canScrollRight && (
                   <button
                     onClick={() => scroll("right")}
-                    className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white shadow-lg rounded-full p-2 hover:bg-gray-100 transition-all opacity-0 group-hover:opacity-100"
+                    className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white shadow-lg rounded-full p-2 hover:bg-slate-100 transition-all opacity-0 group-hover:opacity-100"
                     style={{ right: "-16px" }}
                   >
-                    <ChevronRight className="w-6 h-6 text-gray-700" />
+                    <ChevronRight className="w-6 h-6 text-slate-700" />
                   </button>
                 )}
               </div>
@@ -540,12 +540,12 @@ const Flashcard: React.FC = () => {
 
           {/* Recents Section - List View */}
           <section className="mb-12">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Recents</h2>
-            <div className="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200">
+            <h2 className="text-2xl font-bold text-slate-900 mb-4">Recents</h2>
+            <div className="bg-white rounded-lg shadow-sm overflow-hidden border border-slate-200">
               {recentSets.length > 0 ? (
                 recentSets.map((set) => renderSetRow(set))
               ) : (
-                <div className="px-6 py-12 text-center text-gray-500">
+                <div className="px-6 py-12 text-center text-slate-500">
                   Chưa có flashcard sets gần đây
                 </div>
               )}
@@ -554,12 +554,12 @@ const Flashcard: React.FC = () => {
 
           {/* Popular Section - List View */}
           <section>
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Popular</h2>
-            <div className="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200">
+            <h2 className="text-2xl font-bold text-slate-900 mb-4">Popular</h2>
+            <div className="bg-white rounded-lg shadow-sm overflow-hidden border border-slate-200">
               {popularSets.length > 0 ? (
                 popularSets.map((set) => renderSetRow(set))
               ) : (
-                <div className="px-6 py-12 text-center text-gray-500">
+                <div className="px-6 py-12 text-center text-slate-500">
                   Chưa có flashcard sets phổ biến
                 </div>
               )}

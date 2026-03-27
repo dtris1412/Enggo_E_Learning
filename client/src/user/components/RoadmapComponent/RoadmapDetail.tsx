@@ -91,7 +91,7 @@ const RoadmapDetail: React.FC = () => {
       case "advanced":
         return "bg-purple-100 text-purple-800 border-purple-200";
       default:
-        return "bg-gray-100 text-gray-800 border-gray-200";
+        return "bg-slate-100 text-slate-800 border-slate-200";
     }
   };
 
@@ -103,7 +103,7 @@ const RoadmapDetail: React.FC = () => {
       case "text":
         return <FileText className="h-4 w-4 text-blue-500" />;
       default:
-        return <BookOpen className="h-4 w-4 text-gray-500" />;
+        return <BookOpen className="h-4 w-4 text-slate-500" />;
     }
   };
 
@@ -124,7 +124,7 @@ const RoadmapDetail: React.FC = () => {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Đang tải lộ trình...</p>
+          <p className="text-slate-600">Đang tải lộ trình...</p>
         </div>
       </div>
     );
@@ -135,7 +135,7 @@ const RoadmapDetail: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-slate-50">
       {/* Header */}
       <div className="bg-gradient-to-r from-purple-600 via-blue-600 to-blue-800 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -217,12 +217,12 @@ const RoadmapDetail: React.FC = () => {
           {/* Main Content */}
           <div className="lg:col-span-2">
             <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">
+              <h2 className="text-2xl font-bold text-slate-900 mb-2">
                 Mục tiêu lộ trình
               </h2>
-              <p className="text-gray-700 mb-6">{roadmap.roadmap_aim}</p>
+              <p className="text-slate-700 mb-6">{roadmap.roadmap_aim}</p>
 
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">
+              <h2 className="text-2xl font-bold text-slate-900 mb-4">
                 Lộ trình chi tiết
               </h2>
 
@@ -233,7 +233,7 @@ const RoadmapDetail: React.FC = () => {
                   ).map((phase: any, phaseIndex: number) => (
                     <div
                       key={phase.phase_id}
-                      className="border-2 border-gray-200 rounded-lg overflow-hidden"
+                      className="border-2 border-slate-200 rounded-lg overflow-hidden"
                     >
                       {/* Phase Header */}
                       <button
@@ -245,26 +245,26 @@ const RoadmapDetail: React.FC = () => {
                             {phaseIndex + 1}
                           </div>
                           <div className="flex-1">
-                            <h3 className="font-bold text-gray-900 text-lg">
+                            <h3 className="font-bold text-slate-900 text-lg">
                               {phase.phase_name}
                             </h3>
-                            <p className="text-sm text-gray-600 mt-1">
+                            <p className="text-sm text-slate-600 mt-1">
                               {phase.Phase_Courses?.length || 0} khóa học •{" "}
                               {phase.Document_Phases?.length || 0} tài liệu
                             </p>
                           </div>
                         </div>
                         {expandedPhases.includes(phase.phase_id) ? (
-                          <ChevronUp className="h-6 w-6 text-gray-500" />
+                          <ChevronUp className="h-6 w-6 text-slate-500" />
                         ) : (
-                          <ChevronDown className="h-6 w-6 text-gray-500" />
+                          <ChevronDown className="h-6 w-6 text-slate-500" />
                         )}
                       </button>
 
                       {/* Phase Content */}
                       {expandedPhases.includes(phase.phase_id) && (
                         <div className="p-5 bg-white">
-                          <p className="text-gray-700 mb-4">
+                          <p className="text-slate-700 mb-4">
                             {phase.phase_description}
                           </p>
                           <div className="mb-4 p-3 bg-blue-50 rounded-lg">
@@ -281,7 +281,7 @@ const RoadmapDetail: React.FC = () => {
                           {phase.Phase_Courses &&
                             phase.Phase_Courses.length > 0 && (
                               <div className="mb-6">
-                                <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                                <h4 className="font-semibold text-slate-900 mb-3 flex items-center gap-2">
                                   <BookOpen className="h-5 w-5 text-blue-600" />
                                   Khóa học
                                 </h4>
@@ -292,7 +292,7 @@ const RoadmapDetail: React.FC = () => {
                                   ).map((phaseCourse: any) => (
                                     <div
                                       key={phaseCourse.phase_course_id}
-                                      className="border border-gray-200 rounded-lg overflow-hidden"
+                                      className="border border-slate-200 rounded-lg overflow-hidden"
                                     >
                                       <div
                                         onClick={() =>
@@ -300,24 +300,24 @@ const RoadmapDetail: React.FC = () => {
                                             phaseCourse.Course.course_id,
                                           )
                                         }
-                                        className="flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 cursor-pointer transition-colors"
+                                        className="flex items-center justify-between p-4 bg-slate-50 hover:bg-slate-100 cursor-pointer transition-colors"
                                       >
                                         <div className="flex items-center gap-3 flex-1">
                                           <span className="text-sm font-semibold text-blue-600">
                                             #{phaseCourse.order_number}
                                           </span>
                                           <div className="flex-1">
-                                            <h5 className="font-semibold text-gray-900">
+                                            <h5 className="font-semibold text-slate-900">
                                               {phaseCourse.Course.course_title}
                                             </h5>
                                             <div className="flex items-center gap-3 mt-1">
-                                              <span className="text-xs bg-gray-200 text-gray-700 px-2 py-0.5 rounded">
+                                              <span className="text-xs bg-slate-200 text-slate-700 px-2 py-0.5 rounded">
                                                 {
                                                   phaseCourse.Course
                                                     .course_level
                                                 }
                                               </span>
-                                              <span className="text-xs text-gray-500">
+                                              <span className="text-xs text-slate-500">
                                                 {
                                                   phaseCourse.Course
                                                     .estimate_duration
@@ -342,9 +342,9 @@ const RoadmapDetail: React.FC = () => {
                                         {expandedCourses.includes(
                                           phaseCourse.Course.course_id,
                                         ) ? (
-                                          <ChevronUp className="h-5 w-5 text-gray-500" />
+                                          <ChevronUp className="h-5 w-5 text-slate-500" />
                                         ) : (
-                                          <ChevronDown className="h-5 w-5 text-gray-500" />
+                                          <ChevronDown className="h-5 w-5 text-slate-500" />
                                         )}
                                       </div>
 
@@ -352,8 +352,8 @@ const RoadmapDetail: React.FC = () => {
                                       {expandedCourses.includes(
                                         phaseCourse.Course.course_id,
                                       ) && (
-                                        <div className="p-4 bg-white border-t border-gray-200">
-                                          <p className="text-sm text-gray-600 mb-3">
+                                        <div className="p-4 bg-white border-t border-slate-200">
+                                          <p className="text-sm text-slate-600 mb-3">
                                             {phaseCourse.Course.description}
                                           </p>
 
@@ -361,7 +361,7 @@ const RoadmapDetail: React.FC = () => {
                                             phaseCourse.Course.Modules.length >
                                               0 && (
                                               <div className="space-y-2">
-                                                <p className="text-sm font-semibold text-gray-700">
+                                                <p className="text-sm font-semibold text-slate-700">
                                                   Modules (
                                                   {
                                                     phaseCourse.Course.Modules
@@ -373,13 +373,13 @@ const RoadmapDetail: React.FC = () => {
                                                   (module: any) => (
                                                     <div
                                                       key={module.module_id}
-                                                      className="bg-gray-50 rounded p-3"
+                                                      className="bg-slate-50 rounded p-3"
                                                     >
                                                       <div className="flex items-center justify-between mb-2">
-                                                        <p className="text-sm font-medium text-gray-800">
+                                                        <p className="text-sm font-medium text-slate-800">
                                                           {module.module_title}
                                                         </p>
-                                                        <span className="text-xs text-gray-500">
+                                                        <span className="text-xs text-slate-500">
                                                           {
                                                             module.estimated_time
                                                           }{" "}
@@ -398,7 +398,7 @@ const RoadmapDetail: React.FC = () => {
                                                                   key={
                                                                     ml.module_lesson_id
                                                                   }
-                                                                  className="flex items-center gap-2 text-xs text-gray-600"
+                                                                  className="flex items-center gap-2 text-xs text-slate-600"
                                                                 >
                                                                   {getLessonIcon(
                                                                     ml.Lesson
@@ -410,7 +410,7 @@ const RoadmapDetail: React.FC = () => {
                                                                         .lesson_title
                                                                     }
                                                                   </span>
-                                                                  <span className="text-gray-400">
+                                                                  <span className="text-slate-400">
                                                                     (
                                                                     {
                                                                       ml.Lesson
@@ -447,7 +447,7 @@ const RoadmapDetail: React.FC = () => {
                           {phase.Document_Phases &&
                             phase.Document_Phases.length > 0 && (
                               <div>
-                                <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                                <h4 className="font-semibold text-slate-900 mb-3 flex items-center gap-2">
                                   <File className="h-5 w-5 text-green-600" />
                                   Tài liệu
                                 </h4>
@@ -463,10 +463,10 @@ const RoadmapDetail: React.FC = () => {
                                     >
                                       <FileText className="h-5 w-5 text-green-600 flex-shrink-0" />
                                       <div className="flex-1">
-                                        <p className="text-sm font-medium text-gray-900">
+                                        <p className="text-sm font-medium text-slate-900">
                                           {docPhase.Document.document_name}
                                         </p>
-                                        <p className="text-xs text-gray-600">
+                                        <p className="text-xs text-slate-600">
                                           {docPhase.Document.document_type} •{" "}
                                           {docPhase.Document.file_type}
                                         </p>
@@ -475,7 +475,7 @@ const RoadmapDetail: React.FC = () => {
                                         "premium" && (
                                         <Lock className="h-4 w-4 text-yellow-600" />
                                       )}
-                                      <Download className="h-4 w-4 text-gray-400" />
+                                      <Download className="h-4 w-4 text-slate-400" />
                                     </Link>
                                   ))}
                                 </div>
@@ -487,7 +487,7 @@ const RoadmapDetail: React.FC = () => {
                   ))}
                 </div>
               ) : (
-                <p className="text-gray-500 text-center py-8">
+                <p className="text-slate-500 text-center py-8">
                   Chưa có nội dung lộ trình
                 </p>
               )}
@@ -497,38 +497,38 @@ const RoadmapDetail: React.FC = () => {
           {/* Sidebar */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-lg shadow-sm p-6 sticky top-4">
-              <h3 className="text-xl font-bold text-gray-900 mb-4">
+              <h3 className="text-xl font-bold text-slate-900 mb-4">
                 Thông tin lộ trình
               </h3>
 
               <div className="space-y-4 mb-6">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-600">Phases</span>
-                  <span className="font-semibold text-gray-900">
+                  <span className="text-slate-600">Phases</span>
+                  <span className="font-semibold text-slate-900">
                     {roadmap.Phases?.length || 0}
                   </span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-600">Tổng khóa học</span>
-                  <span className="font-semibold text-gray-900">
+                  <span className="text-slate-600">Tổng khóa học</span>
+                  <span className="font-semibold text-slate-900">
                     {totalCourses}
                   </span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-600">Tài liệu</span>
-                  <span className="font-semibold text-gray-900">
+                  <span className="text-slate-600">Tài liệu</span>
+                  <span className="font-semibold text-slate-900">
                     {totalDocuments}
                   </span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-600">Thời lượng dự kiến</span>
-                  <span className="font-semibold text-gray-900">
+                  <span className="text-slate-600">Thời lượng dự kiến</span>
+                  <span className="font-semibold text-slate-900">
                     {roadmap.estimated_duration} ngày
                   </span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-600">Trình độ</span>
-                  <span className="font-semibold text-gray-900">
+                  <span className="text-slate-600">Trình độ</span>
+                  <span className="font-semibold text-slate-900">
                     {roadmap.roadmap_level}
                   </span>
                 </div>
@@ -582,7 +582,7 @@ const RoadmapDetail: React.FC = () => {
 
               {/* Certificate Info */}
               {roadmap.Certificate && (
-                <div className="mt-6 pt-6 border-t border-gray-200">
+                <div className="mt-6 pt-6 border-t border-slate-200">
                   <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                     <div className="flex items-start gap-3">
                       <Award className="h-6 w-6 text-yellow-600 flex-shrink-0 mt-0.5" />

@@ -26,14 +26,14 @@ const SubscriptionPlans = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-black to-slate-900 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">
             Chọn gói phù hợp với bạn
           </h1>
-          <p className="text-base text-gray-400 max-w-2xl mx-auto">
+          <p className="text-base text-slate-400 max-w-2xl mx-auto">
             Nâng cấp để trải nghiệm đầy đủ tính năng và học tập hiệu quả hơn
           </p>
           <div className="mt-4">
@@ -49,13 +49,13 @@ const SubscriptionPlans = () => {
 
         {/* Billing Type Selector */}
         <div className="flex justify-center mb-8">
-          <div className="inline-flex items-center bg-gray-900 rounded-full p-1 shadow-lg">
+          <div className="inline-flex items-center bg-slate-900 rounded-full p-1 shadow-lg">
             <button
               onClick={() => setBillingType("yearly")}
               className={`relative px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
                 billingType === "yearly"
-                  ? "bg-white text-gray-900 shadow-md"
-                  : "text-gray-400 hover:text-white"
+                  ? "bg-white text-slate-900 shadow-md"
+                  : "text-slate-400 hover:text-white"
               }`}
             >
               Hàng năm
@@ -69,8 +69,8 @@ const SubscriptionPlans = () => {
               onClick={() => setBillingType("monthly")}
               className={`relative px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
                 billingType === "monthly"
-                  ? "bg-white text-gray-900 shadow-md"
-                  : "text-gray-400 hover:text-white"
+                  ? "bg-white text-slate-900 shadow-md"
+                  : "text-slate-400 hover:text-white"
               }`}
             >
               Hàng tháng
@@ -84,8 +84,8 @@ const SubscriptionPlans = () => {
               onClick={() => setBillingType("weekly")}
               className={`relative px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
                 billingType === "weekly"
-                  ? "bg-white text-gray-900 shadow-md"
-                  : "text-gray-400 hover:text-white"
+                  ? "bg-white text-slate-900 shadow-md"
+                  : "text-slate-400 hover:text-white"
               }`}
             >
               Hàng tuần
@@ -142,7 +142,7 @@ const SubscriptionPlans = () => {
         {/* Empty State */}
         {!loading && !error && plans.length === 0 && (
           <div className="text-center py-20">
-            <p className="text-gray-400 text-lg">
+            <p className="text-slate-400 text-lg">
               Không có gói subscription nào khả dụng
             </p>
           </div>
@@ -154,41 +154,41 @@ const SubscriptionPlans = () => {
             Câu hỏi thường gặp
           </h2>
           <div className="space-y-6">
-            <div className="bg-gray-800 rounded-lg p-6 shadow-md border border-gray-700">
+            <div className="bg-slate-800 rounded-lg p-6 shadow-md border border-slate-700">
               <h3 className="text-lg font-semibold text-white mb-2">
                 Tôi có thể hủy đăng ký bất kỳ lúc nào không?
               </h3>
-              <p className="text-gray-400">
+              <p className="text-slate-400">
                 Có, bạn có thể hủy đăng ký bất kỳ lúc nào. Bạn sẽ vẫn có quyền
                 truy cập cho đến hết thời gian đăng ký hiện tại.
               </p>
             </div>
 
-            <div className="bg-gray-800 rounded-lg p-6 shadow-md border border-gray-700">
+            <div className="bg-slate-800 rounded-lg p-6 shadow-md border border-slate-700">
               <h3 className="text-lg font-semibold text-white mb-2">
                 Credits AI là gì?
               </h3>
-              <p className="text-gray-400">
+              <p className="text-slate-400">
                 Credits AI cho phép bạn sử dụng trợ lý AI để hỗ trợ học tập,
                 giải đáp thắc mắc và tạo nội dung học tập cá nhân hóa.
               </p>
             </div>
 
-            <div className="bg-gray-800 rounded-lg p-6 shadow-md border border-gray-700">
+            <div className="bg-slate-800 rounded-lg p-6 shadow-md border border-slate-700">
               <h3 className="text-lg font-semibold text-white mb-2">
                 Tôi có thể nâng cấp/hạ cấp gói sau này không?
               </h3>
-              <p className="text-gray-400">
+              <p className="text-slate-400">
                 Có, bạn có thể thay đổi gói đăng ký bất kỳ lúc nào. Số tiền sẽ
                 được tính theo tỷ lệ thời gian sử dụng.
               </p>
             </div>
 
-            <div className="bg-gray-800 rounded-lg p-6 shadow-md border border-gray-700">
+            <div className="bg-slate-800 rounded-lg p-6 shadow-md border border-slate-700">
               <h3 className="text-lg font-semibold text-white mb-2">
                 Phương thức thanh toán nào được chấp nhận?
               </h3>
-              <p className="text-gray-400">
+              <p className="text-slate-400">
                 Chúng tôi chấp nhận thẻ tín dụng/ghi nợ, ví điện tử (Momo,
                 ZaloPay) và chuyển khoản ngân hàng.
               </p>

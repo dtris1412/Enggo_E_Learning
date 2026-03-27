@@ -69,8 +69,8 @@ const BlogList: React.FC = () => {
         {/* Loading State */}
         {loading && (
           <div className="text-center py-20">
-            <div className="inline-block h-10 w-10 animate-spin rounded-full border-3 border-solid border-gray-300 border-r-transparent"></div>
-            <p className="mt-4 text-gray-500 text-sm">Đang tải bài viết...</p>
+            <div className="inline-block h-10 w-10 animate-spin rounded-full border-3 border-solid border-slate-300 border-r-transparent"></div>
+            <p className="mt-4 text-slate-500 text-sm">Đang tải bài viết...</p>
           </div>
         )}
 
@@ -95,10 +95,10 @@ const BlogList: React.FC = () => {
             {blogs.length === 0 && (
               <div className="text-center py-20">
                 <div className="text-6xl mb-4">📝</div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">
+                <h3 className="text-xl font-black text-slate-900 mb-2">
                   Không tìm thấy bài viết
                 </h3>
-                <p className="text-gray-600">
+                <p className="text-slate-500">
                   Thử tìm kiếm với từ khóa khác hoặc chọn chuyên mục khác
                 </p>
               </div>
@@ -110,7 +110,7 @@ const BlogList: React.FC = () => {
                 <button
                   onClick={() => handlePageChange(currentPage - 1)}
                   disabled={currentPage === 1}
-                  className="px-4 py-2 border border-gray-300 rounded-md text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed text-sm bg-white"
+                  className="px-4 py-2 border border-slate-300 rounded-xl text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed text-sm bg-white transition-colors"
                 >
                   Trước
                 </button>
@@ -130,10 +130,10 @@ const BlogList: React.FC = () => {
                     <button
                       key={page}
                       onClick={() => handlePageChange(page)}
-                      className={`px-4 py-2 rounded-md text-sm ${
+                      className={`px-4 py-2 rounded-xl text-sm transition-colors ${
                         currentPage === page
-                          ? "bg-gray-800 text-white"
-                          : "border border-gray-300 text-gray-600 hover:bg-gray-50 bg-white"
+                          ? "bg-slate-900 text-white"
+                          : "border border-slate-300 text-slate-600 hover:bg-slate-50 bg-white"
                       }`}
                     >
                       {page}
@@ -144,7 +144,7 @@ const BlogList: React.FC = () => {
                 <button
                   onClick={() => handlePageChange(currentPage + 1)}
                   disabled={currentPage === totalPages}
-                  className="px-4 py-2 border border-gray-300 rounded-md text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed text-sm bg-white"
+                  className="px-4 py-2 border border-slate-300 rounded-xl text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed text-sm bg-white transition-colors"
                 >
                   Tiếp
                 </button>

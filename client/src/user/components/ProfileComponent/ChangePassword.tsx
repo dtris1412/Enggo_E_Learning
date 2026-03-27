@@ -102,8 +102,8 @@ const ChangePassword: React.FC = () => {
           <Shield className="w-6 h-6 text-blue-600" />
         </div>
         <div>
-          <h2 className="text-2xl font-bold text-gray-800">Đổi mật khẩu</h2>
-          <p className="text-gray-500 text-sm">
+          <h2 className="text-2xl font-bold text-slate-800">Đổi mật khẩu</h2>
+          <p className="text-slate-500 text-sm">
             Cập nhật mật khẩu của bạn để bảo mật tài khoản
           </p>
         </div>
@@ -126,25 +126,25 @@ const ChangePassword: React.FC = () => {
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Current Password */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-slate-700 mb-2">
             Mật khẩu hiện tại <span className="text-red-500">*</span>
           </label>
           <div className="relative">
             <div className="absolute left-3 top-1/2 -translate-y-1/2">
-              <Lock className="w-5 h-5 text-gray-400" />
+              <Lock className="w-5 h-5 text-slate-400" />
             </div>
             <input
               type={showPasswords.current ? "text" : "password"}
               name="current_password"
               value={formData.current_password}
               onChange={handleChange}
-              className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full pl-10 pr-10 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Nhập mật khẩu hiện tại"
             />
             <button
               type="button"
               onClick={() => togglePasswordVisibility("current")}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
             >
               {showPasswords.current ? (
                 <EyeOff className="w-5 h-5" />
@@ -157,25 +157,25 @@ const ChangePassword: React.FC = () => {
 
         {/* New Password */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-slate-700 mb-2">
             Mật khẩu mới <span className="text-red-500">*</span>
           </label>
           <div className="relative">
             <div className="absolute left-3 top-1/2 -translate-y-1/2">
-              <Lock className="w-5 h-5 text-gray-400" />
+              <Lock className="w-5 h-5 text-slate-400" />
             </div>
             <input
               type={showPasswords.new ? "text" : "password"}
               name="new_password"
               value={formData.new_password}
               onChange={handleChange}
-              className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full pl-10 pr-10 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Nhập mật khẩu mới (tối thiểu 6 ký tự)"
             />
             <button
               type="button"
               onClick={() => togglePasswordVisibility("new")}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
             >
               {showPasswords.new ? (
                 <EyeOff className="w-5 h-5" />
@@ -188,25 +188,25 @@ const ChangePassword: React.FC = () => {
 
         {/* Confirm Password */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-slate-700 mb-2">
             Xác nhận mật khẩu mới <span className="text-red-500">*</span>
           </label>
           <div className="relative">
             <div className="absolute left-3 top-1/2 -translate-y-1/2">
-              <Lock className="w-5 h-5 text-gray-400" />
+              <Lock className="w-5 h-5 text-slate-400" />
             </div>
             <input
               type={showPasswords.confirm ? "text" : "password"}
               name="confirm_password"
               value={formData.confirm_password}
               onChange={handleChange}
-              className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full pl-10 pr-10 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Nhập lại mật khẩu mới"
             />
             <button
               type="button"
               onClick={() => togglePasswordVisibility("confirm")}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
             >
               {showPasswords.confirm ? (
                 <EyeOff className="w-5 h-5" />
@@ -235,7 +235,7 @@ const ChangePassword: React.FC = () => {
           <button
             type="submit"
             disabled={loading}
-            className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition disabled:bg-gray-400"
+            className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition disabled:bg-slate-400"
           >
             {loading ? "Đang xử lý..." : "Đổi mật khẩu"}
           </button>
@@ -250,7 +250,7 @@ const ChangePassword: React.FC = () => {
               setMessage(null);
             }}
             disabled={loading}
-            className="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition disabled:bg-gray-200"
+            className="px-6 py-2 bg-slate-300 text-slate-700 rounded-lg hover:bg-slate-400 transition disabled:bg-slate-200"
           >
             Xóa
           </button>

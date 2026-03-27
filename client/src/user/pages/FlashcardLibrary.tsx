@@ -220,7 +220,7 @@ const FlashcardLibrary: React.FC = () => {
     const progressColors = getProgressBarColor(set);
 
     return (
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-5 hover:shadow-md transition-shadow">
+      <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-5 hover:shadow-md transition-shadow">
         <div className="flex items-start justify-between mb-3">
           <div className="flex items-start gap-3 flex-1">
             <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-lg flex items-center justify-center">
@@ -233,16 +233,16 @@ const FlashcardLibrary: React.FC = () => {
                     ? `/flashcards/${set.flashcard_set_id}/learn`
                     : `/flashcards/${set.flashcard_set_id}`
                 }
-                className="text-lg font-bold text-gray-900 hover:text-indigo-600 transition-colors block"
+                className="text-lg font-bold text-slate-900 hover:text-indigo-600 transition-colors block"
               >
                 {set.title}
               </Link>
               {set.description && (
-                <p className="text-sm text-gray-600 mt-1 line-clamp-2">
+                <p className="text-sm text-slate-600 mt-1 line-clamp-2">
                   {set.description}
                 </p>
               )}
-              <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
+              <div className="flex items-center gap-4 mt-2 text-sm text-slate-500">
                 <span>{set.total_cards} cards</span>
                 {set.User?.user_name && <span>• by {set.User.user_name}</span>}
                 {activeTab === "reference" && set.isTracking && (
@@ -261,14 +261,14 @@ const FlashcardLibrary: React.FC = () => {
                 onClick={() =>
                   navigate(`/flashcards/${set.flashcard_set_id}/edit`)
                 }
-                className="p-2 text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                className="p-2 text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
                 title="Chỉnh sửa"
               >
                 <Edit className="w-5 h-5" />
               </button>
               <button
                 onClick={() => handleDelete(set.flashcard_set_id)}
-                className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                className="p-2 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                 title="Xóa"
               >
                 <Trash2 className="w-5 h-5" />
@@ -280,7 +280,7 @@ const FlashcardLibrary: React.FC = () => {
         {/* Progress Bar */}
         {activeTab === "reference" && (
           <div className="mt-4">
-            <div className="flex items-center justify-between text-sm text-gray-600 mb-2">
+            <div className="flex items-center justify-between text-sm text-slate-600 mb-2">
               <span>
                 {set.learned_cards || 0}/{set.total_cards} cards reviewed
               </span>
@@ -332,7 +332,7 @@ const FlashcardLibrary: React.FC = () => {
       <FlashcardSidebar />
 
       {/* Main Content */}
-      <div className="flex-1 bg-gray-50">
+      <div className="flex-1 bg-slate-50">
         {/* Header */}
         <div className="bg-gradient-to-r from-indigo-700 via-purple-600 to-pink-600">
           <div className="container mx-auto px-4 py-12">
@@ -348,7 +348,7 @@ const FlashcardLibrary: React.FC = () => {
         </div>
 
         {/* Tabs */}
-        <div className="bg-white border-b border-gray-200">
+        <div className="bg-white border-b border-slate-200">
           <div className="container mx-auto px-4">
             <div className="flex gap-8">
               <button
@@ -356,7 +356,7 @@ const FlashcardLibrary: React.FC = () => {
                 className={`py-4 px-2 border-b-2 font-semibold transition-colors ${
                   activeTab === "mine"
                     ? "border-indigo-600 text-indigo-600"
-                    : "border-transparent text-gray-600 hover:text-gray-900"
+                    : "border-transparent text-slate-600 hover:text-slate-900"
                 }`}
               >
                 Của tôi
@@ -366,7 +366,7 @@ const FlashcardLibrary: React.FC = () => {
                 className={`py-4 px-2 border-b-2 font-semibold transition-colors ${
                   activeTab === "reference"
                     ? "border-indigo-600 text-indigo-600"
-                    : "border-transparent text-gray-600 hover:text-gray-900"
+                    : "border-transparent text-slate-600 hover:text-slate-900"
                 }`}
               >
                 Tham khảo
@@ -392,7 +392,7 @@ const FlashcardLibrary: React.FC = () => {
           {isLoading ? (
             <div className="text-center py-12">
               <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
-              <p className="mt-4 text-gray-600">Đang tải...</p>
+              <p className="mt-4 text-slate-600">Đang tải...</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -405,8 +405,8 @@ const FlashcardLibrary: React.FC = () => {
                   ))
                 ) : (
                   <div className="col-span-full text-center py-12">
-                    <Layers className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-600 mb-4">
+                    <Layers className="w-16 h-16 text-slate-400 mx-auto mb-4" />
+                    <p className="text-slate-600 mb-4">
                       Bạn chưa tạo flashcard set nào
                     </p>
                     <button
@@ -426,8 +426,8 @@ const FlashcardLibrary: React.FC = () => {
                 ))
               ) : (
                 <div className="col-span-full text-center py-12">
-                  <TrendingUp className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-600 mb-4">
+                  <TrendingUp className="w-16 h-16 text-slate-400 mx-auto mb-4" />
+                  <p className="text-slate-600 mb-4">
                     Bạn chưa có flashcard set nào đang theo dõi
                   </p>
                   <button

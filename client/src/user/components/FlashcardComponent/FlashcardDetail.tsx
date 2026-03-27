@@ -352,10 +352,10 @@ const FlashcardDetail: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="text-center">
           <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
-          <p className="mt-4 text-gray-600">Đang tải...</p>
+          <p className="mt-4 text-slate-600">Đang tải...</p>
         </div>
       </div>
     );
@@ -366,11 +366,11 @@ const FlashcardDetail: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-slate-50">
       {/* Breadcrumb */}
-      <div className="bg-white border-b border-gray-200">
+      <div className="bg-white border-b border-slate-200">
         <div className="container mx-auto px-4 py-3">
-          <div className="flex items-center gap-2 text-sm text-gray-600">
+          <div className="flex items-center gap-2 text-sm text-slate-600">
             <Home className="w-4 h-4" />
             <a href="/" className="hover:text-indigo-600 transition-colors">
               Trang chủ
@@ -383,7 +383,7 @@ const FlashcardDetail: React.FC = () => {
               Flashcards
             </a>
             <ChevronRight className="w-4 h-4" />
-            <span className="text-gray-900 font-medium">
+            <span className="text-slate-900 font-medium">
               {flashcardSet.title}
             </span>
           </div>
@@ -408,7 +408,7 @@ const FlashcardDetail: React.FC = () => {
                   className={`px-3 py-1 text-sm font-medium rounded-full ${
                     flashcardSet.visibility === "public"
                       ? "bg-green-500/20 text-white"
-                      : "bg-gray-500/20 text-white"
+                      : "bg-slate-500/20 text-white"
                   }`}
                 >
                   {flashcardSet.visibility === "public" ? (
@@ -471,7 +471,7 @@ const FlashcardDetail: React.FC = () => {
             <div className="flex flex-col gap-3">
               <button
                 onClick={handleStartLearning}
-                className="bg-white text-indigo-700 hover:bg-gray-100 font-medium py-3 px-8 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl inline-flex items-center gap-2"
+                className="bg-white text-indigo-700 hover:bg-slate-100 font-medium py-3 px-8 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl inline-flex items-center gap-2"
               >
                 <Play className="w-5 h-5" />
                 Bắt đầu học
@@ -504,14 +504,14 @@ const FlashcardDetail: React.FC = () => {
       <div className="container mx-auto px-4 py-8">
         <div className="bg-white rounded-lg shadow-sm p-6">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">
+            <h2 className="text-2xl font-bold text-slate-900">
               Danh sách flashcards ({flashcardSet.total_cards})
             </h2>
             {isOwner && (
               <div className="flex items-center gap-3">
                 {selectionMode ? (
                   <>
-                    <span className="text-sm text-gray-600">
+                    <span className="text-sm text-slate-600">
                       Đã chọn {selectedFlashcards.size} thẻ
                     </span>
                     {selectedFlashcards.size <
@@ -533,7 +533,7 @@ const FlashcardDetail: React.FC = () => {
                     </button>
                     <button
                       onClick={clearSelection}
-                      className="border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-2 px-4 rounded-lg transition-colors"
+                      className="border border-slate-300 hover:bg-slate-50 text-slate-700 font-medium py-2 px-4 rounded-lg transition-colors"
                     >
                       Hủy
                     </button>
@@ -544,7 +544,7 @@ const FlashcardDetail: React.FC = () => {
                       flashcardSet.Flashcards.length > 0 && (
                         <button
                           onClick={() => setSelectionMode(true)}
-                          className="border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-2 px-4 rounded-lg transition-colors inline-flex items-center gap-2"
+                          className="border border-slate-300 hover:bg-slate-50 text-slate-700 font-medium py-2 px-4 rounded-lg transition-colors inline-flex items-center gap-2"
                         >
                           <CheckSquare className="w-4 h-4" />
                           Chọn nhiều
@@ -579,7 +579,7 @@ const FlashcardDetail: React.FC = () => {
                   className={`border rounded-lg p-4 hover:shadow-md transition-all ${
                     selectedFlashcards.has(flashcard.flashcard_id)
                       ? "border-indigo-500 bg-indigo-50"
-                      : "border-gray-200"
+                      : "border-slate-200"
                   }`}
                 >
                   <div className="flex items-start gap-4">
@@ -592,7 +592,7 @@ const FlashcardDetail: React.FC = () => {
                         {selectedFlashcards.has(flashcard.flashcard_id) ? (
                           <CheckSquare className="w-5 h-5 text-indigo-600" />
                         ) : (
-                          <Square className="w-5 h-5 text-gray-400" />
+                          <Square className="w-5 h-5 text-slate-400" />
                         )}
                       </button>
                     )}
@@ -605,11 +605,11 @@ const FlashcardDetail: React.FC = () => {
                     {/* Content */}
                     <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <span className="text-xs text-gray-500 uppercase font-medium">
+                        <span className="text-xs text-slate-500 uppercase font-medium">
                           Mặt trước
                         </span>
                         <div className="flex items-start gap-2 mt-1">
-                          <p className="text-gray-900 font-medium flex-1">
+                          <p className="text-slate-900 font-medium flex-1">
                             {flashcard.front_content}
                           </p>
                           <SpeakButton
@@ -625,14 +625,14 @@ const FlashcardDetail: React.FC = () => {
                         )}
                       </div>
                       <div>
-                        <span className="text-xs text-gray-500 uppercase font-medium">
+                        <span className="text-xs text-slate-500 uppercase font-medium">
                           Mặt sau
                         </span>
-                        <p className="text-gray-900 font-medium mt-1">
+                        <p className="text-slate-900 font-medium mt-1">
                           {flashcard.back_content}
                         </p>
                         {flashcard.example && (
-                          <p className="text-sm text-gray-600 italic mt-1">
+                          <p className="text-sm text-slate-600 italic mt-1">
                             "{flashcard.example}"
                           </p>
                         )}
@@ -663,7 +663,7 @@ const FlashcardDetail: React.FC = () => {
                       <div className="flex-shrink-0 flex items-center gap-2">
                         <button
                           onClick={() => handleEditCard(flashcard)}
-                          className="p-2 text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                          className="p-2 text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
                           title="Chỉnh sửa"
                         >
                           <Edit className="w-4 h-4" />
@@ -672,7 +672,7 @@ const FlashcardDetail: React.FC = () => {
                           onClick={() =>
                             handleDeleteCard(flashcard.flashcard_id)
                           }
-                          className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                          className="p-2 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                           title="Xóa"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -685,8 +685,8 @@ const FlashcardDetail: React.FC = () => {
             </div>
           ) : (
             <div className="text-center py-12">
-              <BookMarked className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-600">Chưa có flashcard nào</p>
+              <BookMarked className="w-16 h-16 text-slate-300 mx-auto mb-4" />
+              <p className="text-slate-600">Chưa có flashcard nào</p>
               {isOwner && (
                 <button className="mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-6 rounded-lg transition-colors inline-flex items-center gap-2">
                   <Plus className="w-4 h-4" />
@@ -698,18 +698,18 @@ const FlashcardDetail: React.FC = () => {
         </div>
 
         {/* Info Section */}
-        <div className="mt-6 bg-gray-100 rounded-lg p-6">
-          <h3 className="font-semibold text-gray-900 mb-3">Thông tin</h3>
+        <div className="mt-6 bg-slate-100 rounded-lg p-6">
+          <h3 className="font-semibold text-slate-900 mb-3">Thông tin</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
             <div>
-              <span className="text-gray-600">Ngày tạo:</span>
-              <span className="ml-2 text-gray-900 font-medium">
+              <span className="text-slate-600">Ngày tạo:</span>
+              <span className="ml-2 text-slate-900 font-medium">
                 {formatDate(flashcardSet.created_at)}
               </span>
             </div>
             <div>
-              <span className="text-gray-600">Cập nhật lần cuối:</span>
-              <span className="ml-2 text-gray-900 font-medium">
+              <span className="text-slate-600">Cập nhật lần cuối:</span>
+              <span className="ml-2 text-slate-900 font-medium">
                 {formatDate(flashcardSet.updated_at)}
               </span>
             </div>

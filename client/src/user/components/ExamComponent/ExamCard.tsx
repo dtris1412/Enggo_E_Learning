@@ -28,9 +28,9 @@ const ExamCard: React.FC<ExamCardProps> = ({ exam }) => {
       case "TOEIC":
         return "bg-blue-100 text-blue-800";
       case "IELTS":
-        return "bg-green-100 text-green-800";
+        return "bg-emerald-100 text-emerald-800";
       default:
-        return "bg-gray-100 text-gray-800";
+        return "bg-slate-100 text-slate-700";
     }
   };
 
@@ -50,10 +50,10 @@ const ExamCard: React.FC<ExamCardProps> = ({ exam }) => {
   return (
     <div
       onClick={handleCardClick}
-      className="bg-white rounded-lg shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer border border-gray-200 overflow-hidden group"
+      className="bg-white rounded-2xl hover:shadow-xl transition-all duration-300 cursor-pointer border border-slate-200 overflow-hidden group hover:-translate-y-1"
     >
       {/* Header with Icon */}
-      <div className="p-6 bg-gradient-to-br from-blue-50 to-white">
+      <div className="p-6 bg-gradient-to-br from-slate-50 to-white">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-4">
             {getExamTypeIcon()}
@@ -64,11 +64,11 @@ const ExamCard: React.FC<ExamCardProps> = ({ exam }) => {
                 >
                   {exam.exam_type}
                 </span>
-                <span className="px-3 py-1 text-xs font-medium rounded-full bg-purple-100 text-purple-800">
+                <span className="px-3 py-1 text-xs font-medium rounded-full bg-violet-100 text-violet-800">
                   {exam.year}
                 </span>
               </div>
-              <span className="text-sm text-gray-500 font-mono">
+              <span className="text-sm text-slate-400 font-mono">
                 {exam.exam_code}
               </span>
             </div>
@@ -78,57 +78,55 @@ const ExamCard: React.FC<ExamCardProps> = ({ exam }) => {
 
       {/* Content */}
       <div className="p-6">
-        <h3 className="text-lg font-bold text-gray-900 mb-3 line-clamp-2 group-hover:text-blue-600 transition-colors">
+        <h3 className="text-lg font-black text-slate-900 mb-3 line-clamp-2 group-hover:text-blue-600 transition-colors">
           {exam.exam_title}
         </h3>
 
         {exam.Certificate && (
-          <div className="flex items-center gap-2 text-sm text-gray-600 mb-3">
+          <div className="flex items-center gap-2 text-sm text-slate-500 mb-3">
             <BookOpen className="w-4 h-4" />
             <span>{exam.Certificate.certificate_name}</span>
           </div>
         )}
 
         {exam.source && (
-          <p className="text-sm text-gray-600 mb-4 line-clamp-2">
-            Source: {exam.source}
+          <p className="text-sm text-slate-500 mb-4 line-clamp-2">
+            {exam.source}
           </p>
         )}
 
         {/* Stats */}
         <div className="grid grid-cols-2 gap-4 mb-4">
-          <div className="flex items-center gap-2 text-sm text-gray-600">
-            <Clock className="w-4 h-4 text-orange-500" />
-            <span>{exam.exam_duration} minutes</span>
+          <div className="flex items-center gap-2 text-sm text-slate-500">
+            <Clock className="w-4 h-4 text-amber-500" />
+            <span>{exam.exam_duration} phút</span>
           </div>
-          <div className="flex items-center gap-2 text-sm text-gray-600">
+          <div className="flex items-center gap-2 text-sm text-slate-500">
             <FileText className="w-4 h-4 text-blue-500" />
-            <span>{exam.total_questions} questions</span>
+            <span>{exam.total_questions} câu hỏi</span>
           </div>
         </div>
 
         {/* Date */}
-        <div className="flex items-center gap-2 text-xs text-gray-500 mb-4">
+        <div className="flex items-center gap-2 text-xs text-slate-400 mb-4">
           <Calendar className="w-3 h-3" />
-          <span>
-            Created: {new Date(exam.created_at).toLocaleDateString("en-US")}
-          </span>
+          <span>{new Date(exam.created_at).toLocaleDateString("vi-VN")}</span>
         </div>
 
         {/* Actions */}
         <div className="flex gap-2">
           <button
             onClick={handleCardClick}
-            className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium"
+            className="flex-1 px-4 py-2 bg-slate-100 text-slate-700 rounded-xl hover:bg-slate-200 transition-colors text-sm font-medium"
           >
-            View Details
+            Chi tiết
           </button>
           <button
             onClick={handleStartExam}
-            className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium flex items-center justify-center gap-2"
+            className="flex-1 px-4 py-2 bg-gradient-to-r from-amber-400 to-orange-500 text-slate-900 rounded-xl transition-all text-sm font-bold flex items-center justify-center gap-2 hover:shadow-md"
           >
             <Play className="w-4 h-4" />
-            Start Exam
+            Làm bài
           </button>
         </div>
       </div>

@@ -113,9 +113,9 @@ const PaymentHistory: React.FC = () => {
   if (loading && currentPage === 1) {
     return (
       <div className="animate-pulse space-y-1.5">
-        <div className="h-10 bg-gray-200 rounded"></div>
-        <div className="h-10 bg-gray-200 rounded"></div>
-        <div className="h-10 bg-gray-200 rounded"></div>
+        <div className="h-10 bg-slate-200 rounded"></div>
+        <div className="h-10 bg-slate-200 rounded"></div>
+        <div className="h-10 bg-slate-200 rounded"></div>
       </div>
     );
   }
@@ -135,7 +135,7 @@ const PaymentHistory: React.FC = () => {
             className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium transition ${
               activeTab === "orders"
                 ? "bg-blue-500 text-white"
-                : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                : "bg-slate-100 text-slate-600 hover:bg-slate-200"
             }`}
           >
             <Package className="w-4 h-4" />
@@ -151,7 +151,7 @@ const PaymentHistory: React.FC = () => {
             className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium transition ${
               activeTab === "payments"
                 ? "bg-blue-500 text-white"
-                : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                : "bg-slate-100 text-slate-600 hover:bg-slate-200"
             }`}
           >
             <CreditCard className="w-4 h-4" />
@@ -165,7 +165,7 @@ const PaymentHistory: React.FC = () => {
             setStatusFilter(e.target.value);
             setCurrentPage(1);
           }}
-          className="text-xs border border-gray-300 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+          className="text-xs border border-slate-300 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
         >
           <option value="">Tất cả trạng thái</option>
           <option value="completed">Hoàn thành</option>
@@ -181,8 +181,8 @@ const PaymentHistory: React.FC = () => {
           <div className="space-y-1.5">
             {orders.length === 0 ? (
               <div className="text-center py-6">
-                <Package className="w-10 h-10 text-gray-300 mx-auto mb-1.5" />
-                <p className="text-xs text-gray-500">Chưa có đơn hàng</p>
+                <Package className="w-10 h-10 text-slate-300 mx-auto mb-1.5" />
+                <p className="text-xs text-slate-500">Chưa có đơn hàng</p>
               </div>
             ) : (
               orders.map((order) => {
@@ -190,12 +190,12 @@ const PaymentHistory: React.FC = () => {
                 return (
                   <div
                     key={order.order_id}
-                    className="border border-gray-200 rounded-lg overflow-hidden hover:border-blue-300 transition"
+                    className="border border-slate-200 rounded-lg overflow-hidden hover:border-blue-300 transition"
                   >
                     {/* Compact Header - Always visible */}
                     <div
                       onClick={() => toggleExpand(order.order_id)}
-                      className="px-2.5 py-1.5 cursor-pointer hover:bg-gray-50 transition"
+                      className="px-2.5 py-1.5 cursor-pointer hover:bg-slate-50 transition"
                     >
                       <div className="flex items-center justify-between gap-2">
                         <div className="flex items-center gap-1.5 flex-1 min-w-0">
@@ -203,10 +203,10 @@ const PaymentHistory: React.FC = () => {
                             <Package className="w-3.5 h-3.5 text-blue-600" />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="text-xs font-semibold text-gray-800 truncate">
+                            <p className="text-xs font-semibold text-slate-800 truncate">
                               #{order.order_id}
                             </p>
-                            <p className="text-[10px] text-gray-500">
+                            <p className="text-[10px] text-slate-500">
                               {formatDate(order.order_date)}
                             </p>
                           </div>
@@ -217,9 +217,9 @@ const PaymentHistory: React.FC = () => {
                           </span>
                           {getStatusBadge(order.status)}
                           {isExpanded ? (
-                            <ChevronUp className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
+                            <ChevronUp className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
                           ) : (
-                            <ChevronDown className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
+                            <ChevronDown className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
                           )}
                         </div>
                       </div>
@@ -227,18 +227,18 @@ const PaymentHistory: React.FC = () => {
 
                     {/* Expanded Details */}
                     {isExpanded && (
-                      <div className="px-2.5 pb-2 pt-1.5 bg-gray-50 border-t border-gray-100">
+                      <div className="px-2.5 pb-2 pt-1.5 bg-slate-50 border-t border-slate-100">
                         <div className="space-y-1.5 text-xs">
                           <div className="flex justify-between">
-                            <span className="text-gray-600">Gói đăng ký:</span>
-                            <span className="font-medium text-gray-800">
+                            <span className="text-slate-600">Gói đăng ký:</span>
+                            <span className="font-medium text-slate-800">
                               {order.Subscription_Price?.Subscription_Plan
                                 ?.name || "N/A"}
                             </span>
                           </div>
                           <div className="flex justify-between">
-                            <span className="text-gray-600">Loại:</span>
-                            <span className="font-medium text-gray-800">
+                            <span className="text-slate-600">Loại:</span>
+                            <span className="font-medium text-slate-800">
                               {order.Subscription_Price?.billing_type ===
                               "monthly"
                                 ? "Hàng tháng"
@@ -252,13 +252,13 @@ const PaymentHistory: React.FC = () => {
                             </span>
                           </div>
                           <div className="flex justify-between">
-                            <span className="text-gray-600">Thời gian:</span>
-                            <span className="font-medium text-gray-800">
+                            <span className="text-slate-600">Thời gian:</span>
+                            <span className="font-medium text-slate-800">
                               {formatDateTime(order.order_date)}
                             </span>
                           </div>
                           <div className="flex justify-between items-center pt-2 border-t">
-                            <span className="text-gray-600 font-medium">
+                            <span className="text-slate-600 font-medium">
                               Tổng tiền:
                             </span>
                             <span className="font-bold text-lg text-blue-600">
@@ -269,7 +269,7 @@ const PaymentHistory: React.FC = () => {
                           {/* Payment info if exists */}
                           {order.Payments && order.Payments.length > 0 && (
                             <div className="mt-1.5 pt-1.5 border-t">
-                              <p className="text-[10px] text-gray-500 mb-1">
+                              <p className="text-[10px] text-slate-500 mb-1">
                                 Thông tin thanh toán:
                               </p>
                               {order.Payments.map((payment) => (
@@ -277,7 +277,7 @@ const PaymentHistory: React.FC = () => {
                                   key={payment.payment_id}
                                   className="flex items-center justify-between text-[10px] bg-white rounded px-1.5 py-1"
                                 >
-                                  <span className="text-gray-700">
+                                  <span className="text-slate-700">
                                     {getPaymentMethodLabel(
                                       payment.payment_method,
                                       payment.provider,
@@ -301,8 +301,8 @@ const PaymentHistory: React.FC = () => {
           <div className="space-y-1.5">
             {payments.length === 0 ? (
               <div className="text-center py-6">
-                <CreditCard className="w-10 h-10 text-gray-300 mx-auto mb-1.5" />
-                <p className="text-xs text-gray-500">Chưa có giao dịch</p>
+                <CreditCard className="w-10 h-10 text-slate-300 mx-auto mb-1.5" />
+                <p className="text-xs text-slate-500">Chưa có giao dịch</p>
               </div>
             ) : (
               payments.map((payment) => {
@@ -310,12 +310,12 @@ const PaymentHistory: React.FC = () => {
                 return (
                   <div
                     key={payment.payment_id}
-                    className="border border-gray-200 rounded-lg overflow-hidden hover:border-purple-300 transition"
+                    className="border border-slate-200 rounded-lg overflow-hidden hover:border-purple-300 transition"
                   >
                     {/* Compact Header - Always visible */}
                     <div
                       onClick={() => toggleExpand(payment.payment_id)}
-                      className="px-2.5 py-1.5 cursor-pointer hover:bg-gray-50 transition"
+                      className="px-2.5 py-1.5 cursor-pointer hover:bg-slate-50 transition"
                     >
                       <div className="flex items-center justify-between gap-2">
                         <div className="flex items-center gap-1.5 flex-1 min-w-0">
@@ -323,13 +323,13 @@ const PaymentHistory: React.FC = () => {
                             <CreditCard className="w-3.5 h-3.5 text-purple-600" />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="text-xs font-semibold text-gray-800 truncate">
+                            <p className="text-xs font-semibold text-slate-800 truncate">
                               {getPaymentMethodLabel(
                                 payment.payment_method,
                                 payment.provider,
                               )}
                             </p>
-                            <p className="text-[10px] text-gray-500">
+                            <p className="text-[10px] text-slate-500">
                               {formatDate(payment.payment_date)}
                             </p>
                           </div>
@@ -340,9 +340,9 @@ const PaymentHistory: React.FC = () => {
                           </span>
                           {getStatusBadge(payment.status)}
                           {isExpanded ? (
-                            <ChevronUp className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
+                            <ChevronUp className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
                           ) : (
-                            <ChevronDown className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
+                            <ChevronDown className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
                           )}
                         </div>
                       </div>
@@ -350,30 +350,30 @@ const PaymentHistory: React.FC = () => {
 
                     {/* Expanded Details */}
                     {isExpanded && (
-                      <div className="px-2.5 pb-2 pt-1.5 bg-gray-50 border-t border-gray-100">
+                      <div className="px-2.5 pb-2 pt-1.5 bg-slate-50 border-t border-slate-100">
                         <div className="space-y-1.5 text-xs">
                           <div className="flex justify-between">
-                            <span className="text-gray-600">Mã giao dịch:</span>
-                            <span className="font-mono text-[10px] text-gray-800">
+                            <span className="text-slate-600">Mã giao dịch:</span>
+                            <span className="font-mono text-[10px] text-slate-800">
                               {payment.transaction_code}
                             </span>
                           </div>
                           {payment.Order && (
                             <div className="flex justify-between">
-                              <span className="text-gray-600">Đơn hàng:</span>
-                              <span className="font-medium text-gray-800">
+                              <span className="text-slate-600">Đơn hàng:</span>
+                              <span className="font-medium text-slate-800">
                                 #{payment.Order.order_id}
                               </span>
                             </div>
                           )}
                           <div className="flex justify-between">
-                            <span className="text-gray-600">Thời gian:</span>
-                            <span className="font-medium text-gray-800">
+                            <span className="text-slate-600">Thời gian:</span>
+                            <span className="font-medium text-slate-800">
                               {formatDateTime(payment.payment_date)}
                             </span>
                           </div>
                           <div className="flex justify-between items-center pt-1.5 border-t">
-                            <span className="text-gray-600 font-medium">
+                            <span className="text-slate-600 font-medium">
                               Số tiền:
                             </span>
                             <span className="font-bold text-base text-purple-600">
@@ -393,21 +393,21 @@ const PaymentHistory: React.FC = () => {
         {/* Compact Pagination */}
         {pagination && pagination.pages > 1 && (
           <div className="flex items-center justify-between pt-2 mt-0.5 border-t">
-            <p className="text-[10px] text-gray-600">
+            <p className="text-[10px] text-slate-600">
               {pagination?.page}/{pagination?.pages} ({pagination?.total})
             </p>
             <div className="flex gap-1">
               <button
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1}
-                className="p-1 rounded border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                className="p-1 rounded border border-slate-300 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition"
               >
                 <ChevronLeft className="w-3.5 h-3.5" />
               </button>
               <button
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === (pagination?.pages || 1)}
-                className="p-1 rounded border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                className="p-1 rounded border border-slate-300 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition"
               >
                 <ChevronRight className="w-3.5 h-3.5" />
               </button>

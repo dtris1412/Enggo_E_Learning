@@ -179,7 +179,7 @@ const ExamDetail: React.FC = () => {
       Writing: "bg-purple-50 border-purple-200 text-purple-700",
       Speaking: "bg-orange-50 border-orange-200 text-orange-700",
     };
-    return colors[skill] || "bg-gray-50 border-gray-200 text-gray-700";
+    return colors[skill] || "bg-slate-50 border-slate-200 text-slate-700";
   };
 
   const getExamTypeColor = (type: string) => {
@@ -189,7 +189,7 @@ const ExamDetail: React.FC = () => {
       case "IELTS":
         return "bg-green-100 text-green-800";
       default:
-        return "bg-gray-100 text-gray-800";
+        return "bg-slate-100 text-slate-800";
     }
   };
 
@@ -204,7 +204,7 @@ const ExamDetail: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
       </div>
     );
@@ -212,10 +212,10 @@ const ExamDetail: React.FC = () => {
 
   if (!exam) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="text-center">
-          <AlertCircle className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-xl font-semibold text-gray-900 mb-2">
+          <AlertCircle className="w-16 h-16 text-slate-400 mx-auto mb-4" />
+          <h3 className="text-xl font-semibold text-slate-900 mb-2">
             Exam not found
           </h3>
           <button
@@ -230,13 +230,13 @@ const ExamDetail: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-slate-50">
       {/* Header */}
       <div className="bg-white border-b">
         <div className="container mx-auto px-4 py-6">
           <button
             onClick={() => navigate("/exams")}
-            className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4"
+            className="flex items-center gap-2 text-slate-600 hover:text-slate-900 mb-4"
           >
             <ArrowLeft className="w-5 h-5" />
             Back to Exams
@@ -255,15 +255,15 @@ const ExamDetail: React.FC = () => {
                 <span className="px-4 py-1.5 text-sm font-medium rounded-full bg-purple-100 text-purple-800">
                   {exam.year}
                 </span>
-                <span className="text-sm text-gray-500 font-mono">
+                <span className="text-sm text-slate-500 font-mono">
                   {exam.exam_code}
                 </span>
               </div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              <h1 className="text-3xl font-bold text-slate-900 mb-2">
                 {exam.exam_title}
               </h1>
               {exam.Certificate && (
-                <div className="flex items-center gap-2 text-gray-600">
+                <div className="flex items-center gap-2 text-slate-600">
                   <BookOpen className="w-5 h-5" />
                   <span className="font-medium">
                     {exam.Certificate.certificate_name}
@@ -305,16 +305,16 @@ const ExamDetail: React.FC = () => {
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
             {/* Exam Info */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">
+            <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+              <h2 className="text-xl font-bold text-slate-900 mb-4">
                 Exam Information
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="flex items-center gap-3 p-4 bg-blue-50 rounded-lg">
                   <Clock className="w-8 h-8 text-blue-600" />
                   <div>
-                    <p className="text-sm text-gray-600">Duration</p>
-                    <p className="font-semibold text-gray-900">
+                    <p className="text-sm text-slate-600">Duration</p>
+                    <p className="font-semibold text-slate-900">
                       {formatDuration(exam.exam_duration)}
                     </p>
                   </div>
@@ -323,8 +323,8 @@ const ExamDetail: React.FC = () => {
                 <div className="flex items-center gap-3 p-4 bg-green-50 rounded-lg">
                   <FileText className="w-8 h-8 text-green-600" />
                   <div>
-                    <p className="text-sm text-gray-600">Questions</p>
-                    <p className="font-semibold text-gray-900">
+                    <p className="text-sm text-slate-600">Questions</p>
+                    <p className="font-semibold text-slate-900">
                       {exam.total_questions} questions
                     </p>
                   </div>
@@ -333,16 +333,16 @@ const ExamDetail: React.FC = () => {
                 <div className="flex items-center gap-3 p-4 bg-purple-50 rounded-lg">
                   <Calendar className="w-8 h-8 text-purple-600" />
                   <div>
-                    <p className="text-sm text-gray-600">Year</p>
-                    <p className="font-semibold text-gray-900">{exam.year}</p>
+                    <p className="text-sm text-slate-600">Year</p>
+                    <p className="font-semibold text-slate-900">{exam.year}</p>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-3 p-4 bg-orange-50 rounded-lg">
                   <Award className="w-8 h-8 text-orange-600" />
                   <div>
-                    <p className="text-sm text-gray-600">Type</p>
-                    <p className="font-semibold text-gray-900">
+                    <p className="text-sm text-slate-600">Type</p>
+                    <p className="font-semibold text-slate-900">
                       {exam.exam_type}
                     </p>
                   </div>
@@ -350,9 +350,9 @@ const ExamDetail: React.FC = () => {
               </div>
 
               {exam.source && (
-                <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-                  <p className="text-sm text-gray-600 mb-1">Source</p>
-                  <p className="font-medium text-gray-900">{exam.source}</p>
+                <div className="mt-6 p-4 bg-slate-50 rounded-lg">
+                  <p className="text-sm text-slate-600 mb-1">Source</p>
+                  <p className="font-medium text-slate-900">{exam.source}</p>
                 </div>
               )}
 
@@ -360,7 +360,7 @@ const ExamDetail: React.FC = () => {
                 <div className="mt-6">
                   <div className="flex items-center gap-2 mb-3">
                     <Volume2 className="w-5 h-5 text-blue-600" />
-                    <h3 className="font-semibold text-gray-900">
+                    <h3 className="font-semibold text-slate-900">
                       Audio Materials
                     </h3>
                   </div>
@@ -370,10 +370,10 @@ const ExamDetail: React.FC = () => {
                         key={media.media_id}
                         className="flex items-center justify-between p-3 bg-blue-50 rounded-lg"
                       >
-                        <span className="text-sm text-gray-700">
+                        <span className="text-sm text-slate-700">
                           Duration: {Math.floor(media.duration / 60)} minutes
                         </span>
-                        <span className="text-xs text-gray-500">
+                        <span className="text-xs text-slate-500">
                           Audio included
                         </span>
                       </div>
@@ -385,8 +385,8 @@ const ExamDetail: React.FC = () => {
 
             {/* Exam Parts Selection */}
             {exam.Exam_Containers && exam.Exam_Containers.length > 0 && (
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-4">
+              <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+                <h2 className="text-xl font-bold text-slate-900 mb-4">
                   Select Exam Parts
                 </h2>
 
@@ -396,20 +396,20 @@ const ExamDetail: React.FC = () => {
                   className={`cursor-pointer p-4 rounded-lg border-2 mb-4 transition-all ${
                     isFullExam
                       ? "border-blue-500 bg-blue-50"
-                      : "border-gray-200 bg-white hover:border-gray-300"
+                      : "border-slate-200 bg-white hover:border-slate-300"
                   }`}
                 >
                   <div className="flex items-center gap-3">
                     {isFullExam ? (
                       <CheckSquare className="w-6 h-6 text-blue-600" />
                     ) : (
-                      <Square className="w-6 h-6 text-gray-400" />
+                      <Square className="w-6 h-6 text-slate-400" />
                     )}
                     <div className="flex-1">
-                      <h3 className="font-semibold text-gray-900">
+                      <h3 className="font-semibold text-slate-900">
                         Full Exam (All Parts)
                       </h3>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-slate-600">
                         Take the complete exam with all{" "}
                         {exam.Exam_Containers.length} parts
                       </p>
@@ -419,14 +419,14 @@ const ExamDetail: React.FC = () => {
 
                 {/* Individual Parts */}
                 <div className="space-y-3">
-                  <p className="text-sm text-gray-600 font-medium mb-3">
+                  <p className="text-sm text-slate-600 font-medium mb-3">
                     Or select specific parts:
                   </p>
 
                   {Object.entries(groupContainersBySkill()).map(
                     ([skill, containers]: [string, any[]]) => (
                       <div key={skill} className="space-y-2">
-                        <h4 className="font-medium text-gray-700 text-sm uppercase tracking-wide">
+                        <h4 className="font-medium text-slate-700 text-sm uppercase tracking-wide">
                           {skill}
                         </h4>
                         {containers.map((container: any) => (
@@ -437,12 +437,12 @@ const ExamDetail: React.FC = () => {
                             }
                             className={`cursor-pointer p-3 rounded-lg border transition-all ${
                               isFullExam
-                                ? "opacity-50 cursor-not-allowed border-gray-200 bg-gray-50"
+                                ? "opacity-50 cursor-not-allowed border-slate-200 bg-slate-50"
                                 : selectedContainers.includes(
                                       container.container_id,
                                     )
                                   ? `border-2 ${getSkillColor(skill)}`
-                                  : "border-gray-200 bg-white hover:border-gray-300"
+                                  : "border-slate-200 bg-white hover:border-slate-300"
                             }`}
                           >
                             <div className="flex items-start gap-3">
@@ -452,14 +452,14 @@ const ExamDetail: React.FC = () => {
                                 ) ? (
                                   <CheckSquare className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
                                 ) : (
-                                  <Square className="w-5 h-5 text-gray-400 flex-shrink-0 mt-0.5" />
+                                  <Square className="w-5 h-5 text-slate-400 flex-shrink-0 mt-0.5" />
                                 ))}
                               {isFullExam && (
-                                <CheckSquare className="w-5 h-5 text-gray-400 flex-shrink-0 mt-0.5" />
+                                <CheckSquare className="w-5 h-5 text-slate-400 flex-shrink-0 mt-0.5" />
                               )}
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2 mb-1">
-                                  <span className="font-medium text-gray-900">
+                                  <span className="font-medium text-slate-900">
                                     Part {container.order}
                                   </span>
                                   <span
@@ -471,11 +471,11 @@ const ExamDetail: React.FC = () => {
                                   </span>
                                 </div>
                                 {container.instruction && (
-                                  <p className="text-sm text-gray-600 line-clamp-2">
+                                  <p className="text-sm text-slate-600 line-clamp-2">
                                     {container.instruction}
                                   </p>
                                 )}
-                                <p className="text-xs text-gray-500 mt-1">
+                                <p className="text-xs text-slate-500 mt-1">
                                   {getContainerQuestionCount(container)}{" "}
                                   questions
                                   {container.time_limit &&
@@ -513,11 +513,11 @@ const ExamDetail: React.FC = () => {
             )}
 
             {/* Instructions */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">
+            <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+              <h2 className="text-xl font-bold text-slate-900 mb-4">
                 Instructions
               </h2>
-              <div className="space-y-3 text-gray-700">
+              <div className="space-y-3 text-slate-700">
                 <p className="flex items-start gap-2">
                   <span className="text-blue-600 font-bold">1.</span>
                   <span>
@@ -585,10 +585,10 @@ const ExamDetail: React.FC = () => {
             <div className="sticky top-4 space-y-6">
               {/* My Attempts */}
               {isAuthenticated && history.length > 0 && (
-                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
                   <div className="flex items-center gap-2 mb-4">
                     <TrendingUp className="w-5 h-5 text-blue-600" />
-                    <h3 className="font-semibold text-gray-900">My Attempts</h3>
+                    <h3 className="font-semibold text-slate-900">My Attempts</h3>
                   </div>
                   <div className="space-y-3">
                     {history.slice(0, 3).map((attempt: any) => (
@@ -597,10 +597,10 @@ const ExamDetail: React.FC = () => {
                         onClick={() =>
                           navigate(`/exams/result/${attempt.user_exam_id}`)
                         }
-                        className="cursor-pointer hover:bg-gray-50 p-3 rounded-lg transition-colors border border-gray-100"
+                        className="cursor-pointer hover:bg-slate-50 p-3 rounded-lg transition-colors border border-slate-100"
                       >
                         <div className="flex justify-between items-start mb-2">
-                          <span className="text-xs text-gray-500">
+                          <span className="text-xs text-slate-500">
                             {new Date(
                               attempt.submitted_at,
                             ).toLocaleDateString()}
@@ -625,7 +625,7 @@ const ExamDetail: React.FC = () => {
                   </div>
                   <button
                     onClick={() => navigate("/exams/history")}
-                    className="w-full mt-4 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium"
+                    className="w-full mt-4 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors text-sm font-medium"
                   >
                     View All Attempts
                   </button>
@@ -636,9 +636,9 @@ const ExamDetail: React.FC = () => {
               <div className="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-lg shadow-sm border border-yellow-200 p-6">
                 <div className="flex items-center gap-2 mb-4">
                   <BookOpen className="w-5 h-5 text-yellow-600" />
-                  <h3 className="font-semibold text-gray-900">Exam Tips</h3>
+                  <h3 className="font-semibold text-slate-900">Exam Tips</h3>
                 </div>
-                <ul className="space-y-2 text-sm text-gray-700">
+                <ul className="space-y-2 text-sm text-slate-700">
                   <li className="flex items-start gap-2">
                     <span className="text-yellow-600 mt-0.5">•</span>
                     <span>Find a quiet place to take the exam</span>

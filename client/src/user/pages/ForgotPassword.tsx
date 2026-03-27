@@ -32,12 +32,12 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <h2 className="mt-6 text-center text-3xl font-bold text-gray-900">
+        <h2 className="mt-6 text-center text-3xl font-bold text-slate-900">
           Quên mật khẩu
         </h2>
-        <p className="mt-2 text-center text-sm text-gray-600">
+        <p className="mt-2 text-center text-sm text-slate-600">
           Nhập email của bạn để nhận mã OTP
         </p>
       </div>
@@ -54,7 +54,7 @@ const ForgotPassword = () => {
             <div>
               <label
                 htmlFor="email"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-sm font-medium text-slate-700"
               >
                 Email
               </label>
@@ -66,10 +66,10 @@ const ForgotPassword = () => {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="appearance-none block w-full px-3 py-3 pl-10 border border-gray-300 rounded-lg placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all duration-200"
+                  className="appearance-none block w-full px-3 py-3 pl-10 border border-slate-300 rounded-lg placeholder-slate-500 text-slate-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all duration-200"
                   placeholder="Nhập email của bạn"
                 />
-                <Mail className="h-5 w-5 text-gray-400 absolute left-3 top-3.5" />
+                <Mail className="h-5 w-5 text-slate-400 absolute left-3 top-3.5" />
               </div>
             </div>
 

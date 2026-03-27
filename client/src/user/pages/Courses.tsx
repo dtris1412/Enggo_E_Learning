@@ -9,7 +9,7 @@ const Courses: React.FC = () => {
   const [viewMode, setViewMode] = useState<ViewMode>("courses");
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-slate-50">
       {/* Header Section */}
       <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -22,7 +22,7 @@ const Courses: React.FC = () => {
       </div>
 
       {/* Tab Navigation */}
-      <div className="bg-white border-b border-gray-200 sticky top-16 z-40">
+      <div className="bg-white border-b border-slate-200 sticky top-16 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex space-x-1">
             <button
@@ -32,7 +32,7 @@ const Courses: React.FC = () => {
                 ${
                   viewMode === "courses"
                     ? "border-blue-600 text-blue-600"
-                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                    : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300"
                 }
               `}
             >
@@ -46,7 +46,7 @@ const Courses: React.FC = () => {
                 ${
                   viewMode === "roadmaps"
                     ? "border-blue-600 text-blue-600"
-                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                    : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300"
                 }
               `}
             >

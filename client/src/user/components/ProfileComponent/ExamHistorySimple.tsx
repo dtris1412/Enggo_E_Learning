@@ -84,9 +84,9 @@ const ExamHistorySimple: React.FC = () => {
     return (
       <div className="bg-white rounded-lg shadow-md p-6">
         <div className="animate-pulse space-y-4">
-          <div className="h-6 bg-gray-300 rounded w-1/3"></div>
-          <div className="h-4 bg-gray-300 rounded w-full"></div>
-          <div className="h-4 bg-gray-300 rounded w-5/6"></div>
+          <div className="h-6 bg-slate-300 rounded w-1/3"></div>
+          <div className="h-4 bg-slate-300 rounded w-full"></div>
+          <div className="h-4 bg-slate-300 rounded w-5/6"></div>
         </div>
       </div>
     );
@@ -150,15 +150,15 @@ const ExamHistorySimple: React.FC = () => {
       <div className="bg-white rounded-lg shadow-md p-6">
         <div className="flex items-center gap-3 mb-6">
           <FileText className="w-6 h-6 text-blue-600" />
-          <h2 className="text-2xl font-bold text-gray-800">Lịch sử làm bài</h2>
+          <h2 className="text-2xl font-bold text-slate-800">Lịch sử làm bài</h2>
         </div>
 
         {totalExams === 0 ? (
           <div className="text-center py-12">
-            <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <FileText className="w-10 h-10 text-gray-400" />
+            <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <FileText className="w-10 h-10 text-slate-400" />
             </div>
-            <p className="text-gray-500 mb-4">Chưa có lịch sử làm bài</p>
+            <p className="text-slate-500 mb-4">Chưa có lịch sử làm bài</p>
             <Link
               to="/exams"
               className="inline-block px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
@@ -175,16 +175,16 @@ const ExamHistorySimple: React.FC = () => {
               return (
                 <div
                   key={attempt.user_exam_id}
-                  className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition"
+                  className="border border-slate-200 rounded-lg p-4 hover:shadow-md transition"
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
-                      <h3 className="text-base font-semibold text-gray-800 mb-2">
+                      <h3 className="text-base font-semibold text-slate-800 mb-2">
                         {attempt.Exam.exam_title}
                       </h3>
 
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
-                        <div className="flex items-center gap-2 text-gray-600">
+                        <div className="flex items-center gap-2 text-slate-600">
                           <Calendar className="w-4 h-4" />
                           <span>
                             {new Date(attempt.submitted_at).toLocaleDateString(
@@ -193,7 +193,7 @@ const ExamHistorySimple: React.FC = () => {
                           </span>
                         </div>
 
-                        <div className="flex items-center gap-2 text-gray-600">
+                        <div className="flex items-center gap-2 text-slate-600">
                           <Award className="w-4 h-4" />
                           <span>
                             {attempt.statistics.correct_answers}/
@@ -239,15 +239,15 @@ const ExamHistorySimple: React.FC = () => {
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                <p className="text-sm text-gray-500">
+              <div className="flex items-center justify-between pt-4 border-t border-slate-100">
+                <p className="text-sm text-slate-500">
                   Trang {currentPage}/{totalPages} &bull; {totalExams} bài thi
                 </p>
                 <div className="flex gap-1">
                   <button
                     onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                     disabled={currentPage === 1}
-                    className="px-3 py-1.5 rounded-lg text-sm border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition"
+                    className="px-3 py-1.5 rounded-lg text-sm border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition"
                   >
                     ‹ Trước
                   </button>
@@ -268,7 +268,7 @@ const ExamHistorySimple: React.FC = () => {
                       p === "..." ? (
                         <span
                           key={`ellipsis-${i}`}
-                          className="px-2 py-1.5 text-sm text-gray-400"
+                          className="px-2 py-1.5 text-sm text-slate-400"
                         >
                           ...
                         </span>
@@ -279,7 +279,7 @@ const ExamHistorySimple: React.FC = () => {
                           className={`px-3 py-1.5 rounded-lg text-sm border transition ${
                             currentPage === p
                               ? "bg-blue-500 text-white border-blue-500"
-                              : "border-gray-200 text-gray-600 hover:bg-gray-50"
+                              : "border-slate-200 text-slate-600 hover:bg-slate-50"
                           }`}
                         >
                           {p}
@@ -291,7 +291,7 @@ const ExamHistorySimple: React.FC = () => {
                       setCurrentPage((p) => Math.min(totalPages, p + 1))
                     }
                     disabled={currentPage === totalPages}
-                    className="px-3 py-1.5 rounded-lg text-sm border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition"
+                    className="px-3 py-1.5 rounded-lg text-sm border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition"
                   >
                     Sau ›
                   </button>

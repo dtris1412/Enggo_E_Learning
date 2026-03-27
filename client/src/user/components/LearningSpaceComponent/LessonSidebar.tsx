@@ -24,18 +24,18 @@ const LessonSidebar: React.FC = () => {
       case "text":
         return <FileText className="h-4 w-4 text-blue-500" />;
       default:
-        return <BookOpen className="h-4 w-4 text-gray-500" />;
+        return <BookOpen className="h-4 w-4 text-slate-500" />;
     }
   };
 
   return (
-    <div className="h-full bg-white border-r border-gray-200 overflow-y-auto">
+    <div className="h-full bg-white border-r border-slate-200 overflow-y-auto">
       {/* Course Header */}
-      <div className="p-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
-        <h2 className="text-lg font-bold text-gray-900 mb-1">
+      <div className="p-4 border-b border-slate-200 bg-gradient-to-r from-blue-50 to-indigo-50">
+        <h2 className="text-lg font-bold text-slate-900 mb-1">
           {course.course_title}
         </h2>
-        <p className="text-xs text-gray-600">{course.description}</p>
+        <p className="text-xs text-slate-600">{course.description}</p>
         <div className="mt-2 flex items-center gap-2">
           <span className="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded-full font-medium">
             {course.course_level}
@@ -55,15 +55,15 @@ const LessonSidebar: React.FC = () => {
           (module, moduleIndex) => (
             <div key={module.module_id} className="mb-3">
               {/* Module Header */}
-              <div className="flex items-start gap-2 mb-2 p-2 bg-gray-50 rounded-lg">
+              <div className="flex items-start gap-2 mb-2 p-2 bg-slate-50 rounded-lg">
                 <span className="flex-shrink-0 w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-xs font-semibold">
                   {moduleIndex + 1}
                 </span>
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-gray-900 text-xs mb-0.5">
+                  <h3 className="font-semibold text-slate-900 text-xs mb-0.5">
                     {module.module_title}
                   </h3>
-                  <p className="text-xs text-gray-600">
+                  <p className="text-xs text-slate-600">
                     {module.Module_Lessons?.length || 0} bài học •{" "}
                     {module.estimated_time} phút
                   </p>
@@ -86,7 +86,7 @@ const LessonSidebar: React.FC = () => {
                     className={`w-full flex items-center gap-2 p-2 rounded-lg transition-all mb-1.5 text-left group ${
                       isActive
                         ? "bg-blue-600 text-white shadow-md"
-                        : "hover:bg-gray-100"
+                        : "hover:bg-slate-100"
                     }`}
                   >
                     {/* Lesson Icon */}
@@ -100,7 +100,7 @@ const LessonSidebar: React.FC = () => {
                       ) : (
                         <Circle
                           className={`h-4 w-4 ${
-                            isActive ? "text-white" : "text-gray-400"
+                            isActive ? "text-white" : "text-slate-400"
                           }`}
                         />
                       )}
@@ -112,7 +112,7 @@ const LessonSidebar: React.FC = () => {
                         {getLessonIcon(moduleLesson.Lesson.lesson_type)}
                         <span
                           className={`text-xs font-medium ${
-                            isActive ? "text-white" : "text-gray-500"
+                            isActive ? "text-white" : "text-slate-500"
                           }`}
                         >
                           Bài {lessonIndex + 1}
@@ -120,14 +120,14 @@ const LessonSidebar: React.FC = () => {
                       </div>
                       <h4
                         className={`text-xs font-medium ${
-                          isActive ? "text-white" : "text-gray-900"
+                          isActive ? "text-white" : "text-slate-900"
                         } truncate`}
                       >
                         {moduleLesson.Lesson.lesson_title}
                       </h4>
                       <p
                         className={`text-xs ${
-                          isActive ? "text-blue-100" : "text-gray-500"
+                          isActive ? "text-blue-100" : "text-slate-500"
                         } mt-0.5`}
                       >
                         {moduleLesson.Lesson.estimated_time} phút
@@ -147,10 +147,10 @@ const LessonSidebar: React.FC = () => {
       </div>
 
       {/* Progress Summary */}
-      <div className="p-3 border-t border-gray-200 bg-gray-50">
-        <div className="text-xs text-gray-600">
-          <p className="font-medium text-gray-900 mb-1.5">Tiến độ khóa học</p>
-          <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
+      <div className="p-3 border-t border-slate-200 bg-slate-50">
+        <div className="text-xs text-slate-600">
+          <p className="font-medium text-slate-900 mb-1.5">Tiến độ khóa học</p>
+          <div className="w-full bg-slate-200 rounded-full h-2 mb-2">
             <div
               className="bg-blue-600 h-2 rounded-full transition-all duration-300"
               style={{
@@ -164,7 +164,7 @@ const LessonSidebar: React.FC = () => {
               }}
             />
           </div>
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-slate-500">
             {course.Modules?.reduce((acc, m) => {
               const completed =
                 m.Module_Lessons?.filter((ml) => ml.status).length || 0;

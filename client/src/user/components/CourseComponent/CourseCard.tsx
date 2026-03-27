@@ -35,45 +35,45 @@ const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
   const getLevelColor = (level: string) => {
     switch (level.toLowerCase()) {
       case "beginner":
-        return "bg-green-100 text-green-800";
+        return "bg-emerald-100 text-emerald-800";
       case "intermediate":
         return "bg-blue-100 text-blue-800";
       case "advanced":
-        return "bg-purple-100 text-purple-800";
+        return "bg-violet-100 text-violet-800";
       default:
-        return "bg-gray-100 text-gray-800";
+        return "bg-slate-100 text-slate-700";
     }
   };
 
   return (
     <Link
       to={`/courses/${course.course_id}`}
-      className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
+      className="group bg-white rounded-2xl border border-slate-200 overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
     >
       <div className="p-6">
         <div className="flex items-center justify-between mb-3">
           <span
-            className={`${getLevelColor(course.course_level)} text-xs px-3 py-1 rounded-full font-medium`}
+            className={`${getLevelColor(course.course_level)} text-xs px-3 py-1 rounded-full font-semibold`}
           >
             {course.course_level}
           </span>
           {course.access_type === "premium" && (
-            <span className="bg-yellow-100 text-yellow-800 text-xs px-3 py-1 rounded-full font-medium flex items-center">
+            <span className="bg-amber-100 text-amber-800 text-xs px-3 py-1 rounded-full font-semibold flex items-center">
               <Lock className="h-3 w-3 mr-1" />
               Premium
             </span>
           )}
         </div>
 
-        <h3 className="text-xl font-semibold text-gray-900 mb-2 line-clamp-2">
+        <h3 className="text-xl font-black text-slate-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
           {course.course_title}
         </h3>
 
-        <p className="text-gray-600 mb-4 text-sm line-clamp-2">
+        <p className="text-slate-500 mb-4 text-sm line-clamp-2">
           {course.description}
         </p>
 
-        <div className="flex items-center text-sm text-gray-500 mb-4 flex-wrap gap-2">
+        <div className="flex items-center text-sm text-slate-500 mb-4 flex-wrap gap-2">
           <div className="flex items-center">
             <Clock className="h-4 w-4 mr-1" />
             <span>{course.estimate_duration} giờ</span>
@@ -88,11 +88,11 @@ const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
 
         {tags.length > 0 && (
           <div className="flex items-center gap-2 flex-wrap mb-4">
-            <Tag className="h-4 w-4 text-gray-400" />
+            <Tag className="h-4 w-4 text-slate-400" />
             {tags.map((tag, index) => (
               <span
                 key={index}
-                className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded"
+                className="text-xs bg-slate-100 text-slate-600 px-2 py-1 rounded-lg"
               >
                 {tag.trim()}
               </span>
@@ -100,7 +100,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
           </div>
         )}
 
-        <button className="w-full bg-blue-600 text-white py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors">
+        <button className="w-full bg-gradient-to-r from-amber-400 to-orange-500 text-slate-900 py-2 rounded-xl font-bold hover:shadow-md transition-all">
           Xem chi tiết
         </button>
       </div>

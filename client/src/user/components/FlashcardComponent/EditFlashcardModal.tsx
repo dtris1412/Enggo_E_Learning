@@ -109,7 +109,7 @@ const EditFlashcardModal: React.FC<EditFlashcardModalProps> = ({
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
           {/* Front Content */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-slate-700 mb-2">
               Mặt trước <span className="text-red-500">*</span>
             </label>
             <textarea
@@ -118,7 +118,7 @@ const EditFlashcardModal: React.FC<EditFlashcardModalProps> = ({
                 setFormData({ ...formData, front_content: e.target.value })
               }
               className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none ${
-                errors.front_content ? "border-red-500" : "border-gray-300"
+                errors.front_content ? "border-red-500" : "border-slate-300"
               }`}
               rows={3}
               placeholder="Nhập nội dung mặt trước (ví dụ: từ tiếng Anh)"
@@ -132,7 +132,7 @@ const EditFlashcardModal: React.FC<EditFlashcardModalProps> = ({
 
           {/* Back Content */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-slate-700 mb-2">
               Mặt sau <span className="text-red-500">*</span>
             </label>
             <textarea
@@ -141,7 +141,7 @@ const EditFlashcardModal: React.FC<EditFlashcardModalProps> = ({
                 setFormData({ ...formData, back_content: e.target.value })
               }
               className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none ${
-                errors.back_content ? "border-red-500" : "border-gray-300"
+                errors.back_content ? "border-red-500" : "border-slate-300"
               }`}
               rows={3}
               placeholder="Nhập nội dung mặt sau (ví dụ: nghĩa tiếng Việt)"
@@ -153,7 +153,7 @@ const EditFlashcardModal: React.FC<EditFlashcardModalProps> = ({
 
           {/* Pronunciation */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-slate-700 mb-2">
               Phát âm (tùy chọn)
             </label>
             <input
@@ -162,14 +162,14 @@ const EditFlashcardModal: React.FC<EditFlashcardModalProps> = ({
               onChange={(e) =>
                 setFormData({ ...formData, pronunciation: e.target.value })
               }
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
               placeholder="Ví dụ: /ˈhæpi/"
             />
           </div>
 
           {/* Example */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-slate-700 mb-2">
               Ví dụ (tùy chọn)
             </label>
             <textarea
@@ -177,7 +177,7 @@ const EditFlashcardModal: React.FC<EditFlashcardModalProps> = ({
               onChange={(e) =>
                 setFormData({ ...formData, example: e.target.value })
               }
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
+              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
               rows={2}
               placeholder="Câu ví dụ sử dụng từ này"
             />
@@ -185,7 +185,7 @@ const EditFlashcardModal: React.FC<EditFlashcardModalProps> = ({
 
           {/* Difficulty Level */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-slate-700 mb-2">
               Độ khó (tùy chọn)
             </label>
             <select
@@ -193,7 +193,7 @@ const EditFlashcardModal: React.FC<EditFlashcardModalProps> = ({
               onChange={(e) =>
                 setFormData({ ...formData, difficulty_level: e.target.value })
               }
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
             >
               <option value="">Chưa xác định</option>
               <option value="easy">Dễ</option>
@@ -207,7 +207,7 @@ const EditFlashcardModal: React.FC<EditFlashcardModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+              className="flex-1 px-6 py-3 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors font-medium"
               disabled={loading}
             >
               Hủy

@@ -122,22 +122,22 @@ const FlashcardCreateForm: React.FC<FlashcardCreateFormProps> = ({
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b border-gray-200">
+      <div className="bg-white shadow-sm border-b border-slate-200">
         <div className="max-w-4xl mx-auto px-6 py-4">
           <div className="flex items-center gap-4">
             <button
               onClick={() => navigate("/flashcards")}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
             >
-              <ArrowLeft className="w-5 h-5 text-gray-600" />
+              <ArrowLeft className="w-5 h-5 text-slate-600" />
             </button>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">
+              <h1 className="text-2xl font-bold text-slate-900">
                 {isEditMode
                   ? "Chỉnh sửa Flashcard Set"
                   : "Tạo Flashcard Set Mới"}
               </h1>
-              <p className="text-sm text-gray-600 mt-1">
+              <p className="text-sm text-slate-600 mt-1">
                 {isEditMode
                   ? "Cập nhật thông tin bộ flashcard"
                   : "Tạo bộ flashcard mới để bắt đầu học tập"}
@@ -151,12 +151,12 @@ const FlashcardCreateForm: React.FC<FlashcardCreateFormProps> = ({
       <div className="max-w-4xl mx-auto px-6 py-8">
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Main Card */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
             {/* Title */}
             <div className="mb-6">
               <label
                 htmlFor="title"
-                className="block text-sm font-semibold text-gray-700 mb-2"
+                className="block text-sm font-semibold text-slate-700 mb-2"
               >
                 Tiêu đề <span className="text-red-500">*</span>
               </label>
@@ -169,7 +169,7 @@ const FlashcardCreateForm: React.FC<FlashcardCreateFormProps> = ({
                 className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 transition-all ${
                   errors.title
                     ? "border-red-300 focus:ring-red-200"
-                    : "border-gray-300 focus:ring-indigo-200 focus:border-indigo-400"
+                    : "border-slate-300 focus:ring-indigo-200 focus:border-indigo-400"
                 }`}
                 placeholder="Ví dụ: Từ vựng IELTS Band 7+"
                 disabled={loading}
@@ -183,7 +183,7 @@ const FlashcardCreateForm: React.FC<FlashcardCreateFormProps> = ({
             <div className="mb-6">
               <label
                 htmlFor="description"
-                className="block text-sm font-semibold text-gray-700 mb-2"
+                className="block text-sm font-semibold text-slate-700 mb-2"
               >
                 Mô tả
               </label>
@@ -193,7 +193,7 @@ const FlashcardCreateForm: React.FC<FlashcardCreateFormProps> = ({
                 value={formData.description}
                 onChange={handleInputChange}
                 rows={4}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 transition-all resize-none"
+                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 transition-all resize-none"
                 placeholder="Mô tả ngắn về bộ flashcard này..."
                 disabled={loading}
               />
@@ -201,7 +201,7 @@ const FlashcardCreateForm: React.FC<FlashcardCreateFormProps> = ({
 
             {/* Visibility */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-3">
+              <label className="block text-sm font-semibold text-slate-700 mb-3">
                 Quyền riêng tư
               </label>
               <div className="grid grid-cols-2 gap-4">
@@ -212,19 +212,19 @@ const FlashcardCreateForm: React.FC<FlashcardCreateFormProps> = ({
                   className={`flex items-center gap-3 p-4 border-2 rounded-lg transition-all ${
                     formData.visibility === "private"
                       ? "border-indigo-500 bg-indigo-50 text-indigo-700"
-                      : "border-gray-200 hover:border-gray-300 text-gray-700"
+                      : "border-slate-200 hover:border-slate-300 text-slate-700"
                   }`}
                 >
                   <LockKeyhole
                     className={`w-5 h-5 ${
                       formData.visibility === "private"
                         ? "text-indigo-600"
-                        : "text-gray-400"
+                        : "text-slate-400"
                     }`}
                   />
                   <div className="text-left flex-1">
                     <div className="font-semibold text-sm">Riêng tư</div>
-                    <div className="text-xs text-gray-500 mt-0.5">
+                    <div className="text-xs text-slate-500 mt-0.5">
                       Chỉ bạn có thể xem
                     </div>
                   </div>
@@ -237,19 +237,19 @@ const FlashcardCreateForm: React.FC<FlashcardCreateFormProps> = ({
                   className={`flex items-center gap-3 p-4 border-2 rounded-lg transition-all ${
                     formData.visibility === "public"
                       ? "border-indigo-500 bg-indigo-50 text-indigo-700"
-                      : "border-gray-200 hover:border-gray-300 text-gray-700"
+                      : "border-slate-200 hover:border-slate-300 text-slate-700"
                   }`}
                 >
                   <Globe
                     className={`w-5 h-5 ${
                       formData.visibility === "public"
                         ? "text-indigo-600"
-                        : "text-gray-400"
+                        : "text-slate-400"
                     }`}
                   />
                   <div className="text-left flex-1">
                     <div className="font-semibold text-sm">Công khai</div>
-                    <div className="text-xs text-gray-500 mt-0.5">
+                    <div className="text-xs text-slate-500 mt-0.5">
                       Mọi người có thể xem
                     </div>
                   </div>
@@ -264,7 +264,7 @@ const FlashcardCreateForm: React.FC<FlashcardCreateFormProps> = ({
               type="button"
               onClick={() => navigate("/flashcards")}
               disabled={loading}
-              className="px-6 py-3 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-6 py-3 text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Hủy
             </button>

@@ -156,7 +156,7 @@ const DocumentDetail: React.FC = () => {
       case "audio":
         return <FileText className={`${iconClass} text-purple-500`} />;
       default:
-        return <FileText className={`${iconClass} text-gray-500`} />;
+        return <FileText className={`${iconClass} text-slate-500`} />;
     }
   };
 
@@ -169,7 +169,7 @@ const DocumentDetail: React.FC = () => {
       case "guideline":
         return "bg-green-100 text-green-800";
       default:
-        return "bg-gray-100 text-gray-800";
+        return "bg-slate-100 text-slate-800";
     }
   };
 
@@ -191,7 +191,7 @@ const DocumentDetail: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex justify-center items-center">
+      <div className="min-h-screen bg-slate-50 flex justify-center items-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
       </div>
     );
@@ -221,10 +221,10 @@ const DocumentDetail: React.FC = () => {
               <div className="flex items-start gap-3 mb-6">
                 <AlertCircle className="w-6 h-6 text-yellow-600 flex-shrink-0 mt-1" />
                 <div>
-                  <p className="text-gray-700 leading-relaxed">
+                  <p className="text-slate-700 leading-relaxed">
                     Tài liệu này yêu cầu gói Premium để xem và tải xuống.
                   </p>
-                  <p className="text-gray-600 text-sm mt-2">
+                  <p className="text-slate-600 text-sm mt-2">
                     Nâng cấp ngay để truy cập kho tài liệu chất lượng cao và
                     nhiều tính năng độc quyền khác!
                   </p>
@@ -233,10 +233,10 @@ const DocumentDetail: React.FC = () => {
 
               {/* Benefits List */}
               <div className="bg-gradient-to-br from-yellow-50 to-amber-50 rounded-lg p-4 mb-6">
-                <p className="font-semibold text-gray-800 mb-2 text-sm">
+                <p className="font-semibold text-slate-800 mb-2 text-sm">
                   Lợi ích khi nâng cấp Premium:
                 </p>
-                <ul className="space-y-2 text-sm text-gray-700">
+                <ul className="space-y-2 text-sm text-slate-700">
                   <li className="flex items-center gap-2">
                     <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0" />
                     Truy cập không giới hạn tài liệu Premium
@@ -263,7 +263,7 @@ const DocumentDetail: React.FC = () => {
                     setShowUpgradeModal(false);
                     navigate("/documents");
                   }}
-                  className="flex-1 px-4 py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-semibold"
+                  className="flex-1 px-4 py-3 border-2 border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors font-semibold"
                 >
                   Hủy
                 </button>
@@ -277,7 +277,7 @@ const DocumentDetail: React.FC = () => {
               </div>
 
               {/* Additional info */}
-              <p className="text-center text-xs text-gray-500 mt-4">
+              <p className="text-center text-xs text-slate-500 mt-4">
                 Có thể hủy bất cứ lúc nào
               </p>
             </div>
@@ -289,10 +289,10 @@ const DocumentDetail: React.FC = () => {
 
   if (!document) {
     return (
-      <div className="min-h-screen bg-gray-50 flex justify-center items-center">
+      <div className="min-h-screen bg-slate-50 flex justify-center items-center">
         <div className="text-center">
-          <FileText className="w-20 h-20 mx-auto mb-4 text-gray-300" />
-          <h3 className="text-xl font-semibold text-gray-700 mb-2">
+          <FileText className="w-20 h-20 mx-auto mb-4 text-slate-300" />
+          <h3 className="text-xl font-semibold text-slate-700 mb-2">
             Document not found
           </h3>
           <button
@@ -307,12 +307,12 @@ const DocumentDetail: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-slate-50 py-8">
       <div className="container mx-auto px-4 max-w-4xl">
         {/* Back Button */}
         <button
           onClick={() => navigate("/documents")}
-          className="mb-6 flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
+          className="mb-6 flex items-center gap-2 text-slate-600 hover:text-slate-900 transition-colors"
         >
           <ArrowLeft className="w-5 h-5" />
           <span>Back to Documents</span>
@@ -365,10 +365,10 @@ const DocumentDetail: React.FC = () => {
           <div className="p-8">
             {/* Description */}
             <div className="mb-8">
-              <h2 className="text-xl font-semibold text-gray-900 mb-3">
+              <h2 className="text-xl font-semibold text-slate-900 mb-3">
                 Description
               </h2>
-              <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+              <p className="text-slate-700 leading-relaxed whitespace-pre-wrap">
                 {document.description || "No description available."}
               </p>
             </div>
@@ -376,10 +376,10 @@ const DocumentDetail: React.FC = () => {
             {/* Document Viewer */}
             {document.document_url && (
               <div className="mb-8">
-                <h2 className="text-xl font-semibold text-gray-900 mb-3">
+                <h2 className="text-xl font-semibold text-slate-900 mb-3">
                   Preview
                 </h2>
-                <div className="bg-gray-100 rounded-lg overflow-hidden">
+                <div className="bg-slate-100 rounded-lg overflow-hidden">
                   {document.file_type?.toLowerCase() === "pdf" && (
                     <iframe
                       src={`https://docs.google.com/viewer?url=${encodeURIComponent(document.document_url)}&embedded=true`}
@@ -417,8 +417,8 @@ const DocumentDetail: React.FC = () => {
                 <div className="flex items-center gap-3">
                   <Eye className="w-8 h-8 text-blue-600" />
                   <div>
-                    <p className="text-sm text-gray-600">Views</p>
-                    <p className="text-2xl font-bold text-gray-900">
+                    <p className="text-sm text-slate-600">Views</p>
+                    <p className="text-2xl font-bold text-slate-900">
                       {document.view_count || 0}
                     </p>
                   </div>
@@ -429,8 +429,8 @@ const DocumentDetail: React.FC = () => {
                 <div className="flex items-center gap-3">
                   <Download className="w-8 h-8 text-green-600" />
                   <div>
-                    <p className="text-sm text-gray-600">Downloads</p>
-                    <p className="text-2xl font-bold text-gray-900">
+                    <p className="text-sm text-slate-600">Downloads</p>
+                    <p className="text-2xl font-bold text-slate-900">
                       {document.download_count || 0}
                     </p>
                   </div>
@@ -441,8 +441,8 @@ const DocumentDetail: React.FC = () => {
                 <div className="flex items-center gap-3">
                   <Calendar className="w-8 h-8 text-purple-600" />
                   <div>
-                    <p className="text-sm text-gray-600">Published</p>
-                    <p className="text-sm font-semibold text-gray-900">
+                    <p className="text-sm text-slate-600">Published</p>
+                    <p className="text-sm font-semibold text-slate-900">
                       {formatDate(document.created_at)}
                     </p>
                   </div>
@@ -452,12 +452,12 @@ const DocumentDetail: React.FC = () => {
 
             {/* Author Info */}
             {document.uploaded_by && (
-              <div className="bg-gray-50 rounded-lg p-4 mb-8">
+              <div className="bg-slate-50 rounded-lg p-4 mb-8">
                 <div className="flex items-center gap-3">
-                  <User className="w-6 h-6 text-gray-600" />
+                  <User className="w-6 h-6 text-slate-600" />
                   <div>
-                    <p className="text-sm text-gray-600">Uploaded by</p>
-                    <p className="font-semibold text-gray-900">
+                    <p className="text-sm text-slate-600">Uploaded by</p>
+                    <p className="font-semibold text-slate-900">
                       {document.uploaded_by}
                     </p>
                   </div>
@@ -476,7 +476,7 @@ const DocumentDetail: React.FC = () => {
 
             {document.access_type === "premium" && !userHasPremium && (
               <div className="mt-4 p-4 bg-gradient-to-r from-yellow-50 to-amber-50 border border-yellow-200 rounded-lg">
-                <p className="text-center text-sm text-gray-700 mb-3 flex items-center justify-center gap-2">
+                <p className="text-center text-sm text-slate-700 mb-3 flex items-center justify-center gap-2">
                   <Lock className="w-4 h-4 text-yellow-600" />
                   <span className="font-medium">
                     Tài liệu Premium - Yêu cầu gói Premium để tải xuống

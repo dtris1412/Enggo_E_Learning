@@ -3,13 +3,16 @@ import { CERTIFICATIONS } from "./aboutConstants";
 
 const AboutCertifications: React.FC = () => {
   return (
-    <section className="py-20">
+    <section className="py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-            Chứng chỉ hỗ trợ
+        <div className="text-center mb-12">
+          <span className="text-blue-600 text-sm font-semibold uppercase tracking-wider">
+            Chứng chỉ
+          </span>
+          <h2 className="text-4xl font-black text-slate-900 mt-2">
+            Chứng chỉ <span className="text-blue-600">hỗ trợ</span>
           </h2>
-          <p className="text-xl text-gray-600">
+          <p className="text-slate-500 mt-3">
             Tài liệu chính thống từ các tổ chức uy tín quốc tế
           </p>
         </div>
@@ -18,13 +21,13 @@ const AboutCertifications: React.FC = () => {
           {CERTIFICATIONS.map((cert, index) => (
             <div
               key={index}
-              className="bg-gradient-to-br from-blue-50 to-white p-8 rounded-xl border-2 border-blue-200 hover:border-blue-400 transition-all duration-300 hover:shadow-lg"
+              className="group bg-white rounded-2xl border border-slate-200 p-8 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 text-center"
             >
-              <div className="text-5xl mb-4 text-center">{cert.emoji}</div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-3 text-center">
+              <div className="text-5xl mb-4">{cert.emoji}</div>
+              <h3 className="text-2xl font-black text-slate-900 mb-3">
                 {cert.name}
               </h3>
-              <p className="text-gray-700 text-center leading-relaxed">
+              <p className="text-slate-500 leading-relaxed">
                 {cert.description}
               </p>
             </div>

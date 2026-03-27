@@ -83,10 +83,10 @@ const ExamResult: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading results...</p>
+          <p className="text-slate-600">Loading results...</p>
         </div>
       </div>
     );
@@ -94,10 +94,10 @@ const ExamResult: React.FC = () => {
 
   if (!result) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="text-center">
           <XCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-          <h3 className="text-xl font-semibold text-gray-900 mb-2">
+          <h3 className="text-xl font-semibold text-slate-900 mb-2">
             Result not found
           </h3>
           <button
@@ -114,13 +114,13 @@ const ExamResult: React.FC = () => {
   const percentage = parseFloat(result.statistics.percentage);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-slate-50">
       {/* Header */}
       <div className="bg-white border-b">
         <div className="container mx-auto px-4 py-6">
           <button
             onClick={() => navigate("/exams")}
-            className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4"
+            className="flex items-center gap-2 text-slate-600 hover:text-slate-900 mb-4"
           >
             <ArrowLeft className="w-5 h-5" />
             Back to Exams
@@ -128,16 +128,16 @@ const ExamResult: React.FC = () => {
 
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 mb-2">
+              <h1 className="text-2xl font-bold text-slate-900 mb-2">
                 Exam Results
               </h1>
-              <p className="text-gray-600">{result.exam.exam_title}</p>
+              <p className="text-slate-600">{result.exam.exam_title}</p>
             </div>
 
             <div className="flex gap-3">
               <button
                 onClick={() => navigate(`/exams/${result.exam.exam_id}`)}
-                className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2"
+                className="px-4 py-2 border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors flex items-center gap-2"
               >
                 <FileText className="w-4 h-4" />
                 View Exam
@@ -168,22 +168,22 @@ const ExamResult: React.FC = () => {
                 <Award
                   className={`w-20 h-20 mx-auto mb-4 ${getScoreColor(percentage)}`}
                 />
-                <h2 className="text-4xl font-bold text-gray-900 mb-2">
+                <h2 className="text-4xl font-bold text-slate-900 mb-2">
                   {percentage.toFixed(1)}%
                 </h2>
-                <p className="text-lg text-gray-700 mb-4">
+                <p className="text-lg text-slate-700 mb-4">
                   Score: {result.total_score} points
                 </p>
                 <div className="flex items-center justify-center gap-6 text-sm">
                   <div className="flex items-center gap-2">
                     <CheckCircle className="w-5 h-5 text-green-600" />
-                    <span className="text-gray-700">
+                    <span className="text-slate-700">
                       {result.statistics.correct_answers} Correct
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <XCircle className="w-5 h-5 text-red-600" />
-                    <span className="text-gray-700">
+                    <span className="text-slate-700">
                       {result.statistics.incorrect_answers} Incorrect
                     </span>
                   </div>
@@ -192,45 +192,45 @@ const ExamResult: React.FC = () => {
             </div>
 
             {/* Statistics */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h3 className="text-xl font-bold text-gray-900 mb-4">
+            <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+              <h3 className="text-xl font-bold text-slate-900 mb-4">
                 Performance Summary
               </h3>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="text-center p-4 bg-blue-50 rounded-lg">
                   <FileText className="w-8 h-8 text-blue-600 mx-auto mb-2" />
-                  <p className="text-2xl font-bold text-gray-900">
+                  <p className="text-2xl font-bold text-slate-900">
                     {result.statistics.total_questions}
                   </p>
-                  <p className="text-sm text-gray-600">Total Questions</p>
+                  <p className="text-sm text-slate-600">Total Questions</p>
                 </div>
                 <div className="text-center p-4 bg-green-50 rounded-lg">
                   <CheckCircle className="w-8 h-8 text-green-600 mx-auto mb-2" />
-                  <p className="text-2xl font-bold text-gray-900">
+                  <p className="text-2xl font-bold text-slate-900">
                     {result.statistics.correct_answers}
                   </p>
-                  <p className="text-sm text-gray-600">Correct</p>
+                  <p className="text-sm text-slate-600">Correct</p>
                 </div>
                 <div className="text-center p-4 bg-red-50 rounded-lg">
                   <XCircle className="w-8 h-8 text-red-600 mx-auto mb-2" />
-                  <p className="text-2xl font-bold text-gray-900">
+                  <p className="text-2xl font-bold text-slate-900">
                     {result.statistics.incorrect_answers}
                   </p>
-                  <p className="text-sm text-gray-600">Incorrect</p>
+                  <p className="text-sm text-slate-600">Incorrect</p>
                 </div>
                 <div className="text-center p-4 bg-purple-50 rounded-lg">
                   <Award className="w-8 h-8 text-purple-600 mx-auto mb-2" />
-                  <p className="text-2xl font-bold text-gray-900">
+                  <p className="text-2xl font-bold text-slate-900">
                     {result.total_score}
                   </p>
-                  <p className="text-sm text-gray-600">Points</p>
+                  <p className="text-sm text-slate-600">Points</p>
                 </div>
               </div>
             </div>
 
             {/* Detailed Answers */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h3 className="text-xl font-bold text-gray-900 mb-4">
+            <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+              <h3 className="text-xl font-bold text-slate-900 mb-4">
                 Detailed Answers
               </h3>
 
@@ -261,10 +261,10 @@ const ExamResult: React.FC = () => {
                               <XCircle className="w-6 h-6 text-red-600 flex-shrink-0 mt-0.5" />
                             )}
                             <div className="flex-1">
-                              <p className="font-semibold text-gray-900 mb-1">
+                              <p className="font-semibold text-slate-900 mb-1">
                                 Question {index + 1}
                               </p>
-                              <p className="text-gray-700 line-clamp-2">
+                              <p className="text-slate-700 line-clamp-2">
                                 {
                                   answer.Container_Question.Question
                                     .question_content
@@ -273,17 +273,17 @@ const ExamResult: React.FC = () => {
                             </div>
                           </div>
                           {isExpanded ? (
-                            <ChevronUp className="w-5 h-5 text-gray-400 flex-shrink-0" />
+                            <ChevronUp className="w-5 h-5 text-slate-400 flex-shrink-0" />
                           ) : (
-                            <ChevronDown className="w-5 h-5 text-gray-400 flex-shrink-0" />
+                            <ChevronDown className="w-5 h-5 text-slate-400 flex-shrink-0" />
                           )}
                         </div>
                       </div>
 
                       {isExpanded && (
-                        <div className="px-4 pb-4 border-t border-gray-200 pt-4 bg-white">
+                        <div className="px-4 pb-4 border-t border-slate-200 pt-4 bg-white">
                           <div className="mb-4">
-                            <p className="font-medium text-gray-900 mb-3">
+                            <p className="font-medium text-slate-900 mb-3">
                               {
                                 answer.Container_Question.Question
                                   .question_content
@@ -316,7 +316,7 @@ const ExamResult: React.FC = () => {
                                           ? "border-green-500 bg-green-50"
                                           : isUserAnswer && !isCorrectOption
                                             ? "border-red-500 bg-red-50"
-                                            : "border-gray-200 bg-gray-50"
+                                            : "border-slate-200 bg-slate-50"
                                       }`}
                                     >
                                       <div className="flex items-start gap-3">
@@ -326,13 +326,13 @@ const ExamResult: React.FC = () => {
                                               ? "bg-green-600 text-white"
                                               : isUserAnswer
                                                 ? "bg-red-600 text-white"
-                                                : "bg-gray-300 text-gray-700"
+                                                : "bg-slate-300 text-slate-700"
                                           }`}
                                         >
                                           {option.label}
                                         </span>
                                         <div className="flex-1">
-                                          <span className="text-gray-900">
+                                          <span className="text-slate-900">
                                             {option.content}
                                           </span>
                                           {isCorrectOption && (
@@ -378,34 +378,34 @@ const ExamResult: React.FC = () => {
           <div className="lg:col-span-1">
             <div className="sticky top-4 space-y-6">
               {/* Exam Info */}
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <h3 className="font-semibold text-gray-900 mb-4">
+              <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+                <h3 className="font-semibold text-slate-900 mb-4">
                   Exam Details
                 </h3>
                 <div className="space-y-3">
                   <div className="flex items-center gap-3 text-sm">
-                    <FileText className="w-4 h-4 text-gray-400" />
+                    <FileText className="w-4 h-4 text-slate-400" />
                     <div>
-                      <p className="text-gray-600">Exam</p>
-                      <p className="font-medium text-gray-900">
+                      <p className="text-slate-600">Exam</p>
+                      <p className="font-medium text-slate-900">
                         {result.exam.exam_code}
                       </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 text-sm">
-                    <Calendar className="w-4 h-4 text-gray-400" />
+                    <Calendar className="w-4 h-4 text-slate-400" />
                     <div>
-                      <p className="text-gray-600">Submitted</p>
-                      <p className="font-medium text-gray-900">
+                      <p className="text-slate-600">Submitted</p>
+                      <p className="font-medium text-slate-900">
                         {new Date(result.submitted_at).toLocaleString()}
                       </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 text-sm">
-                    <Clock className="w-4 h-4 text-gray-400" />
+                    <Clock className="w-4 h-4 text-slate-400" />
                     <div>
-                      <p className="text-gray-600">Duration</p>
-                      <p className="font-medium text-gray-900">
+                      <p className="text-slate-600">Duration</p>
+                      <p className="font-medium text-slate-900">
                         {result.exam.exam_duration} minutes
                       </p>
                     </div>
@@ -415,10 +415,10 @@ const ExamResult: React.FC = () => {
 
               {/* Performance Tips */}
               <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg shadow-sm border border-blue-200 p-6">
-                <h3 className="font-semibold text-gray-900 mb-3">
+                <h3 className="font-semibold text-slate-900 mb-3">
                   Performance Tips
                 </h3>
-                <ul className="space-y-2 text-sm text-gray-700">
+                <ul className="space-y-2 text-sm text-slate-700">
                   {percentage >= 80 ? (
                     <>
                       <li className="flex items-start gap-2">
@@ -457,8 +457,8 @@ const ExamResult: React.FC = () => {
               </div>
 
               {/* Actions */}
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <h3 className="font-semibold text-gray-900 mb-4">Next Steps</h3>
+              <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+                <h3 className="font-semibold text-slate-900 mb-4">Next Steps</h3>
                 <div className="space-y-3">
                   <button
                     onClick={() =>
@@ -471,14 +471,14 @@ const ExamResult: React.FC = () => {
                   </button>
                   <button
                     onClick={() => navigate("/exams")}
-                    className="w-full px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium flex items-center justify-center gap-2"
+                    className="w-full px-4 py-3 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors font-medium flex items-center justify-center gap-2"
                   >
                     <Home className="w-4 h-4" />
                     Browse Exams
                   </button>
                   <button
                     onClick={() => navigate("/exams/history")}
-                    className="w-full px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium flex items-center justify-center gap-2"
+                    className="w-full px-4 py-3 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors font-medium flex items-center justify-center gap-2"
                   >
                     <FileText className="w-4 h-4" />
                     View History

@@ -100,7 +100,7 @@ const PaymentCheckout = () => {
 
   if (!subscriptionPriceId) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-black to-slate-900 flex items-center justify-center">
         <div className="text-center">
           <p className="text-white text-lg mb-4">
             Không tìm thấy thông tin gói đăng ký
@@ -118,7 +118,7 @@ const PaymentCheckout = () => {
 
   if (plansLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-black to-slate-900 flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="w-12 h-12 text-blue-600 animate-spin mx-auto mb-4" />
           <p className="text-white">Đang tải thông tin gói...</p>
@@ -129,7 +129,7 @@ const PaymentCheckout = () => {
 
   if (!subscriptionPrice) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-black to-slate-900 flex items-center justify-center">
         <div className="text-center max-w-md mx-auto px-4">
           <div className="bg-red-50 border border-red-200 rounded-lg p-6">
             <p className="text-red-600 font-medium mb-4">
@@ -137,7 +137,7 @@ const PaymentCheckout = () => {
             </p>
             <button
               onClick={() => navigate("/subscription-plans")}
-              className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+              className="px-4 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 transition-colors"
             >
               Quay lại
             </button>
@@ -148,19 +148,19 @@ const PaymentCheckout = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 py-8 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-black to-slate-900 py-8 px-4">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-8">
           <button
             onClick={() => navigate("/subscription-plans")}
-            className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-4"
+            className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors mb-4"
           >
             <ArrowLeft className="w-5 h-5" />
             Quay lại
           </button>
           <h1 className="text-3xl font-bold text-white">Thanh toán</h1>
-          <p className="text-gray-400 mt-2">
+          <p className="text-slate-400 mt-2">
             Chọn phương thức thanh toán phù hợp với bạn
           </p>
         </div>
@@ -178,10 +178,10 @@ const PaymentCheckout = () => {
                 setSelectedMethod("momo");
                 setSelectedBank("");
               }}
-              className={`bg-gray-800 border-2 rounded-xl p-6 cursor-pointer transition-all ${
+              className={`bg-slate-800 border-2 rounded-xl p-6 cursor-pointer transition-all ${
                 selectedMethod === "momo"
                   ? "border-pink-500 shadow-lg shadow-pink-500/20"
-                  : "border-gray-700 hover:border-gray-600"
+                  : "border-slate-700 hover:border-slate-600"
               }`}
             >
               <div className="flex items-center gap-4">
@@ -190,7 +190,7 @@ const PaymentCheckout = () => {
                 </div>
                 <div className="flex-1">
                   <h3 className="text-lg font-semibold text-white">Ví MoMo</h3>
-                  <p className="text-sm text-gray-400">
+                  <p className="text-sm text-slate-400">
                     Thanh toán nhanh chóng qua ví điện tử MoMo
                   </p>
                 </div>
@@ -217,10 +217,10 @@ const PaymentCheckout = () => {
             {/* VNPay */}
             <div
               onClick={() => setSelectedMethod("vnpay")}
-              className={`bg-gray-800 border-2 rounded-xl p-6 cursor-pointer transition-all ${
+              className={`bg-slate-800 border-2 rounded-xl p-6 cursor-pointer transition-all ${
                 selectedMethod === "vnpay"
                   ? "border-blue-500 shadow-lg shadow-blue-500/20"
-                  : "border-gray-700 hover:border-gray-600"
+                  : "border-slate-700 hover:border-slate-600"
               }`}
             >
               <div className="flex items-center gap-4 mb-4">
@@ -229,7 +229,7 @@ const PaymentCheckout = () => {
                 </div>
                 <div className="flex-1">
                   <h3 className="text-lg font-semibold text-white">VNPay</h3>
-                  <p className="text-sm text-gray-400">
+                  <p className="text-sm text-slate-400">
                     Thanh toán qua thẻ ATM/Visa/Mastercard
                   </p>
                 </div>
@@ -254,14 +254,14 @@ const PaymentCheckout = () => {
 
               {/* Bank Selection */}
               {selectedMethod === "vnpay" && (
-                <div className="mt-4 pt-4 border-t border-gray-700">
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                <div className="mt-4 pt-4 border-t border-slate-700">
+                  <label className="block text-sm font-medium text-slate-300 mb-2">
                     Chọn ngân hàng (tùy chọn)
                   </label>
                   <select
                     value={selectedBank}
                     onChange={(e) => setSelectedBank(e.target.value)}
-                    className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500"
+                    className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500"
                   >
                     <option value="">Tất cả phương thức</option>
                     <option value="NCB">Ngân hàng NCB</option>
@@ -275,16 +275,16 @@ const PaymentCheckout = () => {
             </div>
 
             {/* Credit Card (Coming Soon) */}
-            <div className="bg-gray-800 border-2 border-gray-700 rounded-xl p-6 opacity-50 cursor-not-allowed">
+            <div className="bg-slate-800 border-2 border-slate-700 rounded-xl p-6 opacity-50 cursor-not-allowed">
               <div className="flex items-center gap-4">
-                <div className="w-16 h-16 bg-gray-700 rounded-lg flex items-center justify-center">
-                  <CreditCard className="w-8 h-8 text-gray-500" />
+                <div className="w-16 h-16 bg-slate-700 rounded-lg flex items-center justify-center">
+                  <CreditCard className="w-8 h-8 text-slate-500" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-gray-400">
+                  <h3 className="text-lg font-semibold text-slate-400">
                     Thẻ tín dụng/ghi nợ
                   </h3>
-                  <p className="text-sm text-gray-500">Sắp ra mắt</p>
+                  <p className="text-sm text-slate-500">Sắp ra mắt</p>
                 </div>
               </div>
             </div>
@@ -299,21 +299,21 @@ const PaymentCheckout = () => {
 
           {/* Order Summary */}
           <div className="lg:col-span-1">
-            <div className="bg-gray-800 border border-gray-700 rounded-xl p-6 sticky top-8">
+            <div className="bg-slate-800 border border-slate-700 rounded-xl p-6 sticky top-8">
               <h2 className="text-lg font-semibold text-white mb-4">
                 Thông tin đơn hàng
               </h2>
 
               <div className="space-y-3 mb-6">
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-400">Gói:</span>
+                  <span className="text-slate-400">Gói:</span>
                   <span className="text-white font-semibold">
                     {subscriptionPrice.Subscription_Plan?.name || "N/A"}
                   </span>
                 </div>
 
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-400">Loại:</span>
+                  <span className="text-slate-400">Loại:</span>
                   <span className="text-white">
                     {subscriptionPrice.billing_type === "monthly"
                       ? "Hàng tháng"
@@ -324,7 +324,7 @@ const PaymentCheckout = () => {
                 </div>
 
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-400">Thời gian:</span>
+                  <span className="text-slate-400">Thời gian:</span>
                   <span className="text-white">
                     {subscriptionPrice.duration_days} ngày
                   </span>
@@ -332,14 +332,14 @@ const PaymentCheckout = () => {
 
                 {subscriptionPrice.discount_percentage > 0 && (
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-400">Giảm giá:</span>
+                    <span className="text-slate-400">Giảm giá:</span>
                     <span className="text-green-400 font-semibold">
                       {subscriptionPrice.discount_percentage}%
                     </span>
                   </div>
                 )}
 
-                <div className="border-t border-gray-700 pt-3 mt-3">
+                <div className="border-t border-slate-700 pt-3 mt-3">
                   <div className="flex justify-between">
                     <span className="text-white font-semibold">Tổng cộng:</span>
                     <span className="text-2xl font-bold text-white">
@@ -364,7 +364,7 @@ const PaymentCheckout = () => {
                 )}
               </button>
 
-              <p className="text-xs text-gray-400 text-center mt-4">
+              <p className="text-xs text-slate-400 text-center mt-4">
                 Bằng cách thanh toán, bạn đồng ý với{" "}
                 <a href="#" className="text-blue-400 hover:underline">
                   Điều khoản dịch vụ

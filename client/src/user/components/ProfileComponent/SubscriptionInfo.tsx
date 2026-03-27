@@ -163,8 +163,8 @@ const SubscriptionInfo: React.FC = () => {
         icon: XCircle,
       },
       canceled: {
-        bg: "bg-gray-100",
-        text: "text-gray-700",
+        bg: "bg-slate-100",
+        text: "text-slate-700",
         label: "Đã hủy",
         icon: XCircle,
       },
@@ -186,9 +186,9 @@ const SubscriptionInfo: React.FC = () => {
     return (
       <div className="bg-white rounded-lg shadow-md p-6">
         <div className="animate-pulse space-y-4">
-          <div className="h-6 bg-gray-300 rounded w-3/4"></div>
-          <div className="h-4 bg-gray-300 rounded w-full"></div>
-          <div className="h-4 bg-gray-300 rounded w-5/6"></div>
+          <div className="h-6 bg-slate-300 rounded w-3/4"></div>
+          <div className="h-4 bg-slate-300 rounded w-full"></div>
+          <div className="h-4 bg-slate-300 rounded w-5/6"></div>
         </div>
       </div>
     );
@@ -198,13 +198,13 @@ const SubscriptionInfo: React.FC = () => {
     return (
       <div className="bg-white rounded-lg shadow-md p-6">
         <div className="text-center">
-          <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Crown className="w-8 h-8 text-gray-400" />
+          <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Crown className="w-8 h-8 text-slate-400" />
           </div>
-          <h3 className="text-lg font-semibold text-gray-800 mb-2">
+          <h3 className="text-lg font-semibold text-slate-800 mb-2">
             Chưa có gói Premium
           </h3>
-          <p className="text-sm text-gray-600 mb-4">
+          <p className="text-sm text-slate-600 mb-4">
             Nâng cấp để trải nghiệm đầy đủ tính năng
           </p>
           <Link
@@ -226,10 +226,10 @@ const SubscriptionInfo: React.FC = () => {
           <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <XCircle className="w-8 h-8 text-red-400" />
           </div>
-          <h3 className="text-lg font-semibold text-gray-800 mb-2">
+          <h3 className="text-lg font-semibold text-slate-800 mb-2">
             Lỗi tải dữ liệu
           </h3>
-          <p className="text-sm text-gray-600 mb-4">
+          <p className="text-sm text-slate-600 mb-4">
             Không thể tải thông tin gói đăng ký
           </p>
         </div>
@@ -265,13 +265,13 @@ const SubscriptionInfo: React.FC = () => {
             </div>
             <div>
               <h3
-                className={`text-lg font-bold ${isPremium ? "text-white" : "text-gray-800"}`}
+                className={`text-lg font-bold ${isPremium ? "text-white" : "text-slate-800"}`}
               >
                 {activeSubscription.Subscription_Price?.Subscription_Plan
                   ?.name || "Gói đăng ký"}
               </h3>
               <p
-                className={`text-sm ${isPremium ? "text-white/80" : "text-gray-500"}`}
+                className={`text-sm ${isPremium ? "text-white/80" : "text-slate-500"}`}
               >
                 Gói hiện tại
               </p>
@@ -282,7 +282,7 @@ const SubscriptionInfo: React.FC = () => {
             {/* Status */}
             <div className="flex items-center justify-between">
               <span
-                className={`text-sm ${isPremium ? "text-white/90" : "text-gray-600"}`}
+                className={`text-sm ${isPremium ? "text-white/90" : "text-slate-600"}`}
               >
                 Trạng thái
               </span>
@@ -300,7 +300,7 @@ const SubscriptionInfo: React.FC = () => {
             {/* End Date */}
             <div className="flex items-center justify-between">
               <span
-                className={`text-sm ${isPremium ? "text-white/90" : "text-gray-600"}`}
+                className={`text-sm ${isPremium ? "text-white/90" : "text-slate-600"}`}
               >
                 <Calendar className="w-4 h-4 inline mr-1" />
                 Hết hạn
@@ -325,7 +325,7 @@ const SubscriptionInfo: React.FC = () => {
                   {daysRemaining}
                 </div>
                 <div
-                  className={`text-xs ${isPremium ? "text-white/80" : "text-gray-600"}`}
+                  className={`text-xs ${isPremium ? "text-white/80" : "text-slate-600"}`}
                 >
                   ngày còn lại
                 </div>
@@ -375,8 +375,8 @@ const SubscriptionInfo: React.FC = () => {
           activeSubscription.Subscription_Price?.Subscription_Plan
             ?.features && (
             <div className="bg-white rounded-lg shadow-md p-6">
-              <h4 className="font-semibold text-gray-800 mb-3">Tính năng</h4>
-              <ul className="space-y-2 text-sm text-gray-600">
+              <h4 className="font-semibold text-slate-800 mb-3">Tính năng</h4>
+              <ul className="space-y-2 text-sm text-slate-600">
                 {Object.entries(
                   activeSubscription.Subscription_Price.Subscription_Plan
                     .features,
@@ -396,7 +396,7 @@ const SubscriptionInfo: React.FC = () => {
 
         {/* Quick Links */}
         <div className="bg-white rounded-lg shadow-md p-6">
-          <h4 className="font-semibold text-gray-800 mb-3">
+          <h4 className="font-semibold text-slate-800 mb-3">
             Quản lý đăng ký & thanh toán
           </h4>
           <div className="space-y-2">
@@ -435,13 +435,13 @@ const SubscriptionInfo: React.FC = () => {
               <div className="p-3 bg-red-100 rounded-full">
                 <AlertTriangle className="w-6 h-6 text-red-600" />
               </div>
-              <h3 className="text-xl font-bold text-gray-800">
+              <h3 className="text-xl font-bold text-slate-800">
                 Xác nhận hủy đăng ký
               </h3>
             </div>
 
             <div className="mb-6">
-              <p className="text-gray-600 mb-3">
+              <p className="text-slate-600 mb-3">
                 Bạn có chắc chắn muốn hủy gói{" "}
                 <span className="font-semibold">
                   {
@@ -469,7 +469,7 @@ const SubscriptionInfo: React.FC = () => {
               <button
                 onClick={() => setShowCancelModal(false)}
                 disabled={canceling}
-                className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition disabled:opacity-50"
+                className="flex-1 px-4 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 transition disabled:opacity-50"
               >
                 Đóng
               </button>
@@ -529,7 +529,7 @@ const SubscriptionInfo: React.FC = () => {
                         <Zap className="w-6 h-6 text-purple-600" />
                       </div>
                       <div>
-                        <p className="text-sm text-gray-600">
+                        <p className="text-sm text-slate-600">
                           AI Credits hàng tháng
                         </p>
                         <p className="text-2xl font-bold text-purple-600">
@@ -542,7 +542,7 @@ const SubscriptionInfo: React.FC = () => {
 
                   {/* Pricing Options */}
                   <div>
-                    <h4 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                    <h4 className="text-lg font-semibold text-slate-800 mb-3 flex items-center gap-2">
                       <DollarSign className="w-5 h-5 text-green-600" />
                       Các gói thanh toán
                     </h4>
@@ -550,16 +550,16 @@ const SubscriptionInfo: React.FC = () => {
                       {planDetails.Subscription_Prices.map((price) => (
                         <div
                           key={price.subscription_price_id}
-                          className="bg-white border-2 border-gray-200 rounded-lg p-4 hover:border-blue-400 transition"
+                          className="bg-white border-2 border-slate-200 rounded-lg p-4 hover:border-blue-400 transition"
                         >
                           <div className="text-center">
-                            <p className="text-sm font-medium text-gray-600 mb-1">
+                            <p className="text-sm font-medium text-slate-600 mb-1">
                               {getBillingTypeLabel(price.billing_type)}
                             </p>
-                            <p className="text-2xl font-bold text-gray-800">
+                            <p className="text-2xl font-bold text-slate-800">
                               {formatPrice(price.price)}
                             </p>
-                            <p className="text-xs text-gray-500 mt-1">
+                            <p className="text-xs text-slate-500 mt-1">
                               {price.duration_days} ngày
                             </p>
                             {price.discount_percentage > 0 && (
@@ -579,11 +579,11 @@ const SubscriptionInfo: React.FC = () => {
                   {planDetails.features &&
                     Object.keys(planDetails.features).length > 0 && (
                       <div>
-                        <h4 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                        <h4 className="text-lg font-semibold text-slate-800 mb-3 flex items-center gap-2">
                           <CheckCircle className="w-5 h-5 text-green-600" />
                           Tính năng
                         </h4>
-                        <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                        <div className="bg-slate-50 rounded-lg p-4 border border-slate-200">
                           <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
                             {Object.entries(planDetails.features).map(
                               ([key, value]) => (
@@ -592,7 +592,7 @@ const SubscriptionInfo: React.FC = () => {
                                   className="flex items-start gap-2"
                                 >
                                   <CheckCircle className="w-4 h-4 text-green-500 mt-1 flex-shrink-0" />
-                                  <span className="text-sm text-gray-700">
+                                  <span className="text-sm text-slate-700">
                                     {typeof value === "boolean"
                                       ? key
                                           .replace(/_/g, " ")
@@ -641,8 +641,8 @@ const SubscriptionInfo: React.FC = () => {
                 </div>
               ) : (
                 <div className="text-center py-12">
-                  <XCircle className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-600">
+                  <XCircle className="w-16 h-16 text-slate-400 mx-auto mb-4" />
+                  <p className="text-slate-600">
                     Không thể tải thông tin chi tiết gói
                   </p>
                 </div>
@@ -650,11 +650,11 @@ const SubscriptionInfo: React.FC = () => {
             </div>
 
             {/* Modal Footer */}
-            <div className="border-t border-gray-200 p-4 bg-gray-50 rounded-b-lg">
+            <div className="border-t border-slate-200 p-4 bg-slate-50 rounded-b-lg">
               <div className="flex gap-3">
                 <button
                   onClick={() => setShowPlanDetailsModal(false)}
-                  className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition"
+                  className="flex-1 px-4 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 transition"
                 >
                   Đóng
                 </button>
@@ -676,16 +676,16 @@ const SubscriptionInfo: React.FC = () => {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
           <div className="bg-white rounded-lg shadow-xl max-w-5xl w-full my-8">
             {/* Modal Header */}
-            <div className="flex items-center justify-between p-6 border-b border-gray-200">
-              <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+            <div className="flex items-center justify-between p-6 border-b border-slate-200">
+              <h3 className="text-xl font-bold text-slate-800 flex items-center gap-2">
                 <Receipt className="w-6 h-6 text-blue-600" />
                 Lịch sử thanh toán
               </h3>
               <button
                 onClick={() => setShowPaymentHistory(false)}
-                className="p-2 hover:bg-gray-100 rounded-lg transition"
+                className="p-2 hover:bg-slate-100 rounded-lg transition"
               >
-                <X className="w-5 h-5 text-gray-500" />
+                <X className="w-5 h-5 text-slate-500" />
               </button>
             </div>
 
@@ -695,10 +695,10 @@ const SubscriptionInfo: React.FC = () => {
             </div>
 
             {/* Modal Footer */}
-            <div className="border-t border-gray-200 p-4 bg-gray-50 rounded-b-lg">
+            <div className="border-t border-slate-200 p-4 bg-slate-50 rounded-b-lg">
               <button
                 onClick={() => setShowPaymentHistory(false)}
-                className="w-full sm:w-auto px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition"
+                className="w-full sm:w-auto px-6 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 transition"
               >
                 Đóng
               </button>

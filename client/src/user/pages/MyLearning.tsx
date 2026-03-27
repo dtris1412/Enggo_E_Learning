@@ -88,7 +88,7 @@ const MyLearning = () => {
       case "advanced":
         return "bg-purple-100 text-purple-800";
       default:
-        return "bg-gray-100 text-gray-800";
+        return "bg-slate-100 text-slate-800";
     }
   };
 
@@ -103,10 +103,10 @@ const MyLearning = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600 font-medium">
+          <p className="text-slate-600 font-medium">
             Đang tải khóa học của bạn...
           </p>
         </div>
@@ -116,7 +116,7 @@ const MyLearning = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="max-w-md w-full p-6">
           <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
             <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
@@ -143,9 +143,9 @@ const MyLearning = () => {
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-3">
             <GraduationCap className="h-10 w-10 text-blue-600" />
-            <h1 className="text-4xl font-bold text-gray-900">Góc học tập</h1>
+            <h1 className="text-4xl font-bold text-slate-900">Góc học tập</h1>
           </div>
-          <p className="text-gray-600 text-lg">
+          <p className="text-slate-600 text-lg">
             Tiếp tục hành trình học tập của bạn và hoàn thành các khóa học đã
             đăng ký
           </p>
@@ -157,10 +157,10 @@ const MyLearning = () => {
             <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-600">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-gray-600 text-sm font-medium">
+                  <p className="text-slate-600 text-sm font-medium">
                     Khóa học đang học
                   </p>
-                  <p className="text-3xl font-bold text-gray-900 mt-1">
+                  <p className="text-3xl font-bold text-slate-900 mt-1">
                     {enrolledCourses.length}
                   </p>
                 </div>
@@ -171,10 +171,10 @@ const MyLearning = () => {
             <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-green-600">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-gray-600 text-sm font-medium">
+                  <p className="text-slate-600 text-sm font-medium">
                     Bài học hoàn thành
                   </p>
-                  <p className="text-3xl font-bold text-gray-900 mt-1">
+                  <p className="text-3xl font-bold text-slate-900 mt-1">
                     {enrolledCourses.reduce(
                       (sum, course) => sum + course.completed_lessons,
                       0,
@@ -188,10 +188,10 @@ const MyLearning = () => {
             <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-purple-600">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-gray-600 text-sm font-medium">
+                  <p className="text-slate-600 text-sm font-medium">
                     Tiến độ trung bình
                   </p>
-                  <p className="text-3xl font-bold text-gray-900 mt-1">
+                  <p className="text-3xl font-bold text-slate-900 mt-1">
                     {Math.round(
                       enrolledCourses.reduce(
                         (sum, course) => sum + course.progress_percentage,
@@ -210,11 +210,11 @@ const MyLearning = () => {
         {/* Course List */}
         {enrolledCourses.length === 0 ? (
           <div className="bg-white rounded-lg shadow-md p-12 text-center">
-            <BookOpen className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+            <BookOpen className="h-16 w-16 text-slate-400 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-slate-900 mb-2">
               Bạn chưa đăng ký khóa học nào
             </h3>
-            <p className="text-gray-600 mb-6">
+            <p className="text-slate-600 mb-6">
               Khám phá các khóa học của chúng tôi và bắt đầu hành trình học tập
             </p>
             <button
@@ -230,7 +230,7 @@ const MyLearning = () => {
             {enrolledCourses.map((course) => (
               <div
                 key={course.course_id}
-                className="bg-white rounded-lg shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-200"
+                className="bg-white rounded-lg shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border border-slate-200"
               >
                 {/* Course Thumbnail */}
                 {course.course_thumbnail && (
@@ -254,43 +254,43 @@ const MyLearning = () => {
 
                 <div className="p-6">
                   {/* Course Title & Description */}
-                  <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2">
+                  <h3 className="text-xl font-bold text-slate-900 mb-2 line-clamp-2">
                     {course.course_title}
                   </h3>
-                  <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+                  <p className="text-slate-600 text-sm mb-4 line-clamp-2">
                     {course.description}
                   </p>
 
                   {/* Progress Bar */}
                   <div className="mb-4">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium text-gray-700">
+                      <span className="text-sm font-medium text-slate-700">
                         Tiến độ
                       </span>
                       <span className="text-sm font-semibold text-blue-600">
                         {Math.round(course.progress_percentage)}%
                       </span>
                     </div>
-                    <div className="w-full bg-gray-200 rounded-full h-3">
+                    <div className="w-full bg-slate-200 rounded-full h-3">
                       <div
                         className="bg-gradient-to-r from-blue-500 to-blue-600 h-3 rounded-full transition-all duration-300"
                         style={{ width: `${course.progress_percentage}%` }}
                       />
                     </div>
-                    <p className="text-xs text-gray-500 mt-2">
+                    <p className="text-xs text-slate-500 mt-2">
                       {course.completed_lessons} / {course.total_lessons} bài
                       học hoàn thành
                     </p>
                   </div>
 
                   {/* Course Info */}
-                  <div className="flex items-center gap-4 text-sm text-gray-600 mb-4">
+                  <div className="flex items-center gap-4 text-sm text-slate-600 mb-4">
                     <div className="flex items-center gap-1">
                       <Clock className="h-4 w-4" />
                       <span>{course.estimated_time} phút</span>
                     </div>
                     {course.last_accessed && (
-                      <div className="text-xs text-gray-500">
+                      <div className="text-xs text-slate-500">
                         Truy cập: {formatDate(course.last_accessed)}
                       </div>
                     )}

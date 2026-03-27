@@ -75,7 +75,7 @@ export const LessonQuiz = ({ questions, onComplete }: LessonQuizProps) => {
       case "hard":
         return "text-red-600 bg-red-50";
       default:
-        return "text-gray-600 bg-gray-50";
+        return "text-slate-600 bg-slate-50";
     }
   };
 
@@ -92,7 +92,7 @@ export const LessonQuiz = ({ questions, onComplete }: LessonQuizProps) => {
             ? isCorrect
               ? "border-green-500 bg-green-50"
               : "border-red-500 bg-red-50"
-            : "border-gray-200 bg-white"
+            : "border-slate-200 bg-white"
         }`}
       >
         {/* Question Header */}
@@ -125,10 +125,10 @@ export const LessonQuiz = ({ questions, onComplete }: LessonQuizProps) => {
                       ? "border-green-500 bg-green-50"
                       : isSelected
                         ? "border-red-500 bg-red-50"
-                        : "border-gray-200 bg-gray-50"
+                        : "border-slate-200 bg-slate-50"
                     : isSelected
                       ? "border-blue-500 bg-blue-50"
-                      : "border-gray-200 hover:border-blue-300 hover:bg-blue-50"
+                      : "border-slate-200 hover:border-blue-300 hover:bg-blue-50"
                 } ${submitted ? "cursor-not-allowed" : ""}`}
               >
                 <input
@@ -161,7 +161,7 @@ export const LessonQuiz = ({ questions, onComplete }: LessonQuizProps) => {
         {showAnswer && question.explaination && (
           <div className="mt-3 p-3 bg-blue-50 border-l-4 border-blue-500">
             <p className="font-semibold text-blue-900 mb-1">💡 Giải thích:</p>
-            <p className="text-gray-700">{question.explaination}</p>
+            <p className="text-slate-700">{question.explaination}</p>
           </div>
         )}
       </div>
@@ -177,7 +177,7 @@ export const LessonQuiz = ({ questions, onComplete }: LessonQuizProps) => {
     <div className="mt-6 border-t pt-6">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-bold">✏️ Kiểm tra kiến thức</h2>
-        <span className="text-gray-600">{questions.length} câu hỏi</span>
+        <span className="text-slate-600">{questions.length} câu hỏi</span>
       </div>
 
       {/* Results Summary */}
@@ -225,7 +225,7 @@ export const LessonQuiz = ({ questions, onComplete }: LessonQuizProps) => {
         ) : (
           <button
             onClick={handleRetry}
-            className="px-6 py-2 text-sm bg-gray-600 text-white font-semibold rounded-lg hover:bg-gray-700 transition-colors"
+            className="px-6 py-2 text-sm bg-slate-600 text-white font-semibold rounded-lg hover:bg-slate-700 transition-colors"
           >
             Làm lại
           </button>

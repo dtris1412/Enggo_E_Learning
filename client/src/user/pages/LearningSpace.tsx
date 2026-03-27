@@ -18,10 +18,10 @@ const LearningSpaceContent: React.FC = () => {
 
   if (loading && !course) {
     return (
-      <div className="flex items-center justify-center h-screen bg-gray-50">
+      <div className="flex items-center justify-center h-screen bg-slate-50">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-3"></div>
-          <p className="text-sm text-gray-600 font-medium">
+          <p className="text-sm text-slate-600 font-medium">
             Đang tải khóa học...
           </p>
         </div>
@@ -31,7 +31,7 @@ const LearningSpaceContent: React.FC = () => {
 
   if (error) {
     return (
-      <div className="flex items-center justify-center h-screen bg-gray-50">
+      <div className="flex items-center justify-center h-screen bg-slate-50">
         <div className="max-w-md w-full p-4">
           <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-center">
             <AlertCircle className="h-10 w-10 text-red-500 mx-auto mb-3" />
@@ -52,18 +52,18 @@ const LearningSpaceContent: React.FC = () => {
   }
 
   return (
-    <div className="h-screen flex flex-col bg-gray-50">
+    <div className="h-screen flex flex-col bg-slate-50">
       {/* Top Navigation Bar */}
-      <div className="flex-shrink-0 bg-white border-b border-gray-200 shadow-sm">
+      <div className="flex-shrink-0 bg-white border-b border-slate-200 shadow-sm">
         <div className="px-4 py-3 flex items-center justify-between">
           <button
             onClick={() => navigate("/courses")}
-            className="flex items-center gap-2 text-sm text-gray-700 hover:text-gray-900 font-medium transition-colors"
+            className="flex items-center gap-2 text-sm text-slate-700 hover:text-slate-900 font-medium transition-colors"
           >
             <ArrowLeft className="h-4 w-4" />
             <span>Quay lại khóa học</span>
           </button>
-          <h1 className="text-lg font-bold text-gray-900">Góc học tập</h1>
+          <h1 className="text-lg font-bold text-slate-900">Góc học tập</h1>
           <div className="w-32"></div> {/* Spacer for alignment */}
         </div>
       </div>

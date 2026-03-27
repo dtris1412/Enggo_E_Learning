@@ -129,7 +129,7 @@ const Header = () => {
   }
 
   return (
-    <header className="bg-white border-b border-gray-200 sticky top-0 z-50 backdrop-blur-sm bg-white/95">
+    <header className="bg-white border-b border-slate-200 sticky top-0 z-50 backdrop-blur-sm bg-white/95">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
@@ -138,7 +138,7 @@ const Header = () => {
             className="flex items-center space-x-3 hover:scale-105 transition-transform duration-200"
           >
             <BookOpen className="h-8 w-8 text-blue-600" />
-            <span className="text-xl font-bold text-gray-900">Enggo</span>
+            <span className="text-xl font-black text-slate-900">Enggo</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -151,7 +151,7 @@ const Header = () => {
                   className={`px-3 py-2 text-sm font-medium transition-all duration-200 hover:scale-105 ${
                     location.pathname === item.path
                       ? "text-blue-600 border-b-2 border-blue-600"
-                      : "text-gray-700 hover:text-blue-600"
+                      : "text-slate-700 hover:text-blue-600"
                   }`}
                 >
                   {item.label}
@@ -169,7 +169,7 @@ const Header = () => {
                       (item) => location.pathname === item.path,
                     )
                       ? "text-blue-600 border-b-2 border-blue-600"
-                      : "text-gray-700 hover:text-blue-600"
+                      : "text-slate-700 hover:text-blue-600"
                   }`}
                 >
                   <span>Góc học tập</span>
@@ -182,7 +182,7 @@ const Header = () => {
 
                 {/* Learning Dropdown Menu */}
                 {learningDropdownOpen && (
-                  <div className="absolute left-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50 animate-fade-in">
+                  <div className="absolute left-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-slate-200 py-2 z-50 animate-fade-in">
                     {learningItems.map((item) => (
                       <Link
                         key={item.path}
@@ -191,7 +191,7 @@ const Header = () => {
                         className={`block px-4 py-2 text-sm transition-colors duration-150 ${
                           location.pathname === item.path
                             ? "text-blue-600 bg-blue-50 font-medium"
-                            : "text-gray-700 hover:bg-gray-50 hover:text-blue-600"
+                            : "text-slate-700 hover:bg-slate-50 hover:text-blue-600"
                         }`}
                       >
                         {item.label}
@@ -222,7 +222,7 @@ const Header = () => {
                   {/* Avatar with Subscription Badge */}
                   <button
                     onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                    className="flex items-center space-x-2 hover:bg-gray-50 rounded-lg p-2 transition-all duration-200"
+                    className="flex items-center space-x-2 hover:bg-slate-50 rounded-lg p-2 transition-all duration-200"
                   >
                     {/* Avatar Circle */}
                     <div className="relative">
@@ -237,7 +237,7 @@ const Header = () => {
 
                     {/* Dropdown Arrow */}
                     <ChevronDown
-                      className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${
+                      className={`w-4 h-4 text-slate-500 transition-transform duration-200 ${
                         isDropdownOpen ? "rotate-180" : ""
                       }`}
                     />
@@ -245,13 +245,13 @@ const Header = () => {
 
                   {/* Dropdown Menu */}
                   {isDropdownOpen && (
-                    <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50 animate-fade-in">
+                    <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-slate-200 py-2 z-50 animate-fade-in">
                       {/* User Info Header */}
-                      <div className="px-4 py-3 border-b border-gray-100">
-                        <p className="text-sm font-semibold text-gray-900">
+                      <div className="px-4 py-3 border-b border-slate-100">
+                        <p className="text-sm font-bold text-slate-900">
                           {user.user_name}
                         </p>
-                        <p className="text-xs text-gray-500 mt-0.5">
+                        <p className="text-xs text-slate-500 mt-0.5">
                           {user.user_email}
                         </p>
                         <div className="mt-2 inline-flex items-center px-3 py-1 bg-gradient-to-r from-emerald-50 via-teal-50 to-cyan-50 border border-emerald-200 rounded-full shadow-sm">
@@ -266,7 +266,7 @@ const Header = () => {
                         <Link
                           to="/profile"
                           onClick={() => setIsDropdownOpen(false)}
-                          className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-150"
+                          className="flex items-center px-4 py-2 text-sm text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-150"
                         >
                           <UserCircle className="w-4 h-4 mr-3" />
                           Trang cá nhân
@@ -293,13 +293,13 @@ const Header = () => {
               <>
                 <Link
                   to="/login"
-                  className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 hover:bg-gray-50"
+                  className="text-slate-700 hover:text-blue-600 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover:bg-slate-50"
                 >
                   Đăng nhập
                 </Link>
                 <Link
                   to="/register"
-                  className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5"
+                  className="bg-gradient-to-r from-amber-400 to-orange-500 text-slate-900 px-4 py-2 rounded-lg text-sm font-bold hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
                 >
                   Đăng ký
                 </Link>
@@ -310,7 +310,7 @@ const Header = () => {
           {/* Mobile menu button */}
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="lg:hidden p-2 rounded-md text-gray-600 hover:text-blue-600 hover:bg-gray-50 transition-all duration-200"
+            className="lg:hidden p-2 rounded-md text-slate-600 hover:text-blue-600 hover:bg-slate-50 transition-all duration-200"
           >
             {isMenuOpen ? (
               <X className="h-6 w-6" />
@@ -321,7 +321,7 @@ const Header = () => {
 
           {/* Mobile Navigation */}
           {isMenuOpen && (
-            <div className="lg:hidden border-t border-gray-200 py-4 animate-fade-in">
+            <div className="lg:hidden border-t border-slate-200 py-4 animate-fade-in">
               <nav className="flex flex-col space-y-2">
                 {allNavItems.map((item) => (
                   <Link
@@ -331,7 +331,7 @@ const Header = () => {
                     className={`px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
                       location.pathname === item.path
                         ? "text-blue-600 bg-blue-50"
-                        : "text-gray-700 hover:text-blue-600 hover:bg-gray-50"
+                        : "text-slate-700 hover:text-blue-600 hover:bg-slate-50"
                     }`}
                   >
                     {item.label}
@@ -340,8 +340,8 @@ const Header = () => {
 
                 {/* Learning Corner Section - Mobile */}
                 {user && (
-                  <div className="pt-2 border-t border-gray-200 mt-2">
-                    <div className="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  <div className="pt-2 border-t border-slate-200 mt-2">
+                    <div className="px-3 py-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">
                       Góc học tập
                     </div>
                     {learningItems.map((item) => (
@@ -352,7 +352,7 @@ const Header = () => {
                         className={`px-3 py-2 pl-6 rounded-md text-sm font-medium transition-all duration-200 flex ${
                           location.pathname === item.path
                             ? "text-blue-600 bg-blue-50"
-                            : "text-gray-700 hover:text-blue-600 hover:bg-gray-50"
+                            : "text-slate-700 hover:text-blue-600 hover:bg-slate-50"
                         }`}
                       >
                         {item.label}
@@ -361,7 +361,7 @@ const Header = () => {
                   </div>
                 )}
 
-                <div className="flex flex-col space-y-2 pt-4 border-t border-gray-200 mt-4">
+                <div className="flex flex-col space-y-2 pt-4 border-t border-slate-200 mt-4">
                   {user ? (
                     <>
                       {/* Upgrade Button - Mobile */}
@@ -394,10 +394,10 @@ const Header = () => {
 
                           {/* User Details */}
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm font-semibold text-gray-900 truncate">
+                            <p className="text-sm font-semibold text-slate-900 truncate">
                               {user.user_name}
                             </p>
-                            <p className="text-xs text-gray-600 truncate">
+                            <p className="text-xs text-slate-600 truncate">
                               {user.user_email}
                             </p>
                             <div className="mt-1 inline-flex items-center px-2 py-0.5 bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-full shadow-sm">
@@ -413,7 +413,7 @@ const Header = () => {
                       <Link
                         to="/profile"
                         onClick={() => setIsMenuOpen(false)}
-                        className="flex items-center space-x-3 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-md mx-3 transition-all duration-200"
+                        className="flex items-center space-x-3 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-blue-50 hover:text-blue-600 rounded-md mx-3 transition-all duration-200"
                       >
                         <UserCircle className="h-5 w-5" />
                         <span>Trang cá nhân</span>
@@ -437,14 +437,14 @@ const Header = () => {
                       <Link
                         to="/login"
                         onClick={() => setIsMenuOpen(false)}
-                        className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 hover:bg-gray-50"
+                        className="text-slate-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 hover:bg-slate-50"
                       >
                         Đăng nhập
                       </Link>
                       <Link
                         to="/register"
                         onClick={() => setIsMenuOpen(false)}
-                        className="bg-blue-600 text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-700 mx-3 transition-all duration-200 hover:shadow-md"
+                        className="bg-gradient-to-r from-amber-400 to-orange-500 text-slate-900 px-3 py-2 rounded-lg text-sm font-bold mx-3 transition-all duration-200 hover:shadow-md"
                       >
                         Đăng ký
                       </Link>

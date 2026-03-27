@@ -27,7 +27,7 @@ const LessonContent: React.FC = () => {
       <div className="flex items-center justify-center h-full">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Đang tải bài học...</p>
+          <p className="text-slate-600">Đang tải bài học...</p>
         </div>
       </div>
     );
@@ -37,8 +37,8 @@ const LessonContent: React.FC = () => {
     return (
       <div className="flex items-center justify-center h-full">
         <div className="text-center">
-          <BookOpen className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-          <p className="text-gray-600">Chọn một bài học để bắt đầu</p>
+          <BookOpen className="h-16 w-16 text-slate-400 mx-auto mb-4" />
+          <p className="text-slate-600">Chọn một bài học để bắt đầu</p>
         </div>
       </div>
     );
@@ -82,10 +82,10 @@ const LessonContent: React.FC = () => {
   return (
     <div className="h-full flex flex-col bg-white">
       {/* Lesson Header */}
-      <div className="flex-shrink-0 border-b border-gray-200 bg-white p-4">
+      <div className="flex-shrink-0 border-b border-slate-200 bg-white p-4">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-between mb-2">
-            <h1 className="text-2xl font-bold text-gray-900">
+            <h1 className="text-2xl font-bold text-slate-900">
               {currentLesson.lesson_title}
             </h1>
             {isCompleted && (
@@ -95,7 +95,7 @@ const LessonContent: React.FC = () => {
               </span>
             )}
           </div>
-          <div className="flex items-center gap-2 text-sm text-gray-600">
+          <div className="flex items-center gap-2 text-sm text-slate-600">
             <Clock className="h-4 w-4" />
             <span>{currentLesson.estimated_time} phút</span>
           </div>
@@ -105,14 +105,14 @@ const LessonContent: React.FC = () => {
         {lessonProgress && lessonProgress.progress_percentage > 0 && (
           <div className="mt-4">
             <div className="flex items-center justify-between mb-1">
-              <span className="text-xs text-gray-600 font-medium">
+              <span className="text-xs text-slate-600 font-medium">
                 Tiến độ bài học
               </span>
-              <span className="text-xs text-gray-600 font-semibold">
+              <span className="text-xs text-slate-600 font-semibold">
                 {Math.round(lessonProgress.progress_percentage)}%
               </span>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
+            <div className="w-full bg-slate-200 rounded-full h-2">
               <div
                 className="bg-blue-600 h-2 rounded-full transition-all duration-300"
                 style={{
@@ -187,13 +187,13 @@ const LessonContent: React.FC = () => {
       </div>
 
       {/* Navigation Footer */}
-      <div className="flex-shrink-0 border-t border-gray-200 bg-gray-50 p-4">
+      <div className="flex-shrink-0 border-t border-slate-200 bg-slate-50 p-4">
         <div className="flex items-center justify-between max-w-4xl mx-auto">
           {/* Previous Button */}
           <button
             onClick={handlePrevious}
             disabled={!previousLesson}
-            className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center gap-2 px-4 py-2 text-slate-700 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <ArrowLeft className="h-5 w-5" />
             <span className="font-medium">Bài trước</span>
@@ -214,7 +214,7 @@ const LessonContent: React.FC = () => {
           <button
             onClick={handleNext}
             disabled={!nextLesson}
-            className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center gap-2 px-4 py-2 text-slate-700 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <span className="font-medium">Bài tiếp theo</span>
             <ArrowRight className="h-5 w-5" />

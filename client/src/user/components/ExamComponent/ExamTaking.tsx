@@ -358,10 +358,10 @@ const ExamTaking: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading exam...</p>
+          <p className="text-slate-600">Loading exam...</p>
         </div>
       </div>
     );
@@ -369,10 +369,10 @@ const ExamTaking: React.FC = () => {
 
   if (!exam) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="text-center">
           <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-          <h3 className="text-xl font-semibold text-gray-900 mb-2">
+          <h3 className="text-xl font-semibold text-slate-900 mb-2">
             Failed to load exam
           </h3>
           <button
@@ -393,7 +393,7 @@ const ExamTaking: React.FC = () => {
   const currentQuestionNumber = getCurrentQuestionNumber();
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-slate-50">
       {/* Hidden audio element for persistent playback */}
       <audio
         ref={audioRef}
@@ -410,10 +410,10 @@ const ExamTaking: React.FC = () => {
             <div className="flex items-center gap-4">
               <BookOpen className="w-5 h-5 text-blue-600" />
               <div>
-                <h1 className="text-lg font-semibold text-gray-900">
+                <h1 className="text-lg font-semibold text-slate-900">
                   {exam.exam_title}
                 </h1>
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-slate-500">
                   Question {currentQuestionNumber} of {totalQuestions}
                 </p>
               </div>
@@ -428,7 +428,7 @@ const ExamTaking: React.FC = () => {
                   className={`p-2 rounded-lg transition-colors ${
                     isAudioPlaying
                       ? "bg-purple-100 text-purple-700"
-                      : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                      : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                   }`}
                   title={isAudioPlaying ? "Pause Audio" : "Play Audio"}
                 >
@@ -463,10 +463,10 @@ const ExamTaking: React.FC = () => {
               {/* Overview Button */}
               <button
                 onClick={() => setShowOverviewModal(true)}
-                className="p-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                className="p-2 border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors"
                 title="Question Overview"
               >
-                <LayoutGrid className="w-5 h-5 text-gray-600" />
+                <LayoutGrid className="w-5 h-5 text-slate-600" />
               </button>
 
               {/* Save */}
@@ -497,7 +497,7 @@ const ExamTaking: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* LEFT COLUMN - All Images & Content */}
           <div>
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 sticky top-24 max-h-[calc(100vh-120px)] overflow-y-auto">
+            <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6 sticky top-24 max-h-[calc(100vh-120px)] overflow-y-auto">
               {currentContainer && (
                 <>
                   {/* Container Header */}
@@ -506,7 +506,7 @@ const ExamTaking: React.FC = () => {
                       {currentContainer.skill || "Section"}
                     </span>
                     {currentContainer.instruction && (
-                      <p className="text-base font-medium text-gray-700 mt-2">
+                      <p className="text-base font-medium text-slate-700 mt-2">
                         {currentContainer.instruction}
                       </p>
                     )}
@@ -518,7 +518,7 @@ const ExamTaking: React.FC = () => {
                       <img
                         src={currentContainer.image_url}
                         alt="Test content"
-                        className="w-full rounded-lg border border-gray-200 shadow-sm"
+                        className="w-full rounded-lg border border-slate-200 shadow-sm"
                       />
                     </div>
                   )}
@@ -526,13 +526,13 @@ const ExamTaking: React.FC = () => {
                   {/* Question Image - Enlarged */}
                   {currentQuestion && currentQuestion.image_url && (
                     <div className="mb-5">
-                      <p className="text-sm font-medium text-gray-600 mb-2">
+                      <p className="text-sm font-medium text-slate-600 mb-2">
                         Question {currentQuestionNumber} Image:
                       </p>
                       <img
                         src={currentQuestion.image_url}
                         alt="Question"
-                        className="w-full rounded-lg border border-gray-200 shadow-sm"
+                        className="w-full rounded-lg border border-slate-200 shadow-sm"
                       />
                     </div>
                   )}
@@ -540,7 +540,7 @@ const ExamTaking: React.FC = () => {
                   {/* Content/Paragraph */}
                   {currentContainer.content && (
                     <div className="prose prose-base max-w-none">
-                      <div className="text-gray-800 text-base leading-relaxed whitespace-pre-wrap">
+                      <div className="text-slate-800 text-base leading-relaxed whitespace-pre-wrap">
                         {currentContainer.content}
                       </div>
                     </div>
@@ -550,7 +550,7 @@ const ExamTaking: React.FC = () => {
                   {!currentContainer.image_url &&
                     !currentContainer.content &&
                     !currentQuestion?.image_url && (
-                      <div className="text-center py-12 text-gray-400">
+                      <div className="text-center py-12 text-slate-400">
                         <BookOpen className="w-16 h-16 mx-auto mb-3 opacity-50" />
                         <p className="text-sm">No visual content</p>
                       </div>
@@ -563,14 +563,14 @@ const ExamTaking: React.FC = () => {
           {/* RIGHT COLUMN - Question & Answers */}
           <div>
             {currentQuestion && (
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
                 {/* Question */}
                 <div className="mb-6">
                   <div className="flex items-start gap-4">
                     <span className="flex-shrink-0 w-9 h-9 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
                       {currentQuestionNumber}
                     </span>
-                    <h3 className="flex-1 text-lg font-medium text-gray-900 leading-relaxed">
+                    <h3 className="flex-1 text-lg font-medium text-slate-900 leading-relaxed">
                       {currentQuestion.Question.question_content}
                     </h3>
                   </div>
@@ -595,7 +595,7 @@ const ExamTaking: React.FC = () => {
                         className={`w-full text-left p-4 rounded-lg border-2 transition-all ${
                           isSelected
                             ? "border-blue-500 bg-blue-50 shadow-sm"
-                            : "border-gray-200 hover:border-blue-200 hover:bg-gray-50"
+                            : "border-slate-200 hover:border-blue-200 hover:bg-slate-50"
                         }`}
                       >
                         <div className="flex items-center gap-3">
@@ -603,12 +603,12 @@ const ExamTaking: React.FC = () => {
                             className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${
                               isSelected
                                 ? "bg-blue-600 text-white"
-                                : "bg-gray-100 text-gray-700"
+                                : "bg-slate-100 text-slate-700"
                             }`}
                           >
                             {option.label}
                           </span>
-                          <span className="text-gray-800 text-base">
+                          <span className="text-slate-800 text-base">
                             {option.content}
                           </span>
                         </div>
@@ -624,13 +624,13 @@ const ExamTaking: React.FC = () => {
                     disabled={
                       currentContainerIndex === 0 && currentQuestionIndex === 0
                     }
-                    className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2 text-sm font-medium text-gray-700"
+                    className="px-6 py-3 border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2 text-sm font-medium text-slate-700"
                   >
                     <ChevronLeft className="w-4 h-4" />
                     Previous
                   </button>
 
-                  <div className="text-sm text-gray-500 font-medium">
+                  <div className="text-sm text-slate-500 font-medium">
                     {Math.round((answeredQuestions / totalQuestions) * 100)}%
                   </div>
 
@@ -659,12 +659,12 @@ const ExamTaking: React.FC = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full p-6 max-h-[85vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-bold text-gray-900">
+              <h3 className="text-xl font-bold text-slate-900">
                 Question Overview
               </h3>
               <button
                 onClick={() => setShowOverviewModal(false)}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-slate-400 hover:text-slate-600"
               >
                 <X className="w-6 h-6" />
               </button>
@@ -679,7 +679,7 @@ const ExamTaking: React.FC = () => {
 
                   return (
                     <div key={container.container_id}>
-                      <h4 className="text-sm font-semibold text-gray-900 mb-3">
+                      <h4 className="text-sm font-semibold text-slate-900 mb-3">
                         {container.instruction || `Section ${containerIdx + 1}`}{" "}
                         - {container.skill?.toUpperCase()}
                       </h4>
@@ -716,7 +716,7 @@ const ExamTaking: React.FC = () => {
                                     ? "bg-blue-600 text-white shadow-md ring-2 ring-blue-300"
                                     : isAnswered
                                       ? "bg-green-100 text-green-700 hover:bg-green-200"
-                                      : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                                      : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                                 }`}
                                 title={`Question ${globalNum}${isAnswered ? " (Answered)" : ""}`}
                               >
@@ -736,15 +736,15 @@ const ExamTaking: React.FC = () => {
             <div className="flex items-center gap-6 mt-6 pt-6 border-t">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 bg-blue-600 rounded-lg"></div>
-                <span className="text-sm text-gray-600">Current</span>
+                <span className="text-sm text-slate-600">Current</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 bg-green-100 border border-green-200 rounded-lg"></div>
-                <span className="text-sm text-gray-600">Answered</span>
+                <span className="text-sm text-slate-600">Answered</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 bg-gray-100 border border-gray-200 rounded-lg"></div>
-                <span className="text-sm text-gray-600">Unanswered</span>
+                <div className="w-8 h-8 bg-slate-100 border border-slate-200 rounded-lg"></div>
+                <span className="text-sm text-slate-600">Unanswered</span>
               </div>
             </div>
           </div>
@@ -756,33 +756,33 @@ const ExamTaking: React.FC = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-bold text-gray-900">Submit Exam?</h3>
+              <h3 className="text-xl font-bold text-slate-900">Submit Exam?</h3>
               <button
                 onClick={() => setShowSubmitModal(false)}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-slate-400 hover:text-slate-600"
               >
                 <X className="w-6 h-6" />
               </button>
             </div>
 
             <div className="mb-6">
-              <p className="text-gray-600 mb-4">
+              <p className="text-slate-600 mb-4">
                 Are you sure you want to submit your exam? You won't be able to
                 change your answers after submission.
               </p>
-              <div className="space-y-2 bg-gray-50 rounded-lg p-4">
+              <div className="space-y-2 bg-slate-50 rounded-lg p-4">
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Total Questions:</span>
+                  <span className="text-slate-600">Total Questions:</span>
                   <span className="font-semibold">{totalQuestions}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Answered:</span>
+                  <span className="text-slate-600">Answered:</span>
                   <span className="font-semibold text-green-600">
                     {answeredQuestions}
                   </span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Unanswered:</span>
+                  <span className="text-slate-600">Unanswered:</span>
                   <span className="font-semibold text-red-600">
                     {totalQuestions - answeredQuestions}
                   </span>
@@ -793,7 +793,7 @@ const ExamTaking: React.FC = () => {
             <div className="flex gap-3">
               <button
                 onClick={() => setShowSubmitModal(false)}
-                className="flex-1 px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+                className="flex-1 px-4 py-3 border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors font-medium"
               >
                 Cancel
               </button>

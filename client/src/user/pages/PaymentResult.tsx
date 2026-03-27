@@ -29,7 +29,7 @@ const PaymentResult = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-black to-slate-900 flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="w-16 h-16 text-blue-600 animate-spin mx-auto mb-4" />
           <p className="text-white text-lg">Đang xử lý kết quả thanh toán...</p>
@@ -39,11 +39,11 @@ const PaymentResult = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 flex items-center justify-center px-4 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-black to-slate-900 flex items-center justify-center px-4 py-8">
       <div className="max-w-md w-full">
         {success ? (
           /* Success State */
-          <div className="bg-gray-800 border border-gray-700 rounded-2xl p-8 text-center">
+          <div className="bg-slate-800 border border-slate-700 rounded-2xl p-8 text-center">
             {/* Success Icon */}
             <div className="mb-6">
               <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -52,14 +52,14 @@ const PaymentResult = () => {
               <h1 className="text-2xl font-bold text-white mb-2">
                 Thanh toán thành công!
               </h1>
-              <p className="text-gray-400">Đơn hàng của bạn đã được xác nhận</p>
+              <p className="text-slate-400">Đơn hàng của bạn đã được xác nhận</p>
             </div>
 
             {/* Order Details */}
-            <div className="bg-gray-900 border border-gray-700 rounded-lg p-4 mb-6 space-y-3">
+            <div className="bg-slate-900 border border-slate-700 rounded-lg p-4 mb-6 space-y-3">
               {orderId && (
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-400 text-sm">Mã đơn hàng:</span>
+                  <span className="text-slate-400 text-sm">Mã đơn hàng:</span>
                   <span className="text-white font-mono font-semibold">
                     #{orderId}
                   </span>
@@ -68,14 +68,14 @@ const PaymentResult = () => {
 
               {amount && (
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-400 text-sm">Số tiền:</span>
+                  <span className="text-slate-400 text-sm">Số tiền:</span>
                   <span className="text-white font-bold text-lg">
                     {formatCurrency(Number(amount))}
                   </span>
                 </div>
               )}
 
-              <div className="pt-3 border-t border-gray-700">
+              <div className="pt-3 border-t border-slate-700">
                 <p className="text-green-400 text-sm flex items-center justify-center gap-2">
                   <CheckCircle className="w-4 h-4" />
                   Subscription đã được kích hoạt
@@ -103,7 +103,7 @@ const PaymentResult = () => {
 
               <button
                 onClick={() => navigate("/subscription-plans")}
-                className="w-full bg-gray-700 text-white py-3 rounded-lg font-semibold hover:bg-gray-600 transition-colors flex items-center justify-center gap-2"
+                className="w-full bg-slate-700 text-white py-3 rounded-lg font-semibold hover:bg-slate-600 transition-colors flex items-center justify-center gap-2"
               >
                 <FileText className="w-5 h-5" />
                 Xem gói của tôi
@@ -111,13 +111,13 @@ const PaymentResult = () => {
             </div>
 
             {/* Footer Note */}
-            <p className="text-xs text-gray-500 mt-6">
+            <p className="text-xs text-slate-500 mt-6">
               Biên lai thanh toán đã được gửi về email của bạn
             </p>
           </div>
         ) : (
           /* Failed State */
-          <div className="bg-gray-800 border border-gray-700 rounded-2xl p-8 text-center">
+          <div className="bg-slate-800 border border-slate-700 rounded-2xl p-8 text-center">
             {/* Error Icon */}
             <div className="mb-6">
               <div className="w-20 h-20 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -126,7 +126,7 @@ const PaymentResult = () => {
               <h1 className="text-2xl font-bold text-white mb-2">
                 Thanh toán thất bại
               </h1>
-              <p className="text-gray-400">
+              <p className="text-slate-400">
                 Đơn hàng của bạn chưa được hoàn tất
               </p>
             </div>
@@ -141,12 +141,12 @@ const PaymentResult = () => {
 
             {/* Order Info if available */}
             {orderId && (
-              <div className="bg-gray-900 border border-gray-700 rounded-lg p-4 mb-6">
+              <div className="bg-slate-900 border border-slate-700 rounded-lg p-4 mb-6">
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-400 text-sm">Mã đơn hàng:</span>
+                  <span className="text-slate-400 text-sm">Mã đơn hàng:</span>
                   <span className="text-white font-mono">#{orderId}</span>
                 </div>
-                <p className="text-gray-500 text-xs mt-2">
+                <p className="text-slate-500 text-xs mt-2">
                   Đơn hàng vẫn ở trạng thái chờ thanh toán
                 </p>
               </div>
@@ -163,7 +163,7 @@ const PaymentResult = () => {
 
               <button
                 onClick={() => navigate("/")}
-                className="w-full bg-gray-700 text-white py-3 rounded-lg font-semibold hover:bg-gray-600 transition-colors flex items-center justify-center gap-2"
+                className="w-full bg-slate-700 text-white py-3 rounded-lg font-semibold hover:bg-slate-600 transition-colors flex items-center justify-center gap-2"
               >
                 <Home className="w-5 h-5" />
                 Về trang chủ
@@ -171,8 +171,8 @@ const PaymentResult = () => {
             </div>
 
             {/* Help Section */}
-            <div className="mt-6 pt-6 border-t border-gray-700">
-              <p className="text-sm text-gray-400 mb-2">Cần hỗ trợ?</p>
+            <div className="mt-6 pt-6 border-t border-slate-700">
+              <p className="text-sm text-slate-400 mb-2">Cần hỗ trợ?</p>
               <a
                 href="mailto:support@example.com"
                 className="text-blue-400 hover:text-blue-300 text-sm"
@@ -184,11 +184,11 @@ const PaymentResult = () => {
         )}
 
         {/* Common Tips */}
-        <div className="mt-6 bg-gray-800/50 border border-gray-700/50 rounded-lg p-4">
+        <div className="mt-6 bg-slate-800/50 border border-slate-700/50 rounded-lg p-4">
           <h3 className="text-sm font-semibold text-white mb-2">
             💡 Mẹo hữu ích
           </h3>
-          <ul className="text-xs text-gray-400 space-y-1">
+          <ul className="text-xs text-slate-400 space-y-1">
             <li>• Kiểm tra email để xem biên lai thanh toán</li>
             <li>• Lưu mã đơn hàng để tra cứu sau này</li>
             <li>• Liên hệ hỗ trợ nếu có thắc mắc</li>

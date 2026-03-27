@@ -3,13 +3,16 @@ import { RESEARCH_OBJECTIVES } from "./aboutConstants";
 
 const AboutResearch: React.FC = () => {
   return (
-    <section className="py-20 bg-gray-50">
+    <section className="py-20 bg-slate-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-            Mục tiêu nghiên cứu
+        <div className="text-center mb-12">
+          <span className="text-blue-600 text-sm font-semibold uppercase tracking-wider">
+            Nghiên cứu
+          </span>
+          <h2 className="text-4xl font-black text-slate-900 mt-2">
+            Mục tiêu <span className="text-blue-600">nghiên cứu</span>
           </h2>
-          <p className="text-xl text-gray-600">
+          <p className="text-slate-500 mt-3">
             Nền tảng khoa học và công nghệ đằng sau hệ thống
           </p>
         </div>
@@ -18,13 +21,13 @@ const AboutResearch: React.FC = () => {
           {RESEARCH_OBJECTIVES.map((objective, index) => (
             <div
               key={index}
-              className="bg-white p-6 rounded-lg border border-gray-200"
+              className="group bg-white rounded-2xl border border-slate-200 p-6 hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
             >
-              <div className="flex items-start">
-                <div className="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold mr-3">
+              <div className="flex items-start gap-3">
+                <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-amber-400 to-orange-500 text-white rounded-full flex items-center justify-center font-black text-sm">
                   {index + 1}
                 </div>
-                <p className="text-gray-700">{objective}</p>
+                <p className="text-slate-600">{objective}</p>
               </div>
             </div>
           ))}

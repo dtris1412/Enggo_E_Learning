@@ -46,14 +46,14 @@ const BlogCard: React.FC<BlogCardProps> = ({
 
   const getCategoryColor = (cat: string) => {
     const colors: { [key: string]: string } = {
-      "Mẹo học tập": "bg-gray-100 text-gray-700",
-      TOEIC: "bg-gray-100 text-gray-700",
-      IELTS: "bg-gray-100 text-gray-700",
-      "Ngữ pháp": "bg-gray-100 text-gray-700",
-      "Từ vựng": "bg-gray-100 text-gray-700",
-      HSK: "bg-gray-100 text-gray-700",
+      "Mẽo học tập": "bg-blue-100 text-blue-700",
+      TOEIC: "bg-emerald-100 text-emerald-700",
+      IELTS: "bg-violet-100 text-violet-700",
+      "Ngữ pháp": "bg-amber-100 text-amber-700",
+      "Từ vựng": "bg-orange-100 text-orange-700",
+      HSK: "bg-rose-100 text-rose-700",
     };
-    return colors[cat] || "bg-gray-100 text-gray-700";
+    return colors[cat] || "bg-slate-100 text-slate-700";
   };
 
   const handleClick = () => {
@@ -63,11 +63,11 @@ const BlogCard: React.FC<BlogCardProps> = ({
   return (
     <article
       onClick={handleClick}
-      className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-all duration-300 cursor-pointer group"
+      className="bg-white border border-slate-200 rounded-2xl overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer group"
     >
       <div className="flex flex-col sm:flex-row gap-4 p-4">
         {/* Thumbnail - Left side */}
-        <div className="relative w-full sm:w-48 h-48 sm:h-32 flex-shrink-0 overflow-hidden rounded-lg">
+        <div className="relative w-full sm:w-48 h-48 sm:h-32 flex-shrink-0 overflow-hidden rounded-xl">
           <img
             src={blog_thumbnail}
             alt={blog_title}
@@ -76,7 +76,7 @@ const BlogCard: React.FC<BlogCardProps> = ({
           {/* Category Badge */}
           <div className="absolute top-2 left-2">
             <span
-              className={`px-3 py-1 rounded text-xs font-semibold border ${getCategoryColor(category)}`}
+              className={`px-3 py-1 rounded-lg text-xs font-semibold ${getCategoryColor(category)}`}
             >
               {category.toUpperCase()}
             </span>
@@ -87,14 +87,16 @@ const BlogCard: React.FC<BlogCardProps> = ({
         <div className="flex-1 flex flex-col justify-between">
           {/* Title & Excerpt */}
           <div>
-            <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
+            <h3 className="text-lg font-black text-slate-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
               {blog_title}
             </h3>
-            <p className="text-gray-600 text-sm mb-3 line-clamp-2">{excerpt}</p>
+            <p className="text-slate-500 text-sm mb-3 line-clamp-2">
+              {excerpt}
+            </p>
           </div>
 
           {/* Meta Info */}
-          <div className="flex flex-wrap items-center gap-3 text-xs text-gray-500">
+          <div className="flex flex-wrap items-center gap-3 text-xs text-slate-400">
             {author && (
               <div className="flex items-center gap-1">
                 <UserIcon className="h-3 w-3" />

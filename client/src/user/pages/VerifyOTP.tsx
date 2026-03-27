@@ -148,12 +148,12 @@ const VerifyOTP = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <h2 className="mt-6 text-center text-3xl font-bold text-gray-900">
+        <h2 className="mt-6 text-center text-3xl font-bold text-slate-900">
           Xác thực OTP
         </h2>
-        <p className="mt-2 text-center text-sm text-gray-600">
+        <p className="mt-2 text-center text-sm text-slate-600">
           Nhập mã OTP đã được gửi đến email
         </p>
         <p className="mt-1 text-center text-sm font-medium text-blue-600">
@@ -171,7 +171,7 @@ const VerifyOTP = () => {
             )}
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 text-center mb-4">
+              <label className="block text-sm font-medium text-slate-700 text-center mb-4">
                 Mã OTP (6 số)
               </label>
               <div className="flex justify-center gap-2">
@@ -186,7 +186,7 @@ const VerifyOTP = () => {
                     onChange={(e) => handleChange(index, e.target.value)}
                     onKeyDown={(e) => handleKeyDown(index, e)}
                     onPaste={index === 0 ? handlePaste : undefined}
-                    className="w-12 h-12 text-center text-xl font-bold border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                    className="w-12 h-12 text-center text-xl font-bold border-2 border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                   />
                 ))}
               </div>
@@ -203,7 +203,7 @@ const VerifyOTP = () => {
             </div>
 
             <div className="text-center space-y-3">
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-slate-600">
                 Không nhận được mã?{" "}
                 <button
                   type="button"

@@ -72,13 +72,13 @@ const PricingCard = ({
   const getCardStyle = () => {
     switch (code) {
       case "free":
-        return "bg-gradient-to-br from-gray-900 to-gray-800 border-gray-700";
+        return "bg-gradient-to-br from-slate-900 to-slate-800 border-slate-700";
       case "pro":
-        return "bg-gradient-to-br from-gray-900 to-gray-800 border-blue-500";
+        return "bg-gradient-to-br from-slate-900 to-slate-800 border-blue-500";
       case "premium":
-        return "bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 border-yellow-500 shadow-2xl shadow-yellow-500/20";
+        return "bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-yellow-500 shadow-2xl shadow-yellow-500/20";
       default:
-        return "bg-gradient-to-br from-gray-900 to-gray-800 border-gray-700";
+        return "bg-gradient-to-br from-slate-900 to-slate-800 border-slate-700";
     }
   };
 
@@ -113,7 +113,7 @@ const PricingCard = ({
         <div className="flex items-center justify-center gap-2 mb-1.5">
           <h3 className="text-xl font-bold text-white">{name}</h3>
           {code === "premium" && (
-            <span className="bg-yellow-500 text-gray-900 text-[10px] font-bold px-1.5 py-0.5 rounded">
+            <span className="bg-yellow-500 text-slate-900 text-[10px] font-bold px-1.5 py-0.5 rounded">
               NEW
             </span>
           )}
@@ -133,7 +133,7 @@ const PricingCard = ({
               <span className="text-3xl font-bold text-white">
                 {formatCurrency(price.price, { showCurrency: false })}
               </span>
-              <span className="text-xs text-gray-400 ml-1">
+              <span className="text-xs text-slate-400 ml-1">
                 VNĐ/{" "}
                 {billingType === "monthly"
                   ? "Tháng"
@@ -144,13 +144,13 @@ const PricingCard = ({
             </div>
 
             {originalPrice && (
-              <div className="text-gray-400 line-through text-xs mb-1">
+              <div className="text-slate-400 line-through text-xs mb-1">
                 {formatCurrency(originalPrice)}
               </div>
             )}
 
             {renewalPrice && billingType !== "monthly" && (
-              <div className="text-[10px] text-gray-400">
+              <div className="text-[10px] text-slate-400">
                 Tương đương: {formatCurrency(renewalPrice)}/tháng
               </div>
             )}
@@ -167,7 +167,7 @@ const PricingCard = ({
             onClick={handleSubscribe}
             className={`w-full py-2 px-4 rounded-lg text-sm font-semibold transition-all duration-200 mb-3 ${
               code === "premium"
-                ? "bg-gradient-to-r from-yellow-500 to-yellow-600 text-gray-900 hover:shadow-lg hover:shadow-yellow-500/50 hover:scale-[1.02]"
+                ? "bg-gradient-to-r from-yellow-500 to-yellow-600 text-slate-900 hover:shadow-lg hover:shadow-yellow-500/50 hover:scale-[1.02]"
                 : "bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:shadow-lg hover:shadow-blue-500/50 hover:scale-[1.02]"
             }`}
           >
@@ -175,7 +175,7 @@ const PricingCard = ({
           </button>
 
           {price && (
-            <p className="text-[10px] text-center text-gray-400 mb-3">
+            <p className="text-[10px] text-center text-slate-400 mb-3">
               Chỉ giảm giá cho lần đăng ký đầu tiên, hủy bất kỳ lúc nào
             </p>
           )}
@@ -183,7 +183,7 @@ const PricingCard = ({
       )}
 
       {/* AI Tokens */}
-      <div className="mb-4 p-3 bg-gray-800/50 rounded-lg border border-gray-700">
+      <div className="mb-4 p-3 bg-slate-800/50 rounded-lg border border-slate-700">
         <div className="flex items-center justify-between mb-1">
           <div className="flex items-center gap-1.5">
             <Sparkles className="w-4 h-4 text-yellow-400" />
@@ -192,10 +192,10 @@ const PricingCard = ({
               Credits
             </span>
           </div>
-          <span className="text-[10px] text-gray-400">mỗi tháng</span>
+          <span className="text-[10px] text-slate-400">mỗi tháng</span>
         </div>
         {monthlyTokens > 0 && (
-          <div className="text-[10px] text-gray-400">
+          <div className="text-[10px] text-slate-400">
             Tương đương ${((monthlyTokens * 0.01) / 100).toFixed(2)} mỗi 100
             Credits
           </div>
@@ -204,7 +204,7 @@ const PricingCard = ({
 
       {/* Features List */}
       <div className="space-y-2">
-        <p className="text-xs font-semibold text-gray-300 mb-2">
+        <p className="text-xs font-semibold text-slate-300 mb-2">
           Tính năng bao gồm:
         </p>
         {Object.entries(safeFeatures).map(([key, value]) => {
@@ -221,12 +221,12 @@ const PricingCard = ({
             <div key={key} className="flex items-start gap-2">
               <Check
                 className={`w-4 h-4 flex-shrink-0 mt-0.5 ${
-                  isIncluded ? "text-green-400" : "text-gray-600"
+                  isIncluded ? "text-green-400" : "text-slate-600"
                 }`}
               />
               <span
                 className={`text-xs ${
-                  isIncluded ? "text-gray-200" : "text-gray-500"
+                  isIncluded ? "text-slate-200" : "text-slate-500"
                 }`}
               >
                 {featureLabel}

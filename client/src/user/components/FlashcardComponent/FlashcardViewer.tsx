@@ -596,10 +596,10 @@ const FlashcardViewer: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="text-center">
           <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
-          <p className="mt-4 text-gray-600">Đang tải...</p>
+          <p className="mt-4 text-slate-600">Đang tải...</p>
         </div>
       </div>
     );
@@ -607,10 +607,10 @@ const FlashcardViewer: React.FC = () => {
 
   if (!flashcardSet) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="text-center">
-          <BookMarked className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <p className="text-gray-600 mb-4">Không tìm thấy flashcard set</p>
+          <BookMarked className="w-16 h-16 text-slate-300 mx-auto mb-4" />
+          <p className="text-slate-600 mb-4">Không tìm thấy flashcard set</p>
           <button
             onClick={() => navigate("/flashcards")}
             className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-6 rounded-lg transition-colors"
@@ -626,10 +626,10 @@ const FlashcardViewer: React.FC = () => {
   // In study mode, we use backend API (currentCard) instead of flashcards array
   if (!studyMode && flashcards.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="text-center">
-          <BookMarked className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <p className="text-gray-600 mb-4">Không có flashcard nào để học</p>
+          <BookMarked className="w-16 h-16 text-slate-300 mx-auto mb-4" />
+          <p className="text-slate-600 mb-4">Không có flashcard nào để học</p>
           <button
             onClick={() => navigate("/flashcards")}
             className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-6 rounded-lg transition-colors"
@@ -719,7 +719,7 @@ const FlashcardViewer: React.FC = () => {
                 {/* Còn lại */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-3 h-3 bg-gray-400 rounded-full"></div>
+                    <div className="w-3 h-3 bg-slate-400 rounded-full"></div>
                     <span className="text-white font-medium">Còn lại</span>
                   </div>
                   <span className="text-white font-bold text-xl">
@@ -728,7 +728,7 @@ const FlashcardViewer: React.FC = () => {
                 </div>
                 <div className="h-2 bg-white/20 rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-gray-400 transition-all duration-500"
+                    className="h-full bg-slate-400 transition-all duration-500"
                     style={{
                       width: `${(progressStats.new / progressStats.total) * 100}%`,
                     }}
@@ -812,20 +812,20 @@ const FlashcardViewer: React.FC = () => {
           <div className="flex items-center justify-between">
             <button
               onClick={() => navigate(`/flashcards/${flashcard_set_id}`)}
-              className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
+              className="flex items-center gap-2 text-slate-600 hover:text-slate-900 transition-colors"
             >
               <ArrowLeft className="w-5 h-5" />
               <span className="font-medium">Quay lại</span>
             </button>
 
             <div className="text-center flex-1 max-w-md mx-4">
-              <h1 className="text-lg font-bold text-gray-900 truncate">
+              <h1 className="text-lg font-bold text-slate-900 truncate">
                 {flashcardSet.title}
               </h1>
               <div className="flex items-center justify-center gap-3 mt-1">
                 {studyMode ? (
                   <>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-slate-600">
                       {progressStats.total - progressStats.new} /{" "}
                       {progressStats.total} đã học
                     </p>
@@ -847,7 +847,7 @@ const FlashcardViewer: React.FC = () => {
                     )}
                   </>
                 ) : (
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-slate-600">
                     {currentIndex + 1} / {flashcards.length} thẻ
                   </p>
                 )}
@@ -861,7 +861,7 @@ const FlashcardViewer: React.FC = () => {
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
                   studyMode
                     ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    : "bg-slate-100 text-slate-700 hover:bg-slate-200"
                 }`}
                 title={
                   studyMode ? "Tắt theo dõi tiến độ" : "Bật theo dõi tiến độ"
@@ -881,14 +881,14 @@ const FlashcardViewer: React.FC = () => {
               </button>
               <button
                 onClick={handleShuffle}
-                className="p-2 text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                className="p-2 text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
                 title="Xáo trộn thẻ"
               >
                 <Shuffle className="w-5 h-5" />
               </button>
               <button
                 onClick={handleReset}
-                className="p-2 text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                className="p-2 text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
                 title="Reset tiến trình"
               >
                 <RotateCcw className="w-5 h-5" />
@@ -898,7 +898,7 @@ const FlashcardViewer: React.FC = () => {
 
           {/* Progress Bar */}
           <div className="mt-4">
-            <div className="w-full bg-gray-200 rounded-full h-2">
+            <div className="w-full bg-slate-200 rounded-full h-2">
               <div
                 className="bg-gradient-to-r from-indigo-600 to-purple-600 h-2 rounded-full transition-all duration-300"
                 style={{ width: `${progress}%` }}
@@ -910,35 +910,35 @@ const FlashcardViewer: React.FC = () => {
           {studyMode && (
             <div className="flex items-center justify-center gap-6 mt-4 text-sm">
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-gray-400 rounded-full"></div>
-                <span className="text-gray-700">
+                <div className="w-3 h-3 bg-slate-400 rounded-full"></div>
+                <span className="text-slate-700">
                   Mới: <span className="font-bold">{progressStats.new}</span>
                 </span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-                <span className="text-gray-700">
+                <span className="text-slate-700">
                   Đang học:{" "}
                   <span className="font-bold">{progressStats.learning}</span>
                 </span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
-                <span className="text-gray-700">
+                <span className="text-slate-700">
                   Ôn lại:{" "}
                   <span className="font-bold">{progressStats.reviewing}</span>
                 </span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                <span className="text-gray-700">
+                <span className="text-slate-700">
                   Thành thạo:{" "}
                   <span className="font-bold">{progressStats.mastered}</span>
                 </span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                <span className="text-gray-700">
+                <span className="text-slate-700">
                   Cần ôn:{" "}
                   <span className="font-bold">
                     {progressStats.due_for_review}
@@ -947,7 +947,7 @@ const FlashcardViewer: React.FC = () => {
               </div>
               <div className="flex items-center gap-2">
                 <Star className="w-4 h-4 text-yellow-600" />
-                <span className="text-gray-700">
+                <span className="text-slate-700">
                   Đánh dấu:{" "}
                   <span className="font-bold">{markedCards.size}</span>
                 </span>
@@ -990,7 +990,7 @@ const FlashcardViewer: React.FC = () => {
                   </div>
 
                   <div className="text-center px-8">
-                    <h2 className="text-5xl font-bold text-gray-900 mb-6">
+                    <h2 className="text-5xl font-bold text-slate-900 mb-6">
                       {displayCard.front_content}
                     </h2>
                     {displayCard.pronunciation && (
@@ -1013,9 +1013,9 @@ const FlashcardViewer: React.FC = () => {
                     )}
                   </div>
 
-                  <div className="absolute bottom-8 text-gray-400 text-sm flex items-center gap-2">
+                  <div className="absolute bottom-8 text-slate-400 text-sm flex items-center gap-2">
                     <span>Nhấp để lật thẻ</span>
-                    <span className="text-gray-300">|</span>
+                    <span className="text-slate-300">|</span>
                     <span>Space</span>
                   </div>
                 </div>
@@ -1124,7 +1124,7 @@ const FlashcardViewer: React.FC = () => {
                   : "Thẻ trước"
               }
             >
-              <ChevronLeft className="w-6 h-6 text-gray-700" />
+              <ChevronLeft className="w-6 h-6 text-slate-700" />
             </button>
 
             <button
@@ -1132,7 +1132,7 @@ const FlashcardViewer: React.FC = () => {
               className={`p-4 rounded-full shadow-lg hover:shadow-xl transition-all ${
                 isMarked
                   ? "bg-yellow-500 text-white"
-                  : "bg-white text-gray-700 hover:bg-yellow-50"
+                  : "bg-white text-slate-700 hover:bg-yellow-50"
               }`}
               title="Đánh dấu thẻ khó"
             >
@@ -1145,13 +1145,13 @@ const FlashcardViewer: React.FC = () => {
               className="p-4 bg-white rounded-full shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all"
               title={studyMode ? "Lấy thẻ tiếp theo" : "Thẻ sau"}
             >
-              <ChevronRight className="w-6 h-6 text-gray-700" />
+              <ChevronRight className="w-6 h-6 text-slate-700" />
             </button>
           </div>
 
           {/* Keyboard Shortcuts Help */}
           <div className="mt-8 bg-white/80 backdrop-blur-sm rounded-lg p-4">
-            <p className="text-sm text-gray-600 text-center">
+            <p className="text-sm text-slate-600 text-center">
               <span className="font-medium">Phím tắt:</span> ← Thẻ trước | → Thẻ
               sau | Space: Lật thẻ
             </p>

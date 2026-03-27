@@ -69,7 +69,7 @@ const PlanComparison = ({ plans, billingType }: PlanComparisonProps) => {
     if (value === undefined || value === null) {
       return (
         <div className="flex justify-center">
-          <X className="w-5 h-5 text-gray-400" />
+          <X className="w-5 h-5 text-slate-400" />
         </div>
       );
     }
@@ -88,7 +88,7 @@ const PlanComparison = ({ plans, billingType }: PlanComparisonProps) => {
 
     return (
       <div className="text-center">
-        <span className="text-sm text-gray-700 font-medium">{value}</span>
+        <span className="text-sm text-slate-700 font-medium">{value}</span>
       </div>
     );
   };
@@ -105,7 +105,7 @@ const PlanComparison = ({ plans, billingType }: PlanComparisonProps) => {
             <div
               key={plan.subscription_plan_id}
               className={`bg-white rounded-lg shadow-lg p-6 border-2 ${
-                isPopular ? "border-blue-500" : "border-gray-200"
+                isPopular ? "border-blue-500" : "border-slate-200"
               }`}
             >
               {isPopular && (
@@ -119,17 +119,17 @@ const PlanComparison = ({ plans, billingType }: PlanComparisonProps) => {
               <div className="text-center mb-6">
                 <div className="flex items-center justify-center gap-2 mb-2">
                   <Crown className="w-6 h-6 text-blue-600" />
-                  <h3 className="text-2xl font-bold text-gray-800">
+                  <h3 className="text-2xl font-bold text-slate-800">
                     {plan.name}
                   </h3>
                 </div>
 
                 {price && (
                   <div className="mt-4">
-                    <div className="text-3xl font-bold text-gray-900">
+                    <div className="text-3xl font-bold text-slate-900">
                       {formatCurrency(price.price)}
                     </div>
-                    <div className="text-sm text-gray-600 mt-1">
+                    <div className="text-sm text-slate-600 mt-1">
                       {billingType === "monthly" && "/ tháng"}
                       {billingType === "yearly" && "/ năm"}
                       {billingType === "weekly" && "/ tuần"}
@@ -148,7 +148,7 @@ const PlanComparison = ({ plans, billingType }: PlanComparisonProps) => {
               <div className="mb-6">
                 <div className="flex items-center gap-2 mb-3">
                   <Zap className="w-5 h-5 text-purple-600" />
-                  <span className="font-semibold text-gray-800">
+                  <span className="font-semibold text-slate-800">
                     AI Credits
                   </span>
                 </div>
@@ -158,7 +158,7 @@ const PlanComparison = ({ plans, billingType }: PlanComparisonProps) => {
               </div>
 
               <div className="space-y-3 mb-6">
-                <h4 className="font-semibold text-gray-800 text-sm">
+                <h4 className="font-semibold text-slate-800 text-sm">
                   Tính năng:
                 </h4>
                 {allFeatures.map((feature) => {
@@ -166,9 +166,9 @@ const PlanComparison = ({ plans, billingType }: PlanComparisonProps) => {
                   return (
                     <div
                       key={feature}
-                      className="flex items-center justify-between py-2 border-b border-gray-100"
+                      className="flex items-center justify-between py-2 border-b border-slate-100"
                     >
-                      <span className="text-sm text-gray-700">
+                      <span className="text-sm text-slate-700">
                         {formatFeatureName(feature)}
                       </span>
                       {renderFeatureCell(value)}
@@ -183,7 +183,7 @@ const PlanComparison = ({ plans, billingType }: PlanComparisonProps) => {
                   className={`w-full py-3 rounded-lg font-semibold transition-all ${
                     isPopular
                       ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:shadow-lg"
-                      : "bg-gray-100 text-gray-800 hover:bg-gray-200"
+                      : "bg-slate-100 text-slate-800 hover:bg-slate-200"
                   }`}
                 >
                   Chọn gói {plan.name}
@@ -198,8 +198,8 @@ const PlanComparison = ({ plans, billingType }: PlanComparisonProps) => {
       <div className="hidden md:block">
         <table className="w-full border-collapse bg-white shadow-lg rounded-lg overflow-hidden">
           <thead>
-            <tr className="bg-gradient-to-r from-gray-900 to-gray-800 text-white">
-              <th className="p-4 text-left font-semibold sticky left-0 bg-gradient-to-r from-gray-900 to-gray-800 z-10">
+            <tr className="bg-gradient-to-r from-slate-900 to-slate-800 text-white">
+              <th className="p-4 text-left font-semibold sticky left-0 bg-gradient-to-r from-slate-900 to-slate-800 z-10">
                 <div className="flex items-center gap-2">
                   <Info className="w-5 h-5" />
                   <span>Tính năng</span>
@@ -228,8 +228,8 @@ const PlanComparison = ({ plans, billingType }: PlanComparisonProps) => {
 
           <tbody>
             {/* Pricing Row */}
-            <tr className="bg-gradient-to-r from-blue-50 to-purple-50 border-b-2 border-gray-300">
-              <td className="p-4 font-semibold text-gray-800 sticky left-0 bg-gradient-to-r from-blue-50 to-purple-50 z-10">
+            <tr className="bg-gradient-to-r from-blue-50 to-purple-50 border-b-2 border-slate-300">
+              <td className="p-4 font-semibold text-slate-800 sticky left-0 bg-gradient-to-r from-blue-50 to-purple-50 z-10">
                 Giá
               </td>
               {plans.map((plan) => {
@@ -241,10 +241,10 @@ const PlanComparison = ({ plans, billingType }: PlanComparisonProps) => {
                   >
                     {price ? (
                       <div>
-                        <div className="text-2xl font-bold text-gray-900">
+                        <div className="text-2xl font-bold text-slate-900">
                           {formatCurrency(price.price)}
                         </div>
-                        <div className="text-sm text-gray-600 mt-1">
+                        <div className="text-sm text-slate-600 mt-1">
                           {billingType === "monthly" && "/ tháng"}
                           {billingType === "yearly" && "/ năm"}
                           {billingType === "weekly" && "/ tuần"}
@@ -258,7 +258,7 @@ const PlanComparison = ({ plans, billingType }: PlanComparisonProps) => {
                         )}
                       </div>
                     ) : (
-                      <span className="text-gray-500 text-sm">-</span>
+                      <span className="text-slate-500 text-sm">-</span>
                     )}
                   </td>
                 );
@@ -266,8 +266,8 @@ const PlanComparison = ({ plans, billingType }: PlanComparisonProps) => {
             </tr>
 
             {/* AI Credits Row */}
-            <tr className="bg-purple-50 border-b border-gray-200">
-              <td className="p-4 font-semibold text-gray-800 sticky left-0 bg-purple-50 z-10">
+            <tr className="bg-purple-50 border-b border-slate-200">
+              <td className="p-4 font-semibold text-slate-800 sticky left-0 bg-purple-50 z-10">
                 <div className="flex items-center gap-2">
                   <Zap className="w-4 h-4 text-purple-600" />
                   AI Credits (hàng tháng)
@@ -278,7 +278,7 @@ const PlanComparison = ({ plans, billingType }: PlanComparisonProps) => {
                   <span className="text-lg font-bold text-purple-600">
                     {plan.monthly_ai_token_quota.toLocaleString()}
                   </span>
-                  <span className="text-sm text-gray-600 ml-1">tokens</span>
+                  <span className="text-sm text-slate-600 ml-1">tokens</span>
                 </td>
               ))}
             </tr>
@@ -287,11 +287,11 @@ const PlanComparison = ({ plans, billingType }: PlanComparisonProps) => {
             {allFeatures.map((feature, idx) => (
               <tr
                 key={feature}
-                className={`border-b border-gray-200 hover:bg-gray-50 transition ${
-                  idx % 2 === 0 ? "bg-white" : "bg-gray-50"
+                className={`border-b border-slate-200 hover:bg-slate-50 transition ${
+                  idx % 2 === 0 ? "bg-white" : "bg-slate-50"
                 }`}
               >
-                <td className="p-4 text-gray-700 sticky left-0 bg-inherit z-10">
+                <td className="p-4 text-slate-700 sticky left-0 bg-inherit z-10">
                   {formatFeatureName(feature)}
                 </td>
                 {plans.map((plan) => (
@@ -306,8 +306,8 @@ const PlanComparison = ({ plans, billingType }: PlanComparisonProps) => {
             ))}
 
             {/* Action Row */}
-            <tr className="bg-gray-50">
-              <td className="p-4 font-semibold text-gray-800 sticky left-0 bg-gray-50 z-10">
+            <tr className="bg-slate-50">
+              <td className="p-4 font-semibold text-slate-800 sticky left-0 bg-slate-50 z-10">
                 Chọn gói
               </td>
               {plans.map((plan) => {
@@ -324,7 +324,7 @@ const PlanComparison = ({ plans, billingType }: PlanComparisonProps) => {
                         className={`px-6 py-3 rounded-lg font-semibold transition-all ${
                           isPopular
                             ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:shadow-lg"
-                            : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+                            : "bg-slate-200 text-slate-800 hover:bg-slate-300"
                         }`}
                       >
                         Chọn gói

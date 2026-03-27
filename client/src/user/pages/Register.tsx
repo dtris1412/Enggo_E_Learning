@@ -84,12 +84,12 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <h2 className="mt-6 text-center text-3xl font-bold text-gray-900">
+        <h2 className="mt-6 text-center text-3xl font-bold text-slate-900">
           Tạo tài khoản mới
         </h2>
-        <p className="mt-2 text-center text-sm text-gray-600">
+        <p className="mt-2 text-center text-sm text-slate-600">
           Đã có tài khoản?{" "}
           <Link
             to="/login"
@@ -107,7 +107,7 @@ const Register = () => {
             <div>
               <label
                 htmlFor="username"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-sm font-medium text-slate-700"
               >
                 Tên đăng nhập
               </label>
@@ -119,16 +119,16 @@ const Register = () => {
                   required
                   value={formData.username}
                   onChange={handleInputChange}
-                  className="appearance-none block w-full px-3 py-3 pl-10 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  className="appearance-none block w-full px-3 py-3 pl-10 border border-slate-300 placeholder-slate-500 text-slate-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                   placeholder="Nhập tên đăng nhập"
                 />
-                <User className="h-5 w-5 text-gray-400 absolute left-3 top-3.5" />
+                <User className="h-5 w-5 text-slate-400 absolute left-3 top-3.5" />
               </div>
             </div>
             <div>
               <label
                 htmlFor="fullName"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-sm font-medium text-slate-700"
               >
                 Họ và tên
               </label>
@@ -140,16 +140,16 @@ const Register = () => {
                   required
                   value={formData.fullName}
                   onChange={handleInputChange}
-                  className="appearance-none block w-full px-3 py-3 pl-10 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  className="appearance-none block w-full px-3 py-3 pl-10 border border-slate-300 placeholder-slate-500 text-slate-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                   placeholder="Nhập họ và tên"
                 />
-                <User className="h-5 w-5 text-gray-400 absolute left-3 top-3.5" />
+                <User className="h-5 w-5 text-slate-400 absolute left-3 top-3.5" />
               </div>
             </div>
             <div>
               <label
                 htmlFor="email"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-sm font-medium text-slate-700"
               >
                 Email
               </label>
@@ -161,16 +161,16 @@ const Register = () => {
                   required
                   value={formData.email}
                   onChange={handleInputChange}
-                  className="appearance-none block w-full px-3 py-3 pl-10 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  className="appearance-none block w-full px-3 py-3 pl-10 border border-slate-300 placeholder-slate-500 text-slate-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                   placeholder="Nhập email"
                 />
-                <Mail className="h-5 w-5 text-gray-400 absolute left-3 top-3.5" />
+                <Mail className="h-5 w-5 text-slate-400 absolute left-3 top-3.5" />
               </div>
             </div>
             <div>
               <label
                 htmlFor="phone"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-sm font-medium text-slate-700"
               >
                 Số điện thoại
               </label>
@@ -182,16 +182,16 @@ const Register = () => {
                   required
                   value={formData.phone}
                   onChange={handleInputChange}
-                  className="appearance-none block w-full px-3 py-3 pl-10 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  className="appearance-none block w-full px-3 py-3 pl-10 border border-slate-300 placeholder-slate-500 text-slate-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                   placeholder="Nhập số điện thoại"
                 />
-                <Phone className="h-5 w-5 text-gray-400 absolute left-3 top-3.5" />
+                <Phone className="h-5 w-5 text-slate-400 absolute left-3 top-3.5" />
               </div>
             </div>
             <div>
               <label
                 htmlFor="password"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-sm font-medium text-slate-700"
               >
                 Mật khẩu
               </label>
@@ -203,14 +203,14 @@ const Register = () => {
                   required
                   value={formData.password}
                   onChange={handleInputChange}
-                  className="appearance-none block w-full px-3 py-3 pl-10 pr-10 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  className="appearance-none block w-full px-3 py-3 pl-10 pr-10 border border-slate-300 placeholder-slate-500 text-slate-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                   placeholder="Nhập mật khẩu"
                 />
-                <Lock className="h-5 w-5 text-gray-400 absolute left-3 top-3.5" />
+                <Lock className="h-5 w-5 text-slate-400 absolute left-3 top-3.5" />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-3.5 text-gray-400 hover:text-gray-600"
+                  className="absolute right-3 top-3.5 text-slate-400 hover:text-slate-600"
                 >
                   {showPassword ? (
                     <EyeOff className="h-5 w-5" />
@@ -223,7 +223,7 @@ const Register = () => {
             <div>
               <label
                 htmlFor="confirmPassword"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-sm font-medium text-slate-700"
               >
                 Xác nhận mật khẩu
               </label>
@@ -235,14 +235,14 @@ const Register = () => {
                   required
                   value={formData.confirmPassword}
                   onChange={handleInputChange}
-                  className="appearance-none block w-full px-3 py-3 pl-10 pr-10 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  className="appearance-none block w-full px-3 py-3 pl-10 pr-10 border border-slate-300 placeholder-slate-500 text-slate-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                   placeholder="Nhập lại mật khẩu"
                 />
-                <Lock className="h-5 w-5 text-gray-400 absolute left-3 top-3.5" />
+                <Lock className="h-5 w-5 text-slate-400 absolute left-3 top-3.5" />
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-3.5 text-gray-400 hover:text-gray-600"
+                  className="absolute right-3 top-3.5 text-slate-400 hover:text-slate-600"
                 >
                   {showConfirmPassword ? (
                     <EyeOff className="h-5 w-5" />
@@ -260,11 +260,11 @@ const Register = () => {
                 required
                 checked={formData.agreeTerms}
                 onChange={handleInputChange}
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-slate-300"
               />
               <label
                 htmlFor="agreeTerms"
-                className="ml-2 block text-sm text-gray-900"
+                className="ml-2 block text-sm text-slate-900"
               >
                 Tôi đồng ý với{" "}
                 <a href="#" className="text-blue-600 hover:text-blue-500">
@@ -290,10 +290,10 @@ const Register = () => {
           <div className="mt-6">
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300" />
+                <div className="w-full border-t border-slate-300" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">
+                <span className="px-2 bg-white text-slate-500">
                   Hoặc đăng ký bằng
                 </span>
               </div>
@@ -303,7 +303,7 @@ const Register = () => {
               <button
                 type="button"
                 onClick={handleGoogleLogin}
-                className="w-full inline-flex justify-center py-3 px-4 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 transition-colors"
+                className="w-full inline-flex justify-center py-3 px-4 border border-slate-300 bg-white text-sm font-medium text-slate-500 hover:bg-slate-50 transition-colors"
               >
                 <svg className="h-5 w-5 text-red-500" viewBox="0 0 24 24">
                   <path
@@ -329,7 +329,7 @@ const Register = () => {
               <button
                 type="button"
                 onClick={handleFacebookLogin}
-                className="w-full inline-flex justify-center py-3 px-4 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 transition-colors"
+                className="w-full inline-flex justify-center py-3 px-4 border border-slate-300 bg-white text-sm font-medium text-slate-500 hover:bg-slate-50 transition-colors"
               >
                 <svg
                   className="h-5 w-5 text-blue-600"

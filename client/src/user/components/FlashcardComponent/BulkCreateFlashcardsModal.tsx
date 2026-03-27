@@ -270,27 +270,27 @@ Goodbye,Tạm biệt,/ɡʊdˈbaɪ/,Goodbye my friend,easy`;
           <div className="flex-1 overflow-auto p-6" ref={tableRef}>
             <div className="overflow-x-auto">
               <table className="w-full border-collapse">
-                <thead className="sticky top-0 bg-gray-100 z-10">
+                <thead className="sticky top-0 bg-slate-100 z-10">
                   <tr>
-                    <th className="border border-gray-300 px-3 py-2 text-left text-sm font-semibold text-gray-700 w-12">
+                    <th className="border border-slate-300 px-3 py-2 text-left text-sm font-semibold text-slate-700 w-12">
                       STT
                     </th>
-                    <th className="border border-gray-300 px-3 py-2 text-left text-sm font-semibold text-gray-700 min-w-[200px]">
+                    <th className="border border-slate-300 px-3 py-2 text-left text-sm font-semibold text-slate-700 min-w-[200px]">
                       Mặt trước <span className="text-red-500">*</span>
                     </th>
-                    <th className="border border-gray-300 px-3 py-2 text-left text-sm font-semibold text-gray-700 min-w-[200px]">
+                    <th className="border border-slate-300 px-3 py-2 text-left text-sm font-semibold text-slate-700 min-w-[200px]">
                       Mặt sau <span className="text-red-500">*</span>
                     </th>
-                    <th className="border border-gray-300 px-3 py-2 text-left text-sm font-semibold text-gray-700 min-w-[120px]">
+                    <th className="border border-slate-300 px-3 py-2 text-left text-sm font-semibold text-slate-700 min-w-[120px]">
                       Phát âm
                     </th>
-                    <th className="border border-gray-300 px-3 py-2 text-left text-sm font-semibold text-gray-700 min-w-[200px]">
+                    <th className="border border-slate-300 px-3 py-2 text-left text-sm font-semibold text-slate-700 min-w-[200px]">
                       Ví dụ
                     </th>
-                    <th className="border border-gray-300 px-3 py-2 text-left text-sm font-semibold text-gray-700 w-32">
+                    <th className="border border-slate-300 px-3 py-2 text-left text-sm font-semibold text-slate-700 w-32">
                       Độ khó
                     </th>
-                    <th className="border border-gray-300 px-3 py-2 text-center text-sm font-semibold text-gray-700 w-16">
+                    <th className="border border-slate-300 px-3 py-2 text-center text-sm font-semibold text-slate-700 w-16">
                       Xóa
                     </th>
                   </tr>
@@ -299,15 +299,15 @@ Goodbye,Tạm biệt,/ɡʊdˈbaɪ/,Goodbye my friend,easy`;
                   {flashcards.map((flashcard, index) => (
                     <tr
                       key={flashcard.id}
-                      className="hover:bg-gray-50 transition-colors"
+                      className="hover:bg-slate-50 transition-colors"
                     >
                       {/* STT */}
-                      <td className="border border-gray-300 px-3 py-2 text-center text-sm text-gray-600 font-medium">
+                      <td className="border border-slate-300 px-3 py-2 text-center text-sm text-slate-600 font-medium">
                         {index + 1}
                       </td>
 
                       {/* Front Content */}
-                      <td className="border border-gray-300 p-1">
+                      <td className="border border-slate-300 p-1">
                         <textarea
                           value={flashcard.front_content}
                           onChange={(e) =>
@@ -324,7 +324,7 @@ Goodbye,Tạm biệt,/ɡʊdˈbaɪ/,Goodbye my friend,easy`;
                       </td>
 
                       {/* Back Content */}
-                      <td className="border border-gray-300 p-1">
+                      <td className="border border-slate-300 p-1">
                         <textarea
                           value={flashcard.back_content}
                           onChange={(e) =>
@@ -341,7 +341,7 @@ Goodbye,Tạm biệt,/ɡʊdˈbaɪ/,Goodbye my friend,easy`;
                       </td>
 
                       {/* Pronunciation */}
-                      <td className="border border-gray-300 p-1">
+                      <td className="border border-slate-300 p-1">
                         <input
                           type="text"
                           value={flashcard.pronunciation || ""}
@@ -358,7 +358,7 @@ Goodbye,Tạm biệt,/ɡʊdˈbaɪ/,Goodbye my friend,easy`;
                       </td>
 
                       {/* Example */}
-                      <td className="border border-gray-300 p-1">
+                      <td className="border border-slate-300 p-1">
                         <textarea
                           value={flashcard.example || ""}
                           onChange={(e) =>
@@ -375,7 +375,7 @@ Goodbye,Tạm biệt,/ɡʊdˈbaɪ/,Goodbye my friend,easy`;
                       </td>
 
                       {/* Difficulty Level */}
-                      <td className="border border-gray-300 p-1">
+                      <td className="border border-slate-300 p-1">
                         <select
                           value={flashcard.difficulty_level || ""}
                           onChange={(e) =>
@@ -395,7 +395,7 @@ Goodbye,Tạm biệt,/ɡʊdˈbaɪ/,Goodbye my friend,easy`;
                       </td>
 
                       {/* Delete Button */}
-                      <td className="border border-gray-300 px-2 py-1 text-center">
+                      <td className="border border-slate-300 px-2 py-1 text-center">
                         <button
                           type="button"
                           onClick={() => removeFlashcard(flashcard.id)}
@@ -424,12 +424,12 @@ Goodbye,Tạm biệt,/ɡʊdˈbaɪ/,Goodbye my friend,easy`;
           </div>
 
           {/* Footer Buttons */}
-          <div className="border-t bg-gray-50 p-6">
+          <div className="border-t bg-slate-50 p-6">
             <div className="flex gap-4">
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors font-medium"
+                className="flex-1 px-6 py-3 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-100 transition-colors font-medium"
                 disabled={loading}
               >
                 Hủy

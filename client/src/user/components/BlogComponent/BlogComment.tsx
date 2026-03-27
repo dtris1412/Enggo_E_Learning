@@ -148,30 +148,30 @@ const BlogComment: React.FC<BlogCommentProps> = ({
                 className="w-10 h-10 rounded-full"
               />
             ) : (
-              <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
-                <User className="h-5 w-5 text-gray-600" />
+              <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center">
+                <User className="h-5 w-5 text-slate-600" />
               </div>
             )}
           </div>
 
           {/* Content */}
           <div className="flex-1">
-            <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+            <div className="bg-slate-50 rounded-lg p-4 border border-slate-200">
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="font-semibold text-gray-900">
+                  <span className="font-semibold text-slate-900">
                     {comment.User?.user_name || "User"}
                   </span>
                   {isAuthor && (
-                    <span className="px-2 py-0.5 bg-gray-800 text-white text-xs font-medium rounded">
+                    <span className="px-2 py-0.5 bg-slate-800 text-white text-xs font-medium rounded">
                       Tác giả
                     </span>
                   )}
-                  <span className="text-sm text-gray-500">
+                  <span className="text-sm text-slate-500">
                     {formatDate(comment.created_at)}
                   </span>
                   {comment.updated_at !== comment.created_at && (
-                    <span className="text-xs text-gray-400">
+                    <span className="text-xs text-slate-400">
                       (đã chỉnh sửa)
                     </span>
                   )}
@@ -182,7 +182,7 @@ const BlogComment: React.FC<BlogCommentProps> = ({
                   <div className="flex gap-2">
                     <button
                       onClick={() => startEdit(comment)}
-                      className="text-gray-500 hover:text-blue-600 p-1"
+                      className="text-slate-500 hover:text-blue-600 p-1"
                       title="Chỉnh sửa"
                     >
                       <Edit className="h-4 w-4" />
@@ -191,7 +191,7 @@ const BlogComment: React.FC<BlogCommentProps> = ({
                       onClick={() =>
                         handleDeleteComment(comment.blog_comment_id)
                       }
-                      className="text-gray-500 hover:text-red-600 p-1"
+                      className="text-slate-500 hover:text-red-600 p-1"
                       title="Xóa"
                     >
                       <Trash2 className="h-4 w-4" />
@@ -206,7 +206,7 @@ const BlogComment: React.FC<BlogCommentProps> = ({
                   <textarea
                     value={editContent}
                     onChange={(e) => setEditContent(e.target.value)}
-                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-gray-400 focus:border-gray-400 text-sm"
+                    className="w-full p-2 border border-slate-300 rounded-md focus:ring-1 focus:ring-slate-400 focus:border-slate-400 text-sm"
                     rows={3}
                   />
                   <div className="flex gap-2 mt-2">
@@ -215,20 +215,20 @@ const BlogComment: React.FC<BlogCommentProps> = ({
                         handleUpdateComment(comment.blog_comment_id)
                       }
                       disabled={submitting}
-                      className="px-4 py-1.5 bg-gray-800 text-white rounded-md hover:bg-gray-700 disabled:opacity-50 text-sm"
+                      className="px-4 py-1.5 bg-slate-800 text-white rounded-md hover:bg-slate-700 disabled:opacity-50 text-sm"
                     >
                       Lưu
                     </button>
                     <button
                       onClick={cancelEdit}
-                      className="px-4 py-1.5 bg-white border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 text-sm"
+                      className="px-4 py-1.5 bg-white border border-slate-300 text-slate-700 rounded-md hover:bg-slate-50 text-sm"
                     >
                       Hủy
                     </button>
                   </div>
                 </div>
               ) : (
-                <p className="text-gray-700 whitespace-pre-wrap">
+                <p className="text-slate-700 whitespace-pre-wrap">
                   {comment.comment_content}
                 </p>
               )}
@@ -238,7 +238,7 @@ const BlogComment: React.FC<BlogCommentProps> = ({
             {!isEditing && currentUserId && (
               <button
                 onClick={() => setReplyTo(comment.blog_comment_id)}
-                className="text-sm text-gray-600 hover:text-gray-900 flex items-center gap-1 mt-2"
+                className="text-sm text-slate-600 hover:text-slate-900 flex items-center gap-1 mt-2"
               >
                 <Reply className="h-3 w-3" />
                 Trả lời
@@ -252,14 +252,14 @@ const BlogComment: React.FC<BlogCommentProps> = ({
                   value={replyContent}
                   onChange={(e) => setReplyContent(e.target.value)}
                   placeholder="Viết phản hồi..."
-                  className="w-full p-3 border border-gray-300 rounded-md focus:ring-1 focus:ring-gray-400 focus:border-gray-400 text-sm"
+                  className="w-full p-3 border border-slate-300 rounded-md focus:ring-1 focus:ring-slate-400 focus:border-slate-400 text-sm"
                   rows={3}
                 />
                 <div className="flex gap-2 mt-2">
                   <button
                     onClick={() => handleSubmitReply(comment.blog_comment_id)}
                     disabled={submitting || !replyContent.trim()}
-                    className="px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700 disabled:opacity-50 text-sm"
+                    className="px-4 py-2 bg-slate-800 text-white rounded-md hover:bg-slate-700 disabled:opacity-50 text-sm"
                   >
                     Gửi
                   </button>
@@ -268,7 +268,7 @@ const BlogComment: React.FC<BlogCommentProps> = ({
                       setReplyTo(null);
                       setReplyContent("");
                     }}
-                    className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 text-sm"
+                    className="px-4 py-2 bg-white border border-slate-300 text-slate-700 rounded-md hover:bg-slate-50 text-sm"
                   >
                     Hủy
                   </button>
@@ -296,7 +296,7 @@ const BlogComment: React.FC<BlogCommentProps> = ({
 
   return (
     <div className="bg-white rounded-lg shadow-sm p-6">
-      <h3 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+      <h3 className="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
         <MessageSquare className="h-5 w-5" />
         Bình luận ({comments.length})
       </h3>
@@ -308,26 +308,26 @@ const BlogComment: React.FC<BlogCommentProps> = ({
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
             placeholder="Viết bình luận của bạn..."
-            className="w-full p-4 border border-gray-300 rounded-md focus:ring-1 focus:ring-gray-400 focus:border-gray-400 text-sm"
+            className="w-full p-4 border border-slate-300 rounded-md focus:ring-1 focus:ring-slate-400 focus:border-slate-400 text-sm"
             rows={4}
           />
           <div className="mt-3 flex justify-end">
             <button
               type="submit"
               disabled={submitting || !newComment.trim()}
-              className="px-6 py-2.5 bg-gray-800 text-white rounded-md hover:bg-gray-700 disabled:opacity-50 font-medium text-sm"
+              className="px-6 py-2.5 bg-slate-800 text-white rounded-md hover:bg-slate-700 disabled:opacity-50 font-medium text-sm"
             >
               {submitting ? "Đang gửi..." : "Gửi bình luận"}
             </button>
           </div>
         </form>
       ) : (
-        <div className="mb-8 p-4 bg-gray-50 rounded-md text-center border border-gray-200">
-          <p className="text-gray-600 text-sm">
+        <div className="mb-8 p-4 bg-slate-50 rounded-md text-center border border-slate-200">
+          <p className="text-slate-600 text-sm">
             Vui lòng{" "}
             <a
               href="/login"
-              className="text-gray-800 hover:underline font-medium"
+              className="text-slate-800 hover:underline font-medium"
             >
               đăng nhập
             </a>{" "}
@@ -339,8 +339,8 @@ const BlogComment: React.FC<BlogCommentProps> = ({
       {/* Comments List */}
       <div>
         {comments.length === 0 ? (
-          <div className="text-center py-12 text-gray-500">
-            <MessageSquare className="h-12 w-12 mx-auto mb-3 text-gray-400" />
+          <div className="text-center py-12 text-slate-500">
+            <MessageSquare className="h-12 w-12 mx-auto mb-3 text-slate-400" />
             <p>Chưa có bình luận nào. Hãy là người đầu tiên!</p>
           </div>
         ) : (

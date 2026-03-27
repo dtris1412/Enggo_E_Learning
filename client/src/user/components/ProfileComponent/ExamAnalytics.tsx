@@ -71,7 +71,7 @@ const WeaknessBar: React.FC<{ weakness: WeaknessType; max: number }> = ({
   const pct = max > 0 ? (weakness.wrong_count / max) * 100 : 0;
   return (
     <div className="space-y-1">
-      <div className="flex justify-between text-xs text-gray-600">
+      <div className="flex justify-between text-xs text-slate-600">
         <span className="truncate max-w-[80%]">
           {QUESTION_TYPE_LABELS[weakness.type] ?? weakness.type}
         </span>
@@ -79,7 +79,7 @@ const WeaknessBar: React.FC<{ weakness: WeaknessType; max: number }> = ({
           {weakness.wrong_count} sai
         </span>
       </div>
-      <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+      <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
         <div
           className="h-full bg-red-400 rounded-full transition-all duration-500"
           style={{ width: `${pct}%` }}
@@ -93,11 +93,11 @@ const WeaknessBar: React.FC<{ weakness: WeaknessType; max: number }> = ({
 const AIAnalysisText: React.FC<{ text: string }> = ({ text }) => {
   const lines = text.split("\n");
   return (
-    <div className="space-y-1 text-sm text-gray-700 leading-relaxed">
+    <div className="space-y-1 text-sm text-slate-700 leading-relaxed">
       {lines.map((line, i) => {
         if (line.startsWith("### "))
           return (
-            <p key={i} className="font-bold text-gray-800 text-base mt-3">
+            <p key={i} className="font-bold text-slate-800 text-base mt-3">
               {line.replace("### ", "")}
             </p>
           );
@@ -109,7 +109,7 @@ const AIAnalysisText: React.FC<{ text: string }> = ({ text }) => {
           );
         if (line.startsWith("**") && line.endsWith("**"))
           return (
-            <p key={i} className="font-semibold text-gray-800 mt-2">
+            <p key={i} className="font-semibold text-slate-800 mt-2">
               {line.replace(/\*\*/g, "")}
             </p>
           );
@@ -220,7 +220,7 @@ const ExamAnalytics: React.FC = () => {
     return (
       <div className="bg-white rounded-lg shadow-md p-12 flex items-center justify-center">
         <Loader2 className="w-8 h-8 text-blue-500 animate-spin mr-3" />
-        <span className="text-gray-500">Đang tải thống kê...</span>
+        <span className="text-slate-500">Đang tải thống kê...</span>
       </div>
     );
   }
@@ -257,9 +257,9 @@ const ExamAnalytics: React.FC = () => {
 
       {totalExams === 0 ? (
         <div className="bg-white rounded-lg shadow-md p-12 text-center">
-          <BookOpen className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <p className="text-gray-500 text-lg">Chưa có dữ liệu thống kê.</p>
-          <p className="text-gray-400 text-sm mt-1">
+          <BookOpen className="w-16 h-16 text-slate-300 mx-auto mb-4" />
+          <p className="text-slate-500 text-lg">Chưa có dữ liệu thống kê.</p>
+          <p className="text-slate-400 text-sm mt-1">
             Hãy hoàn thành ít nhất một bài thi để xem phân tích.
           </p>
         </div>
@@ -267,20 +267,20 @@ const ExamAnalytics: React.FC = () => {
         <>
           {/* ===== Overview Cards ===== */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+            <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-4">
               <div className="flex items-center gap-2 mb-2">
                 <Target className="w-4 h-4 text-blue-500" />
-                <span className="text-xs text-gray-500 font-medium">
+                <span className="text-xs text-slate-500 font-medium">
                   Số đề đã thi
                 </span>
               </div>
-              <p className="text-3xl font-bold text-gray-800">{totalExams}</p>
+              <p className="text-3xl font-bold text-slate-800">{totalExams}</p>
             </div>
 
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+            <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-4">
               <div className="flex items-center gap-2 mb-2">
                 <TrendingUp className="w-4 h-4 text-green-500" />
-                <span className="text-xs text-gray-500 font-medium">
+                <span className="text-xs text-slate-500 font-medium">
                   Trung bình đúng
                 </span>
               </div>
@@ -291,10 +291,10 @@ const ExamAnalytics: React.FC = () => {
               </p>
             </div>
 
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+            <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-4">
               <div className="flex items-center gap-2 mb-2">
                 <CheckCircle className="w-4 h-4 text-emerald-500" />
-                <span className="text-xs text-gray-500 font-medium">
+                <span className="text-xs text-slate-500 font-medium">
                   Tổng câu đúng
                 </span>
               </div>
@@ -303,10 +303,10 @@ const ExamAnalytics: React.FC = () => {
               </p>
             </div>
 
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+            <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-4">
               <div className="flex items-center gap-2 mb-2">
                 <XCircle className="w-4 h-4 text-red-400" />
-                <span className="text-xs text-gray-500 font-medium">
+                <span className="text-xs text-slate-500 font-medium">
                   Tổng câu sai
                 </span>
               </div>
@@ -316,10 +316,10 @@ const ExamAnalytics: React.FC = () => {
 
           {/* ===== Top Weakness Types ===== */}
           {topWeaknesses.length > 0 && (
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
               <div className="flex items-center gap-2 mb-4">
                 <TrendingDown className="w-5 h-5 text-red-500" />
-                <h3 className="font-bold text-gray-800">
+                <h3 className="font-bold text-slate-800">
                   Dạng câu hỏi yếu nhất (tổng hợp)
                 </h3>
               </div>
@@ -332,10 +332,10 @@ const ExamAnalytics: React.FC = () => {
           )}
 
           {/* ===== Per-Exam Stats List ===== */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+          <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
             <div className="flex items-center gap-2 mb-4">
               <BarChart2 className="w-5 h-5 text-indigo-600" />
-              <h3 className="font-bold text-gray-800">Thống kê theo từng đề</h3>
+              <h3 className="font-bold text-slate-800">Thống kê theo từng đề</h3>
             </div>
 
             <div className="space-y-3">
@@ -346,14 +346,14 @@ const ExamAnalytics: React.FC = () => {
                 return (
                   <div
                     key={stat.exam_id}
-                    className="border border-gray-100 rounded-lg overflow-hidden"
+                    className="border border-slate-100 rounded-lg overflow-hidden"
                   >
                     {/* Row header */}
                     <button
                       onClick={() =>
                         setExpandedStat(isExpanded ? null : stat.exam_id)
                       }
-                      className="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition text-left"
+                      className="w-full flex items-center justify-between p-4 hover:bg-slate-50 transition text-left"
                     >
                       <div className="flex items-center gap-3 flex-1 min-w-0">
                         <span
@@ -361,7 +361,7 @@ const ExamAnalytics: React.FC = () => {
                         >
                           {stat.exam_type}
                         </span>
-                        <span className="font-medium text-gray-800 text-sm truncate">
+                        <span className="font-medium text-slate-800 text-sm truncate">
                           {stat.exam_title}
                         </span>
                       </div>
@@ -372,23 +372,23 @@ const ExamAnalytics: React.FC = () => {
                           >
                             {stat.accuracy_rate}%
                           </p>
-                          <p className="text-xs text-gray-400">
+                          <p className="text-xs text-slate-400">
                             {stat.total_correct}/
                             {stat.total_correct + stat.total_wrong}
                           </p>
                         </div>
                         <ChevronDown
-                          className={`w-4 h-4 text-gray-400 transition-transform ${isExpanded ? "rotate-180" : ""}`}
+                          className={`w-4 h-4 text-slate-400 transition-transform ${isExpanded ? "rotate-180" : ""}`}
                         />
                       </div>
                     </button>
 
                     {/* Expanded details */}
                     {isExpanded && (
-                      <div className="border-t border-gray-100 p-4 bg-gray-50 space-y-3">
+                      <div className="border-t border-slate-100 p-4 bg-slate-50 space-y-3">
                         {/* Progress bar */}
                         <div>
-                          <div className="flex justify-between text-xs mb-1 text-gray-600">
+                          <div className="flex justify-between text-xs mb-1 text-slate-600">
                             <span>
                               <span className="text-emerald-600 font-medium">
                                 {stat.total_correct} đúng
@@ -398,14 +398,14 @@ const ExamAnalytics: React.FC = () => {
                                 {stat.total_wrong} sai
                               </span>
                             </span>
-                            <span className="text-gray-400">
+                            <span className="text-slate-400">
                               Cập nhật:{" "}
                               {new Date(stat.updated_at).toLocaleDateString(
                                 "vi-VN",
                               )}
                             </span>
                           </div>
-                          <div className="h-2 bg-gray-200 rounded-full overflow-hidden flex">
+                          <div className="h-2 bg-slate-200 rounded-full overflow-hidden flex">
                             <div
                               className="h-full bg-emerald-500"
                               style={{
@@ -419,7 +419,7 @@ const ExamAnalytics: React.FC = () => {
                         {/* Weakness types for this exam */}
                         {stat.weakness_types?.length > 0 && (
                           <div>
-                            <p className="text-xs font-semibold text-gray-600 mb-2">
+                            <p className="text-xs font-semibold text-slate-600 mb-2">
                               Dạng câu yếu:
                             </p>
                             <div className="space-y-2">
@@ -442,10 +442,10 @@ const ExamAnalytics: React.FC = () => {
           </div>
 
           {/* ===== AI Analysis Section ===== */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+          <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
             <div className="flex items-center gap-2 mb-4">
               <Brain className="w-5 h-5 text-purple-600" />
-              <h3 className="font-bold text-gray-800">
+              <h3 className="font-bold text-slate-800">
                 Phân tích AI & Lộ trình học
               </h3>
               <span className="ml-auto text-xs bg-purple-100 text-purple-600 px-2 py-0.5 rounded-full font-medium">
@@ -453,7 +453,7 @@ const ExamAnalytics: React.FC = () => {
               </span>
             </div>
 
-            <p className="text-sm text-gray-500 mb-4">
+            <p className="text-sm text-slate-500 mb-4">
               Chọn một bài thi đã hoàn thành để AI phân tích chi tiết điểm
               mạnh/yếu và đề xuất lộ trình học cá nhân hóa.
             </p>
@@ -468,7 +468,7 @@ const ExamAnalytics: React.FC = () => {
                     e.target.value ? Number(e.target.value) : null,
                   );
                 }}
-                className="flex-1 px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-400 focus:outline-none bg-white"
+                className="flex-1 px-3 py-2 text-sm border border-slate-200 rounded-lg focus:ring-2 focus:ring-purple-400 focus:outline-none bg-white"
               >
                 <option value="">-- Chọn bài thi --</option>
                 {examHistory.map((e) => (
@@ -580,7 +580,7 @@ const ExamAnalytics: React.FC = () => {
                                       "giảm",
                                     )
                                   ? "text-red-500"
-                                  : "text-gray-600"
+                                  : "text-slate-600"
                             }`}
                           >
                             {aiAnalysis.historical_context.progress_trend
@@ -640,7 +640,7 @@ const ExamAnalytics: React.FC = () => {
                 </div>
 
                 {/* Token info */}
-                <p className="text-right text-xs text-gray-400">
+                <p className="text-right text-xs text-slate-400">
                   Đã dùng {aiAnalysis.token_usage.ai_tokens_used} AI token (
                   {aiAnalysis.token_usage.openai_tokens_used} OpenAI tokens)
                 </p>
@@ -663,10 +663,10 @@ const ExamAnalytics: React.FC = () => {
                             className="flex items-center justify-between bg-white border border-emerald-100 rounded-lg px-4 py-3 hover:border-emerald-400 hover:shadow-sm transition group"
                           >
                             <div className="min-w-0">
-                              <p className="font-medium text-sm text-gray-800 truncate group-hover:text-emerald-700">
+                              <p className="font-medium text-sm text-slate-800 truncate group-hover:text-emerald-700">
                                 {r.roadmap_title}
                               </p>
-                              <p className="text-xs text-gray-400 mt-0.5">
+                              <p className="text-xs text-slate-400 mt-0.5">
                                 {r.certificate_name && (
                                   <span className="mr-2">
                                     {r.certificate_name}
@@ -690,7 +690,7 @@ const ExamAnalytics: React.FC = () => {
                                 )}
                               </p>
                             </div>
-                            <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-emerald-600 flex-shrink-0 ml-2" />
+                            <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-emerald-600 flex-shrink-0 ml-2" />
                           </a>
                         ),
                       )}
@@ -716,10 +716,10 @@ const ExamAnalytics: React.FC = () => {
                             className="flex items-center justify-between bg-white border border-indigo-100 rounded-lg px-4 py-3 hover:border-indigo-400 hover:shadow-sm transition group"
                           >
                             <div className="min-w-0">
-                              <p className="font-medium text-sm text-gray-800 truncate group-hover:text-indigo-700">
+                              <p className="font-medium text-sm text-slate-800 truncate group-hover:text-indigo-700">
                                 {c.course_title}
                               </p>
-                              <p className="text-xs text-gray-400 mt-0.5">
+                              <p className="text-xs text-slate-400 mt-0.5">
                                 <span
                                   className={`px-1.5 py-0.5 rounded-full text-xs font-medium mr-2 ${
                                     c.course_level === "beginner"
@@ -743,7 +743,7 @@ const ExamAnalytics: React.FC = () => {
                                 )}
                               </p>
                             </div>
-                            <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-indigo-600 flex-shrink-0 ml-2" />
+                            <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-indigo-600 flex-shrink-0 ml-2" />
                           </a>
                         ),
                       )}
@@ -755,7 +755,7 @@ const ExamAnalytics: React.FC = () => {
 
             {/* Empty state */}
             {!loadingAI && !aiAnalysis && !errorAI && (
-              <div className="text-center py-8 text-gray-400">
+              <div className="text-center py-8 text-slate-400">
                 <Brain className="w-12 h-12 mx-auto mb-2 opacity-30" />
                 <p className="text-sm">
                   Chọn bài thi và nhấn <strong>Phân tích</strong> để bắt đầu.

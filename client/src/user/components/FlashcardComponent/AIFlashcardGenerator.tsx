@@ -223,10 +223,10 @@ const AIFlashcardGenerator: React.FC = () => {
             <Sparkles className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-gray-800">
+            <h1 className="text-2xl font-bold text-slate-800">
               Tạo Flashcard bằng AI
             </h1>
-            <p className="text-gray-600 text-sm">
+            <p className="text-slate-600 text-sm">
               Nhập chủ đề và để AI tạo bộ flashcard hoàn chỉnh cho bạn
             </p>
           </div>
@@ -235,7 +235,7 @@ const AIFlashcardGenerator: React.FC = () => {
         {/* Input Form */}
         <div className="space-y-4 mb-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-slate-700 mb-2">
               Chủ đề *
             </label>
             <input
@@ -243,14 +243,14 @@ const AIFlashcardGenerator: React.FC = () => {
               value={topic}
               onChange={(e) => setTopic(e.target.value)}
               placeholder="Ví dụ: Từ vựng tiếng Anh về du lịch, Công thức toán học lớp 12..."
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               disabled={isGenerating}
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-slate-700 mb-2">
                 Số lượng flashcard
               </label>
               <input
@@ -259,13 +259,13 @@ const AIFlashcardGenerator: React.FC = () => {
                 onChange={(e) => setCardCount(Number(e.target.value))}
                 min="5"
                 max="50"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 disabled={isGenerating}
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-slate-700 mb-2">
                 Độ khó
               </label>
               <select
@@ -273,7 +273,7 @@ const AIFlashcardGenerator: React.FC = () => {
                 onChange={(e) =>
                   setDifficulty(e.target.value as "easy" | "medium" | "hard")
                 }
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 disabled={isGenerating}
               >
                 <option value="easy">Dễ</option>
@@ -284,7 +284,7 @@ const AIFlashcardGenerator: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-slate-700 mb-2">
               Thông tin bổ sung (tùy chọn)
             </label>
             <textarea
@@ -292,7 +292,7 @@ const AIFlashcardGenerator: React.FC = () => {
               onChange={(e) => setAdditionalContext(e.target.value)}
               placeholder="Thêm yêu cầu đặc biệt, ngữ cảnh, hoặc định dạng mong muốn..."
               rows={3}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               disabled={isGenerating}
             />
           </div>
@@ -320,14 +320,14 @@ const AIFlashcardGenerator: React.FC = () => {
         {generatedData && (
           <div className="border-t pt-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold text-gray-800">
+              <h2 className="text-xl font-bold text-slate-800">
                 Xem trước Flashcard Set
               </h2>
               <div className="flex gap-2">
                 <button
                   onClick={handleGenerate}
                   disabled={isGenerating || isSaving}
-                  className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50 flex items-center gap-2"
+                  className="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 disabled:opacity-50 flex items-center gap-2"
                 >
                   <RefreshCw className="w-4 h-4" />
                   Tạo lại
@@ -353,11 +353,11 @@ const AIFlashcardGenerator: React.FC = () => {
             </div>
 
             {/* Set Info */}
-            <div className="bg-gray-50 rounded-lg p-4 mb-4">
+            <div className="bg-slate-50 rounded-lg p-4 mb-4">
               {editingSetInfo && editedSetInfo ? (
                 <div className="space-y-3">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-slate-700 mb-1">
                       Tiêu đề
                     </label>
                     <input
@@ -369,11 +369,11 @@ const AIFlashcardGenerator: React.FC = () => {
                           title: e.target.value,
                         })
                       }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-slate-700 mb-1">
                       Mô tả
                     </label>
                     <textarea
@@ -385,7 +385,7 @@ const AIFlashcardGenerator: React.FC = () => {
                         })
                       }
                       rows={2}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg"
                     />
                   </div>
                   <div className="flex gap-2">
@@ -398,7 +398,7 @@ const AIFlashcardGenerator: React.FC = () => {
                     </button>
                     <button
                       onClick={cancelEditingSetInfo}
-                      className="px-3 py-1 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 flex items-center gap-1"
+                      className="px-3 py-1 bg-slate-300 text-slate-700 rounded-lg hover:bg-slate-400 flex items-center gap-1"
                     >
                       <X className="w-4 h-4" />
                       Hủy
@@ -408,20 +408,20 @@ const AIFlashcardGenerator: React.FC = () => {
               ) : (
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-lg font-bold text-gray-800">
+                    <h3 className="text-lg font-bold text-slate-800">
                       {generatedData.set_info.title}
                     </h3>
                     <button
                       onClick={startEditingSetInfo}
-                      className="p-2 text-gray-600 hover:bg-gray-200 rounded-lg"
+                      className="p-2 text-slate-600 hover:bg-slate-200 rounded-lg"
                     >
                       <Edit2 className="w-4 h-4" />
                     </button>
                   </div>
-                  <p className="text-gray-600 text-sm">
+                  <p className="text-slate-600 text-sm">
                     {generatedData.set_info.description}
                   </p>
-                  <p className="text-gray-500 text-xs mt-2">
+                  <p className="text-slate-500 text-xs mt-2">
                     {generatedData.flashcards.length} flashcards
                   </p>
                 </div>
@@ -433,12 +433,12 @@ const AIFlashcardGenerator: React.FC = () => {
               {generatedData.flashcards.map((card, index) => (
                 <div
                   key={index}
-                  className="border border-gray-200 rounded-lg p-4 hover:border-purple-300 transition-colors"
+                  className="border border-slate-200 rounded-lg p-4 hover:border-purple-300 transition-colors"
                 >
                   {editingIndex === index && editedCard ? (
                     <div className="space-y-3">
                       <div>
-                        <label className="block text-xs font-medium text-gray-700 mb-1">
+                        <label className="block text-xs font-medium text-slate-700 mb-1">
                           Mặt trước
                         </label>
                         <textarea
@@ -450,11 +450,11 @@ const AIFlashcardGenerator: React.FC = () => {
                             })
                           }
                           rows={2}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                          className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm"
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-medium text-gray-700 mb-1">
+                        <label className="block text-xs font-medium text-slate-700 mb-1">
                           Mặt sau
                         </label>
                         <textarea
@@ -466,11 +466,11 @@ const AIFlashcardGenerator: React.FC = () => {
                             })
                           }
                           rows={2}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                          className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm"
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-medium text-gray-700 mb-1">
+                        <label className="block text-xs font-medium text-slate-700 mb-1">
                           Ví dụ
                         </label>
                         <textarea
@@ -482,11 +482,11 @@ const AIFlashcardGenerator: React.FC = () => {
                             })
                           }
                           rows={2}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                          className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm"
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-medium text-gray-700 mb-1">
+                        <label className="block text-xs font-medium text-slate-700 mb-1">
                           Phiên âm (tùy chọn)
                         </label>
                         <input
@@ -499,7 +499,7 @@ const AIFlashcardGenerator: React.FC = () => {
                             })
                           }
                           placeholder="Ví dụ: /həˈloʊ/"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                          className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm"
                         />
                       </div>
                       <div className="flex gap-2">
@@ -512,7 +512,7 @@ const AIFlashcardGenerator: React.FC = () => {
                         </button>
                         <button
                           onClick={cancelEditingCard}
-                          className="px-3 py-1 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 flex items-center gap-1 text-sm"
+                          className="px-3 py-1 bg-slate-300 text-slate-700 rounded-lg hover:bg-slate-400 flex items-center gap-1 text-sm"
                         >
                           <X className="w-4 h-4" />
                           Hủy
@@ -524,33 +524,33 @@ const AIFlashcardGenerator: React.FC = () => {
                       <div className="flex items-start justify-between mb-2">
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">
-                            <span className="text-xs font-medium text-gray-500">
+                            <span className="text-xs font-medium text-slate-500">
                               #{index + 1}
                             </span>
                             <span className="text-xs px-2 py-0.5 bg-blue-100 text-blue-700 rounded">
                               {card.difficulty_level}
                             </span>
                           </div>
-                          <p className="font-medium text-gray-800 mb-1">
+                          <p className="font-medium text-slate-800 mb-1">
                             {card.front_content}
                           </p>
-                          <p className="text-gray-600 text-sm mb-2">
+                          <p className="text-slate-600 text-sm mb-2">
                             {card.back_content}
                           </p>
                           {card.example && (
-                            <p className="text-gray-500 text-xs italic">
+                            <p className="text-slate-500 text-xs italic">
                               💡 {card.example}
                             </p>
                           )}
                           {card.pronunciation && (
-                            <p className="text-gray-400 text-xs">
+                            <p className="text-slate-400 text-xs">
                               🔊 {card.pronunciation}
                             </p>
                           )}
                         </div>
                         <button
                           onClick={() => startEditingCard(index)}
-                          className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg"
+                          className="p-2 text-slate-600 hover:bg-slate-100 rounded-lg"
                         >
                           <Edit2 className="w-4 h-4" />
                         </button>

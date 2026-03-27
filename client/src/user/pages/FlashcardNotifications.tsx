@@ -118,7 +118,7 @@ const FlashcardNotifications: React.FC = () => {
       <FlashcardSidebar />
 
       {/* Main Content */}
-      <div className="flex-1 bg-gray-50">
+      <div className="flex-1 bg-slate-50">
         {/* Header */}
         <div className="bg-gradient-to-r from-indigo-700 via-purple-600 to-pink-600">
           <div className="container mx-auto px-4 py-12">
@@ -138,7 +138,7 @@ const FlashcardNotifications: React.FC = () => {
 
         {/* Stats Summary */}
         {!isLoading && totalDueCards > 0 && (
-          <div className="bg-white border-b border-gray-200">
+          <div className="bg-white border-b border-slate-200">
             <div className="container mx-auto px-4 py-6">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl">
                 <div className="flex items-center gap-4">
@@ -146,8 +146,8 @@ const FlashcardNotifications: React.FC = () => {
                     <AlertCircle className="w-6 h-6 text-red-600" />
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">Cards đến hạn</p>
-                    <p className="text-2xl font-bold text-gray-900">
+                    <p className="text-sm text-slate-600">Cards đến hạn</p>
+                    <p className="text-2xl font-bold text-slate-900">
                       {totalDueCards}
                     </p>
                   </div>
@@ -157,8 +157,8 @@ const FlashcardNotifications: React.FC = () => {
                     <BookOpen className="w-6 h-6 text-indigo-600" />
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">Sets</p>
-                    <p className="text-2xl font-bold text-gray-900">
+                    <p className="text-sm text-slate-600">Sets</p>
+                    <p className="text-2xl font-bold text-slate-900">
                       {totalSets}
                     </p>
                   </div>
@@ -168,7 +168,7 @@ const FlashcardNotifications: React.FC = () => {
                     <CheckCircle className="w-6 h-6 text-green-600" />
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">Sẵn sàng ôn tập</p>
+                    <p className="text-sm text-slate-600">Sẵn sàng ôn tập</p>
                     <p className="text-2xl font-bold text-green-600">
                       Bắt đầu ngay!
                     </p>
@@ -184,7 +184,7 @@ const FlashcardNotifications: React.FC = () => {
           {isLoading ? (
             <div className="text-center py-12">
               <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
-              <p className="mt-4 text-gray-600">Đang tải thông báo...</p>
+              <p className="mt-4 text-slate-600">Đang tải thông báo...</p>
             </div>
           ) : notifications.length > 0 ? (
             <div className="max-w-4xl space-y-4">
@@ -197,17 +197,17 @@ const FlashcardNotifications: React.FC = () => {
                 return (
                   <div
                     key={notification.flashcard_set_id}
-                    className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden"
+                    className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden"
                   >
                     {/* Set Header */}
                     <div className="p-6">
                       <div className="flex items-start justify-between mb-4">
                         <div className="flex-1">
-                          <h2 className="text-xl font-bold text-gray-900 mb-2">
+                          <h2 className="text-xl font-bold text-slate-900 mb-2">
                             {notification.set_title}
                           </h2>
                           {notification.set_description && (
-                            <p className="text-sm text-gray-600 mb-3">
+                            <p className="text-sm text-slate-600 mb-3">
                               {notification.set_description}
                             </p>
                           )}
@@ -222,7 +222,7 @@ const FlashcardNotifications: React.FC = () => {
                                 {notification.total_due} cards đến hạn
                               </span>
                             </div>
-                            <div className="inline-flex items-center gap-2 text-sm text-gray-600">
+                            <div className="inline-flex items-center gap-2 text-sm text-slate-600">
                               <Clock className="w-4 h-4" />
                               <span>
                                 Cũ nhất:{" "}
@@ -256,19 +256,19 @@ const FlashcardNotifications: React.FC = () => {
 
                     {/* Expanded Card List */}
                     {isExpanded && (
-                      <div className="border-t border-gray-200 bg-gray-50">
+                      <div className="border-t border-slate-200 bg-slate-50">
                         <div className="p-6 space-y-3">
                           {notification.due_cards.map((card) => (
                             <div
                               key={card.flashcard_id}
-                              className="bg-white rounded-lg p-4 border border-gray-200"
+                              className="bg-white rounded-lg p-4 border border-slate-200"
                             >
                               <div className="flex items-start justify-between gap-4">
                                 <div className="flex-1">
-                                  <p className="font-semibold text-gray-900 mb-2">
+                                  <p className="font-semibold text-slate-900 mb-2">
                                     {card.front_content}
                                   </p>
-                                  <p className="text-sm text-gray-600">
+                                  <p className="text-sm text-slate-600">
                                     {card.back_content}
                                   </p>
                                 </div>
@@ -280,7 +280,7 @@ const FlashcardNotifications: React.FC = () => {
                                   >
                                     {getUrgencyLabel(card.due_hours_ago)}
                                   </div>
-                                  <p className="text-xs text-gray-500 mt-1 text-right">
+                                  <p className="text-xs text-slate-500 mt-1 text-right">
                                     {formatDueTime(card.due_hours_ago)}
                                   </p>
                                 </div>
@@ -299,10 +299,10 @@ const FlashcardNotifications: React.FC = () => {
               <div className="inline-flex items-center justify-center w-20 h-20 bg-green-100 rounded-full mb-6">
                 <CheckCircle className="w-10 h-10 text-green-600" />
               </div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-3">
+              <h2 className="text-2xl font-bold text-slate-900 mb-3">
                 Bạn không có thông báo nào!
               </h2>
-              <p className="text-gray-600 mb-6">
+              <p className="text-slate-600 mb-6">
                 Tuyệt vời! Bạn đã ôn tập tất cả các cards đến hạn hoặc chưa có
                 cards nào cần ôn.
               </p>
@@ -316,7 +316,7 @@ const FlashcardNotifications: React.FC = () => {
                 </Link>
                 <Link
                   to="/flashcards/my-library"
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 rounded-lg transition-colors font-semibold"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 rounded-lg transition-colors font-semibold"
                 >
                   <TrendingUp className="w-4 h-4" />
                   Thư viện của tôi

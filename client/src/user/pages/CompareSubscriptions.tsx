@@ -36,13 +36,13 @@ const CompareSubscriptions = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-black to-slate-900 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
           <Link
             to="/subscription-plans"
-            className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition mb-4"
+            className="inline-flex items-center gap-2 text-slate-400 hover:text-white transition mb-4"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Quay lại</span>
@@ -55,7 +55,7 @@ const CompareSubscriptions = () => {
                 So sánh gói đăng ký
               </h1>
             </div>
-            <p className="text-base text-gray-400 max-w-2xl mx-auto">
+            <p className="text-base text-slate-400 max-w-2xl mx-auto">
               So sánh chi tiết tính năng và giá của các gói để chọn gói phù hợp
               nhất
             </p>
@@ -64,13 +64,13 @@ const CompareSubscriptions = () => {
 
         {/* Billing Type Selector */}
         <div className="flex justify-center mb-8">
-          <div className="inline-flex items-center bg-gray-900 rounded-full p-1 shadow-lg border border-gray-700">
+          <div className="inline-flex items-center bg-slate-900 rounded-full p-1 shadow-lg border border-slate-700">
             <button
               onClick={() => setBillingType("yearly")}
               className={`relative px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
                 billingType === "yearly"
-                  ? "bg-white text-gray-900 shadow-md"
-                  : "text-gray-400 hover:text-white"
+                  ? "bg-white text-slate-900 shadow-md"
+                  : "text-slate-400 hover:text-white"
               }`}
             >
               Hàng năm
@@ -84,8 +84,8 @@ const CompareSubscriptions = () => {
               onClick={() => setBillingType("monthly")}
               className={`relative px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
                 billingType === "monthly"
-                  ? "bg-white text-gray-900 shadow-md"
-                  : "text-gray-400 hover:text-white"
+                  ? "bg-white text-slate-900 shadow-md"
+                  : "text-slate-400 hover:text-white"
               }`}
             >
               Hàng tháng
@@ -99,8 +99,8 @@ const CompareSubscriptions = () => {
               onClick={() => setBillingType("weekly")}
               className={`relative px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
                 billingType === "weekly"
-                  ? "bg-white text-gray-900 shadow-md"
-                  : "text-gray-400 hover:text-white"
+                  ? "bg-white text-slate-900 shadow-md"
+                  : "text-slate-400 hover:text-white"
               }`}
             >
               Hàng tuần
@@ -143,7 +143,7 @@ const CompareSubscriptions = () => {
         {/* Empty State */}
         {!loading && !error && plans.length === 0 && (
           <div className="text-center py-20">
-            <p className="text-gray-400 text-lg">
+            <p className="text-slate-400 text-lg">
               Không có gói subscription nào để so sánh
             </p>
           </div>
@@ -155,7 +155,7 @@ const CompareSubscriptions = () => {
             <h3 className="text-xl font-semibold text-white mb-4">
               💡 Gợi ý chọn gói
             </h3>
-            <div className="grid md:grid-cols-3 gap-4 text-sm text-gray-300">
+            <div className="grid md:grid-cols-3 gap-4 text-sm text-slate-300">
               <div>
                 <span className="font-semibold text-blue-400">Free:</span>
                 <p className="mt-1">

@@ -70,11 +70,11 @@ const BlogLayout: React.FC<BlogLayoutProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-slate-50">
       {/* Header */}
       <div className="border-b bg-white">
         <div className="max-w-7xl mx-auto px-4 py-8">
-          <h1 className="text-3xl font-bold text-gray-800">Bài viết nổi bật</h1>
+          <h1 className="text-3xl font-bold text-slate-800">Bài viết nổi bật</h1>
         </div>
       </div>
 
@@ -84,7 +84,7 @@ const BlogLayout: React.FC<BlogLayoutProps> = ({
           {/* Left Sidebar - Chuyên mục / Filter */}
           <aside className="col-span-12 lg:col-span-2">
             <div className="bg-white rounded-lg p-4 lg:sticky lg:top-4 shadow-sm">
-              <h3 className="font-bold text-gray-800 mb-4 text-sm">
+              <h3 className="font-bold text-slate-800 mb-4 text-sm">
                 Chuyên mục
               </h3>
               {categories && onCategoryChange ? (
@@ -95,8 +95,8 @@ const BlogLayout: React.FC<BlogLayoutProps> = ({
                         onClick={() => onCategoryChange(cat.id)}
                         className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
                           selectedCategory === cat.id
-                            ? "bg-gray-800 text-white font-semibold"
-                            : "text-gray-600 hover:bg-gray-100"
+                            ? "bg-slate-800 text-white font-semibold"
+                            : "text-slate-600 hover:bg-slate-100"
                         }`}
                       >
                         {cat.name}
@@ -105,7 +105,7 @@ const BlogLayout: React.FC<BlogLayoutProps> = ({
                   ))}
                 </ul>
               ) : (
-                <p className="text-xs text-gray-400">Không có chuyên mục</p>
+                <p className="text-xs text-slate-400">Không có chuyên mục</p>
               )}
             </div>
           </aside>
@@ -118,7 +118,7 @@ const BlogLayout: React.FC<BlogLayoutProps> = ({
             <div className="space-y-4 lg:sticky lg:top-4">
               {/* Search Box */}
               <div className="bg-white rounded-lg p-4 shadow-sm">
-                <h3 className="font-bold text-gray-800 mb-3 text-sm">
+                <h3 className="font-bold text-slate-800 mb-3 text-sm">
                   Tìm kiếm bài viết
                 </h3>
                 <form onSubmit={handleSearch}>
@@ -128,11 +128,11 @@ const BlogLayout: React.FC<BlogLayoutProps> = ({
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                       placeholder="Nhập từ khóa..."
-                      className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400"
+                      className="w-full px-3 py-2 pr-10 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-slate-400 focus:border-slate-400"
                     />
                     <button
                       type="submit"
-                      className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
                     >
                       <Search className="h-4 w-4" />
                     </button>
@@ -142,7 +142,7 @@ const BlogLayout: React.FC<BlogLayoutProps> = ({
 
               {/* Tìm hiểu thêm */}
               <div className="bg-white rounded-lg p-4 shadow-sm">
-                <h3 className="font-bold text-gray-800 mb-3 text-sm">
+                <h3 className="font-bold text-slate-800 mb-3 text-sm">
                   Tìm hiểu thêm
                 </h3>
                 <div className="space-y-1">
@@ -150,14 +150,14 @@ const BlogLayout: React.FC<BlogLayoutProps> = ({
                     <Link
                       key={item.to}
                       to={item.to}
-                      className="flex items-center gap-3 p-2.5 hover:bg-gray-50 rounded-lg transition-colors group"
+                      className="flex items-center gap-3 p-2.5 hover:bg-slate-50 rounded-lg transition-colors group"
                     >
                       <div
                         className={`w-8 h-8 rounded-lg ${item.iconClass} flex items-center justify-center shrink-0`}
                       >
                         <item.icon className="w-4 h-4" />
                       </div>
-                      <span className="text-sm text-gray-700 group-hover:text-gray-900 font-medium">
+                      <span className="text-sm text-slate-700 group-hover:text-slate-900 font-medium">
                         {item.label}
                       </span>
                     </Link>

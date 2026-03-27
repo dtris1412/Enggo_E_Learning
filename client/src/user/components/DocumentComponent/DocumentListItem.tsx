@@ -50,7 +50,7 @@ const DocumentListItem: React.FC<DocumentListItemProps> = ({
       case "guideline":
         return "from-green-500 to-green-700";
       default:
-        return "from-gray-500 to-gray-700";
+        return "from-slate-500 to-slate-700";
     }
   };
 
@@ -96,7 +96,7 @@ const DocumentListItem: React.FC<DocumentListItemProps> = ({
           {/* Premium Badge */}
           {document.access_type === "premium" && (
             <div className="absolute top-2 right-2">
-              <span className="bg-yellow-400 text-gray-900 px-2 py-1 rounded flex items-center gap-1 text-xs font-bold">
+              <span className="bg-amber-400 text-slate-900 px-2 py-1 rounded flex items-center gap-1 text-xs font-bold">
                 <Lock className="w-3 h-3" />
                 PREMIUM
               </span>
@@ -105,7 +105,7 @@ const DocumentListItem: React.FC<DocumentListItemProps> = ({
 
           {/* File Type */}
           <div className="absolute bottom-2 left-2">
-            <span className="bg-white bg-opacity-90 text-gray-800 px-2 py-1 rounded text-xs font-semibold">
+            <span className="bg-white bg-opacity-90 text-slate-800 px-2 py-1 rounded text-xs font-semibold">
               {document.file_type?.toUpperCase() || "FILE"}
             </span>
           </div>
@@ -114,18 +114,18 @@ const DocumentListItem: React.FC<DocumentListItemProps> = ({
         {/* Content */}
         <div className="flex-1 p-4 flex flex-col justify-between">
           <div>
-            <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors line-clamp-2">
+            <h3 className="text-lg font-black text-slate-900 mb-2 group-hover:text-blue-600 transition-colors line-clamp-2">
               {document.document_name}
             </h3>
-            <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+            <p className="text-slate-500 text-sm mb-3 line-clamp-2">
               {document.document_description ||
                 "Tài liệu học tập chất lượng cao, được cập nhật liên tục từ các nguồn uy tín."}
             </p>
           </div>
 
           {/* Footer */}
-          <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-            <div className="flex items-center gap-4 text-sm text-gray-500">
+          <div className="flex items-center justify-between pt-3 border-t border-slate-100">
+            <div className="flex items-center gap-4 text-sm text-slate-500">
               <div className="flex items-center gap-1">
                 <Eye className="w-4 h-4" />
                 <span className="font-medium">{document.view_count || 0}</span>
@@ -145,7 +145,7 @@ const DocumentListItem: React.FC<DocumentListItemProps> = ({
 
             <button
               onClick={handleDownloadClick}
-              className="px-4 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-semibold flex items-center gap-2"
+              className="px-4 py-1.5 bg-gradient-to-r from-amber-400 to-orange-500 text-slate-900 rounded-xl hover:shadow-md transition-all text-sm font-bold flex items-center gap-2"
             >
               <Download className="w-4 h-4" />
               Tải xuống

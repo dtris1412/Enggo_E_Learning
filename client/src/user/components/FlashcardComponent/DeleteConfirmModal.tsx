@@ -35,24 +35,24 @@ const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
               <AlertTriangle className="w-6 h-6 text-red-600" />
             </div>
             <div className="flex-1">
-              <h3 className="text-xl font-bold text-gray-900">{title}</h3>
+              <h3 className="text-xl font-bold text-slate-900">{title}</h3>
             </div>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 transition-colors"
+              className="text-slate-400 hover:text-slate-600 transition-colors"
               disabled={loading}
             >
               <X className="w-6 h-6" />
             </button>
           </div>
 
-          <p className="text-gray-600 mb-6">{message}</p>
+          <p className="text-slate-600 mb-6">{message}</p>
 
           <div className="flex gap-3">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+              className="flex-1 px-6 py-3 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors font-medium"
               disabled={loading}
             >
               Hủy

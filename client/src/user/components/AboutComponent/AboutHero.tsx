@@ -2,14 +2,24 @@ import React from "react";
 
 const AboutHero: React.FC = () => {
   return (
-    <section className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="relative bg-slate-950 text-white py-24 overflow-hidden">
+      {/* Ambient blobs */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute -top-32 -left-32 w-[500px] h-[500px] bg-blue-700/20 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-violet-700/20 rounded-full blur-3xl" />
+      </div>
+
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center">
-          <h1 className="text-4xl lg:text-5xl font-bold mb-6">EnglishMaster</h1>
-          <p className="text-xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
-            Hệ thống luyện thi tiếng Anh ứng dụng trí tuệ nhân tạo - Cá nhân hóa
-            lộ trình học tập, nâng cao hiệu quả, tiết kiệm chi phí
-          </p>
+          <span className="inline-block text-amber-400 text-sm font-semibold uppercase tracking-wider mb-4">
+            Về chúng tôi
+          </span>
+          <h1 className="text-5xl lg:text-6xl font-black leading-tight mb-6">
+            <span className="text-white">Enggo</span>{" "}
+            <span className="bg-gradient-to-r from-amber-400 via-orange-400 to-rose-400 bg-clip-text text-transparent">
+              E-Learning
+            </span>
+          </h1>
         </div>
       </div>
     </section>

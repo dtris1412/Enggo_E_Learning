@@ -54,16 +54,16 @@ const LearningProgress: React.FC = () => {
     if (progress >= 80) return "bg-green-500";
     if (progress >= 50) return "bg-blue-500";
     if (progress >= 20) return "bg-yellow-500";
-    return "bg-gray-400";
+    return "bg-slate-400";
   };
 
   if (loading) {
     return (
       <div className="bg-white rounded-lg shadow-md p-8">
         <div className="animate-pulse space-y-4">
-          <div className="h-6 bg-gray-300 rounded w-1/3"></div>
-          <div className="h-24 bg-gray-300 rounded"></div>
-          <div className="h-24 bg-gray-300 rounded"></div>
+          <div className="h-6 bg-slate-300 rounded w-1/3"></div>
+          <div className="h-24 bg-slate-300 rounded"></div>
+          <div className="h-24 bg-slate-300 rounded"></div>
         </div>
       </div>
     );
@@ -92,8 +92,8 @@ const LearningProgress: React.FC = () => {
           <TrendingUp className="w-6 h-6 text-blue-600" />
         </div>
         <div>
-          <h2 className="text-2xl font-bold text-gray-800">Tiến độ học tập</h2>
-          <p className="text-gray-500 text-sm">
+          <h2 className="text-2xl font-bold text-slate-800">Tiến độ học tập</h2>
+          <p className="text-slate-500 text-sm">
             Theo dõi quá trình học tập của bạn
           </p>
         </div>
@@ -147,14 +147,14 @@ const LearningProgress: React.FC = () => {
       {/* Overall Progress */}
       <div className="mb-8 p-6 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg">
         <div className="flex justify-between items-center mb-2">
-          <span className="text-sm font-medium text-gray-700">
+          <span className="text-sm font-medium text-slate-700">
             Tiến độ trung bình
           </span>
           <span className="text-sm font-bold text-blue-600">
             {averageProgress.toFixed(1)}%
           </span>
         </div>
-        <div className="w-full bg-gray-200 rounded-full h-3">
+        <div className="w-full bg-slate-200 rounded-full h-3">
           <div
             className={`h-3 rounded-full transition-all ${getProgressColor(averageProgress)}`}
             style={{ width: `${averageProgress}%` }}
@@ -165,11 +165,11 @@ const LearningProgress: React.FC = () => {
       {/* Courses List */}
       {courses.length === 0 ? (
         <div className="text-center py-12">
-          <BookOpen className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-gray-700 mb-2">
+          <BookOpen className="w-16 h-16 text-slate-300 mx-auto mb-4" />
+          <h3 className="text-lg font-semibold text-slate-700 mb-2">
             Chưa có khóa học nào
           </h3>
-          <p className="text-gray-500 mb-4">
+          <p className="text-slate-500 mb-4">
             Bắt đầu hành trình học tập của bạn ngay hôm nay
           </p>
           <Link
@@ -181,11 +181,11 @@ const LearningProgress: React.FC = () => {
         </div>
       ) : (
         <div className="space-y-4">
-          <h3 className="font-semibold text-gray-800 mb-4">Khóa học của bạn</h3>
+          <h3 className="font-semibold text-slate-800 mb-4">Khóa học của bạn</h3>
           {paginatedCourses.map((course) => (
             <div
               key={course.course_id}
-              className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition"
+              className="border border-slate-200 rounded-lg p-4 hover:shadow-md transition"
             >
               <div className="flex gap-4">
                 {/* Placeholder thumbnail */}
@@ -195,12 +195,12 @@ const LearningProgress: React.FC = () => {
                 <div className="flex-1">
                   <div className="flex justify-between items-start mb-2">
                     <div>
-                      <h4 className="font-semibold text-gray-800 hover:text-blue-600">
+                      <h4 className="font-semibold text-slate-800 hover:text-blue-600">
                         <Link to={`/courses/${course.course_id}`}>
                           {course.course_title}
                         </Link>
                       </h4>
-                      <span className="text-xs text-gray-500">
+                      <span className="text-xs text-slate-500">
                         {course.course_level}
                       </span>
                     </div>
@@ -219,15 +219,15 @@ const LearningProgress: React.FC = () => {
 
                   <div className="mb-2">
                     <div className="flex justify-between items-center text-sm mb-1">
-                      <span className="text-gray-600">
+                      <span className="text-slate-600">
                         Tiến độ ({course.completed_lessons}/
                         {course.total_lessons} bài)
                       </span>
-                      <span className="font-medium text-gray-700">
+                      <span className="font-medium text-slate-700">
                         {course.progress_percentage.toFixed(0)}%
                       </span>
                     </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div className="w-full bg-slate-200 rounded-full h-2">
                       <div
                         className={`h-2 rounded-full transition-all ${getProgressColor(course.progress_percentage)}`}
                         style={{ width: `${course.progress_percentage}%` }}
@@ -235,7 +235,7 @@ const LearningProgress: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="flex gap-4 text-xs text-gray-500">
+                  <div className="flex gap-4 text-xs text-slate-500">
                     <span>
                       Bắt đầu:{" "}
                       {new Date(course.started_at).toLocaleDateString("vi-VN")}
@@ -251,8 +251,8 @@ const LearningProgress: React.FC = () => {
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-              <p className="text-sm text-gray-500">
+            <div className="flex items-center justify-between pt-4 border-t border-slate-100">
+              <p className="text-sm text-slate-500">
                 Trang {currentPage}/{totalPages} &bull; {courses.length} khóa
                 học
               </p>
@@ -260,7 +260,7 @@ const LearningProgress: React.FC = () => {
                 <button
                   onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                   disabled={currentPage === 1}
-                  className="px-3 py-1.5 rounded-lg text-sm border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition"
+                  className="px-3 py-1.5 rounded-lg text-sm border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition"
                 >
                   ‹ Trước
                 </button>
@@ -272,7 +272,7 @@ const LearningProgress: React.FC = () => {
                       className={`px-3 py-1.5 rounded-lg text-sm border transition ${
                         currentPage === p
                           ? "bg-blue-500 text-white border-blue-500"
-                          : "border-gray-200 text-gray-600 hover:bg-gray-50"
+                          : "border-slate-200 text-slate-600 hover:bg-slate-50"
                       }`}
                     >
                       {p}
@@ -284,7 +284,7 @@ const LearningProgress: React.FC = () => {
                     setCurrentPage((p) => Math.min(totalPages, p + 1))
                   }
                   disabled={currentPage === totalPages}
-                  className="px-3 py-1.5 rounded-lg text-sm border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition"
+                  className="px-3 py-1.5 rounded-lg text-sm border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition"
                 >
                   Sau ›
                 </button>

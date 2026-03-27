@@ -189,7 +189,7 @@ const CourseDetail: React.FC = () => {
       case "advanced":
         return "bg-purple-100 text-purple-800";
       default:
-        return "bg-gray-100 text-gray-800";
+        return "bg-slate-100 text-slate-800";
     }
   };
 
@@ -201,7 +201,7 @@ const CourseDetail: React.FC = () => {
       case "text":
         return <FileText className="h-5 w-5 text-blue-500" />;
       default:
-        return <BookOpen className="h-5 w-5 text-gray-500" />;
+        return <BookOpen className="h-5 w-5 text-slate-500" />;
     }
   };
 
@@ -216,7 +216,7 @@ const CourseDetail: React.FC = () => {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Đang tải khóa học...</p>
+          <p className="text-slate-600">Đang tải khóa học...</p>
         </div>
       </div>
     );
@@ -227,7 +227,7 @@ const CourseDetail: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-slate-50">
       {/* Header */}
       <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -312,11 +312,11 @@ const CourseDetail: React.FC = () => {
                   <button
                     onClick={handleStartCourse}
                     disabled={startingCourse}
-                    className="w-full bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-semibold py-3 px-6 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:scale-105"
+                    className="w-full bg-yellow-400 hover:bg-yellow-500 text-slate-900 font-semibold py-3 px-6 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:scale-105"
                   >
                     {startingCourse ? (
                       <>
-                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-900"></div>
+                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-slate-900"></div>
                         <span>Đang bắt đầu...</span>
                       </>
                     ) : (
@@ -349,7 +349,7 @@ const CourseDetail: React.FC = () => {
           {/* Main Content */}
           <div className="lg:col-span-2">
             <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">
+              <h2 className="text-2xl font-bold text-slate-900 mb-4">
                 Nội dung khóa học
               </h2>
 
@@ -360,36 +360,36 @@ const CourseDetail: React.FC = () => {
                   ).map((module, index) => (
                     <div
                       key={module.module_id}
-                      className="border border-gray-200 rounded-lg overflow-hidden"
+                      className="border border-slate-200 rounded-lg overflow-hidden"
                     >
                       <button
                         onClick={() => toggleModule(module.module_id)}
-                        className="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+                        className="w-full flex items-center justify-between p-4 bg-slate-50 hover:bg-slate-100 transition-colors"
                       >
                         <div className="flex items-center gap-3 text-left">
                           <span className="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-semibold">
                             {index + 1}
                           </span>
                           <div>
-                            <h3 className="font-semibold text-gray-900">
+                            <h3 className="font-semibold text-slate-900">
                               {module.module_title}
                             </h3>
-                            <p className="text-sm text-gray-600">
+                            <p className="text-sm text-slate-600">
                               {module.Module_Lessons?.length || 0} bài học •{" "}
                               {module.estimated_time} phút
                             </p>
                           </div>
                         </div>
                         {expandedModules.includes(module.module_id) ? (
-                          <ChevronUp className="h-5 w-5 text-gray-500" />
+                          <ChevronUp className="h-5 w-5 text-slate-500" />
                         ) : (
-                          <ChevronDown className="h-5 w-5 text-gray-500" />
+                          <ChevronDown className="h-5 w-5 text-slate-500" />
                         )}
                       </button>
 
                       {expandedModules.includes(module.module_id) && (
                         <div className="p-4 bg-white">
-                          <p className="text-gray-600 mb-4">
+                          <p className="text-slate-600 mb-4">
                             {module.module_description}
                           </p>
 
@@ -417,7 +417,7 @@ const CourseDetail: React.FC = () => {
                                       className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${
                                         isCompleted
                                           ? "bg-green-50 border border-green-200"
-                                          : "bg-gray-50 hover:bg-gray-100"
+                                          : "bg-slate-50 hover:bg-slate-100"
                                       }`}
                                     >
                                       {getLessonIcon(
@@ -428,20 +428,20 @@ const CourseDetail: React.FC = () => {
                                           className={`font-medium ${
                                             isCompleted
                                               ? "text-green-900"
-                                              : "text-gray-900"
+                                              : "text-slate-900"
                                           }`}
                                         >
                                           {moduleLesson.Lesson.lesson_title}
                                         </p>
                                         {moduleLesson.description && (
-                                          <p className="text-sm text-gray-500">
+                                          <p className="text-sm text-slate-500">
                                             {moduleLesson.description}
                                           </p>
                                         )}
                                         {progressPercentage > 0 &&
                                           !isCompleted && (
                                             <div className="mt-1">
-                                              <div className="w-full bg-gray-200 rounded-full h-1">
+                                              <div className="w-full bg-slate-200 rounded-full h-1">
                                                 <div
                                                   className="bg-blue-600 h-1 rounded-full transition-all duration-300"
                                                   style={{
@@ -452,7 +452,7 @@ const CourseDetail: React.FC = () => {
                                             </div>
                                           )}
                                       </div>
-                                      <span className="text-sm text-gray-500">
+                                      <span className="text-sm text-slate-500">
                                         {moduleLesson.Lesson.estimated_time}{" "}
                                         phút
                                       </span>
@@ -470,7 +470,7 @@ const CourseDetail: React.FC = () => {
                   ))}
                 </div>
               ) : (
-                <p className="text-gray-500 text-center py-8">
+                <p className="text-slate-500 text-center py-8">
                   Chưa có nội dung khóa học
                 </p>
               )}
@@ -480,32 +480,32 @@ const CourseDetail: React.FC = () => {
           {/* Sidebar */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-lg shadow-sm p-6 sticky top-4">
-              <h3 className="text-xl font-bold text-gray-900 mb-4">
+              <h3 className="text-xl font-bold text-slate-900 mb-4">
                 Bắt đầu học ngay
               </h3>
 
               <div className="space-y-4 mb-6">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-600">Modules</span>
-                  <span className="font-semibold text-gray-900">
+                  <span className="text-slate-600">Modules</span>
+                  <span className="font-semibold text-slate-900">
                     {course.Modules?.length || 0}
                   </span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-600">Bài học</span>
-                  <span className="font-semibold text-gray-900">
+                  <span className="text-slate-600">Bài học</span>
+                  <span className="font-semibold text-slate-900">
                     {totalLessons}
                   </span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-600">Thời lượng</span>
-                  <span className="font-semibold text-gray-900">
+                  <span className="text-slate-600">Thời lượng</span>
+                  <span className="font-semibold text-slate-900">
                     {course.estimate_duration} giờ
                   </span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-600">Truy cập</span>
-                  <span className="font-semibold text-gray-900">
+                  <span className="text-slate-600">Truy cập</span>
+                  <span className="font-semibold text-slate-900">
                     {course.access_type === "free" ? "Miễn phí" : "Premium"}
                   </span>
                 </div>
@@ -541,15 +541,15 @@ const CourseDetail: React.FC = () => {
 
               {/* Tags */}
               {course.tag && (
-                <div className="mt-6 pt-6 border-t border-gray-200">
-                  <h4 className="text-sm font-semibold text-gray-900 mb-3">
+                <div className="mt-6 pt-6 border-t border-slate-200">
+                  <h4 className="text-sm font-semibold text-slate-900 mb-3">
                     Tags
                   </h4>
                   <div className="flex flex-wrap gap-2">
                     {course.tag.split(",").map((tag, index) => (
                       <span
                         key={index}
-                        className="text-xs bg-gray-100 text-gray-600 px-3 py-1 rounded-full"
+                        className="text-xs bg-slate-100 text-slate-600 px-3 py-1 rounded-full"
                       >
                         {tag.trim()}
                       </span>

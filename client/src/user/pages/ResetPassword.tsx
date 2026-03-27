@@ -78,14 +78,14 @@ const ResetPassword = () => {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-md">
           <div className="bg-white py-8 px-4 rounded-lg shadow-lg sm:px-10 animate-fade-in text-center">
             <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            <h2 className="text-2xl font-bold text-slate-900 mb-2">
               Đặt lại mật khẩu thành công!
             </h2>
-            <p className="text-gray-600">Đang chuyển đến trang đăng nhập...</p>
+            <p className="text-slate-600">Đang chuyển đến trang đăng nhập...</p>
           </div>
         </div>
       </div>
@@ -93,12 +93,12 @@ const ResetPassword = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <h2 className="mt-6 text-center text-3xl font-bold text-gray-900">
+        <h2 className="mt-6 text-center text-3xl font-bold text-slate-900">
           Đặt lại mật khẩu
         </h2>
-        <p className="mt-2 text-center text-sm text-gray-600">
+        <p className="mt-2 text-center text-sm text-slate-600">
           Nhập mật khẩu mới cho tài khoản
         </p>
         <p className="mt-1 text-center text-sm font-medium text-blue-600">
@@ -118,7 +118,7 @@ const ResetPassword = () => {
             <div>
               <label
                 htmlFor="password"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-sm font-medium text-slate-700"
               >
                 Mật khẩu mới
               </label>
@@ -130,14 +130,14 @@ const ResetPassword = () => {
                   required
                   value={formData.password}
                   onChange={handleInputChange}
-                  className="appearance-none block w-full px-3 py-3 pl-10 pr-10 border border-gray-300 rounded-lg placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all duration-200"
+                  className="appearance-none block w-full px-3 py-3 pl-10 pr-10 border border-slate-300 rounded-lg placeholder-slate-500 text-slate-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all duration-200"
                   placeholder="Nhập mật khẩu mới"
                 />
-                <Lock className="h-5 w-5 text-gray-400 absolute left-3 top-3.5" />
+                <Lock className="h-5 w-5 text-slate-400 absolute left-3 top-3.5" />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-3.5 text-gray-400 hover:text-gray-600 transition-colors duration-200"
+                  className="absolute right-3 top-3.5 text-slate-400 hover:text-slate-600 transition-colors duration-200"
                 >
                   {showPassword ? (
                     <EyeOff className="h-5 w-5" />
@@ -151,7 +151,7 @@ const ResetPassword = () => {
             <div>
               <label
                 htmlFor="confirmPassword"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-sm font-medium text-slate-700"
               >
                 Xác nhận mật khẩu
               </label>
@@ -163,14 +163,14 @@ const ResetPassword = () => {
                   required
                   value={formData.confirmPassword}
                   onChange={handleInputChange}
-                  className="appearance-none block w-full px-3 py-3 pl-10 pr-10 border border-gray-300 rounded-lg placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all duration-200"
+                  className="appearance-none block w-full px-3 py-3 pl-10 pr-10 border border-slate-300 rounded-lg placeholder-slate-500 text-slate-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all duration-200"
                   placeholder="Nhập lại mật khẩu mới"
                 />
-                <Lock className="h-5 w-5 text-gray-400 absolute left-3 top-3.5" />
+                <Lock className="h-5 w-5 text-slate-400 absolute left-3 top-3.5" />
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-3.5 text-gray-400 hover:text-gray-600 transition-colors duration-200"
+                  className="absolute right-3 top-3.5 text-slate-400 hover:text-slate-600 transition-colors duration-200"
                 >
                   {showConfirmPassword ? (
                     <EyeOff className="h-5 w-5" />
