@@ -1,6 +1,3 @@
-import { Users, Award, Globe, TrendingUp } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
-
 export const LEVEL_GRADIENT: Record<string, string> = {
   Beginner: "from-emerald-400 to-teal-500",
   Intermediate: "from-blue-400 to-indigo-500",
@@ -33,40 +30,6 @@ export const SKILLS = [
   "Listening Intensive",
   "Reading Strategies",
   "Speaking Fluency",
-];
-
-export interface PlatformFact {
-  icon: LucideIcon;
-  value: string;
-  label: string;
-  color: string;
-}
-
-export const PLATFORM_FACTS: PlatformFact[] = [
-  {
-    icon: Users,
-    value: "10,000+",
-    label: "Học viên tin tưởng",
-    color: "text-blue-600",
-  },
-  {
-    icon: Award,
-    value: "95%",
-    label: "Tỷ lệ đạt mục tiêu",
-    color: "text-emerald-600",
-  },
-  {
-    icon: Globe,
-    value: "50+",
-    label: "Lộ trình đa dạng",
-    color: "text-violet-600",
-  },
-  {
-    icon: TrendingUp,
-    value: "4.8★",
-    label: "Đánh giá trung bình",
-    color: "text-amber-500",
-  },
 ];
 
 export const FLASHCARD_COLORS = [
