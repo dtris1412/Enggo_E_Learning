@@ -9,8 +9,6 @@ import {
   FileText,
   BookOpen,
   TrendingUp,
-  Home,
-  ChevronRight as ChevronRightIcon,
   Award,
 } from "lucide-react";
 
@@ -139,32 +137,31 @@ const ExamList: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      {/* Breadcrumb */}
-      <div className="bg-white border-b">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center gap-2 text-sm text-slate-600">
-            <Home className="w-4 h-4" />
-            <span>Home</span>
-            <ChevronRightIcon className="w-4 h-4" />
-            <span className="text-blue-600 font-medium">Practice Exams</span>
+      {/* Hero Section */}
+      <section className="relative bg-slate-950 text-white py-10 overflow-hidden">
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="absolute -top-16 -left-16 w-[300px] h-[300px] bg-blue-700/20 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 right-0 w-[250px] h-[250px] bg-violet-700/20 rounded-full blur-3xl" />
+        </div>
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <span className="inline-block text-amber-400 text-xs font-semibold uppercase tracking-widest mb-2">
+              Luyện thi
+            </span>
+            <h1 className="text-3xl lg:text-4xl font-black leading-tight">
+              <span className="text-white">Đề thi</span>{" "}
+              <span className="bg-gradient-to-r from-amber-400 via-orange-400 to-rose-400 bg-clip-text text-transparent">
+                luyện tập
+              </span>
+            </h1>
           </div>
         </div>
-      </div>
+      </section>
 
       <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-3">
-            {/* Header */}
-            <div className="mb-8">
-              <h1 className="text-3xl font-bold text-slate-900 mb-2">
-                Practice Exams
-              </h1>
-              <p className="text-slate-600">
-                Test your skills with our comprehensive exam collection
-              </p>
-            </div>
-
             {/* Search and Filters */}
             <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6 mb-6">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -174,7 +171,7 @@ const ExamList: React.FC = () => {
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
                     <input
                       type="text"
-                      placeholder="Search exams by title or code..."
+                      placeholder="Tìm kiếm đề thi theo tên hoặc mã..."
                       value={searchTerm}
                       onChange={handleSearchChange}
                       className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -185,14 +182,14 @@ const ExamList: React.FC = () => {
                 {/* Exam Type Filter */}
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Exam Type
+                    Loại đề thi
                   </label>
                   <select
                     value={examTypeFilter}
                     onChange={handleExamTypeChange}
                     className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
-                    <option value="">All Types</option>
+                    <option value="">Tất cả</option>
                     <option value="TOEIC">TOEIC</option>
                     <option value="IELTS">IELTS</option>
                   </select>
@@ -201,14 +198,14 @@ const ExamList: React.FC = () => {
                 {/* Year Filter */}
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Year
+                    Năm
                   </label>
                   <select
                     value={yearFilter}
                     onChange={handleYearChange}
                     className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
-                    <option value="">All Years</option>
+                    <option value="">Tất cả</option>
                     {yearOptions.map((year) => (
                       <option key={year} value={year}>
                         {year}
@@ -223,7 +220,7 @@ const ExamList: React.FC = () => {
                     <span className="font-semibold text-slate-900">
                       {totalExams}
                     </span>{" "}
-                    exams found
+                    đề thi
                   </div>
                 </div>
               </div>
@@ -282,10 +279,10 @@ const ExamList: React.FC = () => {
               <div className="text-center py-12">
                 <FileText className="w-16 h-16 text-slate-400 mx-auto mb-4" />
                 <h3 className="text-xl font-semibold text-slate-900 mb-2">
-                  No exams found
+                  Không tìm thấy đề thi
                 </h3>
                 <p className="text-slate-600">
-                  Try adjusting your search or filters
+                  Thử tìm kiếm với từ khóa khác hoặc thay đổi bộ lọc
                 </p>
               </div>
             )}
@@ -298,7 +295,9 @@ const ExamList: React.FC = () => {
               <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
                 <div className="flex items-center gap-2 mb-4">
                   <TrendingUp className="w-5 h-5 text-blue-600" />
-                  <h3 className="font-semibold text-slate-900">Recent Exams</h3>
+                  <h3 className="font-semibold text-slate-900">
+                    Đề thi mới nhất
+                  </h3>
                 </div>
                 <div className="space-y-3">
                   {recentExams.slice(0, 5).map((exam) => (
@@ -325,11 +324,11 @@ const ExamList: React.FC = () => {
               <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg shadow-sm p-6 text-white">
                 <div className="flex items-center gap-2 mb-4">
                   <Award className="w-5 h-5" />
-                  <h3 className="font-semibold">Quick Stats</h3>
+                  <h3 className="font-semibold">Thống kê nhanh</h3>
                 </div>
                 <div className="space-y-3">
                   <div className="flex justify-between items-center">
-                    <span className="text-blue-100">Total Exams</span>
+                    <span className="text-blue-100">Tổng số đề thi</span>
                     <span className="font-bold text-xl">{totalExams}</span>
                   </div>
                   <div className="border-t border-blue-500 pt-3">
@@ -337,7 +336,7 @@ const ExamList: React.FC = () => {
                       onClick={() => navigate("/exams/history")}
                       className="w-full bg-white text-blue-600 px-4 py-2 rounded-lg font-medium hover:bg-blue-50 transition-colors"
                     >
-                      View My History
+                      Xem lịch sử làm bài
                     </button>
                   </div>
                 </div>
@@ -347,20 +346,20 @@ const ExamList: React.FC = () => {
               <div className="bg-yellow-50 rounded-lg shadow-sm border border-yellow-200 p-6">
                 <div className="flex items-center gap-2 mb-4">
                   <BookOpen className="w-5 h-5 text-yellow-600" />
-                  <h3 className="font-semibold text-slate-900">Exam Tips</h3>
+                  <h3 className="font-semibold text-slate-900">Mẹo làm bài</h3>
                 </div>
                 <ul className="space-y-2 text-sm text-slate-700">
                   <li className="flex items-start gap-2">
                     <span className="text-yellow-600 mt-0.5">•</span>
-                    <span>Read instructions carefully before starting</span>
+                    <span>Đọc kỹ hướng dẫn trước khi bắt đầu</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-yellow-600 mt-0.5">•</span>
-                    <span>Manage your time wisely</span>
+                    <span>Quản lý thời gian hợp lý</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-yellow-600 mt-0.5">•</span>
-                    <span>Review your answers before submitting</span>
+                    <span>Xem lại câu trả lời trước khi nộp bài</span>
                   </li>
                 </ul>
               </div>
