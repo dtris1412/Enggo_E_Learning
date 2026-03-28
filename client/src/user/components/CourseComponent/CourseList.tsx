@@ -68,18 +68,6 @@ const CourseList: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      {/* Hero Section */}
-      <section className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h1 className="text-4xl lg:text-5xl font-bold mb-4">Khóa Học</h1>
-            <p className="text-xl text-blue-100 max-w-3xl mx-auto">
-              Khám phá các khóa học chất lượng cao, học theo tiến độ của bạn
-            </p>
-          </div>
-        </div>
-      </section>
-
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Search and Filter Section */}
         <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
