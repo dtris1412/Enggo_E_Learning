@@ -163,7 +163,7 @@ const DocumentDetail: React.FC = () => {
   const getTypeColor = (type: string) => {
     switch (type) {
       case "learning":
-        return "bg-blue-100 text-blue-800";
+        return "bg-violet-100 text-violet-800";
       case "reference":
         return "bg-purple-100 text-purple-800";
       case "guideline":
@@ -192,7 +192,7 @@ const DocumentDetail: React.FC = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-50 flex justify-center items-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-violet-600"></div>
       </div>
     );
   }
@@ -297,7 +297,7 @@ const DocumentDetail: React.FC = () => {
           </h3>
           <button
             onClick={() => navigate("/documents")}
-            className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="mt-4 px-6 py-2 bg-violet-600 text-white rounded-md hover:bg-violet-700 transition-colors"
           >
             Quay lại danh sách
           </button>
@@ -321,7 +321,7 @@ const DocumentDetail: React.FC = () => {
         {/* Document Card */}
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
           {/* Header Section */}
-          <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-8 text-white">
+          <div className="bg-gradient-to-r from-violet-800 to-violet-900 p-8 text-white">
             <div className="flex items-start gap-4">
               <div className="p-4 bg-white bg-opacity-20 rounded-lg">
                 {getFileIcon(document.file_type)}
@@ -413,9 +413,9 @@ const DocumentDetail: React.FC = () => {
 
             {/* Statistics Grid */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-              <div className="bg-blue-50 rounded-lg p-4">
+              <div className="bg-violet-50 rounded-lg p-4">
                 <div className="flex items-center gap-3">
-                  <Eye className="w-8 h-8 text-blue-600" />
+                  <Eye className="w-8 h-8 text-violet-600" />
                   <div>
                     <p className="text-sm text-slate-600">Lượt xem</p>
                     <p className="text-2xl font-bold text-slate-900">
@@ -468,7 +468,7 @@ const DocumentDetail: React.FC = () => {
             {/* Download Button */}
             <button
               onClick={handleDownload}
-              className="w-full py-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 text-lg font-semibold shadow-lg hover:shadow-xl"
+              className="w-full py-4 bg-violet-600 text-white rounded-md hover:bg-violet-700 transition-colors flex items-center justify-center gap-2 text-lg font-semibold shadow-lg hover:shadow-xl"
             >
               <Download className="w-6 h-6" />
               Tải xuống tài liệu

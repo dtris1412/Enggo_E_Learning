@@ -96,7 +96,7 @@ const EditFlashcardModal: React.FC<EditFlashcardModalProps> = ({
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="sticky top-0 bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-6 rounded-t-2xl flex justify-between items-center">
+        <div className="sticky top-0 bg-gradient-to-r from-violet-800 to-violet-900 text-white p-6 rounded-t-2xl flex justify-between items-center">
           <h2 className="text-2xl font-bold">Chỉnh sửa Flashcard</h2>
           <button
             onClick={onClose}
@@ -117,7 +117,7 @@ const EditFlashcardModal: React.FC<EditFlashcardModalProps> = ({
               onChange={(e) =>
                 setFormData({ ...formData, front_content: e.target.value })
               }
-              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none ${
+              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-transparent resize-none ${
                 errors.front_content ? "border-red-500" : "border-slate-300"
               }`}
               rows={3}
@@ -140,7 +140,7 @@ const EditFlashcardModal: React.FC<EditFlashcardModalProps> = ({
               onChange={(e) =>
                 setFormData({ ...formData, back_content: e.target.value })
               }
-              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none ${
+              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-transparent resize-none ${
                 errors.back_content ? "border-red-500" : "border-slate-300"
               }`}
               rows={3}
@@ -162,7 +162,7 @@ const EditFlashcardModal: React.FC<EditFlashcardModalProps> = ({
               onChange={(e) =>
                 setFormData({ ...formData, pronunciation: e.target.value })
               }
-              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-transparent"
               placeholder="Ví dụ: /ˈhæpi/"
             />
           </div>
@@ -177,7 +177,7 @@ const EditFlashcardModal: React.FC<EditFlashcardModalProps> = ({
               onChange={(e) =>
                 setFormData({ ...formData, example: e.target.value })
               }
-              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
+              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-transparent resize-none"
               rows={2}
               placeholder="Câu ví dụ sử dụng từ này"
             />
@@ -193,7 +193,7 @@ const EditFlashcardModal: React.FC<EditFlashcardModalProps> = ({
               onChange={(e) =>
                 setFormData({ ...formData, difficulty_level: e.target.value })
               }
-              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-transparent"
             >
               <option value="">Chưa xác định</option>
               <option value="easy">Dễ</option>
@@ -215,7 +215,7 @@ const EditFlashcardModal: React.FC<EditFlashcardModalProps> = ({
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+              className="flex-1 px-6 py-3 bg-violet-600 hover:bg-violet-700 text-white rounded-md transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed font-medium"
             >
               {loading ? "Đang lưu..." : "Lưu thay đổi"}
             </button>

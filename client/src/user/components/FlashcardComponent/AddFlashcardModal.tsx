@@ -140,7 +140,7 @@ const AddFlashcardModal: React.FC<AddFlashcardModalProps> = ({
               className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 transition-all resize-none ${
                 errors.front_content
                   ? "border-red-300 focus:ring-red-200"
-                  : "border-slate-300 focus:ring-indigo-200 focus:border-indigo-400"
+                  : "border-slate-300 focus:ring-violet-200 focus:border-violet-400"
               }`}
               placeholder="Ví dụ: What is React?"
               disabled={loading}
@@ -169,7 +169,7 @@ const AddFlashcardModal: React.FC<AddFlashcardModalProps> = ({
               className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 transition-all resize-none ${
                 errors.back_content
                   ? "border-red-300 focus:ring-red-200"
-                  : "border-slate-300 focus:ring-indigo-200 focus:border-indigo-400"
+                  : "border-slate-300 focus:ring-violet-200 focus:border-violet-400"
               }`}
               placeholder="Ví dụ: A JavaScript library for building user interfaces"
               disabled={loading}
@@ -194,7 +194,7 @@ const AddFlashcardModal: React.FC<AddFlashcardModalProps> = ({
               value={formData.example}
               onChange={handleInputChange}
               rows={2}
-              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 transition-all resize-none"
+              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-200 focus:border-violet-400 transition-all resize-none"
               placeholder="Ví dụ minh họa (tùy chọn)"
               disabled={loading}
             />
@@ -215,7 +215,7 @@ const AddFlashcardModal: React.FC<AddFlashcardModalProps> = ({
               name="pronunciation"
               value={formData.pronunciation}
               onChange={handleInputChange}
-              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 transition-all"
+              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-200 focus:border-violet-400 transition-all"
               placeholder="Ví dụ: /riˈækt/"
               disabled={loading}
             />
@@ -234,7 +234,7 @@ const AddFlashcardModal: React.FC<AddFlashcardModalProps> = ({
               name="difficulty_level"
               value={formData.difficulty_level}
               onChange={handleInputChange}
-              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 transition-all"
+              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-200 focus:border-violet-400 transition-all"
               disabled={loading}
             >
               <option value="">Chọn độ khó (tùy chọn)</option>
@@ -257,7 +257,7 @@ const AddFlashcardModal: React.FC<AddFlashcardModalProps> = ({
             <button
               type="submit"
               disabled={loading}
-              className="px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all flex items-center gap-2 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-5 py-2.5 bg-violet-600 hover:bg-violet-700 text-white rounded-md transition-all flex items-center gap-2 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? (
                 <>

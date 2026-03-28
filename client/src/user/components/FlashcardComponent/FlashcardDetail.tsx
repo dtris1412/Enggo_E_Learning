@@ -354,7 +354,7 @@ const FlashcardDetail: React.FC = () => {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-violet-600"></div>
           <p className="mt-4 text-slate-600">Đang tải...</p>
         </div>
       </div>
@@ -372,13 +372,13 @@ const FlashcardDetail: React.FC = () => {
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-center gap-2 text-sm text-slate-600">
             <Home className="w-4 h-4" />
-            <a href="/" className="hover:text-indigo-600 transition-colors">
+            <a href="/" className="hover:text-violet-600 transition-colors">
               Trang chủ
             </a>
             <ChevronRight className="w-4 h-4" />
             <a
               href="/flashcards"
-              className="hover:text-indigo-600 transition-colors"
+              className="hover:text-violet-600 transition-colors"
             >
               Flashcards
             </a>
@@ -391,7 +391,7 @@ const FlashcardDetail: React.FC = () => {
       </div>
 
       {/* Header */}
-      <div className="bg-gradient-to-r from-indigo-700 via-purple-600 to-pink-600 text-white">
+      <div className="bg-gradient-to-r from-violet-800 to-violet-900 text-white">
         <div className="container mx-auto px-4 py-12">
           <button
             onClick={() => navigate("/flashcards")}
@@ -471,7 +471,7 @@ const FlashcardDetail: React.FC = () => {
             <div className="flex flex-col gap-3">
               <button
                 onClick={handleStartLearning}
-                className="bg-white text-indigo-700 hover:bg-slate-100 font-medium py-3 px-8 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl inline-flex items-center gap-2"
+                className="bg-white text-violet-700 hover:bg-slate-100 font-medium py-3 px-8 rounded-md transition-all duration-200 shadow-lg hover:shadow-xl inline-flex items-center gap-2"
               >
                 <Play className="w-5 h-5" />
                 Bắt đầu học
@@ -481,14 +481,14 @@ const FlashcardDetail: React.FC = () => {
                 <>
                   <button
                     onClick={handleEdit}
-                    className="bg-white/10 hover:bg-white/20 text-white font-medium py-2 px-6 rounded-lg transition-colors inline-flex items-center gap-2"
+                    className="bg-white/10 hover:bg-white/20 text-white font-medium py-2 px-6 rounded-md transition-colors inline-flex items-center gap-2"
                   >
                     <Edit className="w-4 h-4" />
                     Chỉnh sửa
                   </button>
                   <button
                     onClick={handleDeleteSet}
-                    className="bg-red-500/20 hover:bg-red-500/30 text-white font-medium py-2 px-6 rounded-lg transition-colors inline-flex items-center gap-2"
+                    className="bg-red-500/20 hover:bg-red-500/30 text-white font-medium py-2 px-6 rounded-md transition-colors inline-flex items-center gap-2"
                   >
                     <Trash2 className="w-4 h-4" />
                     Xóa
@@ -518,7 +518,7 @@ const FlashcardDetail: React.FC = () => {
                       (flashcardSet.Flashcards?.length || 0) && (
                       <button
                         onClick={selectAll}
-                        className="text-indigo-600 hover:text-indigo-700 font-medium text-sm"
+                        className="text-violet-600 hover:text-violet-700 font-medium text-sm"
                       >
                         Chọn tất cả
                       </button>
@@ -526,14 +526,14 @@ const FlashcardDetail: React.FC = () => {
                     <button
                       onClick={handleDeleteMultiple}
                       disabled={selectedFlashcards.size === 0}
-                      className="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg transition-colors inline-flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-md transition-colors inline-flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <Trash2 className="w-4 h-4" />
                       Xóa ({selectedFlashcards.size})
                     </button>
                     <button
                       onClick={clearSelection}
-                      className="border border-slate-300 hover:bg-slate-50 text-slate-700 font-medium py-2 px-4 rounded-lg transition-colors"
+                      className="border border-slate-300 hover:bg-slate-50 text-slate-700 font-medium py-2 px-4 rounded-md transition-colors"
                     >
                       Hủy
                     </button>
@@ -544,7 +544,7 @@ const FlashcardDetail: React.FC = () => {
                       flashcardSet.Flashcards.length > 0 && (
                         <button
                           onClick={() => setSelectionMode(true)}
-                          className="border border-slate-300 hover:bg-slate-50 text-slate-700 font-medium py-2 px-4 rounded-lg transition-colors inline-flex items-center gap-2"
+                          className="border border-slate-300 hover:bg-slate-50 text-slate-700 font-medium py-2 px-4 rounded-md transition-colors inline-flex items-center gap-2"
                         >
                           <CheckSquare className="w-4 h-4" />
                           Chọn nhiều
@@ -552,14 +552,14 @@ const FlashcardDetail: React.FC = () => {
                       )}
                     <button
                       onClick={() => setIsBulkCreateModalOpen(true)}
-                      className="border border-indigo-600 text-indigo-600 hover:bg-indigo-50 font-medium py-2 px-4 rounded-lg transition-colors inline-flex items-center gap-2"
+                      className="border border-violet-600 text-violet-600 hover:bg-violet-50 font-medium py-2 px-4 rounded-md transition-colors inline-flex items-center gap-2"
                     >
                       <List className="w-4 h-4" />
                       Thêm nhiều
                     </button>
                     <button
                       onClick={handleOpenAddModal}
-                      className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-6 rounded-lg transition-colors inline-flex items-center gap-2"
+                      className="bg-violet-600 hover:bg-violet-700 text-white font-medium py-2 px-6 rounded-md transition-colors inline-flex items-center gap-2"
                     >
                       <Plus className="w-4 h-4" />
                       Thêm thẻ mới
@@ -578,7 +578,7 @@ const FlashcardDetail: React.FC = () => {
                   key={flashcard.flashcard_id}
                   className={`border rounded-lg p-4 hover:shadow-md transition-all ${
                     selectedFlashcards.has(flashcard.flashcard_id)
-                      ? "border-indigo-500 bg-indigo-50"
+                      ? "border-violet-500 bg-violet-50"
                       : "border-slate-200"
                   }`}
                 >
@@ -590,7 +590,7 @@ const FlashcardDetail: React.FC = () => {
                         className="flex-shrink-0 mt-1"
                       >
                         {selectedFlashcards.has(flashcard.flashcard_id) ? (
-                          <CheckSquare className="w-5 h-5 text-indigo-600" />
+                          <CheckSquare className="w-5 h-5 text-violet-600" />
                         ) : (
                           <Square className="w-5 h-5 text-slate-400" />
                         )}
@@ -598,7 +598,7 @@ const FlashcardDetail: React.FC = () => {
                     )}
 
                     {/* Index Number */}
-                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 font-bold flex items-center justify-center">
+                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-violet-100 text-violet-600 font-bold flex items-center justify-center">
                       {index + 1}
                     </div>
 
@@ -619,7 +619,7 @@ const FlashcardDetail: React.FC = () => {
                           />
                         </div>
                         {flashcard.pronunciation && (
-                          <p className="text-sm text-indigo-600 mt-1">
+                          <p className="text-sm text-violet-600 mt-1">
                             {flashcard.pronunciation}
                           </p>
                         )}
@@ -663,7 +663,7 @@ const FlashcardDetail: React.FC = () => {
                       <div className="flex-shrink-0 flex items-center gap-2">
                         <button
                           onClick={() => handleEditCard(flashcard)}
-                          className="p-2 text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                          className="p-2 text-slate-600 hover:text-violet-600 hover:bg-violet-50 rounded-md transition-colors"
                           title="Chỉnh sửa"
                         >
                           <Edit className="w-4 h-4" />
@@ -672,7 +672,7 @@ const FlashcardDetail: React.FC = () => {
                           onClick={() =>
                             handleDeleteCard(flashcard.flashcard_id)
                           }
-                          className="p-2 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                          className="p-2 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
                           title="Xóa"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -688,7 +688,7 @@ const FlashcardDetail: React.FC = () => {
               <BookMarked className="w-16 h-16 text-slate-300 mx-auto mb-4" />
               <p className="text-slate-600">Chưa có flashcard nào</p>
               {isOwner && (
-                <button className="mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-6 rounded-lg transition-colors inline-flex items-center gap-2">
+                <button className="mt-4 bg-violet-600 hover:bg-violet-700 text-white font-medium py-2 px-6 rounded-md transition-colors inline-flex items-center gap-2">
                   <Plus className="w-4 h-4" />
                   Thêm thẻ mới
                 </button>

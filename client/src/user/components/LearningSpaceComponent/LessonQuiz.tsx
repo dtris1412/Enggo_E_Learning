@@ -98,7 +98,7 @@ export const LessonQuiz = ({ questions, onComplete }: LessonQuizProps) => {
         {/* Question Header */}
         <div className="flex items-start justify-between mb-3">
           <h3 className="font-semibold text-base flex-1">
-            <span className="text-blue-600 mr-2">Câu {index + 1}:</span>
+            <span className="text-violet-600 mr-2">Câu {index + 1}:</span>
             {question.content}
           </h3>
           <span
@@ -127,8 +127,8 @@ export const LessonQuiz = ({ questions, onComplete }: LessonQuizProps) => {
                         ? "border-red-500 bg-red-50"
                         : "border-slate-200 bg-slate-50"
                     : isSelected
-                      ? "border-blue-500 bg-blue-50"
-                      : "border-slate-200 hover:border-blue-300 hover:bg-blue-50"
+                      ? "border-violet-500 bg-violet-50"
+                      : "border-slate-200 hover:border-violet-300 hover:bg-violet-50"
                 } ${submitted ? "cursor-not-allowed" : ""}`}
               >
                 <input
@@ -159,8 +159,8 @@ export const LessonQuiz = ({ questions, onComplete }: LessonQuizProps) => {
 
         {/* Explanation */}
         {showAnswer && question.explaination && (
-          <div className="mt-3 p-3 bg-blue-50 border-l-4 border-blue-500">
-            <p className="font-semibold text-blue-900 mb-1">💡 Giải thích:</p>
+          <div className="mt-3 p-3 bg-violet-50 border-l-4 border-violet-500">
+            <p className="font-semibold text-violet-900 mb-1">💡 Giải thích:</p>
             <p className="text-slate-700">{question.explaination}</p>
           </div>
         )}
@@ -200,7 +200,7 @@ export const LessonQuiz = ({ questions, onComplete }: LessonQuizProps) => {
           </h3>
           <p className="text-base">
             Bạn đã trả lời đúng{" "}
-            <span className="font-bold text-blue-600">
+            <span className="font-bold text-violet-600">
               {correctCount}/{questions.length}
             </span>{" "}
             câu hỏi ({scorePercentage.toFixed(0)}%)
@@ -218,14 +218,14 @@ export const LessonQuiz = ({ questions, onComplete }: LessonQuizProps) => {
         {!submitted ? (
           <button
             onClick={handleSubmit}
-            className="px-6 py-2 text-sm bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+            className="px-6 py-2 text-sm bg-violet-600 text-white font-semibold rounded-md hover:bg-violet-700 transition-colors"
           >
             Nộp bài
           </button>
         ) : (
           <button
             onClick={handleRetry}
-            className="px-6 py-2 text-sm bg-slate-600 text-white font-semibold rounded-lg hover:bg-slate-700 transition-colors"
+            className="px-6 py-2 text-sm bg-slate-600 text-white font-semibold rounded-md hover:bg-slate-700 transition-colors"
           >
             Làm lại
           </button>

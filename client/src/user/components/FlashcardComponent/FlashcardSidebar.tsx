@@ -56,7 +56,7 @@ const FlashcardSidebar: React.FC = () => {
   ];
 
   return (
-    <aside className="w-full lg:w-64 bg-gradient-to-b from-indigo-900 via-indigo-800 to-purple-900 text-white min-h-screen lg:min-h-0 lg:sticky lg:top-16">
+    <aside className="w-full lg:w-64 lg:shrink-0 bg-gradient-to-b from-slate-900 to-violet-900 text-white min-h-screen lg:min-h-0 lg:sticky lg:top-16">
       <div className="p-4">
         {/* Navigation Items */}
         <nav className="space-y-1 mb-6">
@@ -74,12 +74,14 @@ const FlashcardSidebar: React.FC = () => {
                 to={item.path}
                 className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 relative ${
                   isActive
-                    ? "bg-indigo-700 text-white shadow-lg"
-                    : "text-indigo-100 hover:bg-indigo-700/50 hover:text-white"
+                    ? "bg-violet-700 text-white shadow-lg"
+                    : "text-violet-100 hover:bg-violet-700/50 hover:text-white"
                 }`}
               >
                 <Icon className="w-5 h-5" />
-                <span className="font-medium text-sm flex-1">{item.label}</span>
+                <span className="font-medium text-sm flex-1 whitespace-nowrap">
+                  {item.label}
+                </span>
                 {showBadge && (
                   <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 bg-red-500 text-white text-xs font-bold rounded-full">
                     {dueCount > 99 ? "99+" : dueCount}
@@ -91,8 +93,8 @@ const FlashcardSidebar: React.FC = () => {
         </nav>
 
         {/* Footer Section */}
-        <div className="mt-8 px-4 py-4 bg-indigo-950/30 rounded-lg">
-          <p className="text-xs text-indigo-300 text-center">
+        <div className="mt-8 px-4 py-4 bg-violet-950/30 rounded-lg">
+          <p className="text-xs text-violet-300 text-center">
             Học thông minh hơn với Flashcards
           </p>
         </div>

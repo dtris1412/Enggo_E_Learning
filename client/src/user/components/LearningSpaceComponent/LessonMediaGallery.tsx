@@ -67,7 +67,7 @@ export const LessonMediaGallery = ({ media }: LessonMediaGalleryProps) => {
               href={currentMedia.media_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="inline-flex items-center px-6 py-3 bg-violet-600 text-white rounded-md hover:bg-violet-700 transition-colors"
             >
               Tải xuống tài liệu
             </a>
@@ -91,7 +91,7 @@ export const LessonMediaGallery = ({ media }: LessonMediaGalleryProps) => {
 
         {/* Description */}
         {currentMedia.description && (
-          <div className="mt-3 p-3 bg-blue-50 rounded-lg">
+          <div className="mt-3 p-3 bg-violet-50 rounded-lg">
             <p className="text-sm text-slate-700">{currentMedia.description}</p>
           </div>
         )}
@@ -115,7 +115,7 @@ export const LessonMediaGallery = ({ media }: LessonMediaGalleryProps) => {
               setSelectedMediaIndex((prev) => Math.max(0, prev - 1))
             }
             disabled={selectedMediaIndex === 0}
-            className="px-3 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-slate-300 disabled:cursor-not-allowed"
+            className="px-3 py-2 text-sm bg-violet-600 text-white rounded-md hover:bg-violet-700 disabled:bg-slate-300 disabled:cursor-not-allowed"
           >
             ← Trước
           </button>
@@ -127,7 +127,7 @@ export const LessonMediaGallery = ({ media }: LessonMediaGalleryProps) => {
                 onClick={() => setSelectedMediaIndex(index)}
                 className={`w-3 h-3 rounded-full transition-colors ${
                   index === selectedMediaIndex
-                    ? "bg-blue-600"
+                    ? "bg-violet-600"
                     : "bg-slate-300 hover:bg-slate-400"
                 }`}
                 aria-label={`View media ${index + 1}`}
@@ -142,7 +142,7 @@ export const LessonMediaGallery = ({ media }: LessonMediaGalleryProps) => {
               )
             }
             disabled={selectedMediaIndex === media.length - 1}
-            className="px-3 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-slate-300 disabled:cursor-not-allowed"
+            className="px-3 py-2 text-sm bg-violet-600 text-white rounded-md hover:bg-violet-700 disabled:bg-slate-300 disabled:cursor-not-allowed"
           >
             Sau →
           </button>

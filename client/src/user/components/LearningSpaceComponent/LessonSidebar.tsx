@@ -22,7 +22,7 @@ const LessonSidebar: React.FC = () => {
         return <PlayCircle className="h-4 w-4 text-red-500" />;
       case "reading":
       case "text":
-        return <FileText className="h-4 w-4 text-blue-500" />;
+        return <FileText className="h-4 w-4 text-violet-500" />;
       default:
         return <BookOpen className="h-4 w-4 text-slate-500" />;
     }
@@ -31,13 +31,13 @@ const LessonSidebar: React.FC = () => {
   return (
     <div className="h-full bg-white border-r border-slate-200 overflow-y-auto">
       {/* Course Header */}
-      <div className="p-4 border-b border-slate-200 bg-gradient-to-r from-blue-50 to-indigo-50">
+      <div className="p-4 border-b border-slate-200 bg-gradient-to-r from-violet-50 to-violet-100">
         <h2 className="text-lg font-bold text-slate-900 mb-1">
           {course.course_title}
         </h2>
         <p className="text-xs text-slate-600">{course.description}</p>
         <div className="mt-2 flex items-center gap-2">
-          <span className="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded-full font-medium">
+          <span className="text-xs px-2 py-1 bg-violet-100 text-violet-700 rounded-full font-medium">
             {course.course_level}
           </span>
           {course.access_type === "premium" && (
@@ -56,7 +56,7 @@ const LessonSidebar: React.FC = () => {
             <div key={module.module_id} className="mb-3">
               {/* Module Header */}
               <div className="flex items-start gap-2 mb-2 p-2 bg-slate-50 rounded-lg">
-                <span className="flex-shrink-0 w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-xs font-semibold">
+                <span className="flex-shrink-0 w-6 h-6 bg-violet-600 text-white rounded-full flex items-center justify-center text-xs font-semibold">
                   {moduleIndex + 1}
                 </span>
                 <div className="flex-1 min-w-0">
@@ -85,7 +85,7 @@ const LessonSidebar: React.FC = () => {
                     onClick={() => selectLesson(moduleLesson.module_lesson_id)}
                     className={`w-full flex items-center gap-2 p-2 rounded-lg transition-all mb-1.5 text-left group ${
                       isActive
-                        ? "bg-blue-600 text-white shadow-md"
+                        ? "bg-violet-600 text-white shadow-md"
                         : "hover:bg-slate-100"
                     }`}
                   >
@@ -127,7 +127,7 @@ const LessonSidebar: React.FC = () => {
                       </h4>
                       <p
                         className={`text-xs ${
-                          isActive ? "text-blue-100" : "text-slate-500"
+                          isActive ? "text-violet-100" : "text-slate-500"
                         } mt-0.5`}
                       >
                         {moduleLesson.Lesson.estimated_time} phút
@@ -152,7 +152,7 @@ const LessonSidebar: React.FC = () => {
           <p className="font-medium text-slate-900 mb-1.5">Tiến độ khóa học</p>
           <div className="w-full bg-slate-200 rounded-full h-2 mb-2">
             <div
-              className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+              className="bg-violet-600 h-2 rounded-full transition-all duration-300"
               style={{
                 width: `${
                   course.Modules?.reduce((acc, m) => {

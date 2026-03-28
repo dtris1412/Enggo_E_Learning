@@ -219,7 +219,7 @@ const AIFlashcardGenerator: React.FC = () => {
       <div className="bg-white rounded-lg shadow-md p-6">
         {/* Header */}
         <div className="flex items-center gap-3 mb-6">
-          <div className="p-3 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg">
+          <div className="p-3 bg-violet-600 rounded-lg">
             <Sparkles className="w-6 h-6 text-white" />
           </div>
           <div>
@@ -300,7 +300,7 @@ const AIFlashcardGenerator: React.FC = () => {
           <button
             onClick={handleGenerate}
             disabled={isGenerating || !topic.trim()}
-            className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-3 rounded-lg font-medium hover:from-purple-600 hover:to-pink-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="w-full bg-violet-600 text-white py-3 rounded-md font-medium hover:bg-violet-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {isGenerating ? (
               <>
@@ -527,7 +527,7 @@ const AIFlashcardGenerator: React.FC = () => {
                             <span className="text-xs font-medium text-slate-500">
                               #{index + 1}
                             </span>
-                            <span className="text-xs px-2 py-0.5 bg-blue-100 text-blue-700 rounded">
+                            <span className="text-xs px-2 py-0.5 bg-violet-100 text-violet-700 rounded">
                               {card.difficulty_level}
                             </span>
                           </div>

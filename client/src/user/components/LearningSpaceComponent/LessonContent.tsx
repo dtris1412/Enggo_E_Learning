@@ -26,7 +26,7 @@ const LessonContent: React.FC = () => {
     return (
       <div className="flex items-center justify-center h-full">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-violet-600 mx-auto mb-4"></div>
           <p className="text-slate-600">Đang tải bài học...</p>
         </div>
       </div>
@@ -114,7 +114,7 @@ const LessonContent: React.FC = () => {
             </div>
             <div className="w-full bg-slate-200 rounded-full h-2">
               <div
-                className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                className="bg-violet-600 h-2 rounded-full transition-all duration-300"
                 style={{
                   width: `${lessonProgress.progress_percentage}%`,
                 }}
@@ -193,7 +193,7 @@ const LessonContent: React.FC = () => {
           <button
             onClick={handlePrevious}
             disabled={!previousLesson}
-            className="flex items-center gap-2 px-4 py-2 text-slate-700 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center gap-2 px-4 py-2 text-slate-700 hover:text-slate-900 hover:bg-slate-100 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <ArrowLeft className="h-5 w-5" />
             <span className="font-medium">Bài trước</span>
@@ -203,7 +203,7 @@ const LessonContent: React.FC = () => {
           {!isCompleted && (
             <button
               onClick={handleComplete}
-              className="flex items-center gap-2 px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition-colors shadow-md hover:shadow-lg"
+              className="flex items-center gap-2 px-6 py-2 bg-violet-600 hover:bg-violet-700 text-white rounded-md font-semibold transition-colors shadow-md hover:shadow-lg"
             >
               <CheckCircle className="h-5 w-5" />
               <span>Hoàn thành & Tiếp tục</span>
@@ -214,7 +214,7 @@ const LessonContent: React.FC = () => {
           <button
             onClick={handleNext}
             disabled={!nextLesson}
-            className="flex items-center gap-2 px-4 py-2 text-slate-700 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center gap-2 px-4 py-2 text-slate-700 hover:text-slate-900 hover:bg-slate-100 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <span className="font-medium">Bài tiếp theo</span>
             <ArrowRight className="h-5 w-5" />

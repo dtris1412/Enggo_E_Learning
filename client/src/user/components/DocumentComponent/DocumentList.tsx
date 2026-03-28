@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useDocument } from "../../contexts/documentContext";
-import { useToast } from "../../../shared/components/Toast/Toast";
+import { useDocument } from "../../contexts/documentContext.tsx";
+import { useToast } from "../../../shared/components/Toast/Toast.tsx";
 import DocumentListItem from "./DocumentListItem";
 import {
   Search,

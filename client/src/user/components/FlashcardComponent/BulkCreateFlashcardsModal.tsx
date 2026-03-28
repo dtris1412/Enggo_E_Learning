@@ -195,11 +195,11 @@ Goodbye,Tạm biệt,/ɡʊdˈbaɪ/,Goodbye my friend,easy`;
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl shadow-2xl max-w-7xl w-full max-h-[90vh] flex flex-col">
         {/* Header */}
-        <div className="sticky top-0 bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-6 rounded-t-2xl">
+        <div className="sticky top-0 bg-gradient-to-r from-violet-800 to-violet-900 text-white p-6 rounded-t-2xl">
           <div className="flex justify-between items-start mb-4">
             <div>
               <h2 className="text-2xl font-bold">Thêm nhiều Flashcard</h2>
-              <p className="text-indigo-100 text-sm mt-1">
+              <p className="text-violet-100 text-sm mt-1">
                 Đang thêm {flashcards.length} thẻ
               </p>
             </div>
@@ -317,7 +317,7 @@ Goodbye,Tạm biệt,/ɡʊdˈbaɪ/,Goodbye my friend,easy`;
                               e.target.value,
                             )
                           }
-                          className="w-full px-2 py-1 text-sm border-0 focus:ring-2 focus:ring-indigo-500 rounded resize-none"
+                          className="w-full px-2 py-1 text-sm border-0 focus:ring-2 focus:ring-violet-500 rounded resize-none"
                           rows={2}
                           placeholder="Nhập từ/câu hỏi"
                         />
@@ -334,7 +334,7 @@ Goodbye,Tạm biệt,/ɡʊdˈbaɪ/,Goodbye my friend,easy`;
                               e.target.value,
                             )
                           }
-                          className="w-full px-2 py-1 text-sm border-0 focus:ring-2 focus:ring-indigo-500 rounded resize-none"
+                          className="w-full px-2 py-1 text-sm border-0 focus:ring-2 focus:ring-violet-500 rounded resize-none"
                           rows={2}
                           placeholder="Nhập nghĩa/câu trả lời"
                         />
@@ -352,7 +352,7 @@ Goodbye,Tạm biệt,/ɡʊdˈbaɪ/,Goodbye my friend,easy`;
                               e.target.value,
                             )
                           }
-                          className="w-full px-2 py-1 text-sm border-0 focus:ring-2 focus:ring-indigo-500 rounded"
+                          className="w-full px-2 py-1 text-sm border-0 focus:ring-2 focus:ring-violet-500 rounded"
                           placeholder="/ˈhæpi/"
                         />
                       </td>
@@ -368,7 +368,7 @@ Goodbye,Tạm biệt,/ɡʊdˈbaɪ/,Goodbye my friend,easy`;
                               e.target.value,
                             )
                           }
-                          className="w-full px-2 py-1 text-sm border-0 focus:ring-2 focus:ring-indigo-500 rounded resize-none"
+                          className="w-full px-2 py-1 text-sm border-0 focus:ring-2 focus:ring-violet-500 rounded resize-none"
                           rows={2}
                           placeholder="Ví dụ: Hello everyone!"
                         />
@@ -385,7 +385,7 @@ Goodbye,Tạm biệt,/ɡʊdˈbaɪ/,Goodbye my friend,easy`;
                               e.target.value,
                             )
                           }
-                          className="w-full px-2 py-1 text-sm border-0 focus:ring-2 focus:ring-indigo-500 rounded"
+                          className="w-full px-2 py-1 text-sm border-0 focus:ring-2 focus:ring-violet-500 rounded"
                         >
                           <option value="">--</option>
                           <option value="easy">Dễ</option>
@@ -416,7 +416,7 @@ Goodbye,Tạm biệt,/ɡʊdˈbaɪ/,Goodbye my friend,easy`;
             <button
               type="button"
               onClick={addFlashcard}
-              className="mt-4 w-full py-3 border-2 border-dashed border-indigo-300 text-indigo-600 rounded-lg hover:bg-indigo-50 transition-colors flex items-center justify-center gap-2 font-medium"
+              className="mt-4 w-full py-3 border-2 border-dashed border-violet-300 text-violet-600 rounded-lg hover:bg-violet-50 transition-colors flex items-center justify-center gap-2 font-medium"
             >
               <Plus className="w-5 h-5" />
               Thêm hàng mới
@@ -437,7 +437,7 @@ Goodbye,Tạm biệt,/ɡʊdˈbaɪ/,Goodbye my friend,easy`;
               <button
                 type="submit"
                 disabled={loading}
-                className="flex-1 px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                className="flex-1 px-6 py-3 bg-gradient-to-r from-violet-800 to-violet-900 text-white rounded-md hover:bg-violet-700 transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed font-medium"
               >
                 {loading ? "Đang lưu..." : `Lưu ${flashcards.length} thẻ`}
               </button>
@@ -450,3 +450,5 @@ Goodbye,Tạm biệt,/ɡʊdˈbaɪ/,Goodbye my friend,easy`;
 };
 
 export default BulkCreateFlashcardsModal;
+
+
