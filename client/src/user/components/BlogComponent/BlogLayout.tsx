@@ -71,12 +71,26 @@ const BlogLayout: React.FC<BlogLayoutProps> = ({
 
   return (
     <div className="min-h-screen bg-slate-50">
-      {/* Header */}
-      <div className="border-b bg-white">
-        <div className="max-w-7xl mx-auto px-4 py-8">
-          <h1 className="text-3xl font-bold text-slate-800">Bài viết nổi bật</h1>
+      {/* Hero Section */}
+      <section className="relative bg-slate-950 text-white py-10 overflow-hidden">
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="absolute -top-16 -left-16 w-[300px] h-[300px] bg-blue-700/20 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 right-0 w-[250px] h-[250px] bg-violet-700/20 rounded-full blur-3xl" />
         </div>
-      </div>
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <span className="inline-block text-amber-400 text-xs font-semibold uppercase tracking-widest mb-2">
+              Góc học tập
+            </span>
+            <h1 className="text-3xl lg:text-4xl font-black leading-tight">
+              <span className="text-white">Bài viết</span>{" "}
+              <span className="bg-gradient-to-r from-amber-400 via-orange-400 to-rose-400 bg-clip-text text-transparent">
+                nổi bật
+              </span>
+            </h1>
+          </div>
+        </div>
+      </section>
 
       {/* Main Content - 3 columns layout */}
       <div className="max-w-7xl mx-auto px-4 py-8">
