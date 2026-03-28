@@ -47,12 +47,12 @@ const ExamResult: React.FC = () => {
             }
           });
         } else {
-          showToast("error", resultData.message || "Failed to load result");
+          showToast("error", resultData.message || "Không thể tải kết quả");
           navigate("/exams");
         }
       } catch (error) {
         console.error("Error fetching result:", error);
-        showToast("error", "Failed to load result");
+        showToast("error", "Không thể tải kết quả");
         navigate("/exams");
       } finally {
         setLoading(false);
@@ -86,7 +86,7 @@ const ExamResult: React.FC = () => {
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-slate-600">Loading results...</p>
+          <p className="text-slate-600">Đang tải kết quả...</p>
         </div>
       </div>
     );
@@ -98,13 +98,13 @@ const ExamResult: React.FC = () => {
         <div className="text-center">
           <XCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
           <h3 className="text-xl font-semibold text-slate-900 mb-2">
-            Result not found
+            Không tìm thấy kết quả
           </h3>
           <button
             onClick={() => navigate("/exams")}
             className="text-blue-600 hover:underline"
           >
-            Back to exams
+            Quay lại danh sách đề thi
           </button>
         </div>
       </div>
@@ -123,13 +123,13 @@ const ExamResult: React.FC = () => {
             className="flex items-center gap-2 text-slate-600 hover:text-slate-900 mb-4"
           >
             <ArrowLeft className="w-5 h-5" />
-            Back to Exams
+            Quay lại đề thi
           </button>
 
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold text-slate-900 mb-2">
-                Exam Results
+                Kết quả thi
               </h1>
               <p className="text-slate-600">{result.exam.exam_title}</p>
             </div>
@@ -140,14 +140,14 @@ const ExamResult: React.FC = () => {
                 className="px-4 py-2 border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors flex items-center gap-2"
               >
                 <FileText className="w-4 h-4" />
-                View Exam
+                Xem đề thi
               </button>
               <button
                 onClick={() => navigate(`/exams/${result.exam.exam_id}/take`)}
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
               >
                 <RotateCcw className="w-4 h-4" />
-                Retake Exam
+                Làm lại
               </button>
             </div>
           </div>
@@ -172,19 +172,19 @@ const ExamResult: React.FC = () => {
                   {percentage.toFixed(1)}%
                 </h2>
                 <p className="text-lg text-slate-700 mb-4">
-                  Score: {result.total_score} points
+                  Điểm: {result.total_score} điểm
                 </p>
                 <div className="flex items-center justify-center gap-6 text-sm">
                   <div className="flex items-center gap-2">
                     <CheckCircle className="w-5 h-5 text-green-600" />
                     <span className="text-slate-700">
-                      {result.statistics.correct_answers} Correct
+                      {result.statistics.correct_answers} Đúng
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <XCircle className="w-5 h-5 text-red-600" />
                     <span className="text-slate-700">
-                      {result.statistics.incorrect_answers} Incorrect
+                      {result.statistics.incorrect_answers} Sai
                     </span>
                   </div>
                 </div>
@@ -194,7 +194,7 @@ const ExamResult: React.FC = () => {
             {/* Statistics */}
             <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
               <h3 className="text-xl font-bold text-slate-900 mb-4">
-                Performance Summary
+                Tổng quan kết quả
               </h3>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="text-center p-4 bg-blue-50 rounded-lg">
@@ -202,28 +202,28 @@ const ExamResult: React.FC = () => {
                   <p className="text-2xl font-bold text-slate-900">
                     {result.statistics.total_questions}
                   </p>
-                  <p className="text-sm text-slate-600">Total Questions</p>
+                  <p className="text-sm text-slate-600">Tổng câu hỏi</p>
                 </div>
                 <div className="text-center p-4 bg-green-50 rounded-lg">
                   <CheckCircle className="w-8 h-8 text-green-600 mx-auto mb-2" />
                   <p className="text-2xl font-bold text-slate-900">
                     {result.statistics.correct_answers}
                   </p>
-                  <p className="text-sm text-slate-600">Correct</p>
+                  <p className="text-sm text-slate-600">Câu đúng</p>
                 </div>
                 <div className="text-center p-4 bg-red-50 rounded-lg">
                   <XCircle className="w-8 h-8 text-red-600 mx-auto mb-2" />
                   <p className="text-2xl font-bold text-slate-900">
                     {result.statistics.incorrect_answers}
                   </p>
-                  <p className="text-sm text-slate-600">Incorrect</p>
+                  <p className="text-sm text-slate-600">Câu sai</p>
                 </div>
                 <div className="text-center p-4 bg-purple-50 rounded-lg">
                   <Award className="w-8 h-8 text-purple-600 mx-auto mb-2" />
                   <p className="text-2xl font-bold text-slate-900">
                     {result.total_score}
                   </p>
-                  <p className="text-sm text-slate-600">Points</p>
+                  <p className="text-sm text-slate-600">Điểm số</p>
                 </div>
               </div>
             </div>
@@ -231,7 +231,7 @@ const ExamResult: React.FC = () => {
             {/* Detailed Answers */}
             <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
               <h3 className="text-xl font-bold text-slate-900 mb-4">
-                Detailed Answers
+                Đáp án chi tiết
               </h3>
 
               <div className="space-y-4">
@@ -262,7 +262,7 @@ const ExamResult: React.FC = () => {
                             )}
                             <div className="flex-1">
                               <p className="font-semibold text-slate-900 mb-1">
-                                Question {index + 1}
+                                Câu {index + 1}
                               </p>
                               <p className="text-slate-700 line-clamp-2">
                                 {
@@ -337,12 +337,12 @@ const ExamResult: React.FC = () => {
                                           </span>
                                           {isCorrectOption && (
                                             <span className="ml-2 text-green-600 font-semibold text-sm">
-                                              (Correct Answer)
+                                              (Đáp án đúng)
                                             </span>
                                           )}
                                           {isUserAnswer && !isCorrectOption && (
                                             <span className="ml-2 text-red-600 font-semibold text-sm">
-                                              (Your Answer)
+                                              (Câu trả lời của bạn)
                                             </span>
                                           )}
                                         </div>
@@ -358,7 +358,7 @@ const ExamResult: React.FC = () => {
                           {answer.Container_Question.Question.explanation && (
                             <div className="mt-4 p-4 bg-blue-50 border-l-4 border-blue-500 rounded">
                               <p className="font-semibold text-blue-900 mb-2">
-                                Explanation:
+                                Giải thích:
                               </p>
                               <p className="text-blue-800">
                                 {answer.Container_Question.Question.explanation}
@@ -380,13 +380,13 @@ const ExamResult: React.FC = () => {
               {/* Exam Info */}
               <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
                 <h3 className="font-semibold text-slate-900 mb-4">
-                  Exam Details
+                  Chi tiết đề thi
                 </h3>
                 <div className="space-y-3">
                   <div className="flex items-center gap-3 text-sm">
                     <FileText className="w-4 h-4 text-slate-400" />
                     <div>
-                      <p className="text-slate-600">Exam</p>
+                      <p className="text-slate-600">Đề thi</p>
                       <p className="font-medium text-slate-900">
                         {result.exam.exam_code}
                       </p>
@@ -395,7 +395,7 @@ const ExamResult: React.FC = () => {
                   <div className="flex items-center gap-3 text-sm">
                     <Calendar className="w-4 h-4 text-slate-400" />
                     <div>
-                      <p className="text-slate-600">Submitted</p>
+                      <p className="text-slate-600">Đã nộp</p>
                       <p className="font-medium text-slate-900">
                         {new Date(result.submitted_at).toLocaleString()}
                       </p>
@@ -404,9 +404,9 @@ const ExamResult: React.FC = () => {
                   <div className="flex items-center gap-3 text-sm">
                     <Clock className="w-4 h-4 text-slate-400" />
                     <div>
-                      <p className="text-slate-600">Duration</p>
+                      <p className="text-slate-600">Thời gian</p>
                       <p className="font-medium text-slate-900">
-                        {result.exam.exam_duration} minutes
+                        {result.exam.exam_duration} phút
                       </p>
                     </div>
                   </div>
@@ -416,40 +416,40 @@ const ExamResult: React.FC = () => {
               {/* Performance Tips */}
               <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg shadow-sm border border-blue-200 p-6">
                 <h3 className="font-semibold text-slate-900 mb-3">
-                  Performance Tips
+                  Lời khuyên
                 </h3>
                 <ul className="space-y-2 text-sm text-slate-700">
                   {percentage >= 80 ? (
                     <>
                       <li className="flex items-start gap-2">
                         <span className="text-green-600 mt-0.5">✓</span>
-                        <span>Excellent work! Keep practicing.</span>
+                        <span>Xuất sắc! Hãy tiếp tục luyện tập.</span>
                       </li>
                       <li className="flex items-start gap-2">
                         <span className="text-green-600 mt-0.5">✓</span>
-                        <span>Review incorrect answers to improve.</span>
+                        <span>Xem lại các câu sai để cải thiện.</span>
                       </li>
                     </>
                   ) : percentage >= 60 ? (
                     <>
                       <li className="flex items-start gap-2">
                         <span className="text-yellow-600 mt-0.5">!</span>
-                        <span>Good effort! More practice needed.</span>
+                        <span>Cố gắng tốt! Cần luyện tập thêm.</span>
                       </li>
                       <li className="flex items-start gap-2">
                         <span className="text-yellow-600 mt-0.5">!</span>
-                        <span>Focus on your weak areas.</span>
+                        <span>Tập trung vào các điểm yếu.</span>
                       </li>
                     </>
                   ) : (
                     <>
                       <li className="flex items-start gap-2">
                         <span className="text-red-600 mt-0.5">×</span>
-                        <span>Keep practicing to improve your score.</span>
+                        <span>Tiếp tục luyện tập để nâng cao điểm số.</span>
                       </li>
                       <li className="flex items-start gap-2">
                         <span className="text-red-600 mt-0.5">×</span>
-                        <span>Review the material carefully.</span>
+                        <span>Xem lại tài liệu một cách cẩn thận.</span>
                       </li>
                     </>
                   )}
@@ -458,7 +458,9 @@ const ExamResult: React.FC = () => {
 
               {/* Actions */}
               <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
-                <h3 className="font-semibold text-slate-900 mb-4">Next Steps</h3>
+                <h3 className="font-semibold text-slate-900 mb-4">
+                  Bước tiếp theo
+                </h3>
                 <div className="space-y-3">
                   <button
                     onClick={() =>
@@ -467,21 +469,21 @@ const ExamResult: React.FC = () => {
                     className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center justify-center gap-2"
                   >
                     <RotateCcw className="w-4 h-4" />
-                    Retake Exam
+                    Làm lại bài thi
                   </button>
                   <button
                     onClick={() => navigate("/exams")}
                     className="w-full px-4 py-3 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors font-medium flex items-center justify-center gap-2"
                   >
                     <Home className="w-4 h-4" />
-                    Browse Exams
+                    Khám phá đề thi
                   </button>
                   <button
                     onClick={() => navigate("/exams/history")}
                     className="w-full px-4 py-3 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors font-medium flex items-center justify-center gap-2"
                   >
                     <FileText className="w-4 h-4" />
-                    View History
+                    Xem lịch sử
                   </button>
                 </div>
               </div>

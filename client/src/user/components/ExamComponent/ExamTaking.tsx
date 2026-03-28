@@ -72,7 +72,7 @@ const ExamTaking: React.FC = () => {
           });
           setAnswers(savedAnswers);
 
-          showToast("info", "Resuming your exam...");
+          showToast("info", "Đang tiếp tục bài thi...");
         } else {
           // Start new exam
           const startResult = await startExam(parseInt(id));
@@ -80,7 +80,10 @@ const ExamTaking: React.FC = () => {
             examId = startResult.data.user_exam_id;
             setUserExamId(examId);
           } else {
-            showToast("error", startResult.message || "Failed to start exam");
+            showToast(
+              "error",
+              startResult.message || "Không thể bắt đầu bài thi",
+            );
             navigate(`/exams/${id}`);
             return;
           }
@@ -92,12 +95,12 @@ const ExamTaking: React.FC = () => {
           setExam(examData);
           setTimeRemaining(examData.exam_duration * 60); // Convert to seconds
         } else {
-          showToast("error", "Failed to load exam");
+          showToast("error", "Không thể tải đề thi");
           navigate(`/exams/${id}`);
         }
       } catch (error) {
         console.error("Error initializing exam:", error);
-        showToast("error", "Failed to load exam");
+        showToast("error", "Không thể tải đề thi");
         navigate(`/exams/${id}`);
       } finally {
         setLoading(false);
@@ -185,12 +188,12 @@ const ExamTaking: React.FC = () => {
 
       const result = await saveAnswers(userExamId, answersArray);
       if (result.success && showNotification) {
-        showToast("success", "Answers saved successfully");
+        showToast("success", "Đã lưu câu trả lời");
       }
     } catch (error) {
       console.error("Error saving answers:", error);
       if (showNotification) {
-        showToast("error", "Failed to save answers");
+        showToast("error", "Không thể lưu câu trả lời");
       }
     } finally {
       setIsSaving(false);
@@ -206,15 +209,15 @@ const ExamTaking: React.FC = () => {
     // Submit exam
     const result = await submitExam(userExamId);
     if (result.success) {
-      showToast("success", "Exam submitted successfully!");
+      showToast("success", "Đã nộp bài thi thành công!");
       navigate(`/exams/result/${userExamId}`);
     } else {
-      showToast("error", result.message || "Failed to submit exam");
+      showToast("error", result.message || "Không thể nộp bài thi");
     }
   };
 
   const handleAutoSubmit = async () => {
-    showToast("info", "Time's up! Submitting your exam...");
+    showToast("info", "Hết giờ! Đang nộp bài thi...");
     await handleSubmit();
   };
 
@@ -361,7 +364,7 @@ const ExamTaking: React.FC = () => {
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-slate-600">Loading exam...</p>
+          <p className="text-slate-600">Đang tải đề thi...</p>
         </div>
       </div>
     );
@@ -373,13 +376,13 @@ const ExamTaking: React.FC = () => {
         <div className="text-center">
           <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
           <h3 className="text-xl font-semibold text-slate-900 mb-2">
-            Failed to load exam
+            Không thể tải đề thi
           </h3>
           <button
             onClick={() => navigate(`/exams/${id}`)}
             className="text-blue-600 hover:underline"
           >
-            Back to exam details
+            Quay lại chi tiết đề thi
           </button>
         </div>
       </div>
@@ -414,7 +417,7 @@ const ExamTaking: React.FC = () => {
                   {exam.exam_title}
                 </h1>
                 <p className="text-xs text-slate-500">
-                  Question {currentQuestionNumber} of {totalQuestions}
+                  Câu {currentQuestionNumber} / {totalQuestions}
                 </p>
               </div>
             </div>
@@ -430,7 +433,7 @@ const ExamTaking: React.FC = () => {
                       ? "bg-purple-100 text-purple-700"
                       : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                   }`}
-                  title={isAudioPlaying ? "Pause Audio" : "Play Audio"}
+                  title={isAudioPlaying ? "Tạm dừng âm thanh" : "Phát âm thanh"}
                 >
                   {isAudioPlaying ? (
                     <Volume2 className="w-5 h-5" />
@@ -464,7 +467,7 @@ const ExamTaking: React.FC = () => {
               <button
                 onClick={() => setShowOverviewModal(true)}
                 className="p-2 border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors"
-                title="Question Overview"
+                title="Tổng quan câu hỏi"
               >
                 <LayoutGrid className="w-5 h-5 text-slate-600" />
               </button>
@@ -476,7 +479,7 @@ const ExamTaking: React.FC = () => {
                 className="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 flex items-center gap-2"
               >
                 <Save className="w-4 h-4" />
-                {isSaving ? "Saving..." : "Save"}
+                {isSaving ? "Đang lưu..." : "Lưu"}
               </button>
 
               {/* Submit */}
@@ -485,7 +488,7 @@ const ExamTaking: React.FC = () => {
                 className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
               >
                 <Send className="w-4 h-4" />
-                Submit
+                Nộp bài
               </button>
             </div>
           </div>
@@ -527,7 +530,7 @@ const ExamTaking: React.FC = () => {
                   {currentQuestion && currentQuestion.image_url && (
                     <div className="mb-5">
                       <p className="text-sm font-medium text-slate-600 mb-2">
-                        Question {currentQuestionNumber} Image:
+                        Hình ảnh câu {currentQuestionNumber}:
                       </p>
                       <img
                         src={currentQuestion.image_url}
@@ -552,7 +555,7 @@ const ExamTaking: React.FC = () => {
                     !currentQuestion?.image_url && (
                       <div className="text-center py-12 text-slate-400">
                         <BookOpen className="w-16 h-16 mx-auto mb-3 opacity-50" />
-                        <p className="text-sm">No visual content</p>
+                        <p className="text-sm">Không có nội dung hình ảnh</p>
                       </div>
                     )}
                 </>
@@ -627,7 +630,7 @@ const ExamTaking: React.FC = () => {
                     className="px-6 py-3 border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2 text-sm font-medium text-slate-700"
                   >
                     <ChevronLeft className="w-4 h-4" />
-                    Previous
+                    Trước
                   </button>
 
                   <div className="text-sm text-slate-500 font-medium">
@@ -644,7 +647,7 @@ const ExamTaking: React.FC = () => {
                     }
                     className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2 text-sm font-medium"
                   >
-                    Next
+                    Tiếp
                     <ChevronRight className="w-4 h-4" />
                   </button>
                 </div>
@@ -660,7 +663,7 @@ const ExamTaking: React.FC = () => {
           <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full p-6 max-h-[85vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-xl font-bold text-slate-900">
-                Question Overview
+                Tổng quan câu hỏi
               </h3>
               <button
                 onClick={() => setShowOverviewModal(false)}
@@ -680,8 +683,8 @@ const ExamTaking: React.FC = () => {
                   return (
                     <div key={container.container_id}>
                       <h4 className="text-sm font-semibold text-slate-900 mb-3">
-                        {container.instruction || `Section ${containerIdx + 1}`}{" "}
-                        - {container.skill?.toUpperCase()}
+                        {container.instruction || `Phần ${containerIdx + 1}`} -{" "}
+                        {container.skill?.toUpperCase()}
                       </h4>
                       <div className="grid grid-cols-10 gap-2">
                         {containerQuestions.map(
@@ -718,7 +721,7 @@ const ExamTaking: React.FC = () => {
                                       ? "bg-green-100 text-green-700 hover:bg-green-200"
                                       : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                                 }`}
-                                title={`Question ${globalNum}${isAnswered ? " (Answered)" : ""}`}
+                                title={`Câu ${globalNum}${isAnswered ? " (Đã trả lời)" : ""}`}
                               >
                                 {globalNum}
                               </button>
@@ -736,15 +739,15 @@ const ExamTaking: React.FC = () => {
             <div className="flex items-center gap-6 mt-6 pt-6 border-t">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 bg-blue-600 rounded-lg"></div>
-                <span className="text-sm text-slate-600">Current</span>
+                <span className="text-sm text-slate-600">Hiện tại</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 bg-green-100 border border-green-200 rounded-lg"></div>
-                <span className="text-sm text-slate-600">Answered</span>
+                <span className="text-sm text-slate-600">Đã trả lời</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 bg-slate-100 border border-slate-200 rounded-lg"></div>
-                <span className="text-sm text-slate-600">Unanswered</span>
+                <span className="text-sm text-slate-600">Chưa trả lời</span>
               </div>
             </div>
           </div>
@@ -756,7 +759,9 @@ const ExamTaking: React.FC = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-bold text-slate-900">Submit Exam?</h3>
+              <h3 className="text-xl font-bold text-slate-900">
+                Xác nhận nộp bài?
+              </h3>
               <button
                 onClick={() => setShowSubmitModal(false)}
                 className="text-slate-400 hover:text-slate-600"
@@ -767,22 +772,22 @@ const ExamTaking: React.FC = () => {
 
             <div className="mb-6">
               <p className="text-slate-600 mb-4">
-                Are you sure you want to submit your exam? You won't be able to
-                change your answers after submission.
+                Bạn có chắc muốn nộp bài? Bạn sẽ không thể thay đổi câu trả lời
+                sau khi nộp.
               </p>
               <div className="space-y-2 bg-slate-50 rounded-lg p-4">
                 <div className="flex justify-between text-sm">
-                  <span className="text-slate-600">Total Questions:</span>
+                  <span className="text-slate-600">Tổng số câu:</span>
                   <span className="font-semibold">{totalQuestions}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-slate-600">Answered:</span>
+                  <span className="text-slate-600">Đã trả lời:</span>
                   <span className="font-semibold text-green-600">
                     {answeredQuestions}
                   </span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-slate-600">Unanswered:</span>
+                  <span className="text-slate-600">Chưa trả lời:</span>
                   <span className="font-semibold text-red-600">
                     {totalQuestions - answeredQuestions}
                   </span>
@@ -795,13 +800,13 @@ const ExamTaking: React.FC = () => {
                 onClick={() => setShowSubmitModal(false)}
                 className="flex-1 px-4 py-3 border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors font-medium"
               >
-                Cancel
+                Hủy
               </button>
               <button
                 onClick={handleSubmit}
                 className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
               >
-                Submit Exam
+                Nộp bài thi
               </button>
             </div>
           </div>

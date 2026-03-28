@@ -47,12 +47,12 @@ const ExamDetail: React.FC = () => {
         if (examData) {
           setExam(examData);
         } else {
-          showToast("error", "Failed to load exam");
+          showToast("error", "Không thể tải đề thi");
           setTimeout(() => navigate("/exams"), 2000);
         }
       } catch (error) {
         console.error("Error fetching exam:", error);
-        showToast("error", "Failed to load exam");
+        showToast("error", "Không thể tải đề thi");
       } finally {
         setLoading(false);
       }
@@ -85,13 +85,13 @@ const ExamDetail: React.FC = () => {
 
   const handleStartExam = async () => {
     if (!isAuthenticated) {
-      showToast("error", "Please login to take the exam");
+      showToast("error", "Vui lòng đăng nhập để làm bài thi");
       navigate("/login");
       return;
     }
 
     if (!isFullExam && selectedContainers.length === 0) {
-      showToast("error", "Please select at least one part to take the exam");
+      showToast("error", "Vui lòng chọn ít nhất một phần để làm bài thi");
       return;
     }
 
@@ -109,11 +109,11 @@ const ExamDetail: React.FC = () => {
           state: { userExamId: result.data.user_exam_id },
         });
       } else {
-        showToast("error", result.message || "Failed to start exam");
+        showToast("error", result.message || "Không thể bắt đầu bài thi");
       }
     } catch (error) {
       console.error("Error starting exam:", error);
-      showToast("error", "Failed to start exam");
+      showToast("error", "Không thể bắt đầu bài thi");
     } finally {
       setStartingExam(false);
     }
@@ -199,7 +199,7 @@ const ExamDetail: React.FC = () => {
     if (hours > 0) {
       return `${hours}h ${mins}m`;
     }
-    return `${mins} minutes`;
+    return `${mins} phút`;
   };
 
   if (loading) {
@@ -216,13 +216,13 @@ const ExamDetail: React.FC = () => {
         <div className="text-center">
           <AlertCircle className="w-16 h-16 text-slate-400 mx-auto mb-4" />
           <h3 className="text-xl font-semibold text-slate-900 mb-2">
-            Exam not found
+            Không tìm thấy đề thi
           </h3>
           <button
             onClick={() => navigate("/exams")}
             className="text-blue-600 hover:underline"
           >
-            Back to exams
+            Quay lại danh sách đề thi
           </button>
         </div>
       </div>
@@ -239,7 +239,7 @@ const ExamDetail: React.FC = () => {
             className="flex items-center gap-2 text-slate-600 hover:text-slate-900 mb-4"
           >
             <ArrowLeft className="w-5 h-5" />
-            Back to Exams
+            Quay lại đề thi
           </button>
 
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
@@ -284,14 +284,14 @@ const ExamDetail: React.FC = () => {
                 {startingExam ? (
                   <>
                     <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
-                    Starting...
+                    Đang bắt đầu...
                   </>
                 ) : (
                   <>
                     <Play className="w-6 h-6" />
                     {isFullExam
-                      ? "Start Full Exam"
-                      : `Start Selected Parts (${selectedContainers.length})`}
+                      ? "Làm toàn bộ đề thi"
+                      : `Làm phần đã chọn (${selectedContainers.length})`}
                   </>
                 )}
               </button>
@@ -307,13 +307,13 @@ const ExamDetail: React.FC = () => {
             {/* Exam Info */}
             <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
               <h2 className="text-xl font-bold text-slate-900 mb-4">
-                Exam Information
+                Thông tin đề thi
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="flex items-center gap-3 p-4 bg-blue-50 rounded-lg">
                   <Clock className="w-8 h-8 text-blue-600" />
                   <div>
-                    <p className="text-sm text-slate-600">Duration</p>
+                    <p className="text-sm text-slate-600">Thời gian</p>
                     <p className="font-semibold text-slate-900">
                       {formatDuration(exam.exam_duration)}
                     </p>
@@ -323,9 +323,9 @@ const ExamDetail: React.FC = () => {
                 <div className="flex items-center gap-3 p-4 bg-green-50 rounded-lg">
                   <FileText className="w-8 h-8 text-green-600" />
                   <div>
-                    <p className="text-sm text-slate-600">Questions</p>
+                    <p className="text-sm text-slate-600">Câu hỏi</p>
                     <p className="font-semibold text-slate-900">
-                      {exam.total_questions} questions
+                      {exam.total_questions} câu hỏi
                     </p>
                   </div>
                 </div>
@@ -333,7 +333,7 @@ const ExamDetail: React.FC = () => {
                 <div className="flex items-center gap-3 p-4 bg-purple-50 rounded-lg">
                   <Calendar className="w-8 h-8 text-purple-600" />
                   <div>
-                    <p className="text-sm text-slate-600">Year</p>
+                    <p className="text-sm text-slate-600">Năm</p>
                     <p className="font-semibold text-slate-900">{exam.year}</p>
                   </div>
                 </div>
@@ -341,7 +341,7 @@ const ExamDetail: React.FC = () => {
                 <div className="flex items-center gap-3 p-4 bg-orange-50 rounded-lg">
                   <Award className="w-8 h-8 text-orange-600" />
                   <div>
-                    <p className="text-sm text-slate-600">Type</p>
+                    <p className="text-sm text-slate-600">Loại</p>
                     <p className="font-semibold text-slate-900">
                       {exam.exam_type}
                     </p>
@@ -351,7 +351,7 @@ const ExamDetail: React.FC = () => {
 
               {exam.source && (
                 <div className="mt-6 p-4 bg-slate-50 rounded-lg">
-                  <p className="text-sm text-slate-600 mb-1">Source</p>
+                  <p className="text-sm text-slate-600 mb-1">Nguồn</p>
                   <p className="font-medium text-slate-900">{exam.source}</p>
                 </div>
               )}
@@ -361,7 +361,7 @@ const ExamDetail: React.FC = () => {
                   <div className="flex items-center gap-2 mb-3">
                     <Volume2 className="w-5 h-5 text-blue-600" />
                     <h3 className="font-semibold text-slate-900">
-                      Audio Materials
+                      Tài liệu âm thanh
                     </h3>
                   </div>
                   <div className="space-y-2">
@@ -371,10 +371,10 @@ const ExamDetail: React.FC = () => {
                         className="flex items-center justify-between p-3 bg-blue-50 rounded-lg"
                       >
                         <span className="text-sm text-slate-700">
-                          Duration: {Math.floor(media.duration / 60)} minutes
+                          Thời lượng: {Math.floor(media.duration / 60)} phút
                         </span>
                         <span className="text-xs text-slate-500">
-                          Audio included
+                          Có âm thanh
                         </span>
                       </div>
                     ))}
@@ -387,7 +387,7 @@ const ExamDetail: React.FC = () => {
             {exam.Exam_Containers && exam.Exam_Containers.length > 0 && (
               <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
                 <h2 className="text-xl font-bold text-slate-900 mb-4">
-                  Select Exam Parts
+                  Chọn phần thi
                 </h2>
 
                 {/* Full Exam Toggle */}
@@ -407,11 +407,11 @@ const ExamDetail: React.FC = () => {
                     )}
                     <div className="flex-1">
                       <h3 className="font-semibold text-slate-900">
-                        Full Exam (All Parts)
+                        Toàn bộ đề thi
                       </h3>
                       <p className="text-sm text-slate-600">
-                        Take the complete exam with all{" "}
-                        {exam.Exam_Containers.length} parts
+                        Làm toàn bộ đề với tất cả {exam.Exam_Containers.length}{" "}
+                        phần
                       </p>
                     </div>
                   </div>
@@ -420,7 +420,7 @@ const ExamDetail: React.FC = () => {
                 {/* Individual Parts */}
                 <div className="space-y-3">
                   <p className="text-sm text-slate-600 font-medium mb-3">
-                    Or select specific parts:
+                    Hoặc chọn phần thi cụ thể:
                   </p>
 
                   {Object.entries(groupContainersBySkill()).map(
@@ -460,7 +460,7 @@ const ExamDetail: React.FC = () => {
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2 mb-1">
                                   <span className="font-medium text-slate-900">
-                                    Part {container.order}
+                                    Phần {container.order}
                                   </span>
                                   <span
                                     className={`text-xs px-2 py-0.5 rounded-full ${getSkillColor(
@@ -476,10 +476,9 @@ const ExamDetail: React.FC = () => {
                                   </p>
                                 )}
                                 <p className="text-xs text-slate-500 mt-1">
-                                  {getContainerQuestionCount(container)}{" "}
-                                  questions
+                                  {getContainerQuestionCount(container)} câu hỏi
                                   {container.time_limit &&
-                                    ` • ${container.time_limit} minutes`}
+                                    ` • ${container.time_limit} phút`}
                                 </p>
                               </div>
                             </div>
@@ -494,8 +493,8 @@ const ExamDetail: React.FC = () => {
                 {!isFullExam && selectedContainers.length > 0 && (
                   <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                     <p className="text-sm text-blue-800">
-                      <span className="font-semibold">Selected:</span>{" "}
-                      {selectedContainers.length} part(s) •{" "}
+                      <span className="font-semibold">Đã chọn:</span>{" "}
+                      {selectedContainers.length} phần •{" "}
                       {exam.Exam_Containers.filter(
                         (c: any) =>
                           selectedContainers.includes(c.container_id) &&
@@ -505,7 +504,7 @@ const ExamDetail: React.FC = () => {
                           sum + getContainerQuestionCount(c),
                         0,
                       )}{" "}
-                      questions
+                      câu hỏi
                     </p>
                   </div>
                 )}
@@ -515,39 +514,38 @@ const ExamDetail: React.FC = () => {
             {/* Instructions */}
             <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
               <h2 className="text-xl font-bold text-slate-900 mb-4">
-                Instructions
+                Hướng dẫn
               </h2>
               <div className="space-y-3 text-slate-700">
                 <p className="flex items-start gap-2">
                   <span className="text-blue-600 font-bold">1.</span>
                   <span>
-                    Make sure you have a stable internet connection before
-                    starting the exam.
+                    Đảm bảo kết nối internet ổn định trước khi bắt đầu làm bài.
                   </span>
                 </p>
                 <p className="flex items-start gap-2">
                   <span className="text-blue-600 font-bold">2.</span>
                   <span>
-                    You will have {formatDuration(exam.exam_duration)} to
-                    complete the exam.
+                    Bạn có {formatDuration(exam.exam_duration)} để hoàn thành
+                    bài thi.
                   </span>
                 </p>
                 <p className="flex items-start gap-2">
                   <span className="text-blue-600 font-bold">3.</span>
                   <span>
-                    Your answers will be automatically saved as you progress.
+                    Câu trả lời sẽ được tự động lưu trong quá trình làm bài.
                   </span>
                 </p>
                 <p className="flex items-start gap-2">
                   <span className="text-blue-600 font-bold">4.</span>
                   <span>
-                    You can review and change your answers before submitting.
+                    Bạn có thể xem lại và thay đổi câu trả lời trước khi nộp.
                   </span>
                 </p>
                 <p className="flex items-start gap-2">
                   <span className="text-blue-600 font-bold">5.</span>
                   <span>
-                    Once submitted, you will receive your results immediately.
+                    Sau khi nộp bài, bạn sẽ nhận được kết quả ngay lập tức.
                   </span>
                 </p>
               </div>
@@ -566,14 +564,14 @@ const ExamDetail: React.FC = () => {
                 {startingExam ? (
                   <>
                     <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
-                    Starting...
+                    Đang bắt đầu...
                   </>
                 ) : (
                   <>
                     <Play className="w-6 h-6" />
                     {isFullExam
-                      ? "Start Full Exam"
-                      : `Start Selected Parts (${selectedContainers.length})`}
+                      ? "Làm toàn bộ đề thi"
+                      : `Làm phần đã chọn (${selectedContainers.length})`}
                   </>
                 )}
               </button>
@@ -588,7 +586,9 @@ const ExamDetail: React.FC = () => {
                 <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
                   <div className="flex items-center gap-2 mb-4">
                     <TrendingUp className="w-5 h-5 text-blue-600" />
-                    <h3 className="font-semibold text-slate-900">My Attempts</h3>
+                    <h3 className="font-semibold text-slate-900">
+                      Lượt thi của tôi
+                    </h3>
                   </div>
                   <div className="space-y-3">
                     {history.slice(0, 3).map((attempt: any) => (
@@ -617,7 +617,7 @@ const ExamDetail: React.FC = () => {
                         </div>
                         {attempt.total_score !== null && (
                           <p className="text-lg font-bold text-blue-600">
-                            Score: {attempt.total_score}
+                            Điểm: {attempt.total_score}
                           </p>
                         )}
                       </div>
@@ -627,7 +627,7 @@ const ExamDetail: React.FC = () => {
                     onClick={() => navigate("/exams/history")}
                     className="w-full mt-4 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors text-sm font-medium"
                   >
-                    View All Attempts
+                    Xem tất cả lượt thi
                   </button>
                 </div>
               )}
@@ -636,24 +636,24 @@ const ExamDetail: React.FC = () => {
               <div className="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-lg shadow-sm border border-yellow-200 p-6">
                 <div className="flex items-center gap-2 mb-4">
                   <BookOpen className="w-5 h-5 text-yellow-600" />
-                  <h3 className="font-semibold text-slate-900">Exam Tips</h3>
+                  <h3 className="font-semibold text-slate-900">Mẹo làm bài</h3>
                 </div>
                 <ul className="space-y-2 text-sm text-slate-700">
                   <li className="flex items-start gap-2">
                     <span className="text-yellow-600 mt-0.5">•</span>
-                    <span>Find a quiet place to take the exam</span>
+                    <span>Tìm nơi yên tĩnh để làm bài</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-yellow-600 mt-0.5">•</span>
-                    <span>Use headphones for listening sections</span>
+                    <span>Dùng tai nghe cho phần Listening</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-yellow-600 mt-0.5">•</span>
-                    <span>Read all questions carefully</span>
+                    <span>Đọc kỹ tất cả các câu hỏi</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-yellow-600 mt-0.5">•</span>
-                    <span>Manage your time wisely</span>
+                    <span>Quản lý thời gian hợp lý</span>
                   </li>
                 </ul>
               </div>
