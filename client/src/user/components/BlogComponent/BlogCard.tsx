@@ -46,7 +46,7 @@ const BlogCard: React.FC<BlogCardProps> = ({
 
   const getCategoryColor = (cat: string) => {
     const colors: { [key: string]: string } = {
-      "Mẽo học tập": "bg-blue-100 text-blue-700",
+      "Mớo học tập": "bg-purple-100 text-purple-700",
       TOEIC: "bg-emerald-100 text-emerald-700",
       IELTS: "bg-violet-100 text-violet-700",
       "Ngữ pháp": "bg-amber-100 text-amber-700",
@@ -63,11 +63,11 @@ const BlogCard: React.FC<BlogCardProps> = ({
   return (
     <article
       onClick={handleClick}
-      className="bg-white border border-slate-200 rounded-2xl overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer group"
+      className="bg-white border border-slate-200 rounded-md overflow-hidden hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer group"
     >
       <div className="flex flex-col sm:flex-row gap-4 p-4">
         {/* Thumbnail - Left side */}
-        <div className="relative w-full sm:w-48 h-48 sm:h-32 flex-shrink-0 overflow-hidden rounded-xl">
+        <div className="relative w-full sm:w-48 h-48 sm:h-32 flex-shrink-0 overflow-hidden rounded">
           <img
             src={blog_thumbnail}
             alt={blog_title}
@@ -76,7 +76,7 @@ const BlogCard: React.FC<BlogCardProps> = ({
           {/* Category Badge */}
           <div className="absolute top-2 left-2">
             <span
-              className={`px-3 py-1 rounded-lg text-xs font-semibold ${getCategoryColor(category)}`}
+              className={`px-3 py-1 rounded text-xs font-semibold ${getCategoryColor(category)}`}
             >
               {category.toUpperCase()}
             </span>
@@ -87,7 +87,7 @@ const BlogCard: React.FC<BlogCardProps> = ({
         <div className="flex-1 flex flex-col justify-between">
           {/* Title & Excerpt */}
           <div>
-            <h3 className="text-lg font-black text-slate-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
+            <h3 className="text-lg font-black text-slate-900 mb-2 line-clamp-2 group-hover:text-violet-600 transition-colors">
               {blog_title}
             </h3>
             <p className="text-slate-500 text-sm mb-3 line-clamp-2">

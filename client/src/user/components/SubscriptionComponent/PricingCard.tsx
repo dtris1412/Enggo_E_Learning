@@ -74,7 +74,7 @@ const PricingCard = ({
       case "free":
         return "bg-gradient-to-br from-slate-900 to-slate-800 border-slate-700";
       case "pro":
-        return "bg-gradient-to-br from-slate-900 to-slate-800 border-blue-500";
+        return "bg-gradient-to-br from-slate-900 to-slate-800 border-purple-500";
       case "premium":
         return "bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-yellow-500 shadow-2xl shadow-yellow-500/20";
       default:
@@ -88,13 +88,13 @@ const PricingCard = ({
   return (
     <div
       className={`relative rounded-xl border-2 ${getCardStyle()} p-5 transition-all duration-300 hover:shadow-xl hover:scale-[1.02] ${
-        isPopular ? "ring-2 ring-blue-400" : ""
+        isPopular ? "ring-2 ring-purple-400" : ""
       } ${code === "premium" ? "ring-2 ring-yellow-500" : ""}`}
     >
       {/* Popular Badge */}
       {isPopular && (
         <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-          <span className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-md flex items-center gap-1">
+          <span className="bg-purple-600 text-white px-3 py-1 rounded text-xs font-semibold shadow-md flex items-center gap-1">
             <Sparkles className="w-3 h-3" />
             Phổ biến nhất
           </span>
@@ -168,7 +168,7 @@ const PricingCard = ({
             className={`w-full py-2 px-4 rounded-lg text-sm font-semibold transition-all duration-200 mb-3 ${
               code === "premium"
                 ? "bg-gradient-to-r from-yellow-500 to-yellow-600 text-slate-900 hover:shadow-lg hover:shadow-yellow-500/50 hover:scale-[1.02]"
-                : "bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:shadow-lg hover:shadow-blue-500/50 hover:scale-[1.02]"
+                : "bg-purple-600 text-white hover:bg-purple-700 hover:shadow-lg hover:shadow-purple-500/50 hover:scale-[1.02]"
             }`}
           >
             Đăng ký ngay

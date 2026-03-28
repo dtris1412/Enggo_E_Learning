@@ -137,7 +137,7 @@ const Header = () => {
             to="/"
             className="flex items-center space-x-3 hover:scale-105 transition-transform duration-200"
           >
-            <BookOpen className="h-8 w-8 text-blue-600" />
+            <BookOpen className="h-8 w-8 text-violet-600" />
             <span className="text-xl font-black text-slate-900">Enggo</span>
           </Link>
 
@@ -150,8 +150,8 @@ const Header = () => {
                   to={item.path}
                   className={`px-3 py-2 text-sm font-medium transition-all duration-200 hover:scale-105 ${
                     location.pathname === item.path
-                      ? "text-blue-600 border-b-2 border-blue-600"
-                      : "text-slate-700 hover:text-blue-600"
+                      ? "text-violet-600 border-b-2 border-violet-600"
+                      : "text-slate-700 hover:text-violet-600"
                   }`}
                 >
                   {item.label}
@@ -168,8 +168,8 @@ const Header = () => {
                     learningItems.some(
                       (item) => location.pathname === item.path,
                     )
-                      ? "text-blue-600 border-b-2 border-blue-600"
-                      : "text-slate-700 hover:text-blue-600"
+                      ? "text-violet-600 border-b-2 border-violet-600"
+                      : "text-slate-700 hover:text-violet-600"
                   }`}
                 >
                   <span>Góc học tập</span>
@@ -182,7 +182,7 @@ const Header = () => {
 
                 {/* Learning Dropdown Menu */}
                 {learningDropdownOpen && (
-                  <div className="absolute left-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-slate-200 py-2 z-50 animate-fade-in">
+                  <div className="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-slate-200 py-2 z-50 animate-fade-in">
                     {learningItems.map((item) => (
                       <Link
                         key={item.path}
@@ -190,8 +190,8 @@ const Header = () => {
                         onClick={() => setLearningDropdownOpen(false)}
                         className={`block px-4 py-2 text-sm transition-colors duration-150 ${
                           location.pathname === item.path
-                            ? "text-blue-600 bg-blue-50 font-medium"
-                            : "text-slate-700 hover:bg-slate-50 hover:text-blue-600"
+                            ? "text-violet-600 bg-violet-50 font-medium"
+                            : "text-slate-700 hover:bg-slate-50 hover:text-violet-600"
                         }`}
                       >
                         {item.label}
@@ -211,7 +211,7 @@ const Header = () => {
                 {userSubscription.toLowerCase() !== "premium" && (
                   <Link
                     to="/subscription"
-                    className="flex items-center space-x-2 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:shadow-lg transition-all duration-200 hover:scale-[1.02] animate-shimmer bg-[length:200%_100%]"
+                    className="flex items-center space-x-2 bg-violet-600 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-violet-700 transition-colors duration-200"
                   >
                     <Sparkles className="w-4 h-4" />
                     <span className="drop-shadow-sm">Nâng cấp</span>
@@ -226,11 +226,11 @@ const Header = () => {
                   >
                     {/* Avatar Circle */}
                     <div className="relative">
-                      <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold text-sm shadow-md">
+                      <div className="w-10 h-10 bg-violet-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
                         {user.user_name?.charAt(0).toUpperCase() || "U"}
                       </div>
                       {/* Subscription Badge */}
-                      <div className="absolute -bottom-1.5 left-6 bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 text-[10px] font-bold text-white px-2 py-0.5 rounded-full shadow-md border-2 border-white animate-shimmer bg-[length:200%_100%]">
+                      <div className="absolute -bottom-1.5 left-6 bg-violet-700 text-[10px] font-bold text-white px-2 py-0.5 rounded-full border-2 border-white">
                         {userSubscription.toLowerCase()}
                       </div>
                     </div>
@@ -245,7 +245,7 @@ const Header = () => {
 
                   {/* Dropdown Menu */}
                   {isDropdownOpen && (
-                    <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-slate-200 py-2 z-50 animate-fade-in">
+                    <div className="absolute right-0 mt-2 w-56 bg-white rounded-md shadow-lg border border-slate-200 py-2 z-50 animate-fade-in">
                       {/* User Info Header */}
                       <div className="px-4 py-3 border-b border-slate-100">
                         <p className="text-sm font-bold text-slate-900">
@@ -254,8 +254,8 @@ const Header = () => {
                         <p className="text-xs text-slate-500 mt-0.5">
                           {user.user_email}
                         </p>
-                        <div className="mt-2 inline-flex items-center px-3 py-1 bg-gradient-to-r from-emerald-50 via-teal-50 to-cyan-50 border border-emerald-200 rounded-full shadow-sm">
-                          <span className="text-xs font-semibold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+                        <div className="mt-2 inline-flex items-center px-3 py-1 bg-violet-50 border border-violet-200 rounded">
+                          <span className="text-xs font-semibold text-violet-700">
                             {userSubscription} Member
                           </span>
                         </div>
@@ -266,7 +266,7 @@ const Header = () => {
                         <Link
                           to="/profile"
                           onClick={() => setIsDropdownOpen(false)}
-                          className="flex items-center px-4 py-2 text-sm text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-150"
+                          className="flex items-center px-4 py-2 text-sm text-slate-700 hover:bg-violet-50 hover:text-violet-600 transition-colors duration-150"
                         >
                           <UserCircle className="w-4 h-4 mr-3" />
                           Trang cá nhân
@@ -293,13 +293,13 @@ const Header = () => {
               <>
                 <Link
                   to="/login"
-                  className="text-slate-700 hover:text-blue-600 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover:bg-slate-50"
+                  className="text-slate-700 hover:text-violet-600 px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 hover:bg-slate-50"
                 >
                   Đăng nhập
                 </Link>
                 <Link
                   to="/register"
-                  className="bg-gradient-to-r from-amber-400 to-orange-500 text-slate-900 px-4 py-2 rounded-lg text-sm font-bold hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
+                  className="bg-violet-600 text-white px-4 py-2 rounded-md text-sm font-bold hover:bg-violet-700 transition-colors duration-200"
                 >
                   Đăng ký
                 </Link>
@@ -310,7 +310,7 @@ const Header = () => {
           {/* Mobile menu button */}
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="lg:hidden p-2 rounded-md text-slate-600 hover:text-blue-600 hover:bg-slate-50 transition-all duration-200"
+            className="lg:hidden p-2 rounded-md text-slate-600 hover:text-violet-600 hover:bg-slate-50 transition-all duration-200"
           >
             {isMenuOpen ? (
               <X className="h-6 w-6" />
@@ -330,8 +330,8 @@ const Header = () => {
                     onClick={() => setIsMenuOpen(false)}
                     className={`px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
                       location.pathname === item.path
-                        ? "text-blue-600 bg-blue-50"
-                        : "text-slate-700 hover:text-blue-600 hover:bg-slate-50"
+                        ? "text-violet-600 bg-violet-50"
+                        : "text-slate-700 hover:text-violet-600 hover:bg-slate-50"
                     }`}
                   >
                     {item.label}
@@ -351,8 +351,8 @@ const Header = () => {
                         onClick={() => setIsMenuOpen(false)}
                         className={`px-3 py-2 pl-6 rounded-md text-sm font-medium transition-all duration-200 flex ${
                           location.pathname === item.path
-                            ? "text-blue-600 bg-blue-50"
-                            : "text-slate-700 hover:text-blue-600 hover:bg-slate-50"
+                            ? "text-violet-600 bg-violet-50"
+                            : "text-slate-700 hover:text-violet-600 hover:bg-slate-50"
                         }`}
                       >
                         {item.label}
@@ -369,7 +369,7 @@ const Header = () => {
                         <Link
                           to="/subscription"
                           onClick={() => setIsMenuOpen(false)}
-                          className="flex items-center justify-center space-x-2 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 text-white px-4 py-3 rounded-lg text-sm font-semibold mx-3 hover:shadow-lg transition-all duration-200 hover:scale-[1.02] animate-shimmer bg-[length:200%_100%]"
+                          className="flex items-center justify-center space-x-2 bg-violet-600 text-white px-4 py-3 rounded-md text-sm font-semibold mx-3 hover:bg-violet-700 transition-colors duration-200"
                         >
                           <Sparkles className="w-5 h-5" />
                           <span className="drop-shadow-sm">
@@ -379,15 +379,15 @@ const Header = () => {
                       )}
 
                       {/* User Info Card - Mobile */}
-                      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4 mx-3 mb-2">
+                      <div className="bg-violet-50 rounded-md p-4 mx-3 mb-2">
                         <div className="flex items-center space-x-3">
                           {/* Avatar with Badge */}
                           <div className="relative flex-shrink-0">
-                            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold shadow-md">
+                            <div className="w-12 h-12 bg-violet-600 rounded-full flex items-center justify-center text-white font-semibold">
                               {user.user_name?.charAt(0).toUpperCase() || "U"}
                             </div>
                             {/* Subscription Badge */}
-                            <div className="absolute -bottom-1.5 left-7 bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 text-[10px] font-bold text-white px-2 py-0.5 rounded-full shadow-md border-2 border-white animate-shimmer bg-[length:200%_100%]">
+                            <div className="absolute -bottom-1.5 left-7 bg-violet-700 text-[10px] font-bold text-white px-2 py-0.5 rounded-full border-2 border-white">
                               {userSubscription.toLowerCase()}
                             </div>
                           </div>
@@ -400,9 +400,9 @@ const Header = () => {
                             <p className="text-xs text-slate-600 truncate">
                               {user.user_email}
                             </p>
-                            <div className="mt-1 inline-flex items-center px-2 py-0.5 bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-full shadow-sm">
-                              <span className="text-xs font-semibold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
-                                ✨ {userSubscription}
+                            <div className="mt-1 inline-flex items-center px-2 py-0.5 bg-violet-50 border border-violet-200 rounded">
+                              <span className="text-xs font-semibold text-violet-700">
+                                {userSubscription}
                               </span>
                             </div>
                           </div>
@@ -413,7 +413,7 @@ const Header = () => {
                       <Link
                         to="/profile"
                         onClick={() => setIsMenuOpen(false)}
-                        className="flex items-center space-x-3 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-blue-50 hover:text-blue-600 rounded-md mx-3 transition-all duration-200"
+                        className="flex items-center space-x-3 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-violet-50 hover:text-violet-600 rounded-md mx-3 transition-all duration-200"
                       >
                         <UserCircle className="h-5 w-5" />
                         <span>Trang cá nhân</span>

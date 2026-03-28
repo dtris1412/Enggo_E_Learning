@@ -156,7 +156,7 @@ const VerifyOTP = () => {
         <p className="mt-2 text-center text-sm text-slate-600">
           Nhập mã OTP đã được gửi đến email
         </p>
-        <p className="mt-1 text-center text-sm font-medium text-blue-600">
+        <p className="mt-1 text-center text-sm font-medium text-purple-600">
           {email}
         </p>
       </div>
@@ -186,7 +186,7 @@ const VerifyOTP = () => {
                     onChange={(e) => handleChange(index, e.target.value)}
                     onKeyDown={(e) => handleKeyDown(index, e)}
                     onPaste={index === 0 ? handlePaste : undefined}
-                    className="w-12 h-12 text-center text-xl font-bold border-2 border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                    className="w-12 h-12 text-center text-xl font-bold border-2 border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200"
                   />
                 ))}
               </div>
@@ -196,7 +196,7 @@ const VerifyOTP = () => {
               <button
                 type="submit"
                 disabled={isLoading || otp.some((digit) => !digit)}
-                className="group relative w-full flex justify-center py-3 px-4 border border-transparent rounded-lg text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+                className="group relative w-full flex justify-center py-3 px-4 border border-transparent rounded-lg text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
               >
                 {isLoading ? "Đang xác thực..." : "Xác nhận"}
               </button>
@@ -209,7 +209,7 @@ const VerifyOTP = () => {
                   type="button"
                   onClick={handleResendOTP}
                   disabled={resendLoading}
-                  className="font-medium text-blue-600 hover:text-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="font-medium text-purple-600 hover:text-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {resendLoading ? "Đang gửi..." : "Gửi lại"}
                 </button>
@@ -217,7 +217,7 @@ const VerifyOTP = () => {
 
               <Link
                 to="/forgot-password"
-                className="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-500"
+                className="inline-flex items-center text-sm font-medium text-purple-600 hover:text-purple-500"
               >
                 <ArrowLeft className="h-4 w-4 mr-1" />
                 Thay đổi email

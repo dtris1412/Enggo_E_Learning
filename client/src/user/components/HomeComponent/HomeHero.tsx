@@ -39,9 +39,9 @@ const HomeHero: React.FC<Props> = ({ roadmaps }) => {
       <section className="relative min-h-screen bg-slate-950 text-white overflow-hidden flex items-center">
         {/* Ambient blobs */}
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="absolute -top-32 -left-32 w-[600px] h-[600px] bg-blue-700/20 rounded-full blur-3xl" />
-          <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-violet-700/20 rounded-full blur-3xl" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-indigo-900/30 rounded-full blur-3xl" />
+          <div className="absolute -top-32 -left-32 w-[600px] h-[600px] bg-violet-700/20 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-purple-700/20 rounded-full blur-3xl" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-violet-900/20 rounded-full blur-3xl" />
         </div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full">
@@ -50,7 +50,7 @@ const HomeHero: React.FC<Props> = ({ roadmaps }) => {
             <div className="lg:col-span-3 space-y-5">
               <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black leading-none tracking-tight">
                 <span className="block text-white">Chinh phục</span>
-                <span className="block bg-gradient-to-r from-amber-400 via-orange-400 to-rose-400 bg-clip-text text-transparent">
+                <span className="block bg-gradient-to-r from-violet-300 via-purple-300 to-fuchsia-400 bg-clip-text text-transparent">
                   tiếng Anh
                 </span>
                 <span className="block text-slate-300 text-4xl sm:text-5xl lg:text-6xl">
@@ -67,14 +67,14 @@ const HomeHero: React.FC<Props> = ({ roadmaps }) => {
               <div className="flex flex-wrap gap-4">
                 <Link
                   to="/roadmaps"
-                  className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-400 to-orange-500 text-slate-900 px-8 py-3.5 rounded-xl font-bold shadow-lg shadow-orange-500/30 hover:scale-105 transition-transform"
+                  className="inline-flex items-center gap-2 bg-violet-600 hover:bg-violet-700 text-white px-8 py-3.5 rounded-md font-bold transition-colors"
                 >
                   Bắt đầu miễn phí
                   <ArrowRight className="w-5 h-5" />
                 </Link>
                 <Link
                   to="/exams"
-                  className="inline-flex items-center gap-2 border border-slate-600 text-slate-300 px-8 py-3.5 rounded-xl font-semibold hover:bg-slate-800 hover:text-white transition-colors"
+                  className="inline-flex items-center gap-2 border border-slate-600 text-slate-300 px-8 py-3.5 rounded-md font-semibold hover:bg-slate-800 hover:text-white transition-colors"
                 >
                   <Play className="w-4 h-4" />
                   Thi thử ngay
@@ -87,7 +87,7 @@ const HomeHero: React.FC<Props> = ({ roadmaps }) => {
               {displayRoadmaps.map((rm, i) => (
                 <div
                   key={rm.roadmap_id}
-                  className="bg-white/8 backdrop-blur-md border border-white/10 rounded-2xl p-4 flex items-center gap-4 shadow-xl"
+                  className="bg-white/8 backdrop-blur-md border border-white/10 rounded-lg p-4 flex items-center gap-4 shadow-xl"
                   style={{
                     transform: `translateX(${i % 2 === 0 ? "0px" : "24px"})`,
                   }}
@@ -110,7 +110,7 @@ const HomeHero: React.FC<Props> = ({ roadmaps }) => {
               ))}
 
               {/* AI accent card */}
-              <div className="mt-4 bg-gradient-to-br from-blue-500/20 to-purple-500/20 border border-white/10 rounded-2xl p-5 backdrop-blur-md">
+              <div className="mt-4 bg-violet-900/30 border border-white/10 rounded-lg p-5 backdrop-blur-md">
                 <div className="flex items-center gap-3 mb-3">
                   <Target className="w-5 h-5 text-amber-400" />
                   <span className="text-white font-semibold text-sm">
@@ -143,7 +143,7 @@ const HomeHero: React.FC<Props> = ({ roadmaps }) => {
               key={i}
               className="inline-flex items-center gap-2.5 text-slate-400 text-sm font-medium"
             >
-              <span className="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0" />
+              <span className="w-1.5 h-1.5 rounded-full bg-violet-500 shrink-0" />
               {skill}
             </span>
           ))}

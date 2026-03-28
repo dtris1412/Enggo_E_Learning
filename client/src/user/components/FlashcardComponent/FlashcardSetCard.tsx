@@ -33,8 +33,8 @@ const FlashcardSetCard: React.FC<FlashcardSetCardProps> = ({
 
   const getCreatedByColor = (type: string) => {
     return type === "admin"
-      ? "bg-purple-100 text-purple-800"
-      : "bg-blue-100 text-blue-800";
+      ? "bg-purple-50 text-purple-700"
+      : "bg-violet-50 text-violet-700";
   };
 
   const handleCardClick = () => {
@@ -55,12 +55,12 @@ const FlashcardSetCard: React.FC<FlashcardSetCardProps> = ({
   return (
     <div
       onClick={handleCardClick}
-      className="bg-white rounded-2xl hover:shadow-xl transition-all duration-300 cursor-pointer border border-slate-200 overflow-hidden group hover:-translate-y-1"
+      className="bg-white rounded-lg hover:shadow-lg transition-all duration-300 cursor-pointer border border-slate-200 overflow-hidden group hover:-translate-y-1"
     >
       <div className="flex items-center gap-4 p-4">
         {/* Icon */}
         <div className="flex-shrink-0">
-          <div className="p-4 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl">
+          <div className="p-3 bg-violet-600 rounded-md">
             <BookMarked className="w-8 h-8 text-white" />
           </div>
         </div>
@@ -69,12 +69,12 @@ const FlashcardSetCard: React.FC<FlashcardSetCardProps> = ({
         <div className="flex-1 min-w-0">
           {/* Title & Badges */}
           <div className="flex items-start justify-between gap-4 mb-2">
-            <h3 className="text-lg font-black text-slate-900 line-clamp-1 group-hover:text-blue-600 transition-colors">
+            <h3 className="text-lg font-black text-slate-900 line-clamp-1 group-hover:text-violet-600 transition-colors">
               {flashcardSet.title}
             </h3>
             <div className="flex items-center gap-2 flex-shrink-0">
               <span
-                className={`px-2 py-1 text-xs font-medium rounded-full ${getVisibilityColor(
+                className={`px-2 py-1 text-xs font-medium rounded ${getVisibilityColor(
                   flashcardSet.visibility,
                 )}`}
               >
@@ -91,7 +91,7 @@ const FlashcardSetCard: React.FC<FlashcardSetCardProps> = ({
                 )}
               </span>
               <span
-                className={`px-2 py-1 text-xs font-medium rounded-full ${getCreatedByColor(
+                className={`px-2 py-1 text-xs font-medium rounded ${getCreatedByColor(
                   flashcardSet.created_by_type,
                 )}`}
               >

@@ -49,18 +49,18 @@ const HomeRoadmaps: React.FC<Props> = ({ roadmaps }) => {
         {/* Heading */}
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
           <div>
-            <span className="text-blue-600 text-sm font-semibold uppercase tracking-wider">
+            <span className="text-violet-600 text-sm font-semibold uppercase tracking-wider">
               Lộ trình học tập
             </span>
             <h2 className="text-4xl font-black text-slate-900 mt-1">
               Chọn hành trình
               <br />
-              <span className="text-blue-600">phù hợp với bạn</span>
+              <span className="text-violet-600">phù hợp với bạn</span>
             </h2>
           </div>
           <Link
             to="/roadmaps"
-            className="inline-flex items-center gap-2 text-blue-600 font-semibold hover:gap-3 transition-all text-sm"
+            className="inline-flex items-center gap-2 text-violet-600 font-semibold hover:gap-3 transition-all text-sm"
           >
             Xem tất cả lộ trình
             <ArrowRight className="w-4 h-4" />
@@ -86,7 +86,7 @@ const HomeRoadmaps: React.FC<Props> = ({ roadmaps }) => {
             {featured && (
               <Link
                 to={`/roadmaps/${featured.roadmap_id}`}
-                className="lg:col-span-3 group relative rounded-2xl overflow-hidden bg-slate-900 min-h-72 flex flex-col justify-end hover:shadow-2xl transition-shadow"
+                className="lg:col-span-3 group relative rounded-lg overflow-hidden bg-slate-900 min-h-72 flex flex-col justify-end hover:shadow-2xl transition-shadow"
               >
                 {/* Gradient overlay */}
                 <div
@@ -102,7 +102,7 @@ const HomeRoadmaps: React.FC<Props> = ({ roadmaps }) => {
                 <div className="relative p-8">
                   <div className="flex items-center gap-2 mb-3">
                     <span
-                      className={`px-2.5 py-0.5 rounded-full text-xs font-bold bg-gradient-to-r ${LEVEL_GRADIENT[featured.roadmap_level] ?? "from-blue-400 to-indigo-500"} text-white`}
+                      className={`px-2.5 py-0.5 rounded text-xs font-bold bg-gradient-to-r ${LEVEL_GRADIENT[featured.roadmap_level] ?? "from-violet-500 to-purple-600"} text-white`}
                     >
                       {featured.roadmap_level}
                     </span>
@@ -119,7 +119,7 @@ const HomeRoadmaps: React.FC<Props> = ({ roadmaps }) => {
                   <p className="text-slate-300 text-sm line-clamp-2 mb-4">
                     {featured.roadmap_description}
                   </p>
-                  <span className="inline-flex items-center gap-2 bg-white text-slate-900 px-5 py-2 rounded-xl text-sm font-bold group-hover:bg-amber-400 transition-colors">
+                  <span className="inline-flex items-center gap-2 bg-white text-violet-800 px-5 py-2 rounded-md text-sm font-bold group-hover:bg-violet-600 group-hover:text-white transition-colors">
                     Xem lộ trình <ArrowRight className="w-4 h-4" />
                   </span>
                 </div>
@@ -132,15 +132,15 @@ const HomeRoadmaps: React.FC<Props> = ({ roadmaps }) => {
                 <Link
                   to={`/roadmaps/${rm.roadmap_id}`}
                   key={rm.roadmap_id}
-                  className="group flex items-center gap-4 bg-white hover:bg-slate-100 rounded-xl p-4 border border-slate-200 transition-colors"
+                  className="group flex items-center gap-4 bg-white hover:bg-violet-50 rounded-md p-4 border border-slate-200 transition-colors"
                 >
                   <div
-                    className={`w-12 h-12 shrink-0 rounded-xl bg-gradient-to-br ${LEVEL_GRADIENT[rm.roadmap_level] ?? "from-blue-400 to-indigo-500"} flex items-center justify-center shadow-sm`}
+                    className={`w-12 h-12 shrink-0 rounded-md bg-gradient-to-br ${LEVEL_GRADIENT[rm.roadmap_level] ?? "from-violet-500 to-purple-600"} flex items-center justify-center shadow-sm`}
                   >
                     <Map className="w-6 h-6 text-white" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <div className="font-bold text-slate-800 text-sm leading-tight truncate group-hover:text-blue-600 transition-colors">
+                    <div className="font-bold text-slate-800 text-sm leading-tight truncate group-hover:text-violet-600 transition-colors">
                       {rm.roadmap_title}
                     </div>
                     <div className="flex items-center gap-2 text-slate-400 text-xs mt-1">
@@ -157,14 +157,14 @@ const HomeRoadmaps: React.FC<Props> = ({ roadmaps }) => {
                       )}
                     </div>
                   </div>
-                  <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-blue-500 shrink-0 transition-colors" />
+                  <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-violet-500 shrink-0 transition-colors" />
                 </Link>
               ))}
 
               {/* View all anchor card */}
               <Link
                 to="/roadmaps"
-                className="group flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl py-4 font-bold text-sm transition-colors"
+                className="group flex items-center justify-center gap-2 bg-violet-600 hover:bg-violet-700 text-white rounded-md py-4 font-bold text-sm transition-colors"
               >
                 Xem tất cả lộ trình
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />

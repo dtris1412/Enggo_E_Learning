@@ -94,13 +94,13 @@ const DocumentDetail: React.FC = () => {
           ) {
             setShowUpgradeModal(true);
           } else {
-            showToast("error", result.message || "Failed to load document");
+            showToast("error", result.message || "Không thể tải tài liệu");
             setTimeout(() => navigate("/documents"), 2000);
           }
         }
       } catch (error: any) {
         console.error("Error fetching document:", error);
-        showToast("error", "Failed to load document");
+        showToast("error", "Không thể tải tài liệu");
         setTimeout(() => navigate("/documents"), 2000);
       } finally {
         setLoading(false);
@@ -115,7 +115,7 @@ const DocumentDetail: React.FC = () => {
 
     const result = await downloadDocument(document.document_id);
     if (result.success) {
-      showToast("success", "Document is downloading...");
+      showToast("success", "Đang tải tài liệu...");
       // Update download count in current view
       setDocument((prev: any) => ({
         ...prev,
@@ -138,7 +138,7 @@ const DocumentDetail: React.FC = () => {
       } else {
         showToast(
           "error",
-          result.message || "Failed to download document. Please login first.",
+          result.message || "Tải xuống thất bại. Vui lòng đăng nhập trước.",
         );
       }
     }
@@ -182,7 +182,7 @@ const DocumentDetail: React.FC = () => {
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
+    return new Date(dateString).toLocaleDateString("vi-VN", {
       year: "numeric",
       month: "long",
       day: "numeric",
@@ -293,13 +293,13 @@ const DocumentDetail: React.FC = () => {
         <div className="text-center">
           <FileText className="w-20 h-20 mx-auto mb-4 text-slate-300" />
           <h3 className="text-xl font-semibold text-slate-700 mb-2">
-            Document not found
+            Không tìm thấy tài liệu
           </h3>
           <button
             onClick={() => navigate("/documents")}
             className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
-            Back to Documents
+            Quay lại danh sách
           </button>
         </div>
       </div>
@@ -315,7 +315,7 @@ const DocumentDetail: React.FC = () => {
           className="mb-6 flex items-center gap-2 text-slate-600 hover:text-slate-900 transition-colors"
         >
           <ArrowLeft className="w-5 h-5" />
-          <span>Back to Documents</span>
+          <span>Quay lại tài liệu</span>
         </button>
 
         {/* Document Card */}
@@ -340,7 +340,7 @@ const DocumentDetail: React.FC = () => {
                   {document.access_type === "free" && (
                     <span className="px-3 py-1 bg-green-400 text-green-900 rounded-full text-sm font-semibold flex items-center gap-1">
                       <CheckCircle className="w-4 h-4" />
-                      Free
+                      Miễn phí
                     </span>
                   )}
                 </div>
@@ -366,10 +366,10 @@ const DocumentDetail: React.FC = () => {
             {/* Description */}
             <div className="mb-8">
               <h2 className="text-xl font-semibold text-slate-900 mb-3">
-                Description
+                Mô tả
               </h2>
               <p className="text-slate-700 leading-relaxed whitespace-pre-wrap">
-                {document.description || "No description available."}
+                {document.description || "Chưa có mô tả."}
               </p>
             </div>
 
@@ -377,14 +377,14 @@ const DocumentDetail: React.FC = () => {
             {document.document_url && (
               <div className="mb-8">
                 <h2 className="text-xl font-semibold text-slate-900 mb-3">
-                  Preview
+                  Xem trước
                 </h2>
                 <div className="bg-slate-100 rounded-lg overflow-hidden">
                   {document.file_type?.toLowerCase() === "pdf" && (
                     <iframe
                       src={`https://docs.google.com/viewer?url=${encodeURIComponent(document.document_url)}&embedded=true`}
                       className="w-full h-[600px] border-0"
-                      title="PDF Viewer"
+                      title="Xem PDF"
                     />
                   )}
                   {(document.file_type?.toLowerCase() === "mp3" ||
@@ -395,7 +395,7 @@ const DocumentDetail: React.FC = () => {
                         className="w-full"
                         src={document.document_url}
                       >
-                        Your browser does not support the audio element.
+                        Trình duyệt của bạn không hỗ trợ phát âm thanh.
                       </audio>
                     </div>
                   )}
@@ -404,7 +404,7 @@ const DocumentDetail: React.FC = () => {
                     <iframe
                       src={`https://docs.google.com/viewer?url=${encodeURIComponent(document.document_url)}&embedded=true`}
                       className="w-full h-[600px] border-0"
-                      title="Document Viewer"
+                      title="Xem tài liệu"
                     />
                   )}
                 </div>
@@ -417,7 +417,7 @@ const DocumentDetail: React.FC = () => {
                 <div className="flex items-center gap-3">
                   <Eye className="w-8 h-8 text-blue-600" />
                   <div>
-                    <p className="text-sm text-slate-600">Views</p>
+                    <p className="text-sm text-slate-600">Lượt xem</p>
                     <p className="text-2xl font-bold text-slate-900">
                       {document.view_count || 0}
                     </p>
@@ -429,7 +429,7 @@ const DocumentDetail: React.FC = () => {
                 <div className="flex items-center gap-3">
                   <Download className="w-8 h-8 text-green-600" />
                   <div>
-                    <p className="text-sm text-slate-600">Downloads</p>
+                    <p className="text-sm text-slate-600">Lượt tải</p>
                     <p className="text-2xl font-bold text-slate-900">
                       {document.download_count || 0}
                     </p>
@@ -441,7 +441,7 @@ const DocumentDetail: React.FC = () => {
                 <div className="flex items-center gap-3">
                   <Calendar className="w-8 h-8 text-purple-600" />
                   <div>
-                    <p className="text-sm text-slate-600">Published</p>
+                    <p className="text-sm text-slate-600">Ngày đăng</p>
                     <p className="text-sm font-semibold text-slate-900">
                       {formatDate(document.created_at)}
                     </p>
@@ -456,7 +456,7 @@ const DocumentDetail: React.FC = () => {
                 <div className="flex items-center gap-3">
                   <User className="w-6 h-6 text-slate-600" />
                   <div>
-                    <p className="text-sm text-slate-600">Uploaded by</p>
+                    <p className="text-sm text-slate-600">Đăng bởi</p>
                     <p className="font-semibold text-slate-900">
                       {document.uploaded_by}
                     </p>
@@ -471,7 +471,7 @@ const DocumentDetail: React.FC = () => {
               className="w-full py-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 text-lg font-semibold shadow-lg hover:shadow-xl"
             >
               <Download className="w-6 h-6" />
-              Download Document
+              Tải xuống tài liệu
             </button>
 
             {document.access_type === "premium" && !userHasPremium && (

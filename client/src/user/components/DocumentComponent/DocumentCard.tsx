@@ -38,7 +38,7 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
     if (fileType.includes("pdf"))
       return <FileText className="w-12 h-12 text-red-500" />;
     if (fileType.includes("word") || fileType.includes("docx"))
-      return <FileText className="w-12 h-12 text-blue-500" />;
+      return <FileText className="w-12 h-12 text-purple-500" />;
     if (fileType.includes("audio"))
       return <FileText className="w-12 h-12 text-green-500" />;
     return <FileText className="w-12 h-12 text-slate-400" />;
@@ -47,7 +47,7 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
   const getTypeColor = (type: string) => {
     switch (type) {
       case "learning":
-        return "bg-blue-100 text-blue-800";
+        return "bg-purple-100 text-purple-800";
       case "reference":
         return "bg-purple-100 text-purple-800";
       case "guideline":
@@ -71,7 +71,7 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
   return (
     <div
       onClick={handleCardClick}
-      className="bg-white rounded-2xl hover:shadow-xl transition-all duration-300 cursor-pointer border border-slate-200 overflow-hidden group hover:-translate-y-1"
+      className="bg-white rounded-lg hover:shadow-xl transition-all duration-300 cursor-pointer border border-slate-200 overflow-hidden group hover:-translate-y-1"
     >
       {/* Header with Icon */}
       <div className="p-6 bg-gradient-to-br from-slate-50 to-white">
@@ -81,14 +81,14 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-2">
                 <span
-                  className={`px-2 py-1 text-xs font-medium rounded-full ${getTypeColor(
+                  className={`px-2 py-1 text-xs font-medium rounded ${getTypeColor(
                     document.document_type,
                   )}`}
                 >
                   {document.document_type}
                 </span>
                 {document.access_type === "premium" && (
-                  <span className="px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800 flex items-center gap-1">
+                  <span className="px-2 py-1 text-xs font-medium rounded bg-yellow-100 text-yellow-800 flex items-center gap-1">
                     <Lock className="w-3 h-3" />
                     Premium
                   </span>
@@ -101,7 +101,7 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
 
       {/* Content */}
       <div className="p-6 pt-4">
-        <h3 className="text-lg font-black text-slate-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
+        <h3 className="text-lg font-black text-slate-900 mb-2 line-clamp-2 group-hover:text-purple-600 transition-colors">
           {document.document_name}
         </h3>
 

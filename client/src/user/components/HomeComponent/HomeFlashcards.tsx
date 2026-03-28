@@ -13,18 +13,18 @@ const HomeFlashcards: React.FC<Props> = ({ flashcardSets }) => {
         {/* Heading */}
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
           <div>
-            <span className="text-rose-500 text-sm font-semibold uppercase tracking-wider">
+            <span className="text-violet-600 text-sm font-semibold uppercase tracking-wider">
               Thẻ học từ vựng
             </span>
             <h2 className="text-3xl font-black text-slate-900 mt-1">
               Flashcard thông minh
               <br />
-              <span className="text-rose-500">ghi nhớ siêu nhanh</span>
+              <span className="text-violet-600">ghi nhớ siêu nhanh</span>
             </h2>
           </div>
           <Link
             to="/flashcards"
-            className="inline-flex items-center gap-2 text-rose-500 font-semibold hover:gap-3 transition-all text-sm"
+            className="inline-flex items-center gap-2 text-violet-600 font-semibold hover:gap-3 transition-all text-sm"
           >
             Thư viện flashcard
             <ArrowRight className="w-4 h-4" />
@@ -46,7 +46,7 @@ const HomeFlashcards: React.FC<Props> = ({ flashcardSets }) => {
               <Link
                 to={`/flashcards/${set.flashcard_set_id}`}
                 key={set.flashcard_set_id}
-                className={`group relative rounded-xl overflow-hidden aspect-[4/3] flex flex-col justify-end hover:shadow-lg hover:-translate-y-0.5 transition-all bg-gradient-to-br ${FLASHCARD_COLORS[i % FLASHCARD_COLORS.length]}`}
+                className={`group relative rounded-md overflow-hidden aspect-[4/3] flex flex-col justify-end hover:shadow-lg hover:-translate-y-0.5 transition-all bg-gradient-to-br ${FLASHCARD_COLORS[i % FLASHCARD_COLORS.length]}`}
               >
                 <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors" />
                 <div className="relative p-3">
@@ -66,10 +66,10 @@ const HomeFlashcards: React.FC<Props> = ({ flashcardSets }) => {
         )}
 
         {/* Create prompt */}
-        <div className="mt-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-rose-50 border border-rose-100 rounded-xl px-5 py-4">
+        <div className="mt-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-violet-50 border border-violet-100 rounded-lg px-5 py-4">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-white border border-rose-200 rounded-lg flex items-center justify-center shrink-0">
-              <Layers className="w-5 h-5 text-rose-500" />
+            <div className="w-9 h-9 bg-white border border-violet-200 rounded-md flex items-center justify-center shrink-0">
+              <Layers className="w-5 h-5 text-violet-600" />
             </div>
             <div>
               <div className="text-sm font-semibold text-slate-800">
@@ -82,7 +82,7 @@ const HomeFlashcards: React.FC<Props> = ({ flashcardSets }) => {
           </div>
           <Link
             to="/flashcards/create"
-            className="inline-flex items-center gap-1.5 bg-rose-500 hover:bg-rose-600 text-white px-4 py-2 rounded-lg text-sm font-bold transition-colors whitespace-nowrap shrink-0"
+            className="inline-flex items-center gap-1.5 bg-violet-600 hover:bg-violet-700 text-white px-4 py-2 rounded-md text-sm font-bold transition-colors whitespace-nowrap shrink-0"
           >
             Tạo ngay
             <ArrowRight className="w-3.5 h-3.5" />

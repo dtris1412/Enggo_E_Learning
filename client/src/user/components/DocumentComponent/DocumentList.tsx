@@ -8,10 +8,7 @@ import {
   ChevronLeft,
   ChevronRight,
   FileText,
-  BookOpen,
   TrendingUp,
-  Home,
-  ChevronRight as ChevronRightIcon,
   Eye,
   Download,
 } from "lucide-react";
@@ -145,7 +142,7 @@ const DocumentList: React.FC = () => {
   const handleDownload = async (document_id: number) => {
     const result = await downloadDocument(document_id);
     if (result.success) {
-      showToast("success", "Document is downloading...");
+      showToast("success", "Đang tải tài liệu...");
       // Refresh list to update download count
       fetchDocumentsPaginated(
         searchTerm,
@@ -171,18 +168,18 @@ const DocumentList: React.FC = () => {
       } else {
         showToast(
           "error",
-          result.message || "Failed to download document. Please login first.",
+          result.message || "Tải xuống thất bại. Vui lòng đăng nhập trước.",
         );
       }
     }
   };
 
   const documentTypes = [
-    { value: "", label: "All Types" },
-    { value: "learning", label: "Learning" },
-    { value: "reference", label: "Reference" },
-    { value: "guideline", label: "Guideline" },
-    { value: "other", label: "Other" },
+    { value: "", label: "Tất cả" },
+    { value: "learning", label: "Học tập" },
+    { value: "reference", label: "Tham khảo" },
+    { value: "guideline", label: "Hướng dẫn" },
+    { value: "other", label: "Khác" },
   ];
 
   const accessTypes = [
@@ -193,42 +190,26 @@ const DocumentList: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      {/* Hero Banner with Background */}
-      <div className="relative bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 overflow-hidden">
-        {/* Background Pattern Overlay */}
-        <div
-          className="absolute inset-0 opacity-10"
-          style={{
-            backgroundImage:
-              'url(\'data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="1"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\')',
-          }}
-        ></div>
-
-        <div className="relative container mx-auto px-4 py-16 md:py-24">
+      {/* Hero Section */}
+      <section className="relative bg-slate-950 text-white py-10 overflow-hidden">
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="absolute -top-16 -left-16 w-[300px] h-[300px] bg-violet-700/20 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 right-0 w-[250px] h-[250px] bg-violet-700/20 rounded-full blur-3xl" />
+        </div>
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 drop-shadow-lg">
-              TÀI LIỆU HỌC TẬP
+            <span className="inline-block text-violet-400 text-xs font-semibold uppercase tracking-widest mb-2">
+              Thư viện
+            </span>
+            <h1 className="text-3xl lg:text-4xl font-black leading-tight">
+              <span className="text-white">Tài liệu</span>{" "}
+              <span className="bg-gradient-to-r from-violet-300 via-purple-300 to-fuchsia-400 bg-clip-text text-transparent">
+                học tập
+              </span>
             </h1>
-            <p className="text-lg md:text-xl text-blue-100 max-w-2xl mx-auto">
-              Kho tài liệu học tiếng Anh phong phú, chất lượng cao
-            </p>
           </div>
         </div>
-      </div>
-
-      {/* Breadcrumb */}
-      <div className="bg-slate-100 border-b border-slate-200">
-        <div className="container mx-auto px-4 py-3">
-          <div className="flex items-center gap-2 text-sm text-slate-600">
-            <Home className="w-4 h-4" />
-            <a href="/" className="hover:text-blue-600 transition-colors">
-              Trang chủ
-            </a>
-            <ChevronRightIcon className="w-4 h-4" />
-            <span className="text-slate-900 font-medium">Tài liệu học tập</span>
-          </div>
-        </div>
-      </div>
+      </section>
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
@@ -244,7 +225,7 @@ const DocumentList: React.FC = () => {
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   placeholder="Tìm kiếm tài liệu..."
-                  className="w-full pl-12 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full pl-12 pr-4 py-3 border border-slate-300 rounded-md focus:ring-2 focus:ring-violet-500 focus:border-transparent"
                 />
               </div>
             </div>
@@ -255,10 +236,10 @@ const DocumentList: React.FC = () => {
                 <button
                   key={type.value}
                   onClick={() => setDocumentTypeFilter(type.value)}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                  className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
                     documentTypeFilter === type.value
-                      ? "bg-blue-600 text-white shadow-md"
-                      : "bg-white text-slate-700 border border-slate-300 hover:border-blue-500 hover:text-blue-600"
+                      ? "bg-violet-600 text-white shadow-sm"
+                      : "bg-white text-slate-700 border border-slate-300 hover:border-violet-500 hover:text-violet-600"
                   }`}
                 >
                   {type.label}
@@ -271,10 +252,10 @@ const DocumentList: React.FC = () => {
                 <button
                   key={access.value}
                   onClick={() => setAccessTypeFilter(access.value)}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                  className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
                     accessTypeFilter === access.value
-                      ? "bg-blue-600 text-white shadow-md"
-                      : "bg-white text-slate-700 border border-slate-300 hover:border-blue-500 hover:text-blue-600"
+                      ? "bg-violet-600 text-white shadow-sm"
+                      : "bg-white text-slate-700 border border-slate-300 hover:border-violet-500 hover:text-violet-600"
                   }`}
                 >
                   {access.label}
@@ -298,7 +279,7 @@ const DocumentList: React.FC = () => {
             {/* Loading State */}
             {loading && (
               <div className="flex justify-center items-center py-20">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-violet-600"></div>
               </div>
             )}
 
@@ -353,7 +334,7 @@ const DocumentList: React.FC = () => {
                               onClick={() => handlePageChange(page)}
                               className={`px-4 py-2 rounded-lg transition-colors ${
                                 currentPage === page
-                                  ? "bg-blue-600 text-white"
+                                  ? "bg-violet-600 text-white"
                                   : "border border-slate-300 hover:bg-slate-50"
                               }`}
                             >
@@ -392,10 +373,10 @@ const DocumentList: React.FC = () => {
             <div className="sticky top-4">
               {/* Popular Documents */}
               <div className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
-                <div className="bg-blue-600 text-white px-5 py-4">
+                <div className="bg-violet-700 text-white px-5 py-4">
                   <h3 className="font-bold text-lg flex items-center gap-2">
                     <TrendingUp className="w-5 h-5" />
-                    TÀI LIỆU PHỔ BIẾN
+                    Tài liệu phổ biến
                   </h3>
                 </div>
                 <div className="divide-y divide-slate-200">
@@ -406,14 +387,14 @@ const DocumentList: React.FC = () => {
                         onClick={() =>
                           navigate(`/documents/${doc.document_id}`)
                         }
-                        className="p-4 hover:bg-blue-50 transition-colors cursor-pointer group"
+                        className="p-4 hover:bg-violet-50 transition-colors cursor-pointer group"
                       >
                         <div className="flex gap-3">
-                          <div className="flex-shrink-0 w-20 h-16 bg-gradient-to-br from-blue-500 to-blue-700 rounded flex items-center justify-center">
+                          <div className="flex-shrink-0 w-20 h-16 bg-violet-700 rounded flex items-center justify-center">
                             <FileText className="w-8 h-8 text-white" />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <h4 className="font-semibold text-sm text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-2 mb-1">
+                            <h4 className="font-semibold text-sm text-slate-900 group-hover:text-violet-600 transition-colors line-clamp-2 mb-1">
                               {doc.document_name}
                             </h4>
                             <div className="flex items-center gap-3 text-xs text-slate-500">
@@ -440,16 +421,15 @@ const DocumentList: React.FC = () => {
               </div>
 
               {/* Download Info */}
-              <div className="mt-6 bg-gradient-to-br from-blue-600 to-indigo-700 text-white rounded-lg p-6 shadow-lg">
-                <BookOpen className="w-12 h-12 mb-4 text-blue-200" />
+              <div className="mt-6 bg-violet-800 text-white rounded-md p-6">
                 <h3 className="font-bold text-lg mb-2">
                   Tài liệu chất lượng cao
                 </h3>
-                <p className="text-sm text-blue-100 mb-4">
+                <p className="text-sm text-violet-200 mb-4">
                   Truy cập hàng trăm tài liệu học tập được tuyển chọn kỹ lưỡng
                   từ các nguồn uy tín.
                 </p>
-                <div className="text-sm text-blue-100">
+                <div className="text-sm text-violet-200">
                   ✓ Cập nhật liên tục
                   <br />
                   ✓ Đa dạng chủ đề

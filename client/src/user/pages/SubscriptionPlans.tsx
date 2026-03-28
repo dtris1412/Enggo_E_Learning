@@ -39,7 +39,7 @@ const SubscriptionPlans = () => {
           <div className="mt-4">
             <Link
               to="/subscription-compare"
-              className="inline-flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:shadow-lg hover:from-blue-700 hover:to-purple-700 transition-all"
+              className="inline-flex items-center gap-2 px-6 py-2.5 bg-purple-600 text-white rounded-lg hover:bg-purple-700 hover:shadow-lg transition-all"
             >
               <Scale className="w-4 h-4" />
               <span className="font-medium">So sánh chi tiết các gói</span>
@@ -96,7 +96,7 @@ const SubscriptionPlans = () => {
         {/* Loading State */}
         {loading && (
           <div className="flex justify-center items-center py-20">
-            <Loader2 className="w-12 h-12 text-blue-600 animate-spin" />
+            <Loader2 className="w-12 h-12 text-purple-600 animate-spin" />
           </div>
         )}
 

@@ -37,7 +37,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
       case "beginner":
         return "bg-emerald-100 text-emerald-800";
       case "intermediate":
-        return "bg-blue-100 text-blue-800";
+        return "bg-violet-50 text-violet-700";
       case "advanced":
         return "bg-violet-100 text-violet-800";
       default:
@@ -48,24 +48,24 @@ const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
   return (
     <Link
       to={`/courses/${course.course_id}`}
-      className="group bg-white rounded-2xl border border-slate-200 overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+      className="group bg-white rounded-lg border border-slate-200 overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
     >
       <div className="p-6">
         <div className="flex items-center justify-between mb-3">
           <span
-            className={`${getLevelColor(course.course_level)} text-xs px-3 py-1 rounded-full font-semibold`}
+            className={`${getLevelColor(course.course_level)} text-xs px-3 py-1 rounded font-semibold`}
           >
             {course.course_level}
           </span>
           {course.access_type === "premium" && (
-            <span className="bg-amber-100 text-amber-800 text-xs px-3 py-1 rounded-full font-semibold flex items-center">
+            <span className="bg-amber-100 text-amber-800 text-xs px-3 py-1 rounded font-semibold flex items-center">
               <Lock className="h-3 w-3 mr-1" />
               Premium
             </span>
           )}
         </div>
 
-        <h3 className="text-xl font-black text-slate-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
+        <h3 className="text-xl font-black text-slate-900 mb-2 line-clamp-2 group-hover:text-violet-600 transition-colors">
           {course.course_title}
         </h3>
 
@@ -92,7 +92,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
             {tags.map((tag, index) => (
               <span
                 key={index}
-                className="text-xs bg-slate-100 text-slate-600 px-2 py-1 rounded-lg"
+                className="text-xs bg-slate-100 text-slate-600 px-2 py-1 rounded"
               >
                 {tag.trim()}
               </span>
@@ -100,7 +100,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
           </div>
         )}
 
-        <button className="w-full bg-gradient-to-r from-amber-400 to-orange-500 text-slate-900 py-2 rounded-xl font-bold hover:shadow-md transition-all">
+        <button className="w-full bg-violet-600 hover:bg-violet-700 text-white py-2 rounded-md font-bold transition-colors">
           Xem chi tiết
         </button>
       </div>

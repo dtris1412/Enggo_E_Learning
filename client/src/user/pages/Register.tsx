@@ -93,7 +93,7 @@ const Register = () => {
           Đã có tài khoản?{" "}
           <Link
             to="/login"
-            className="font-medium text-blue-600 hover:text-blue-500"
+            className="font-medium text-purple-600 hover:text-purple-500"
           >
             Đăng nhập ngay
           </Link>
@@ -119,7 +119,7 @@ const Register = () => {
                   required
                   value={formData.username}
                   onChange={handleInputChange}
-                  className="appearance-none block w-full px-3 py-3 pl-10 border border-slate-300 placeholder-slate-500 text-slate-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  className="appearance-none block w-full px-3 py-3 pl-10 border border-slate-300 placeholder-slate-500 text-slate-900 focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
                   placeholder="Nhập tên đăng nhập"
                 />
                 <User className="h-5 w-5 text-slate-400 absolute left-3 top-3.5" />
@@ -140,7 +140,7 @@ const Register = () => {
                   required
                   value={formData.fullName}
                   onChange={handleInputChange}
-                  className="appearance-none block w-full px-3 py-3 pl-10 border border-slate-300 placeholder-slate-500 text-slate-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  className="appearance-none block w-full px-3 py-3 pl-10 border border-slate-300 placeholder-slate-500 text-slate-900 focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
                   placeholder="Nhập họ và tên"
                 />
                 <User className="h-5 w-5 text-slate-400 absolute left-3 top-3.5" />
@@ -161,7 +161,7 @@ const Register = () => {
                   required
                   value={formData.email}
                   onChange={handleInputChange}
-                  className="appearance-none block w-full px-3 py-3 pl-10 border border-slate-300 placeholder-slate-500 text-slate-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  className="appearance-none block w-full px-3 py-3 pl-10 border border-slate-300 placeholder-slate-500 text-slate-900 focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
                   placeholder="Nhập email"
                 />
                 <Mail className="h-5 w-5 text-slate-400 absolute left-3 top-3.5" />
@@ -182,7 +182,7 @@ const Register = () => {
                   required
                   value={formData.phone}
                   onChange={handleInputChange}
-                  className="appearance-none block w-full px-3 py-3 pl-10 border border-slate-300 placeholder-slate-500 text-slate-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  className="appearance-none block w-full px-3 py-3 pl-10 border border-slate-300 placeholder-slate-500 text-slate-900 focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
                   placeholder="Nhập số điện thoại"
                 />
                 <Phone className="h-5 w-5 text-slate-400 absolute left-3 top-3.5" />
@@ -203,7 +203,7 @@ const Register = () => {
                   required
                   value={formData.password}
                   onChange={handleInputChange}
-                  className="appearance-none block w-full px-3 py-3 pl-10 pr-10 border border-slate-300 placeholder-slate-500 text-slate-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  className="appearance-none block w-full px-3 py-3 pl-10 pr-10 border border-slate-300 placeholder-slate-500 text-slate-900 focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
                   placeholder="Nhập mật khẩu"
                 />
                 <Lock className="h-5 w-5 text-slate-400 absolute left-3 top-3.5" />
@@ -235,7 +235,7 @@ const Register = () => {
                   required
                   value={formData.confirmPassword}
                   onChange={handleInputChange}
-                  className="appearance-none block w-full px-3 py-3 pl-10 pr-10 border border-slate-300 placeholder-slate-500 text-slate-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  className="appearance-none block w-full px-3 py-3 pl-10 pr-10 border border-slate-300 placeholder-slate-500 text-slate-900 focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
                   placeholder="Nhập lại mật khẩu"
                 />
                 <Lock className="h-5 w-5 text-slate-400 absolute left-3 top-3.5" />
@@ -260,18 +260,18 @@ const Register = () => {
                 required
                 checked={formData.agreeTerms}
                 onChange={handleInputChange}
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-slate-300"
+                className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-slate-300"
               />
               <label
                 htmlFor="agreeTerms"
                 className="ml-2 block text-sm text-slate-900"
               >
                 Tôi đồng ý với{" "}
-                <a href="#" className="text-blue-600 hover:text-blue-500">
+                <a href="#" className="text-purple-600 hover:text-purple-500">
                   Điều khoản sử dụng
                 </a>{" "}
                 và{" "}
-                <a href="#" className="text-blue-600 hover:text-blue-500">
+                <a href="#" className="text-purple-600 hover:text-purple-500">
                   Chính sách bảo mật
                 </a>
               </label>
@@ -280,7 +280,7 @@ const Register = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? "Đang tạo tài khoản..." : "Tạo tài khoản"}
               </button>

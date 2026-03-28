@@ -119,7 +119,7 @@ const ExamList: React.FC = () => {
           onClick={() => handlePageChange(i)}
           className={`px-4 py-2 rounded-lg font-medium transition-colors ${
             currentPage === i
-              ? "bg-blue-600 text-white"
+              ? "bg-violet-600 text-white"
               : "bg-white text-slate-700 hover:bg-slate-100 border border-slate-300"
           }`}
         >
@@ -140,17 +140,17 @@ const ExamList: React.FC = () => {
       {/* Hero Section */}
       <section className="relative bg-slate-950 text-white py-10 overflow-hidden">
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="absolute -top-16 -left-16 w-[300px] h-[300px] bg-blue-700/20 rounded-full blur-3xl" />
+          <div className="absolute -top-16 -left-16 w-[300px] h-[300px] bg-violet-700/20 rounded-full blur-3xl" />
           <div className="absolute bottom-0 right-0 w-[250px] h-[250px] bg-violet-700/20 rounded-full blur-3xl" />
         </div>
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <span className="inline-block text-amber-400 text-xs font-semibold uppercase tracking-widest mb-2">
+            <span className="inline-block text-violet-400 text-xs font-semibold uppercase tracking-widest mb-2">
               Luyện thi
             </span>
             <h1 className="text-3xl lg:text-4xl font-black leading-tight">
               <span className="text-white">Đề thi</span>{" "}
-              <span className="bg-gradient-to-r from-amber-400 via-orange-400 to-rose-400 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-violet-300 via-purple-300 to-fuchsia-400 bg-clip-text text-transparent">
                 luyện tập
               </span>
             </h1>
@@ -174,7 +174,7 @@ const ExamList: React.FC = () => {
                       placeholder="Tìm kiếm đề thi theo tên hoặc mã..."
                       value={searchTerm}
                       onChange={handleSearchChange}
-                      className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-md focus:ring-2 focus:ring-violet-500 focus:border-transparent"
                     />
                   </div>
                 </div>
@@ -187,7 +187,7 @@ const ExamList: React.FC = () => {
                   <select
                     value={examTypeFilter}
                     onChange={handleExamTypeChange}
-                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-violet-500 focus:border-transparent"
                   >
                     <option value="">Tất cả</option>
                     <option value="TOEIC">TOEIC</option>
@@ -203,7 +203,7 @@ const ExamList: React.FC = () => {
                   <select
                     value={yearFilter}
                     onChange={handleYearChange}
-                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-violet-500 focus:border-transparent"
                   >
                     <option value="">Tất cả</option>
                     {yearOptions.map((year) => (
@@ -236,7 +236,7 @@ const ExamList: React.FC = () => {
             {/* Loading State */}
             {loading && (
               <div className="flex justify-center items-center py-12">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-violet-600"></div>
               </div>
             )}
 
@@ -294,7 +294,7 @@ const ExamList: React.FC = () => {
               {/* Recent Exams */}
               <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
                 <div className="flex items-center gap-2 mb-4">
-                  <TrendingUp className="w-5 h-5 text-blue-600" />
+                  <TrendingUp className="w-5 h-5 text-violet-600" />
                   <h3 className="font-semibold text-slate-900">
                     Đề thi mới nhất
                   </h3>
@@ -310,7 +310,7 @@ const ExamList: React.FC = () => {
                         {exam.exam_title}
                       </h4>
                       <div className="flex items-center gap-2 text-xs text-slate-500">
-                        <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded">
+                        <span className="px-2 py-0.5 bg-violet-50 text-violet-700 rounded">
                           {exam.exam_type}
                         </span>
                         <span>{exam.year}</span>
@@ -321,20 +321,20 @@ const ExamList: React.FC = () => {
               </div>
 
               {/* Exam Statistics */}
-              <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg shadow-sm p-6 text-white">
+              <div className="bg-violet-700 rounded-md shadow-sm p-6 text-white">
                 <div className="flex items-center gap-2 mb-4">
                   <Award className="w-5 h-5" />
                   <h3 className="font-semibold">Thống kê nhanh</h3>
                 </div>
                 <div className="space-y-3">
                   <div className="flex justify-between items-center">
-                    <span className="text-blue-100">Tổng số đề thi</span>
+                    <span className="text-violet-200">Tổng số đề thi</span>
                     <span className="font-bold text-xl">{totalExams}</span>
                   </div>
-                  <div className="border-t border-blue-500 pt-3">
+                  <div className="border-t border-violet-600 pt-3">
                     <button
                       onClick={() => navigate("/exams/history")}
-                      className="w-full bg-white text-blue-600 px-4 py-2 rounded-lg font-medium hover:bg-blue-50 transition-colors"
+                      className="w-full bg-white text-violet-700 px-4 py-2 rounded-md font-medium hover:bg-violet-50 transition-colors"
                     >
                       Xem lịch sử làm bài
                     </button>

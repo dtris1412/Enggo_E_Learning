@@ -81,13 +81,13 @@ const CourseList: React.FC = () => {
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   onKeyPress={handleKeyPress}
-                  className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-violet-500 focus:border-transparent"
                 />
               </div>
             </div>
             <button
               onClick={handleSearch}
-              className="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+              className="bg-violet-600 text-white px-6 py-2 rounded-md font-medium hover:bg-violet-700 transition-colors"
             >
               Tìm kiếm
             </button>
@@ -110,7 +110,7 @@ const CourseList: React.FC = () => {
                 <select
                   value={courseLevel}
                   onChange={(e) => setCourseLevel(e.target.value)}
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-violet-500 focus:border-transparent"
                 >
                   <option value="">Tất cả</option>
                   <option value="Beginner">Beginner</option>
@@ -126,7 +126,7 @@ const CourseList: React.FC = () => {
                 <select
                   value={accessType}
                   onChange={(e) => setAccessType(e.target.value)}
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-violet-500 focus:border-transparent"
                 >
                   <option value="">Tất cả</option>
                   <option value="free">Miễn phí</option>
@@ -145,7 +145,7 @@ const CourseList: React.FC = () => {
                     setSortBy(newSortBy);
                     setSortOrder(newSortOrder);
                   }}
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-violet-500 focus:border-transparent"
                 >
                   <option value="created_at-DESC">Mới nhất</option>
                   <option value="created_at-ASC">Cũ nhất</option>
@@ -174,7 +174,7 @@ const CourseList: React.FC = () => {
         {/* Loading State */}
         {loading && (
           <div className="flex justify-center items-center py-20">
-            <Loader2 className="h-8 w-8 text-blue-600 animate-spin" />
+            <Loader2 className="h-8 w-8 text-violet-600 animate-spin" />
           </div>
         )}
 
@@ -221,7 +221,7 @@ const CourseList: React.FC = () => {
                         onClick={() => handlePageChange(page)}
                         className={`px-4 py-2 rounded-lg ${
                           currentPage === page
-                            ? "bg-blue-600 text-white"
+                            ? "bg-violet-600 text-white"
                             : "border border-slate-300 hover:bg-slate-50"
                         }`}
                       >

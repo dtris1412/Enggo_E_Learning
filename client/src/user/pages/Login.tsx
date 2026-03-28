@@ -96,7 +96,7 @@ const Login = () => {
           Hoặc{" "}
           <Link
             to="/register"
-            className="font-medium text-blue-600 hover:text-blue-500"
+            className="font-medium text-purple-600 hover:text-purple-500"
           >
             tạo tài khoản mới
           </Link>
@@ -121,7 +121,7 @@ const Login = () => {
                   required
                   value={formData.username}
                   onChange={handleInputChange}
-                  className="appearance-none block w-full px-3 py-3 pl-10 border border-slate-300 rounded-lg placeholder-slate-500 text-slate-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all duration-200"
+                  className="appearance-none block w-full px-3 py-3 pl-10 border border-slate-300 rounded-lg placeholder-slate-500 text-slate-900 focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm transition-all duration-200"
                   placeholder="Nhập tên đăng nhập hoặc email"
                 />
                 <Mail className="h-5 w-5 text-slate-400 absolute left-3 top-3.5" />
@@ -143,7 +143,7 @@ const Login = () => {
                   required
                   value={formData.password}
                   onChange={handleInputChange}
-                  className="appearance-none block w-full px-3 py-3 pl-10 pr-10 border border-slate-300 rounded-lg placeholder-slate-500 text-slate-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all duration-200"
+                  className="appearance-none block w-full px-3 py-3 pl-10 pr-10 border border-slate-300 rounded-lg placeholder-slate-500 text-slate-900 focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm transition-all duration-200"
                   placeholder="Nhập mật khẩu"
                 />
                 <Lock className="h-5 w-5 text-slate-400 absolute left-3 top-3.5" />
@@ -169,7 +169,7 @@ const Login = () => {
                   type="checkbox"
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-slate-300 rounded"
+                  className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-slate-300 rounded"
                 />
                 <label
                   htmlFor="remember-me"
@@ -182,7 +182,7 @@ const Login = () => {
               <div className="text-sm">
                 <Link
                   to="/forgot-password"
-                  className="font-medium text-blue-600 hover:text-blue-500"
+                  className="font-medium text-purple-600 hover:text-purple-500"
                 >
                   Quên mật khẩu?
                 </Link>
@@ -193,7 +193,7 @@ const Login = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="group relative w-full flex justify-center py-3 px-4 border border-transparent rounded-lg text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+                className="group relative w-full flex justify-center py-3 px-4 border border-transparent rounded-lg text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
               >
                 {isLoading ? "Đang đăng nhập..." : "Đăng nhập"}
               </button>

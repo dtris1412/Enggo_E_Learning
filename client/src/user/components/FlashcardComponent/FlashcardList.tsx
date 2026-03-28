@@ -8,8 +8,6 @@ import {
   ChevronLeft,
   ChevronRight,
   BookMarked,
-  Home,
-  ChevronRight as ChevronRightIcon,
   Plus,
   Filter,
 } from "lucide-react";
@@ -112,54 +110,41 @@ const FlashcardList: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      {/* Hero Banner */}
-      <div className="relative bg-gradient-to-r from-indigo-700 via-purple-600 to-pink-600 overflow-hidden">
-        {/* Background Pattern */}
-        <div
-          className="absolute inset-0 opacity-10"
-          style={{
-            backgroundImage:
-              'url(\'data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="1"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\')',
-          }}
-        ></div>
-
-        <div className="relative container mx-auto px-4 py-12 md:py-16">
+      {/* Hero Section */}
+      <section className="relative bg-slate-950 text-white py-10 overflow-hidden">
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="absolute -top-16 -left-16 w-[300px] h-[300px] bg-violet-700/20 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 right-0 w-[250px] h-[250px] bg-violet-700/20 rounded-full blur-3xl" />
+        </div>
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-3 drop-shadow-lg">
-              FLASHCARD HỌC TẬP
+            <span className="inline-block text-violet-400 text-xs font-semibold uppercase tracking-widest mb-2">
+              Ôn luyện
+            </span>
+            <h1 className="text-3xl lg:text-4xl font-black leading-tight">
+              <span className="text-white">Flashcard</span>{" "}
+              <span className="bg-gradient-to-r from-violet-300 via-purple-300 to-fuchsia-400 bg-clip-text text-transparent">
+                học tập
+              </span>
             </h1>
-            <p className="text-base md:text-lg text-purple-100 max-w-2xl mx-auto mb-4">
-              Học từ vựng thông minh với flashcard - Ghi nhớ nhanh, hiệu quả cao
-            </p>
-            {isLoggedIn && (
-              <button
-                onClick={handleCreateNew}
-                className="bg-white text-indigo-700 hover:bg-slate-100 font-medium py-2.5 px-6 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl inline-flex items-center gap-2"
-              >
-                <Plus className="w-5 h-5" />
-                Tạo Flashcard Set mới
-              </button>
-            )}
           </div>
         </div>
-      </div>
-
-      {/* Breadcrumb */}
-      <div className="bg-slate-100 border-b border-slate-200">
-        <div className="container mx-auto px-4 py-3">
-          <div className="flex items-center gap-2 text-sm text-slate-600">
-            <Home className="w-4 h-4" />
-            <a href="/" className="hover:text-indigo-600 transition-colors">
-              Trang chủ
-            </a>
-            <ChevronRightIcon className="w-4 h-4" />
-            <span className="text-slate-900 font-medium">Flashcards</span>
-          </div>
-        </div>
-      </div>
+      </section>
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
+        {/* Create button */}
+        {isLoggedIn && (
+          <div className="mb-6 flex justify-end">
+            <button
+              onClick={handleCreateNew}
+              className="bg-violet-600 text-white hover:bg-violet-700 font-medium py-2.5 px-6 rounded-md transition-colors inline-flex items-center gap-2"
+            >
+              <Plus className="w-5 h-5" />
+              Tạo Flashcard Set mới
+            </button>
+          </div>
+        )}
         {/* Search Bar */}
         <div className="mb-6">
           <div className="relative">
@@ -169,7 +154,7 @@ const FlashcardList: React.FC = () => {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Tìm kiếm flashcard set..."
-              className="w-full pl-12 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="w-full pl-12 pr-4 py-3 border border-slate-300 rounded-md focus:ring-2 focus:ring-violet-500 focus:border-transparent"
             />
           </div>
         </div>
@@ -188,7 +173,7 @@ const FlashcardList: React.FC = () => {
               <select
                 value={visibilityFilter}
                 onChange={(e) => setVisibilityFilter(e.target.value)}
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-violet-500 focus:border-transparent"
               >
                 {visibilityOptions.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -204,7 +189,7 @@ const FlashcardList: React.FC = () => {
               <select
                 value={createdByFilter}
                 onChange={(e) => setCreatedByFilter(e.target.value)}
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-violet-500 focus:border-transparent"
               >
                 {createdByOptions.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -230,7 +215,7 @@ const FlashcardList: React.FC = () => {
         {/* Loading State */}
         {loading && (
           <div className="text-center py-12">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-violet-600"></div>
             <p className="mt-4 text-slate-600">Đang tải...</p>
           </div>
         )}
@@ -255,7 +240,7 @@ const FlashcardList: React.FC = () => {
             {isLoggedIn && (
               <button
                 onClick={handleCreateNew}
-                className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-6 rounded-lg transition-colors duration-200 inline-flex items-center gap-2"
+                className="bg-violet-600 hover:bg-violet-700 text-white font-medium py-2 px-6 rounded-md transition-colors duration-200 inline-flex items-center gap-2"
               >
                 <Plus className="w-4 h-4" />
                 Tạo Flashcard Set mới
@@ -316,7 +301,7 @@ const FlashcardList: React.FC = () => {
                       onClick={() => handlePageChange(page)}
                       className={`px-4 py-2 rounded-lg transition-colors ${
                         currentPage === page
-                          ? "bg-indigo-600 text-white"
+                          ? "bg-violet-600 text-white"
                           : "border border-slate-300 hover:bg-slate-50 text-slate-700"
                       }`}
                     >
