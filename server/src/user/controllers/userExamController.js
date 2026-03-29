@@ -7,6 +7,10 @@ import {
   abandonExam as abandonExamService,
   getOngoingExam as getOngoingExamService,
   getUserExamHistory as getUserExamHistoryService,
+  submitWritingTask as submitWritingTaskService,
+  getWritingSubmissions as getWritingSubmissionsService,
+  handleSpeakingTurn as handleSpeakingTurnService,
+  submitSpeakingSession as submitSpeakingSessionService,
 } from "../services/userExamService.js";
 
 /**
@@ -177,6 +181,112 @@ const getUserExamHistory = async (req, res) => {
   }
 };
 
+// ──────────────────────────────────────────────
+// IELTS Writing controllers
+// ──────────────────────────────────────────────
+
+const submitWritingTask = async (req, res) => {
+  try {
+    const { user_exam_id } = req.params;
+    const { container_question_id, content } = req.body;
+
+    if (!container_question_id || !content) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+          message: "container_question_id and content are required.",
+        });
+    }
+
+    const result = await submitWritingTaskService(
+      parseInt(user_exam_id),
+      parseInt(container_question_id),
+      content,
+    );
+
+    if (!result.success) return res.status(400).json(result);
+    res.status(200).json(result);
+  } catch (err) {
+    console.error("Error in submitWritingTask:", err);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+const getWritingSubmissions = async (req, res) => {
+  try {
+    const { user_exam_id } = req.params;
+    const result = await getWritingSubmissionsService(parseInt(user_exam_id));
+    if (!result.success) return res.status(400).json(result);
+    res.status(200).json(result);
+  } catch (err) {
+    console.error("Error in getWritingSubmissions:", err);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+// ──────────────────────────────────────────────
+// IELTS Speaking controllers
+// ──────────────────────────────────────────────
+
+const speakingTurn = async (req, res) => {
+  try {
+    const { user_exam_id } = req.params;
+    const { container_id, messages, part_type } = req.body;
+
+    if (!container_id || !Array.isArray(messages)) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+          message: "container_id and messages array are required.",
+        });
+    }
+
+    const result = await handleSpeakingTurnService(
+      parseInt(user_exam_id),
+      parseInt(container_id),
+      messages,
+      part_type,
+    );
+
+    if (!result.success) return res.status(400).json(result);
+    res.status(200).json(result);
+  } catch (err) {
+    console.error("Error in speakingTurn:", err);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+const submitSpeaking = async (req, res) => {
+  try {
+    const { user_exam_id } = req.params;
+    const { container_id, messages, duration_seconds } = req.body;
+
+    if (!container_id || !Array.isArray(messages)) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+          message: "container_id and messages array are required.",
+        });
+    }
+
+    const result = await submitSpeakingSessionService(
+      parseInt(user_exam_id),
+      parseInt(container_id),
+      messages,
+      duration_seconds || 0,
+    );
+
+    if (!result.success) return res.status(400).json(result);
+    res.status(200).json(result);
+  } catch (err) {
+    console.error("Error in submitSpeaking:", err);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
 export {
   startExam,
   saveAnswers,
@@ -186,4 +296,8 @@ export {
   abandonExam,
   getOngoingExam,
   getUserExamHistory,
+  submitWritingTask,
+  getWritingSubmissions,
+  speakingTurn,
+  submitSpeaking,
 };

@@ -360,3 +360,247 @@ ${additionalContext ? `\n💡 Yêu cầu thêm: ${additionalContext}` : ""}
     throw error;
   }
 };
+
+// ─────────────────────────────────────────────
+// IELTS Writing Grader
+// ─────────────────────────────────────────────
+
+/**
+ * Chấm điểm bài viết IELTS theo rubric chuẩn
+ * @param {string} task_prompt - Đề bài (nội dung container + câu hỏi)
+ * @param {string} user_content - Bài viết của thí sinh
+ * @param {'task1'|'task2'} task_type - Loại task
+ * @returns {Promise<{overall_band, criteria_scores, feedback, corrected_sentences, usage}>}
+ */
+export const gradeIeltsWriting = async ({
+  task_prompt,
+  user_content,
+  task_type = "task2",
+}) => {
+  const wordCount = user_content.trim().split(/\s+/).filter(Boolean).length;
+  const minWords = task_type === "task1" ? 150 : 250;
+
+  const systemPrompt = `You are an expert IELTS examiner with 15+ years of experience grading Writing tasks.
+Grade the following ${task_type === "task1" ? "Task 1 (report/graph description)" : "Task 2 (essay)"} response strictly according to the official IELTS Writing band descriptors.
+
+Respond ONLY with valid JSON (no markdown, no extra text):
+{
+  "overall_band": <number 0-9, step 0.5>,
+  "criteria_scores": {
+    ${
+      task_type === "task1"
+        ? `"task_achievement": <0-9>,
+    "coherence_cohesion": <0-9>,
+    "lexical_resource": <0-9>,
+    "grammatical_range_accuracy": <0-9>`
+        : `"task_response": <0-9>,
+    "coherence_cohesion": <0-9>,
+    "lexical_resource": <0-9>,
+    "grammatical_range_accuracy": <0-9>`
+    }
+  },
+  "feedback": {
+    "strengths": ["..."],
+    "improvements": ["..."],
+    "overall_comment": "..."
+  },
+  "word_count_note": "...",
+  "sample_improvements": ["up to 2 corrected example sentences from the essay"]
+}`;
+
+  const userMessage = `TASK PROMPT:\n${task_prompt}\n\nCANDIDATE RESPONSE (${wordCount} words, minimum required: ${minWords}):\n${user_content}`;
+
+  const response = await axios.post(
+    "https://api.openai.com/v1/chat/completions",
+    {
+      model: "gpt-4o-mini",
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userMessage },
+      ],
+      max_tokens: 1200,
+      temperature: 0.3,
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+    },
+  );
+
+  const raw = response.data.choices[0].message.content.trim();
+  const usage = response.data.usage;
+
+  let parsed;
+  try {
+    parsed = JSON.parse(raw);
+  } catch {
+    // Fallback if JSON parse fails
+    parsed = {
+      overall_band: null,
+      criteria_scores: {},
+      feedback: { overall_comment: raw },
+      sample_improvements: [],
+    };
+  }
+
+  return {
+    ...parsed,
+    usage: {
+      prompt_tokens: usage?.prompt_tokens || 0,
+      completion_tokens: usage?.completion_tokens || 0,
+      total_tokens: usage?.total_tokens || 0,
+    },
+  };
+};
+
+// ─────────────────────────────────────────────
+// IELTS Speaking Conversation & Evaluator
+// ─────────────────────────────────────────────
+
+/**
+ * Một lượt đối thoại với AI Speaking Examiner
+ * @param {Array} messages - Lịch sử conversation [{ role: 'user'|'ai', content }]
+ * @param {string} part_context - Mô tả part (Part 1/2/3) + context
+ * @param {string} part_type - 'part1'|'part2'|'part3'
+ * @returns {Promise<{reply, is_finished, usage}>}
+ */
+export const speakingConversationTurn = async ({
+  messages,
+  part_context,
+  part_type = "part1",
+}) => {
+  const partGuide = {
+    part1:
+      "Part 1 - Introduction & Interview (about 4-5 minutes): Ask short, friendly questions about familiar topics (family, work, hobbies, hometown). After 3-4 exchanges, wrap up Part 1 naturally.",
+    part2:
+      "Part 2 - Individual Long Turn (about 3-4 minutes): Give the candidate a cue card. Let them speak for 1-2 minutes, then ask 1-2 follow-up questions.",
+    part3:
+      "Part 3 - Two-way Discussion (about 4-5 minutes): Ask deeper, more abstract questions related to Part 2 topic. Encourage extended responses.",
+  };
+
+  const systemPrompt = `You are a professional IELTS Speaking Examiner conducting an official IELTS Speaking test.
+Role: ${partGuide[part_type] || partGuide["part1"]}
+Context: ${part_context}
+
+Rules:
+- Stay strictly in role as IELTS examiner
+- Keep your responses SHORT (1-2 sentences max) — just ask the next question or give a brief acknowledgment
+- Do NOT evaluate during the conversation
+- When the part is naturally complete, end your message with exactly: [PART_COMPLETE]
+- Ask only one question at a time
+- Be encouraging but professional`;
+
+  const aiMessages = [{ role: "system", content: systemPrompt }];
+  for (const m of messages) {
+    aiMessages.push({
+      role: m.role === "user" ? "user" : "assistant",
+      content: m.content,
+    });
+  }
+
+  const response = await axios.post(
+    "https://api.openai.com/v1/chat/completions",
+    {
+      model: "gpt-4o-mini",
+      messages: aiMessages,
+      max_tokens: 200,
+      temperature: 0.6,
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+    },
+  );
+
+  const rawReply = response.data.choices[0].message.content.trim();
+  const usage = response.data.usage;
+  const is_finished = rawReply.includes("[PART_COMPLETE]");
+  const reply = rawReply.replace("[PART_COMPLETE]", "").trim();
+
+  return {
+    reply,
+    is_finished,
+    usage: {
+      prompt_tokens: usage?.prompt_tokens || 0,
+      completion_tokens: usage?.completion_tokens || 0,
+      total_tokens: usage?.total_tokens || 0,
+    },
+  };
+};
+
+/**
+ * Đánh giá bài thi Speaking IELTS từ transcript
+ * @param {string} transcript - Toàn bộ transcript (Q&A)
+ * @param {string} part_context - Context của part
+ * @returns {Promise<{overall_band, criteria_scores, feedback, usage}>}
+ */
+export const evaluateIeltsSpeaking = async ({ transcript, part_context }) => {
+  const systemPrompt = `You are an expert IELTS examiner grading a Speaking test.
+Evaluate the CANDIDATE's responses only (not the examiner's questions).
+Use official IELTS Speaking band descriptors.
+
+Respond ONLY with valid JSON:
+{
+  "overall_band": <number 0-9, step 0.5>,
+  "criteria_scores": {
+    "fluency_coherence": <0-9>,
+    "lexical_resource": <0-9>,
+    "grammatical_range_accuracy": <0-9>,
+    "pronunciation": <0-9>
+  },
+  "feedback": {
+    "strengths": ["..."],
+    "improvements": ["..."],
+    "overall_comment": "..."
+  }
+}`;
+
+  const response = await axios.post(
+    "https://api.openai.com/v1/chat/completions",
+    {
+      model: "gpt-4o-mini",
+      messages: [
+        { role: "system", content: systemPrompt },
+        {
+          role: "user",
+          content: `PART CONTEXT: ${part_context}\n\nTRANSCRIPT:\n${transcript}`,
+        },
+      ],
+      max_tokens: 800,
+      temperature: 0.2,
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+    },
+  );
+
+  const raw = response.data.choices[0].message.content.trim();
+  const usage = response.data.usage;
+
+  let parsed;
+  try {
+    parsed = JSON.parse(raw);
+  } catch {
+    parsed = {
+      overall_band: null,
+      criteria_scores: {},
+      feedback: { overall_comment: raw },
+    };
+  }
+
+  return {
+    ...parsed,
+    usage: {
+      prompt_tokens: usage?.prompt_tokens || 0,
+      completion_tokens: usage?.completion_tokens || 0,
+      total_tokens: usage?.total_tokens || 0,
+    },
+  };
+};

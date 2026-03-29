@@ -149,6 +149,28 @@ interface ExamContextType {
     data?: any;
     message?: string;
   }>;
+  // IELTS Writing
+  submitWriting: (
+    user_exam_id: number,
+    container_question_id: number,
+    content: string,
+  ) => Promise<{ success: boolean; data?: any; message?: string }>;
+  getWritingSubmissions: (
+    user_exam_id: number,
+  ) => Promise<{ success: boolean; data?: any; message?: string }>;
+  // IELTS Speaking
+  speakingTurn: (
+    user_exam_id: number,
+    container_id: number,
+    messages: Array<{ role: string; content: string }>,
+    part_type?: string,
+  ) => Promise<{ success: boolean; data?: any; message?: string }>;
+  submitSpeaking: (
+    user_exam_id: number,
+    container_id: number,
+    messages: Array<{ role: string; content: string }>,
+    duration_seconds?: number,
+  ) => Promise<{ success: boolean; data?: any; message?: string }>;
 }
 
 const ExamContext = createContext<ExamContextType | undefined>(undefined);
@@ -438,6 +460,96 @@ export const ExamProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  // ──────────────────────────────────────────────
+  // IELTS Writing
+  // ──────────────────────────────────────────────
+
+  const submitWriting = async (
+    user_exam_id: number,
+    container_question_id: number,
+    content: string,
+  ) => {
+    try {
+      const response = await fetch(
+        `${API_URL}/user/user-exams/${user_exam_id}/submit-writing`,
+        {
+          method: "POST",
+          headers: getAuthHeaders(),
+          body: JSON.stringify({ container_question_id, content }),
+        },
+      );
+      const result = await response.json();
+      return result;
+    } catch (err: any) {
+      console.error("Error submitting writing:", err);
+      return { success: false, message: err.message };
+    }
+  };
+
+  const getWritingSubmissions = async (user_exam_id: number) => {
+    try {
+      const response = await fetch(
+        `${API_URL}/user/user-exams/${user_exam_id}/writing-submissions`,
+        { method: "GET", headers: getAuthHeaders() },
+      );
+      const result = await response.json();
+      return result;
+    } catch (err: any) {
+      console.error("Error fetching writing submissions:", err);
+      return { success: false, message: err.message };
+    }
+  };
+
+  // ──────────────────────────────────────────────
+  // IELTS Speaking
+  // ──────────────────────────────────────────────
+
+  const speakingTurn = async (
+    user_exam_id: number,
+    container_id: number,
+    messages: Array<{ role: string; content: string }>,
+    part_type?: string,
+  ) => {
+    try {
+      const response = await fetch(
+        `${API_URL}/user/user-exams/${user_exam_id}/speaking-turn`,
+        {
+          method: "POST",
+          headers: getAuthHeaders(),
+          body: JSON.stringify({ container_id, messages, part_type }),
+        },
+      );
+      const result = await response.json();
+      return result;
+    } catch (err: any) {
+      console.error("Error in speaking turn:", err);
+      return { success: false, message: err.message };
+    }
+  };
+
+  const submitSpeaking = async (
+    user_exam_id: number,
+    container_id: number,
+    messages: Array<{ role: string; content: string }>,
+    duration_seconds?: number,
+  ) => {
+    try {
+      const response = await fetch(
+        `${API_URL}/user/user-exams/${user_exam_id}/speaking-submit`,
+        {
+          method: "POST",
+          headers: getAuthHeaders(),
+          body: JSON.stringify({ container_id, messages, duration_seconds }),
+        },
+      );
+      const result = await response.json();
+      return result;
+    } catch (err: any) {
+      console.error("Error submitting speaking:", err);
+      return { success: false, message: err.message };
+    }
+  };
+
   return (
     <ExamContext.Provider
       value={{
@@ -457,6 +569,10 @@ export const ExamProvider = ({ children }: { children: ReactNode }) => {
         getExamResult,
         abandonExam,
         getOngoingExam,
+        submitWriting,
+        getWritingSubmissions,
+        speakingTurn,
+        submitSpeaking,
       }}
     >
       {children}

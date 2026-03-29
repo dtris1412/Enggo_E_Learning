@@ -10,6 +10,7 @@ import ExamDetail from "../components/ExamComponent/ExamDetail";
 import ExamTaking from "../components/ExamComponent/ExamTaking";
 import ExamResult from "../components/ExamComponent/ExamResult";
 import ExamHistory from "../components/ExamComponent/ExamHistory";
+import SpeakingExam from "../components/ExamComponent/SpeakingExam";
 
 // User Profile
 import Profile from "../pages/Profile";
@@ -47,6 +48,16 @@ export const UserRoutes = () => {
         element={
           <ProtectedRoute>
             <ExamTaking />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* IELTS Speaking Exam - Requires authentication */}
+      <Route
+        path="/speaking-exam/:examId/:userExamId/:containerId"
+        element={
+          <ProtectedRoute>
+            <SpeakingExam />
           </ProtectedRoute>
         }
       />

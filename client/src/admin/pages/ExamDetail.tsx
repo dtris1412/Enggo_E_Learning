@@ -391,7 +391,112 @@ const ExamDetail = () => {
         </div>
 
         {/* Guide Panel */}
-        {showGuide && (
+        {showGuide && exam?.exam_type === "IELTS" && (
+          <div className="mb-6 bg-gradient-to-r from-indigo-50 to-blue-50 border-l-4 border-indigo-500 p-4 rounded-lg">
+            <div className="flex items-start gap-3">
+              <Info className="w-5 h-5 text-indigo-600 flex-shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <h3 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
+                  🇦🇺 Hướng dẫn tổ chức đề thi IELTS
+                </h3>
+                <div className="text-sm text-gray-700 space-y-2">
+                  <div className="flex items-start gap-2">
+                    <span className="text-blue-600 font-bold w-4 flex-shrink-0">
+                      🎧
+                    </span>
+                    <div>
+                      <strong className="text-blue-700">
+                        Listening (4 sections):
+                      </strong>
+                      <br />
+                      <span className="text-gray-600">
+                        Mỗi section = 1 container (type:{" "}
+                        <code className="bg-blue-100 px-1 rounded">
+                          ielts_passage
+                        </code>
+                        ) + audio riêng
+                      </span>
+                      <br />
+                      <span className="text-xs text-gray-500">
+                        Section 1–10 câu | Section 2–10 câu | Section 3–10 câu |
+                        Section 4–10 câu
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="text-green-600 font-bold w-4 flex-shrink-0">
+                      📖
+                    </span>
+                    <div>
+                      <strong className="text-green-700">
+                        Reading (3 passages):
+                      </strong>
+                      <br />
+                      <span className="text-gray-600">
+                        Mỗi passage = 1 container (type:{" "}
+                        <code className="bg-green-100 px-1 rounded">
+                          ielts_passage
+                        </code>
+                        ) + đoạn văn dài
+                      </span>
+                      <br />
+                      <span className="text-xs text-gray-500">
+                        Passage 1: ~13 câu | Passage 2: ~13 câu | Passage 3: ~14
+                        câu
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="text-purple-600 font-bold w-4 flex-shrink-0">
+                      ✍️
+                    </span>
+                    <div>
+                      <strong className="text-purple-700">
+                        Writing (2 tasks):
+                      </strong>
+                      <br />
+                      <span className="text-gray-600">
+                        Type:{" "}
+                        <code className="bg-purple-100 px-1 rounded">
+                          writing_task
+                        </code>{" "}
+                        — Task 1: mô tả biểu đồ (150 từ) | Task 2: essay (250
+                        từ)
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="text-orange-600 font-bold w-4 flex-shrink-0">
+                      🗣️
+                    </span>
+                    <div>
+                      <strong className="text-orange-700">
+                        Speaking (3 parts):
+                      </strong>
+                      <br />
+                      <span className="text-gray-600">
+                        Type:{" "}
+                        <code className="bg-orange-100 px-1 rounded">
+                          speaking_part
+                        </code>{" "}
+                        — Part 1: interview | Part 2: cue card | Part 3:
+                        discussion
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowGuide(false)}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+        )}
+
+        {showGuide && exam?.exam_type !== "IELTS" && (
           <div className="mb-6 bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 border-blue-500 p-4 rounded-lg">
             <div className="flex items-start gap-3">
               <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
@@ -586,12 +691,29 @@ const ExamDetail = () => {
                                 <Layers className="w-3 h-3" />
                                 Group (Nhóm câu)
                               </span>
-                            ) : (
+                            ) : container.type === "toeic_single" ? (
                               <span className="px-2 py-0.5 bg-gray-100 text-gray-700 text-xs font-medium rounded border border-gray-300 flex items-center gap-1">
                                 <FileText className="w-3 h-3" />
                                 Single (Độc lập)
                               </span>
-                            )}
+                            ) : container.type === "ielts_passage" ? (
+                              <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs font-medium rounded border border-blue-300 flex items-center gap-1">
+                                <FileText className="w-3 h-3" />
+                                {container.skill === "listening"
+                                  ? "Section (Listening)"
+                                  : "Passage (Reading)"}
+                              </span>
+                            ) : container.type === "writing_task" ? (
+                              <span className="px-2 py-0.5 bg-purple-100 text-purple-700 text-xs font-medium rounded border border-purple-300 flex items-center gap-1">
+                                <FileText className="w-3 h-3" />
+                                Writing Task
+                              </span>
+                            ) : container.type === "speaking_part" ? (
+                              <span className="px-2 py-0.5 bg-orange-100 text-orange-700 text-xs font-medium rounded border border-orange-300 flex items-center gap-1">
+                                <MessageSquare className="w-3 h-3" />
+                                Speaking Part
+                              </span>
+                            ) : null}
                             {container.audio_url && (
                               <Music className="w-4 h-4 text-purple-500" />
                             )}
@@ -732,6 +854,66 @@ const ExamDetail = () => {
                                     thêm!
                                   </span>
                                 )}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                      {container.type === "ielts_passage" &&
+                        container.skill === "listening" && (
+                          <div className="mb-4 bg-blue-50 border-l-4 border-blue-500 p-3 rounded">
+                            <div className="flex items-start gap-2 text-sm">
+                              <Music className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
+                              <div className="text-blue-800">
+                                <strong>IELTS Listening Section:</strong> Mỗi
+                                section có 1 audio riêng + 10 câu hỏi.
+                                {!container.audio_url && (
+                                  <span className="ml-1 text-orange-600">
+                                    ⚠️ Chưa có audio - hãy Edit container để
+                                    thêm!
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      {container.type === "ielts_passage" &&
+                        container.skill === "reading" && (
+                          <div className="mb-4 bg-green-50 border-l-4 border-green-500 p-3 rounded">
+                            <div className="flex items-start gap-2 text-sm">
+                              <FileText className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                              <div className="text-green-800">
+                                <strong>IELTS Reading Passage:</strong> Đoạn văn
+                                đọc hiểu dài, khoảng 13–14 câu hỏi với nhiều
+                                dạng khác nhau.
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      {container.type === "writing_task" && (
+                        <div className="mb-4 bg-purple-50 border-l-4 border-purple-500 p-3 rounded">
+                          <div className="flex items-start gap-2 text-sm">
+                            <FileText className="w-4 h-4 text-purple-600 flex-shrink-0 mt-0.5" />
+                            <div className="text-purple-800">
+                              <strong>IELTS Writing Task:</strong>{" "}
+                              {container.instruction
+                                ?.toLowerCase()
+                                .includes("task 1") ||
+                              container.instruction
+                                ?.toLowerCase()
+                                .includes("task1")
+                                ? "Task 1 — Mô tả biểu đồ/sơ đồ (tối thiểu 150 từ)"
+                                : "Task 2 — Viết essay (tối thiểu 250 từ)"}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                      {container.type === "speaking_part" && (
+                        <div className="mb-4 bg-orange-50 border-l-4 border-orange-500 p-3 rounded">
+                          <div className="flex items-start gap-2 text-sm">
+                            <MessageSquare className="w-4 h-4 text-orange-600 flex-shrink-0 mt-0.5" />
+                            <div className="text-orange-800">
+                              <strong>IELTS Speaking:</strong> Câu hỏi nói — ghi
+                              âm hoặc đánh giá thủ công.
                             </div>
                           </div>
                         </div>
@@ -1263,6 +1445,7 @@ const ExamDetail = () => {
         <AddExamContainerModal
           isOpen={isAddContainerModalOpen}
           examId={parseInt(examId)}
+          examType={exam?.exam_type as "TOEIC" | "IELTS" | undefined}
           initialParentId={addContainerParentId}
           onClose={() => {
             setIsAddContainerModalOpen(false);
@@ -1280,6 +1463,7 @@ const ExamDetail = () => {
         <EditExamContainerModal
           isOpen={isEditContainerModalOpen}
           container={selectedContainer}
+          examType={exam?.exam_type as "TOEIC" | "IELTS" | undefined}
           onClose={() => {
             setIsEditContainerModalOpen(false);
             setSelectedContainer(null);

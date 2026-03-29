@@ -3,6 +3,11 @@ import {
   computeAndSaveUserExamStats,
   computeAndSaveExamQuestionStats,
 } from "./examStatsService.js";
+import {
+  gradeIeltsWriting,
+  speakingConversationTurn,
+  evaluateIeltsSpeaking,
+} from "./aiService.js";
 
 /**
  * USER EXAM SERVICE
@@ -525,6 +530,307 @@ export const getUserExamHistory = async (user_id, limit = 10, page = 1) => {
     return {
       success: false,
       message: error.message || "Failed to get exam history",
+    };
+  }
+};
+
+// ─────────────────────────────────────────────
+// IELTS Writing
+// ─────────────────────────────────────────────
+
+export const submitWritingTask = async (
+  user_exam_id,
+  container_question_id,
+  content,
+) => {
+  try {
+    if (!content || content.trim().split(/\s+/).filter(Boolean).length < 5) {
+      return { success: false, message: "Nội dung bài viết quá ngắn." };
+    }
+
+    const containerQuestion = await db.Container_Question.findByPk(
+      container_question_id,
+      {
+        include: [
+          { model: db.Question },
+          {
+            model: db.Exam_Container,
+            attributes: [
+              "container_id",
+              "content",
+              "type",
+              "instruction",
+              "skill",
+            ],
+          },
+        ],
+      },
+    );
+
+    if (!containerQuestion) {
+      return { success: false, message: "Không tìm thấy câu hỏi." };
+    }
+
+    const task_prompt = [
+      containerQuestion.Exam_Container?.instruction,
+      containerQuestion.Exam_Container?.content,
+      containerQuestion.Question?.question_content,
+    ]
+      .filter(Boolean)
+      .join("\n\n");
+
+    const skill = containerQuestion.Exam_Container?.skill;
+    // Determine task type: Writing Task 1 is typically the shorter report/chart task
+    const task_type = skill === "writing" ? "task2" : "task1";
+    const word_count = content.trim().split(/\s+/).filter(Boolean).length;
+
+    const submission = await db.Writing_Submission.create({
+      user_exam_id,
+      container_question_id,
+      content: content.trim(),
+      word_count,
+      status: "submitted",
+      submitted_at: new Date(),
+    });
+
+    let feedbackData = null;
+    try {
+      const grading = await gradeIeltsWriting({
+        task_prompt,
+        user_content: content,
+        task_type,
+      });
+
+      feedbackData = await db.Writing_Feedback.create({
+        submission_id: submission.submission_id,
+        model_name: "gpt-4o-mini",
+        overall_score: grading.overall_band || 0,
+        criteria_scores: grading.criteria_scores || {},
+        comments: JSON.stringify({
+          feedback: grading.feedback,
+          sample_improvements: grading.sample_improvements || [],
+          word_count_note: grading.word_count_note || "",
+        }),
+        created_at: new Date(),
+      });
+
+      await submission.update({
+        status: "graded",
+        final_score: grading.overall_band,
+      });
+    } catch (aiError) {
+      console.error("[submitWritingTask] AI grading error:", aiError);
+    }
+
+    return {
+      success: true,
+      message: "Bài viết đã được nộp và chấm điểm",
+      data: {
+        submission: {
+          submission_id: submission.submission_id,
+          word_count: submission.word_count,
+          status: submission.status,
+          final_score: submission.final_score,
+        },
+        feedback: feedbackData
+          ? {
+              overall_score: feedbackData.overall_score,
+              criteria_scores: feedbackData.criteria_scores,
+              comments: (() => {
+                try {
+                  return JSON.parse(feedbackData.comments);
+                } catch {
+                  return feedbackData.comments;
+                }
+              })(),
+            }
+          : null,
+      },
+    };
+  } catch (error) {
+    console.error("[submitWritingTask] ERROR:", error);
+    return {
+      success: false,
+      message: error.message || "Failed to submit writing task",
+    };
+  }
+};
+
+export const getWritingSubmissions = async (user_exam_id) => {
+  try {
+    const submissions = await db.Writing_Submission.findAll({
+      where: { user_exam_id },
+      include: [{ model: db.Writing_Feedback }],
+      order: [["submitted_at", "DESC"]],
+    });
+    return { success: true, data: submissions };
+  } catch (error) {
+    console.error("[getWritingSubmissions] ERROR:", error);
+    return { success: false, message: error.message };
+  }
+};
+
+// ─────────────────────────────────────────────
+// IELTS Speaking
+// ─────────────────────────────────────────────
+
+export const handleSpeakingTurn = async (
+  user_exam_id,
+  container_id,
+  messages,
+  part_type,
+) => {
+  try {
+    const container = await db.Exam_Container.findByPk(container_id, {
+      attributes: ["container_id", "content", "instruction", "skill"],
+      include: [
+        {
+          model: db.Container_Question,
+          include: [{ model: db.Question }],
+        },
+      ],
+    });
+
+    // Auto-detect part type from instruction text if not provided
+    const inferPartType = (instr) => {
+      if (!instr) return "part1";
+      const lower = instr.toLowerCase();
+      if (lower.includes("part 3") || lower.includes("part3")) return "part3";
+      if (lower.includes("part 2") || lower.includes("part2")) return "part2";
+      return "part1";
+    };
+    const detectedPartType = part_type || inferPartType(container?.instruction);
+
+    const promptParts = [container?.instruction, container?.content];
+    if (container?.Container_Questions?.length > 0) {
+      promptParts.push(
+        "Topic questions / cue card bullet points:\n" +
+          container.Container_Questions.map(
+            (cq, i) => `${i + 1}. ${cq.Question?.question_content}`,
+          ).join("\n"),
+      );
+    }
+    const part_context = promptParts.filter(Boolean).join("\n\n");
+
+    const result = await speakingConversationTurn({
+      messages,
+      part_context,
+      part_type: detectedPartType,
+    });
+
+    return { success: true, data: result };
+  } catch (error) {
+    console.error("[handleSpeakingTurn] ERROR:", error);
+    return {
+      success: false,
+      message: error.message || "Failed to process speaking turn",
+    };
+  }
+};
+
+export const submitSpeakingSession = async (
+  user_exam_id,
+  container_id,
+  messages,
+  duration_seconds,
+) => {
+  try {
+    const container = await db.Exam_Container.findByPk(container_id, {
+      attributes: ["container_id", "content", "instruction"],
+      include: [
+        {
+          model: db.Container_Question,
+          attributes: ["container_question_id"],
+          limit: 1,
+          order: [["order", "ASC"]],
+        },
+      ],
+    });
+
+    if (!container) {
+      return { success: false, message: "Speaking container not found" };
+    }
+
+    const container_question_id =
+      container.Container_Questions?.[0]?.container_question_id;
+    if (!container_question_id) {
+      return {
+        success: false,
+        message: "No questions found for this speaking part",
+      };
+    }
+
+    const transcript = messages
+      .map(
+        (m) => `${m.role === "user" ? "CANDIDATE" : "EXAMINER"}: ${m.content}`,
+      )
+      .join("\n\n");
+
+    const part_context = [container.instruction, container.content]
+      .filter(Boolean)
+      .join("\n");
+
+    const record = await db.Speaking_Record.create({
+      user_exam_id,
+      container_question_id,
+      audio_url: "text_session",
+      duration: duration_seconds || 0,
+      submitted_at: new Date(),
+    });
+
+    let feedbackData = null;
+    try {
+      const evaluation = await evaluateIeltsSpeaking({
+        transcript,
+        part_context,
+      });
+
+      feedbackData = await db.Speaking_Feedback.create({
+        record_id: record.record_id,
+        model_name: "gpt-4o-mini",
+        overall_score: evaluation.overall_band || 0,
+        criteria_scores: evaluation.criteria_scores || {},
+        comments: JSON.stringify({
+          feedback: evaluation.feedback,
+          transcript_excerpt: transcript.substring(0, 800),
+        }),
+        created_at: new Date(),
+        updated_at: new Date(),
+      });
+
+      await record.update({ final_score: evaluation.overall_band });
+    } catch (aiError) {
+      console.error("[submitSpeakingSession] AI evaluation error:", aiError);
+    }
+
+    return {
+      success: true,
+      message: "Phiên speaking đã được đánh giá",
+      data: {
+        record: {
+          record_id: record.record_id,
+          final_score: record.final_score,
+        },
+        feedback: feedbackData
+          ? {
+              overall_score: feedbackData.overall_score,
+              criteria_scores: feedbackData.criteria_scores,
+              comments: (() => {
+                try {
+                  return JSON.parse(feedbackData.comments);
+                } catch {
+                  return feedbackData.comments;
+                }
+              })(),
+            }
+          : null,
+      },
+    };
+  } catch (error) {
+    console.error("[submitSpeakingSession] ERROR:", error);
+    return {
+      success: false,
+      message: error.message || "Failed to submit speaking session",
     };
   }
 };

@@ -5,18 +5,30 @@ import { useExam } from "../../contexts/examContext";
 interface AddExamContainerModalProps {
   isOpen: boolean;
   examId: number;
+  examType?: "TOEIC" | "IELTS";
   onClose: () => void;
   onSuccess: () => void;
   initialParentId?: number | null;
 }
 
+// Map IELTS skill → container type
+const getIeltsTypeFromSkill = (
+  skill: string,
+): "ielts_passage" | "writing_task" | "speaking_part" => {
+  if (skill === "writing") return "writing_task";
+  if (skill === "speaking") return "speaking_part";
+  return "ielts_passage"; // listening + reading both use ielts_passage
+};
+
 const AddExamContainerModal = ({
   isOpen,
   examId,
+  examType = "TOEIC",
   onClose,
   onSuccess,
   initialParentId = null,
 }: AddExamContainerModalProps) => {
+  const isIelts = examType === "IELTS";
   const {
     createExamContainer,
     getContainersByExamId,
@@ -28,7 +40,7 @@ const AddExamContainerModal = ({
 
   const [formData, setFormData] = useState({
     skill: "" as "listening" | "reading" | "writing" | "speaking" | "",
-    type: "toeic_group" as
+    type: (examType === "IELTS" ? "ielts_passage" : "toeic_group") as
       | "toeic_group"
       | "toeic_single"
       | "ielts_passage"
@@ -50,13 +62,16 @@ const AddExamContainerModal = ({
 
   useEffect(() => {
     if (isOpen && examId) {
-      // Get current containers to set next order and available parents
       getContainersByExamId(examId).then((containers) => {
         setFormData((prev) => ({
           ...prev,
           order: containers.length + 1,
+          // Reset type when modal opens
+          type: isIelts ? "ielts_passage" : "toeic_group",
+          skill: "",
         }));
-        // Only show containers that can be parents (Part 3,4,6,7 type)
+        // For TOEIC: parents are toeic_group containers
+        // For IELTS: no parent containers used in standard structure
         const potentialParents = containers.filter(
           (c: any) =>
             c.type === "toeic_group" &&
@@ -65,7 +80,6 @@ const AddExamContainerModal = ({
         setAvailableParents(potentialParents);
       });
 
-      // If initialParentId is provided, set it and mark as child container
       if (initialParentId) {
         setIsParentContainer(false);
         setParentId(initialParentId);
@@ -82,13 +96,22 @@ const AddExamContainerModal = ({
     >,
   ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]:
-        name === "order" || name === "time_limit"
-          ? parseInt(value) || 0
-          : value,
-    }));
+    if (name === "skill" && isIelts && value) {
+      // Auto-derive container type from skill for IELTS
+      setFormData((prev) => ({
+        ...prev,
+        skill: value as "listening" | "reading" | "writing" | "speaking",
+        type: getIeltsTypeFromSkill(value),
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]:
+          name === "order" || name === "time_limit"
+            ? parseInt(value) || 0
+            : value,
+      }));
+    }
   };
 
   const handleAudioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -139,7 +162,7 @@ const AddExamContainerModal = ({
       onSuccess();
       setFormData({
         skill: "",
-        type: "toeic_group",
+        type: isIelts ? "ielts_passage" : "toeic_group",
         order: 1,
         content: "",
         instruction: "",
@@ -178,16 +201,58 @@ const AddExamContainerModal = ({
             </div>
           )}
 
+          {/* IELTS Structure Guide */}
+          {isIelts && (
+            <div className="mb-4 p-3 bg-indigo-50 border border-indigo-200 rounded-lg text-sm text-indigo-800">
+              <p className="font-semibold mb-1">📋 Cấu trúc đề thi IELTS:</p>
+              <ul className="space-y-0.5 text-xs">
+                <li>
+                  🎧 <strong>Listening:</strong> Section 1–4 (mỗi section có
+                  audio riêng) → type:{" "}
+                  <code className="bg-indigo-100 px-1 rounded">
+                    ielts_passage
+                  </code>
+                </li>
+                <li>
+                  📖 <strong>Reading:</strong> Passage 1–3 (đoạn văn dài) →
+                  type:{" "}
+                  <code className="bg-indigo-100 px-1 rounded">
+                    ielts_passage
+                  </code>
+                </li>
+                <li>
+                  ✍️ <strong>Writing:</strong> Task 1–2 (mô tả biểu đồ / essay)
+                  → type:{" "}
+                  <code className="bg-indigo-100 px-1 rounded">
+                    writing_task
+                  </code>
+                </li>
+                <li>
+                  🗣️ <strong>Speaking:</strong> Part 1–3 (interview / cue card /
+                  discussion) → type:{" "}
+                  <code className="bg-indigo-100 px-1 rounded">
+                    speaking_part
+                  </code>
+                </li>
+              </ul>
+              <p className="mt-1.5 text-xs text-indigo-600">
+                💡 Chọn kỹ năng bên dưới — loại container sẽ được tự động xác
+                định.
+              </p>
+            </div>
+          )}
+
           <div className="space-y-4">
             {/* Skill */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Kỹ năng
+                Kỹ năng {isIelts && <span className="text-red-500">*</span>}
               </label>
               <select
                 name="skill"
                 value={formData.skill}
                 onChange={handleChange}
+                required={isIelts}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="">-- Chọn kỹ năng --</option>
@@ -198,104 +263,130 @@ const AddExamContainerModal = ({
               </select>
             </div>
 
-            {/* Type */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Loại <span className="text-red-500">*</span>
-              </label>
-              <select
-                name="type"
-                value={formData.type}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                <option value="toeic_group">
-                  TOEIC Group (Part 3, 4, 6, 7)
-                </option>
-                <option value="toeic_single">
-                  TOEIC Single (Part 1, 2, 5)
-                </option>
-                <option value="ielts_passage">IELTS Passage</option>
-                <option value="writing_task">Writing Task</option>
-                <option value="speaking_part">Speaking Part</option>
-              </select>
-            </div>
-
-            {/* Parent Container Selection */}
-            <div className="bg-blue-50 border border-blue-200 p-4 rounded-lg">
-              {initialParentId ? (
-                <div className="bg-purple-100 border border-purple-300 p-3 rounded mb-3">
-                  <p className="text-sm font-medium text-purple-900">
-                    🎯 Đang tạo Container con (Conversation/Passage)
-                  </p>
-                  <p className="text-xs text-purple-700 mt-1">
-                    Container này sẽ được thêm vào Part đã chọn
-                  </p>
+            {/* Type: TOEIC → manual select; IELTS → read-only derived from skill */}
+            {isIelts ? (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Loại container (tự động)
+                </label>
+                <div className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-600 text-sm">
+                  {formData.skill === "listening" &&
+                    "ielts_passage — Section (Listening)"}
+                  {formData.skill === "reading" &&
+                    "ielts_passage — Passage (Reading)"}
+                  {formData.skill === "writing" &&
+                    "writing_task — Writing Task"}
+                  {formData.skill === "speaking" &&
+                    "speaking_part — Speaking Part"}
+                  {!formData.skill && "Chọn kỹ năng để xác định loại"}
                 </div>
-              ) : (
-                <>
-                  <label className="flex items-center gap-2 mb-3">
-                    <input
-                      type="checkbox"
-                      checked={isParentContainer}
-                      onChange={(e) => {
-                        setIsParentContainer(e.target.checked);
-                        if (e.target.checked) setParentId(null);
-                      }}
-                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                    />
-                    <span className="text-sm font-medium text-gray-800">
-                      Tạo Part mới (Parent Container)
-                    </span>
-                  </label>
-                  <p className="text-xs text-gray-600 mb-2">
-                    ✓ Check: Tạo Part mới (VD: Part 3, Part 4, Part 6, Part 7)
-                    <br />✗ Uncheck: Tạo Container con (VD: Conversation 1, 2,
-                    3...)
-                  </p>
-                </>
-              )}
+              </div>
+            ) : (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Loại <span className="text-red-500">*</span>
+                </label>
+                <select
+                  name="type"
+                  value={formData.type}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="toeic_group">
+                    TOEIC Group (Part 3, 4, 6, 7)
+                  </option>
+                  <option value="toeic_single">
+                    TOEIC Single (Part 1, 2, 5)
+                  </option>
+                </select>
+              </div>
+            )}
 
-              {!isParentContainer && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Chọn Part cha <span className="text-red-500">*</span>
-                  </label>
-                  <select
-                    value={parentId || ""}
-                    onChange={(e) =>
-                      setParentId(
-                        e.target.value ? parseInt(e.target.value) : null,
-                      )
-                    }
-                    required={!isParentContainer}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="">-- Chọn Part cha --</option>
-                    {availableParents.map((parent) => (
-                      <option
-                        key={parent.container_id}
-                        value={parent.container_id}
-                      >
-                        {parent.instruction ||
-                          `Part ${parent.order} - ${parent.skill}`}
-                      </option>
-                    ))}
-                  </select>
-                  {availableParents.length === 0 && (
-                    <p className="mt-1 text-xs text-yellow-600">
-                      ⚠️ Chưa có Part nào. Hãy tạo Parent Container trước!
+            {/* Parent Container Selection — TOEIC only */}
+            {!isIelts && (
+              <div className="bg-blue-50 border border-blue-200 p-4 rounded-lg">
+                {initialParentId ? (
+                  <div className="bg-purple-100 border border-purple-300 p-3 rounded mb-3">
+                    <p className="text-sm font-medium text-purple-900">
+                      🎯 Đang tạo Container con (Conversation/Passage)
                     </p>
-                  )}
-                </div>
-              )}
-            </div>
+                    <p className="text-xs text-purple-700 mt-1">
+                      Container này sẽ được thêm vào Part đã chọn
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                    <label className="flex items-center gap-2 mb-3">
+                      <input
+                        type="checkbox"
+                        checked={isParentContainer}
+                        onChange={(e) => {
+                          setIsParentContainer(e.target.checked);
+                          if (e.target.checked) setParentId(null);
+                        }}
+                        className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                      />
+                      <span className="text-sm font-medium text-gray-800">
+                        Tạo Part mới (Parent Container)
+                      </span>
+                    </label>
+                    <p className="text-xs text-gray-600 mb-2">
+                      ✓ Check: Tạo Part mới (VD: Part 3, Part 4, Part 6, Part 7)
+                      <br />✗ Uncheck: Tạo Container con (VD: Conversation 1, 2,
+                      3...)
+                    </p>
+                  </>
+                )}
+
+                {!isParentContainer && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Chọn Part cha <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      value={parentId || ""}
+                      onChange={(e) =>
+                        setParentId(
+                          e.target.value ? parseInt(e.target.value) : null,
+                        )
+                      }
+                      required={!isParentContainer}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    >
+                      <option value="">-- Chọn Part cha --</option>
+                      {availableParents.map((parent) => (
+                        <option
+                          key={parent.container_id}
+                          value={parent.container_id}
+                        >
+                          {parent.instruction ||
+                            `Part ${parent.order} - ${parent.skill}`}
+                        </option>
+                      ))}
+                    </select>
+                    {availableParents.length === 0 && (
+                      <p className="mt-1 text-xs text-yellow-600">
+                        ⚠️ Chưa có Part nào. Hãy tạo Parent Container trước!
+                      </p>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Content */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Nội dung (Đoạn văn/Hội thoại...){" "}
+                {isIelts
+                  ? formData.skill === "writing"
+                    ? "Đề bài / Prompt"
+                    : formData.skill === "speaking"
+                      ? "Nội dung Part (Cue card / Câu hỏi)"
+                      : formData.skill === "listening"
+                        ? "Mô tả Section (tiêu đề / context)"
+                        : "Nội dung Passage (đoạn văn đọc)"
+                  : "Nội dung (Đoạn văn/Hội thoại...)"}{" "}
                 <span className="text-red-500">*</span>
               </label>
               <textarea
@@ -305,14 +396,24 @@ const AddExamContainerModal = ({
                 required
                 rows={6}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Nhập nội dung cho phần thi này..."
+                placeholder={
+                  isIelts
+                    ? formData.skill === "writing"
+                      ? "Nhập đề bài (describe the chart / write an essay...)"
+                      : formData.skill === "speaking"
+                        ? "Nhập nội dung cue card / câu hỏi part..."
+                        : formData.skill === "listening"
+                          ? "Nhập tiêu đề section hoặc script audio..."
+                          : "Nhập đoạn văn đọc hiểu..."
+                    : "Nhập nội dung cho phần thi này..."
+                }
               />
             </div>
 
             {/* Instruction */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Hướng dẫn
+                Hướng dẫn / Tiêu đề
               </label>
               <textarea
                 name="instruction"
@@ -320,14 +421,27 @@ const AddExamContainerModal = ({
                 onChange={handleChange}
                 rows={3}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Nhập hướng dẫn cho Part (VD: Questions 1-5)..."
+                placeholder={
+                  isIelts
+                    ? formData.skill === "listening"
+                      ? "VD: Section 1 — Questions 1–10"
+                      : formData.skill === "reading"
+                        ? "VD: Passage 1 — Reading Passage 1"
+                        : formData.skill === "writing"
+                          ? "VD: Task 1 — Writing Task 1"
+                          : "VD: Part 1 — Interview"
+                    : "Nhập hướng dẫn cho Part (VD: Questions 1-5)..."
+                }
               />
             </div>
 
             {/* Audio Upload */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Audio (Part Listening)
+                Audio
+                {isIelts && formData.skill === "listening"
+                  ? " (Bắt buộc cho Section Listening)"
+                  : " (Part Listening)"}
               </label>
               <input
                 type="file"

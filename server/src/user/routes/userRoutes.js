@@ -164,6 +164,10 @@ import {
   abandonExam,
   getOngoingExam,
   getUserExamHistory,
+  submitWritingTask,
+  getWritingSubmissions,
+  speakingTurn,
+  submitSpeaking,
 } from "../controllers/userExamController.js";
 
 // ===========Exam Analytics Controllers===========
@@ -760,6 +764,46 @@ const initUserRoutes = (app) => {
     verifyToken,
     requireUser,
     getOngoingExam,
+  );
+
+  // ──────────────────────────────────────────────
+  // IELTS Writing routes
+  // ──────────────────────────────────────────────
+
+  // Submit writing task + get AI feedback
+  router.post(
+    "/api/user/user-exams/:user_exam_id/submit-writing",
+    verifyToken,
+    requireUser,
+    submitWritingTask,
+  );
+
+  // Get all writing submissions for a user_exam
+  router.get(
+    "/api/user/user-exams/:user_exam_id/writing-submissions",
+    verifyToken,
+    requireUser,
+    getWritingSubmissions,
+  );
+
+  // ──────────────────────────────────────────────
+  // IELTS Speaking routes
+  // ──────────────────────────────────────────────
+
+  // One conversation turn with AI examiner
+  router.post(
+    "/api/user/user-exams/:user_exam_id/speaking-turn",
+    verifyToken,
+    requireUser,
+    speakingTurn,
+  );
+
+  // Submit & evaluate full speaking session
+  router.post(
+    "/api/user/user-exams/:user_exam_id/speaking-submit",
+    verifyToken,
+    requireUser,
+    submitSpeaking,
   );
 
   // ===========AI Assistant Routes===========

@@ -16,6 +16,9 @@ import {
   BookOpen,
   X,
   LayoutGrid,
+  FileText,
+  Mic,
+  Loader2,
 } from "lucide-react";
 
 const ExamTaking: React.FC = () => {
@@ -27,6 +30,7 @@ const ExamTaking: React.FC = () => {
     saveAnswers,
     submitExam,
     getOngoingExam,
+    submitWriting,
   } = useExam();
   const { showToast } = useToast();
 
@@ -34,6 +38,14 @@ const ExamTaking: React.FC = () => {
   const [userExamId, setUserExamId] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [answers, setAnswers] = useState<Record<number, number | null>>({});
+  // Writing: text per container_question_id
+  const [writingTexts, setWritingTexts] = useState<Record<number, string>>({});
+  const [writingFeedbacks, setWritingFeedbacks] = useState<Record<number, any>>(
+    {},
+  );
+  const [writingSubmitting, setWritingSubmitting] = useState<
+    Record<number, boolean>
+  >({});
   const [currentContainerIndex, setCurrentContainerIndex] = useState(0);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [timeRemaining, setTimeRemaining] = useState(0);
@@ -176,6 +188,45 @@ const ExamTaking: React.FC = () => {
     }
   }, [currentContainerIndex, exam]);
 
+  const handleWritingSubmit = async (container_question_id: number) => {
+    if (!userExamId) return;
+    const content = writingTexts[container_question_id] || "";
+    if (content.trim().split(/\s+/).filter(Boolean).length < 5) {
+      showToast("error", "Vui lòng viết ít nhất 5 từ trước khi nộp.");
+      return;
+    }
+    setWritingSubmitting((prev) => ({
+      ...prev,
+      [container_question_id]: true,
+    }));
+    try {
+      const result = await submitWriting(
+        userExamId,
+        container_question_id,
+        content,
+      );
+      if (result.success) {
+        setWritingFeedbacks((prev) => ({
+          ...prev,
+          [container_question_id]: result.data,
+        }));
+        showToast(
+          "success",
+          `Bài viết đã được chấm: Band ${result.data?.submission?.final_score ?? "N/A"}`,
+        );
+      } else {
+        showToast("error", result.message || "Không thể nộp bài viết");
+      }
+    } catch (e) {
+      showToast("error", "Lỗi kết nối");
+    } finally {
+      setWritingSubmitting((prev) => ({
+        ...prev,
+        [container_question_id]: false,
+      }));
+    }
+  };
+
   const handleSave = async (showNotification = true) => {
     if (!userExamId) return;
 
@@ -294,15 +345,25 @@ const ExamTaking: React.FC = () => {
 
   const getTotalQuestionsCount = () => {
     const containers = getFlattenedContainers();
-    return containers.reduce(
-      (total: number, container: any) =>
-        total + (container.Container_Questions?.length || 0),
-      0,
-    );
+    return containers.reduce((total: number, container: any) => {
+      // Speaking parts count as 1 "item" in progress
+      if (container.type === "speaking_part") return total + 1;
+      return total + (container.Container_Questions?.length || 0);
+    }, 0);
   };
 
   const getAnsweredQuestionsCount = () => {
-    return Object.values(answers).filter((ans) => ans !== null).length;
+    const containers = getFlattenedContainers();
+    let count = Object.values(answers).filter((ans) => ans !== null).length;
+    // Also count submitted writing tasks
+    containers.forEach((container: any) => {
+      if (container.type === "writing_task") {
+        container.Container_Questions?.forEach((cq: any) => {
+          if (writingFeedbacks[cq.container_question_id]) count++;
+        });
+      }
+    });
+    return count;
   };
 
   const getCurrentQuestionNumber = () => {
@@ -565,87 +626,238 @@ const ExamTaking: React.FC = () => {
 
           {/* RIGHT COLUMN - Question & Answers */}
           <div>
-            {currentQuestion && (
-              <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
-                {/* Question */}
-                <div className="mb-6">
-                  <div className="flex items-start gap-4">
-                    <span className="flex-shrink-0 w-9 h-9 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
-                      {currentQuestionNumber}
-                    </span>
-                    <h3 className="flex-1 text-lg font-medium text-slate-900 leading-relaxed">
-                      {currentQuestion.Question.question_content}
-                    </h3>
+            {/* ── WRITING TASK ─────────────────────────── */}
+            {currentContainer?.type === "writing_task" &&
+              currentQuestion &&
+              (() => {
+                const cqId = currentQuestion.container_question_id;
+                const text = writingTexts[cqId] || "";
+                const wordCount = text
+                  .trim()
+                  .split(/\s+/)
+                  .filter(Boolean).length;
+                const feedback = writingFeedbacks[cqId];
+                const isSubmitting = writingSubmitting[cqId];
+
+                return (
+                  <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6 space-y-5">
+                    {/* Task instruction */}
+                    <div className="flex items-start gap-3">
+                      <span className="flex-shrink-0 w-9 h-9 bg-green-600 text-white rounded-full flex items-center justify-center">
+                        <FileText className="w-4 h-4" />
+                      </span>
+                      <div>
+                        <p className="text-xs font-semibold text-green-700 uppercase mb-1">
+                          Writing Task
+                        </p>
+                        <p className="text-base font-medium text-slate-900 leading-relaxed">
+                          {currentQuestion.Question.question_content}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Textarea */}
+                    {!feedback ? (
+                      <>
+                        <textarea
+                          className="w-full h-64 border border-slate-300 rounded-lg p-3 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-green-500 resize-y"
+                          placeholder="Viết bài của bạn ở đây..."
+                          value={text}
+                          onChange={(e) =>
+                            setWritingTexts((prev) => ({
+                              ...prev,
+                              [cqId]: e.target.value,
+                            }))
+                          }
+                          disabled={isSubmitting}
+                        />
+                        <div className="flex items-center justify-between">
+                          <span
+                            className={`text-sm font-medium ${wordCount < 50 ? "text-red-500" : "text-slate-500"}`}
+                          >
+                            {wordCount} từ
+                          </span>
+                          <button
+                            onClick={() => handleWritingSubmit(cqId)}
+                            disabled={isSubmitting || wordCount < 5}
+                            className="px-5 py-2 bg-green-600 text-white text-sm font-semibold rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 flex items-center gap-2"
+                          >
+                            {isSubmitting ? (
+                              <>
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                                Đang chấm...
+                              </>
+                            ) : (
+                              <>
+                                <Send className="w-4 h-4" />
+                                Nộp & Chấm điểm
+                              </>
+                            )}
+                          </button>
+                        </div>
+                      </>
+                    ) : (
+                      /* Feedback display */
+                      <div className="space-y-4">
+                        <div className="flex items-center gap-3 p-4 bg-green-50 rounded-lg border border-green-200">
+                          <CheckCircle className="w-8 h-8 text-green-600 flex-shrink-0" />
+                          <div>
+                            <p className="text-sm font-semibold text-green-800">
+                              Đã chấm điểm
+                            </p>
+                            <p className="text-2xl font-bold text-green-700">
+                              Band {feedback.submission?.final_score ?? "N/A"}
+                            </p>
+                          </div>
+                        </div>
+
+                        {feedback.feedback?.criteria_scores && (
+                          <div className="grid grid-cols-2 gap-2">
+                            {Object.entries(
+                              feedback.feedback.criteria_scores,
+                            ).map(([k, v]: [string, any]) => (
+                              <div
+                                key={k}
+                                className="bg-slate-50 rounded-lg p-3 border border-slate-200"
+                              >
+                                <p className="text-xs text-slate-500 capitalize mb-1">
+                                  {k.replace(/_/g, " ")}
+                                </p>
+                                <p className="text-lg font-bold text-slate-800">
+                                  {v}
+                                </p>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+
+                        {feedback.feedback?.comments?.feedback
+                          ?.overall_comment && (
+                          <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
+                            <p className="text-sm font-semibold text-blue-800 mb-2">
+                              Nhận xét chung
+                            </p>
+                            <p className="text-sm text-blue-900 leading-relaxed">
+                              {
+                                feedback.feedback.comments.feedback
+                                  .overall_comment
+                              }
+                            </p>
+                          </div>
+                        )}
+
+                        {feedback.feedback?.comments?.feedback?.improvements
+                          ?.length > 0 && (
+                          <div className="bg-amber-50 rounded-lg p-4 border border-amber-200">
+                            <p className="text-sm font-semibold text-amber-800 mb-2">
+                              Cần cải thiện
+                            </p>
+                            <ul className="space-y-1">
+                              {feedback.feedback.comments.feedback.improvements.map(
+                                (imp: string, i: number) => (
+                                  <li
+                                    key={i}
+                                    className="text-sm text-amber-900 flex items-start gap-2"
+                                  >
+                                    <span className="mt-1 flex-shrink-0 w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                                    {imp}
+                                  </li>
+                                ),
+                              )}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Navigation */}
+                    <div className="flex items-center justify-between pt-4 border-t">
+                      <button
+                        onClick={handlePreviousQuestion}
+                        disabled={
+                          currentContainerIndex === 0 &&
+                          currentQuestionIndex === 0
+                        }
+                        className="px-6 py-3 border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors disabled:opacity-40 flex items-center gap-2 text-sm font-medium text-slate-700"
+                      >
+                        <ChevronLeft className="w-4 h-4" />
+                        Trước
+                      </button>
+                      <button
+                        onClick={handleNextQuestion}
+                        disabled={
+                          currentContainerIndex ===
+                            getFlattenedContainers().length - 1 &&
+                          currentQuestionIndex ===
+                            (currentContainer?.Container_Questions?.length ||
+                              0) -
+                              1
+                        }
+                        className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-40 flex items-center gap-2 text-sm font-medium"
+                      >
+                        Tiếp
+                        <ChevronRight className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                );
+              })()}
+
+            {/* ── SPEAKING PART ────────────────────────── */}
+            {currentContainer?.type === "speaking_part" && (
+              <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6 space-y-5">
+                <div className="flex items-start gap-3">
+                  <span className="flex-shrink-0 w-9 h-9 bg-purple-600 text-white rounded-full flex items-center justify-center">
+                    <Mic className="w-4 h-4" />
+                  </span>
+                  <div>
+                    <p className="text-xs font-semibold text-purple-700 uppercase mb-1">
+                      Speaking Part
+                    </p>
+                    <p className="text-base font-medium text-slate-900">
+                      {currentContainer.instruction ||
+                        currentContainer.content ||
+                        "IELTS Speaking"}
+                    </p>
                   </div>
                 </div>
 
-                {/* Answer Options */}
-                <div className="space-y-3">
-                  {currentQuestion.Question_Options.map((option: any) => {
-                    const isSelected =
-                      answers[currentQuestion.container_question_id] ===
-                      option.question_option_id;
-
-                    return (
-                      <button
-                        key={option.question_option_id}
-                        onClick={() =>
-                          handleAnswerSelect(
-                            currentQuestion.container_question_id,
-                            option.question_option_id,
-                          )
-                        }
-                        className={`w-full text-left p-4 rounded-lg border-2 transition-all ${
-                          isSelected
-                            ? "border-blue-500 bg-blue-50 shadow-sm"
-                            : "border-slate-200 hover:border-blue-200 hover:bg-slate-50"
-                        }`}
-                      >
-                        <div className="flex items-center gap-3">
-                          <span
-                            className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${
-                              isSelected
-                                ? "bg-blue-600 text-white"
-                                : "bg-slate-100 text-slate-700"
-                            }`}
-                          >
-                            {option.label}
-                          </span>
-                          <span className="text-slate-800 text-base">
-                            {option.content}
-                          </span>
-                        </div>
-                      </button>
-                    );
-                  })}
+                <div className="bg-purple-50 rounded-lg p-4 border border-purple-200">
+                  <p className="text-sm text-purple-900 leading-relaxed mb-4">
+                    Phần Speaking sẽ diễn ra dưới dạng đối thoại 1-1 với AI
+                    Examiner. Sau khi kết thúc, AI sẽ đánh giá dựa trên
+                    transcript ghi lại.
+                  </p>
+                  <button
+                    onClick={() =>
+                      navigate(
+                        `/speaking-exam/${id}/${userExamId}/${currentContainer.container_id}`,
+                      )
+                    }
+                    className="w-full px-5 py-3 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 transition-colors flex items-center justify-center gap-2"
+                  >
+                    <Mic className="w-4 h-4" />
+                    Vào phòng Speaking
+                  </button>
                 </div>
 
-                {/* Navigation Buttons */}
-                <div className="flex items-center justify-between mt-8 pt-6 border-t">
+                {/* Navigation */}
+                <div className="flex items-center justify-between pt-4 border-t">
                   <button
                     onClick={handlePreviousQuestion}
-                    disabled={
-                      currentContainerIndex === 0 && currentQuestionIndex === 0
-                    }
-                    className="px-6 py-3 border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2 text-sm font-medium text-slate-700"
+                    disabled={currentContainerIndex === 0}
+                    className="px-6 py-3 border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors disabled:opacity-40 flex items-center gap-2 text-sm font-medium text-slate-700"
                   >
                     <ChevronLeft className="w-4 h-4" />
                     Trước
                   </button>
-
-                  <div className="text-sm text-slate-500 font-medium">
-                    {Math.round((answeredQuestions / totalQuestions) * 100)}%
-                  </div>
-
                   <button
                     onClick={handleNextQuestion}
                     disabled={
                       currentContainerIndex ===
-                        getFlattenedContainers().length - 1 &&
-                      currentQuestionIndex ===
-                        (currentContainer?.Container_Questions?.length || 0) - 1
+                      getFlattenedContainers().length - 1
                     }
-                    className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2 text-sm font-medium"
+                    className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-40 flex items-center gap-2 text-sm font-medium"
                   >
                     Tiếp
                     <ChevronRight className="w-4 h-4" />
@@ -653,6 +865,100 @@ const ExamTaking: React.FC = () => {
                 </div>
               </div>
             )}
+
+            {/* ── MCQ (default) ────────────────────────── */}
+            {currentContainer?.type !== "writing_task" &&
+              currentContainer?.type !== "speaking_part" &&
+              currentQuestion && (
+                <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+                  {/* Question */}
+                  <div className="mb-6">
+                    <div className="flex items-start gap-4">
+                      <span className="flex-shrink-0 w-9 h-9 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                        {currentQuestionNumber}
+                      </span>
+                      <h3 className="flex-1 text-lg font-medium text-slate-900 leading-relaxed">
+                        {currentQuestion.Question.question_content}
+                      </h3>
+                    </div>
+                  </div>
+
+                  {/* Answer Options */}
+                  <div className="space-y-3">
+                    {currentQuestion.Question_Options.map((option: any) => {
+                      const isSelected =
+                        answers[currentQuestion.container_question_id] ===
+                        option.question_option_id;
+
+                      return (
+                        <button
+                          key={option.question_option_id}
+                          onClick={() =>
+                            handleAnswerSelect(
+                              currentQuestion.container_question_id,
+                              option.question_option_id,
+                            )
+                          }
+                          className={`w-full text-left p-4 rounded-lg border-2 transition-all ${
+                            isSelected
+                              ? "border-blue-500 bg-blue-50 shadow-sm"
+                              : "border-slate-200 hover:border-blue-200 hover:bg-slate-50"
+                          }`}
+                        >
+                          <div className="flex items-center gap-3">
+                            <span
+                              className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${
+                                isSelected
+                                  ? "bg-blue-600 text-white"
+                                  : "bg-slate-100 text-slate-700"
+                              }`}
+                            >
+                              {option.label}
+                            </span>
+                            <span className="text-slate-800 text-base">
+                              {option.content}
+                            </span>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Navigation Buttons */}
+                  <div className="flex items-center justify-between mt-8 pt-6 border-t">
+                    <button
+                      onClick={handlePreviousQuestion}
+                      disabled={
+                        currentContainerIndex === 0 &&
+                        currentQuestionIndex === 0
+                      }
+                      className="px-6 py-3 border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2 text-sm font-medium text-slate-700"
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                      Trước
+                    </button>
+
+                    <div className="text-sm text-slate-500 font-medium">
+                      {Math.round((answeredQuestions / totalQuestions) * 100)}%
+                    </div>
+
+                    <button
+                      onClick={handleNextQuestion}
+                      disabled={
+                        currentContainerIndex ===
+                          getFlattenedContainers().length - 1 &&
+                        currentQuestionIndex ===
+                          (currentContainer?.Container_Questions?.length || 0) -
+                            1
+                      }
+                      className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2 text-sm font-medium"
+                    >
+                      Tiếp
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              )}
           </div>
         </div>
       </div>

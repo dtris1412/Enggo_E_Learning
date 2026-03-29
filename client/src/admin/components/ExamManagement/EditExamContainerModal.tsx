@@ -5,16 +5,28 @@ import { useExam } from "../../contexts/examContext";
 interface EditExamContainerModalProps {
   isOpen: boolean;
   container: any;
+  examType?: "TOEIC" | "IELTS";
   onClose: () => void;
   onSuccess: () => void;
 }
 
+// Map IELTS skill → container type
+const getIeltsTypeFromSkill = (
+  skill: string,
+): "ielts_passage" | "writing_task" | "speaking_part" => {
+  if (skill === "writing") return "writing_task";
+  if (skill === "speaking") return "speaking_part";
+  return "ielts_passage";
+};
+
 const EditExamContainerModal = ({
   isOpen,
   container,
+  examType = "TOEIC",
   onClose,
   onSuccess,
 }: EditExamContainerModalProps) => {
+  const isIelts = examType === "IELTS";
   const {
     updateExamContainer,
     uploadExamAudio,
@@ -63,13 +75,21 @@ const EditExamContainerModal = ({
     >,
   ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]:
-        name === "order" || name === "time_limit"
-          ? parseInt(value) || 0
-          : value,
-    }));
+    if (name === "skill" && isIelts && value) {
+      setFormData((prev) => ({
+        ...prev,
+        skill: value as "listening" | "reading" | "writing" | "speaking",
+        type: getIeltsTypeFromSkill(value),
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]:
+          name === "order" || name === "time_limit"
+            ? parseInt(value) || 0
+            : value,
+      }));
+    }
   };
 
   const handleAudioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -149,12 +169,13 @@ const EditExamContainerModal = ({
             {/* Skill */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Kỹ năng
+                Kỹ năng {isIelts && <span className="text-red-500">*</span>}
               </label>
               <select
                 name="skill"
                 value={formData.skill}
                 onChange={handleChange}
+                required={isIelts}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="">-- Chọn kỹ năng --</option>
@@ -166,33 +187,57 @@ const EditExamContainerModal = ({
             </div>
 
             {/* Type */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Loại <span className="text-red-500">*</span>
-              </label>
-              <select
-                name="type"
-                value={formData.type}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                <option value="toeic_group">
-                  TOEIC Group (Part 3, 4, 6, 7)
-                </option>
-                <option value="toeic_single">
-                  TOEIC Single (Part 1, 2, 5)
-                </option>
-                <option value="ielts_passage">IELTS Passage</option>
-                <option value="writing_task">Writing Task</option>
-                <option value="speaking_part">Speaking Part</option>
-              </select>
-            </div>
+            {isIelts ? (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Loại container (tự động)
+                </label>
+                <div className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-600 text-sm">
+                  {formData.skill === "listening" &&
+                    "ielts_passage — Section (Listening)"}
+                  {formData.skill === "reading" &&
+                    "ielts_passage — Passage (Reading)"}
+                  {formData.skill === "writing" &&
+                    "writing_task — Writing Task"}
+                  {formData.skill === "speaking" &&
+                    "speaking_part — Speaking Part"}
+                  {!formData.skill && "Chọn kỹ năng để xác định loại"}
+                </div>
+              </div>
+            ) : (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Loại <span className="text-red-500">*</span>
+                </label>
+                <select
+                  name="type"
+                  value={formData.type}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="toeic_group">
+                    TOEIC Group (Part 3, 4, 6, 7)
+                  </option>
+                  <option value="toeic_single">
+                    TOEIC Single (Part 1, 2, 5)
+                  </option>
+                </select>
+              </div>
+            )}
 
             {/* Content */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Nội dung (Đoạn văn/Hội thoại...){" "}
+                {isIelts
+                  ? formData.skill === "writing"
+                    ? "Đề bài / Prompt"
+                    : formData.skill === "speaking"
+                      ? "Nội dung Part (Cue card / Câu hỏi)"
+                      : formData.skill === "listening"
+                        ? "Mô tả Section (tiêu đề / context)"
+                        : "Nội dung Passage (đoạn văn đọc)"
+                  : "Nội dung (Đoạn văn/Hội thoại...)"}{" "}
                 <span className="text-red-500">*</span>
               </label>
               <textarea
@@ -202,14 +247,24 @@ const EditExamContainerModal = ({
                 required
                 rows={6}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Nhập nội dung cho phần thi này..."
+                placeholder={
+                  isIelts
+                    ? formData.skill === "writing"
+                      ? "Nhập đề bài (describe the chart / write an essay...)"
+                      : formData.skill === "speaking"
+                        ? "Nhập nội dung cue card / câu hỏi part..."
+                        : formData.skill === "listening"
+                          ? "Nhập tiêu đề section hoặc script audio..."
+                          : "Nhập đoạn văn đọc hiểu..."
+                    : "Nhập nội dung cho phần thi này..."
+                }
               />
             </div>
 
             {/* Instruction */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Hướng dẫn
+                Hướng dẫn / Tiêu đề
               </label>
               <textarea
                 name="instruction"
@@ -217,14 +272,27 @@ const EditExamContainerModal = ({
                 onChange={handleChange}
                 rows={3}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Nhập hướng dẫn cho Part (VD: Questions 1-5)..."
+                placeholder={
+                  isIelts
+                    ? formData.skill === "listening"
+                      ? "VD: Section 1 — Questions 1–10"
+                      : formData.skill === "reading"
+                        ? "VD: Passage 1 — Reading Passage 1"
+                        : formData.skill === "writing"
+                          ? "VD: Task 1 — Writing Task 1"
+                          : "VD: Part 1 — Interview"
+                    : "Nhập hướng dẫn cho Part (VD: Questions 1-5)..."
+                }
               />
             </div>
 
             {/* Audio Upload */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Audio (Part Listening)
+                Audio
+                {isIelts && formData.skill === "listening"
+                  ? " (Bắt buộc cho Section Listening)"
+                  : " (Part Listening)"}
               </label>
               {formData.audio_url && !audioFile && (
                 <p className="mb-2 text-sm text-green-600">
