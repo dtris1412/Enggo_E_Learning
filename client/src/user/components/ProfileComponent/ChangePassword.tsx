@@ -98,8 +98,8 @@ const ChangePassword: React.FC = () => {
   return (
     <div className="bg-white rounded-lg shadow-md p-8">
       <div className="flex items-center gap-3 mb-6">
-        <div className="p-3 bg-blue-100 rounded-lg">
-          <Shield className="w-6 h-6 text-blue-600" />
+        <div className="p-3 bg-violet-100 rounded-lg">
+          <Shield className="w-6 h-6 text-violet-600" />
         </div>
         <div>
           <h2 className="text-2xl font-bold text-slate-800">Đổi mật khẩu</h2>
@@ -138,7 +138,7 @@ const ChangePassword: React.FC = () => {
               name="current_password"
               value={formData.current_password}
               onChange={handleChange}
-              className="w-full pl-10 pr-10 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full pl-10 pr-10 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500"
               placeholder="Nhập mật khẩu hiện tại"
             />
             <button
@@ -169,7 +169,7 @@ const ChangePassword: React.FC = () => {
               name="new_password"
               value={formData.new_password}
               onChange={handleChange}
-              className="w-full pl-10 pr-10 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full pl-10 pr-10 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500"
               placeholder="Nhập mật khẩu mới (tối thiểu 6 ký tự)"
             />
             <button
@@ -200,7 +200,7 @@ const ChangePassword: React.FC = () => {
               name="confirm_password"
               value={formData.confirm_password}
               onChange={handleChange}
-              className="w-full pl-10 pr-10 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full pl-10 pr-10 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500"
               placeholder="Nhập lại mật khẩu mới"
             />
             <button
@@ -218,11 +218,11 @@ const ChangePassword: React.FC = () => {
         </div>
 
         {/* Security Tips */}
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <h3 className="font-semibold text-blue-800 mb-2">
+        <div className="bg-violet-50 border border-violet-200 rounded-lg p-4">
+          <h3 className="font-semibold text-violet-800 mb-2">
             Lời khuyên bảo mật:
           </h3>
-          <ul className="text-sm text-blue-700 space-y-1">
+          <ul className="text-sm text-violet-700 space-y-1">
             <li>• Mật khẩu nên có ít nhất 6 ký tự</li>
             <li>• Sử dụng kết hợp chữ hoa, chữ thường, số và ký tự đặc biệt</li>
             <li>• Không sử dụng mật khẩu giống với các tài khoản khác</li>
@@ -235,7 +235,7 @@ const ChangePassword: React.FC = () => {
           <button
             type="submit"
             disabled={loading}
-            className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition disabled:bg-slate-400"
+            className="px-6 py-2 bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition disabled:bg-slate-400"
           >
             {loading ? "Đang xử lý..." : "Đổi mật khẩu"}
           </button>
@@ -261,3 +261,4 @@ const ChangePassword: React.FC = () => {
 };
 
 export default ChangePassword;
+

@@ -5,10 +5,6 @@ import {
   Save,
   X,
   User as UserIcon,
-  Mail,
-  Phone,
-  MapPin,
-  Calendar,
   Lock,
   Eye,
   EyeOff,
@@ -390,7 +386,7 @@ const ProfileInfo: React.FC = () => {
   return (
     <div className="bg-white rounded-lg shadow-md">
       {/* Header Banner with Avatar */}
-      <div className="relative h-40 bg-gradient-to-r from-orange-400 via-blue-500 to-cyan-400 rounded-t-lg">
+      <div className="relative h-40 bg-gradient-to-r from-violet-800 to-violet-900 rounded-t-lg">
         <div className="absolute -bottom-16 left-1/2 -translate-x-1/2">
           <div className="relative">
             <div className="w-32 h-32 rounded-full border-4 border-white bg-slate-100 flex items-center justify-center overflow-hidden shadow-lg">
@@ -416,7 +412,7 @@ const ProfileInfo: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="absolute bottom-0 right-0 bg-blue-500 text-white p-2 rounded-full hover:bg-blue-600 transition shadow-md"
+                  className="absolute bottom-0 right-0 bg-violet-600 text-white p-2 rounded-full hover:bg-violet-700 transition shadow-md"
                 >
                   <Camera className="w-4 h-4" />
                 </button>
@@ -458,13 +454,13 @@ const ProfileInfo: React.FC = () => {
             }}
             className={`pb-4 px-2 font-medium text-sm transition-colors relative ${
               activeTab === "view"
-                ? "text-blue-600"
+                ? "text-violet-600"
                 : "text-slate-500 hover:text-slate-700"
             }`}
           >
             Thông tin
             {activeTab === "view" && (
-              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"></div>
+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-violet-700"></div>
             )}
           </button>
           <button
@@ -474,13 +470,13 @@ const ProfileInfo: React.FC = () => {
             }}
             className={`pb-4 px-2 font-medium text-sm transition-colors relative ${
               activeTab === "edit"
-                ? "text-blue-600"
+                ? "text-violet-600"
                 : "text-slate-500 hover:text-slate-700"
             }`}
           >
             Chỉnh sửa
             {activeTab === "edit" && (
-              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"></div>
+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-violet-700"></div>
             )}
           </button>
           {!isSocialLogin && (
@@ -491,13 +487,13 @@ const ProfileInfo: React.FC = () => {
               }}
               className={`pb-4 px-2 font-medium text-sm transition-colors relative ${
                 activeTab === "password"
-                  ? "text-blue-600"
+                  ? "text-violet-600"
                   : "text-slate-500 hover:text-slate-700"
               }`}
             >
               Đổi mật khẩu
               {activeTab === "password" && (
-                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"></div>
+                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-violet-700"></div>
               )}
             </button>
           )}
@@ -524,9 +520,6 @@ const ProfileInfo: React.FC = () => {
           <div className="space-y-4">
             {/* Email */}
             <div className="flex items-start gap-3 p-4 bg-slate-50 rounded-lg">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <Mail className="w-5 h-5 text-blue-600" />
-              </div>
               <div className="flex-1">
                 <p className="text-sm text-slate-500 mb-1">Email</p>
                 <p className="text-slate-800 font-medium">
@@ -538,9 +531,6 @@ const ProfileInfo: React.FC = () => {
             {/* Phone */}
             {profile.user_phone && (
               <div className="flex items-start gap-3 p-4 bg-slate-50 rounded-lg">
-                <div className="p-2 bg-green-100 rounded-lg">
-                  <Phone className="w-5 h-5 text-green-600" />
-                </div>
                 <div className="flex-1">
                   <p className="text-sm text-slate-500 mb-1">Số điện thoại</p>
                   <p className="text-slate-800 font-medium">
@@ -553,9 +543,6 @@ const ProfileInfo: React.FC = () => {
             {/* Address */}
             {profile.user_address && (
               <div className="flex items-start gap-3 p-4 bg-slate-50 rounded-lg">
-                <div className="p-2 bg-purple-100 rounded-lg">
-                  <MapPin className="w-5 h-5 text-purple-600" />
-                </div>
                 <div className="flex-1">
                   <p className="text-sm text-slate-500 mb-1">Địa chỉ</p>
                   <p className="text-slate-800 font-medium">
@@ -567,9 +554,6 @@ const ProfileInfo: React.FC = () => {
 
             {/* Created Date */}
             <div className="flex items-start gap-3 p-4 bg-slate-50 rounded-lg">
-              <div className="p-2 bg-orange-100 rounded-lg">
-                <Calendar className="w-5 h-5 text-orange-600" />
-              </div>
               <div className="flex-1">
                 <p className="text-sm text-slate-500 mb-1">Ngày tham gia</p>
                 <p className="text-slate-800 font-medium">
@@ -584,13 +568,13 @@ const ProfileInfo: React.FC = () => {
 
             {/* Social Login Info */}
             {isSocialLogin && (
-              <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                <p className="text-sm text-blue-800">
+              <div className="p-4 bg-violet-50 border border-violet-200 rounded-lg">
+                <p className="text-sm text-violet-800">
                   <span className="font-medium">Phương thức đăng nhập:</span>{" "}
                   {profile.google_id && "Google"}
                   {profile.facebook_id && "Facebook"}
                   {" • "}
-                  <span className="text-blue-600">
+                  <span className="text-violet-600">
                     Không thể thay đổi mật khẩu
                   </span>
                 </p>
@@ -603,7 +587,7 @@ const ProfileInfo: React.FC = () => {
         {activeTab === "edit" && (
           <form onSubmit={handleSubmit} className="space-y-6">
             {selectedFile && (
-              <div className="flex items-center justify-center gap-2 text-sm text-slate-600 bg-blue-50 p-3 rounded-lg">
+              <div className="flex items-center justify-center gap-2 text-sm text-slate-600 bg-violet-50 p-3 rounded-lg">
                 <span>Ảnh mới đã chọn: {selectedFile.name}</span>
                 <button
                   type="button"
@@ -658,7 +642,7 @@ const ProfileInfo: React.FC = () => {
                   name="full_name"
                   value={formData.full_name}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500"
                   placeholder="Nhập họ và tên"
                 />
               </div>
@@ -676,7 +660,7 @@ const ProfileInfo: React.FC = () => {
                   className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
                     errors.user_phone
                       ? "border-red-500 focus:ring-red-500"
-                      : "border-slate-300 focus:ring-blue-500"
+                      : "border-slate-300 focus:ring-violet-500"
                   }`}
                   placeholder="Nhập số điện thoại"
                 />
@@ -698,7 +682,7 @@ const ProfileInfo: React.FC = () => {
                 value={formData.user_address}
                 onChange={handleChange}
                 rows={3}
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500"
                 placeholder="Nhập địa chỉ"
               />
             </div>
@@ -708,7 +692,7 @@ const ProfileInfo: React.FC = () => {
               <button
                 type="submit"
                 disabled={updating}
-                className="flex items-center gap-2 px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition disabled:bg-slate-400 disabled:cursor-not-allowed"
+                className="flex items-center gap-2 px-6 py-2.5 bg-violet-600 text-white rounded-md hover:bg-violet-700 transition disabled:bg-slate-400 disabled:cursor-not-allowed"
               >
                 <Save className="w-4 h-4" />
                 {updating ? "Đang lưu..." : "Lưu thay đổi"}
@@ -717,7 +701,7 @@ const ProfileInfo: React.FC = () => {
                 type="button"
                 onClick={handleCancel}
                 disabled={updating}
-                className="flex items-center gap-2 px-6 py-3 bg-slate-300 text-slate-700 rounded-lg hover:bg-slate-400 transition disabled:bg-slate-200 disabled:cursor-not-allowed"
+                className="flex items-center gap-2 px-6 py-2.5 bg-slate-100 text-slate-700 rounded-md hover:bg-slate-200 transition disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <X className="w-4 h-4" />
                 Hủy
@@ -730,8 +714,8 @@ const ProfileInfo: React.FC = () => {
         {activeTab === "password" && (
           <form onSubmit={handlePasswordSubmit} className="space-y-6">
             <div className="flex items-center gap-3 mb-6">
-              <div className="p-3 bg-blue-100 rounded-lg">
-                <Shield className="w-6 h-6 text-blue-600" />
+              <div className="p-3 bg-violet-50 rounded-lg">
+                <Shield className="w-6 h-6 text-violet-600" />
               </div>
               <div>
                 <h3 className="text-lg font-semibold text-slate-800">
@@ -757,7 +741,7 @@ const ProfileInfo: React.FC = () => {
                   name="current_password"
                   value={passwordData.current_password}
                   onChange={handlePasswordChange}
-                  className="w-full pl-10 pr-10 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full pl-10 pr-10 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500"
                   placeholder="Nhập mật khẩu hiện tại"
                 />
                 <button
@@ -788,7 +772,7 @@ const ProfileInfo: React.FC = () => {
                   name="new_password"
                   value={passwordData.new_password}
                   onChange={handlePasswordChange}
-                  className="w-full pl-10 pr-10 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full pl-10 pr-10 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500"
                   placeholder="Nhập mật khẩu mới (tối thiểu 6 ký tự)"
                 />
                 <button
@@ -819,7 +803,7 @@ const ProfileInfo: React.FC = () => {
                   name="confirm_password"
                   value={passwordData.confirm_password}
                   onChange={handlePasswordChange}
-                  className="w-full pl-10 pr-10 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full pl-10 pr-10 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500"
                   placeholder="Nhập lại mật khẩu mới"
                 />
                 <button
@@ -841,7 +825,7 @@ const ProfileInfo: React.FC = () => {
               <button
                 type="submit"
                 disabled={updating}
-                className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition disabled:bg-slate-400 disabled:cursor-not-allowed"
+                className="w-full flex items-center justify-center gap-2 px-6 py-2.5 bg-violet-600 text-white rounded-md hover:bg-violet-700 transition disabled:bg-slate-400 disabled:cursor-not-allowed"
               >
                 <Lock className="w-4 h-4" />
                 {updating ? "Đang xử lý..." : "Đổi mật khẩu"}

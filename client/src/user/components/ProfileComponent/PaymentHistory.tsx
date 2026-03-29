@@ -134,7 +134,7 @@ const PaymentHistory: React.FC = () => {
             }}
             className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium transition ${
               activeTab === "orders"
-                ? "bg-blue-500 text-white"
+                ? "bg-violet-600 text-white"
                 : "bg-slate-100 text-slate-600 hover:bg-slate-200"
             }`}
           >
@@ -150,7 +150,7 @@ const PaymentHistory: React.FC = () => {
             }}
             className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium transition ${
               activeTab === "payments"
-                ? "bg-blue-500 text-white"
+                ? "bg-violet-600 text-white"
                 : "bg-slate-100 text-slate-600 hover:bg-slate-200"
             }`}
           >
@@ -165,7 +165,7 @@ const PaymentHistory: React.FC = () => {
             setStatusFilter(e.target.value);
             setCurrentPage(1);
           }}
-          className="text-xs border border-slate-300 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+          className="text-xs border border-slate-300 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-violet-500 bg-white"
         >
           <option value="">Tất cả trạng thái</option>
           <option value="completed">Hoàn thành</option>
@@ -190,7 +190,7 @@ const PaymentHistory: React.FC = () => {
                 return (
                   <div
                     key={order.order_id}
-                    className="border border-slate-200 rounded-lg overflow-hidden hover:border-blue-300 transition"
+                    className="border border-slate-200 rounded-lg overflow-hidden hover:border-violet-300 transition"
                   >
                     {/* Compact Header - Always visible */}
                     <div
@@ -199,8 +199,8 @@ const PaymentHistory: React.FC = () => {
                     >
                       <div className="flex items-center justify-between gap-2">
                         <div className="flex items-center gap-1.5 flex-1 min-w-0">
-                          <div className="w-7 h-7 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                            <Package className="w-3.5 h-3.5 text-blue-600" />
+                          <div className="w-7 h-7 bg-violet-100 rounded-full flex items-center justify-center flex-shrink-0">
+                            <Package className="w-3.5 h-3.5 text-violet-600" />
                           </div>
                           <div className="flex-1 min-w-0">
                             <p className="text-xs font-semibold text-slate-800 truncate">
@@ -212,7 +212,7 @@ const PaymentHistory: React.FC = () => {
                           </div>
                         </div>
                         <div className="flex items-center gap-1.5">
-                          <span className="text-sm font-bold text-blue-600 hidden sm:inline">
+                          <span className="text-sm font-bold text-violet-600 hidden sm:inline">
                             {formatCurrency(order.amount)}
                           </span>
                           {getStatusBadge(order.status)}
@@ -261,7 +261,7 @@ const PaymentHistory: React.FC = () => {
                             <span className="text-slate-600 font-medium">
                               Tổng tiền:
                             </span>
-                            <span className="font-bold text-lg text-blue-600">
+                            <span className="font-bold text-lg text-violet-600">
                               {formatCurrency(order.amount)}
                             </span>
                           </div>
@@ -310,7 +310,7 @@ const PaymentHistory: React.FC = () => {
                 return (
                   <div
                     key={payment.payment_id}
-                    className="border border-slate-200 rounded-lg overflow-hidden hover:border-purple-300 transition"
+                    className="border border-slate-200 rounded-lg overflow-hidden hover:border-violet-300 transition"
                   >
                     {/* Compact Header - Always visible */}
                     <div
@@ -319,8 +319,8 @@ const PaymentHistory: React.FC = () => {
                     >
                       <div className="flex items-center justify-between gap-2">
                         <div className="flex items-center gap-1.5 flex-1 min-w-0">
-                          <div className="w-7 h-7 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
-                            <CreditCard className="w-3.5 h-3.5 text-purple-600" />
+                          <div className="w-7 h-7 bg-violet-100 rounded-full flex items-center justify-center flex-shrink-0">
+                            <CreditCard className="w-3.5 h-3.5 text-violet-600" />
                           </div>
                           <div className="flex-1 min-w-0">
                             <p className="text-xs font-semibold text-slate-800 truncate">
@@ -335,7 +335,7 @@ const PaymentHistory: React.FC = () => {
                           </div>
                         </div>
                         <div className="flex items-center gap-1.5">
-                          <span className="text-xs font-bold text-purple-600 hidden sm:inline">
+                          <span className="text-xs font-bold text-violet-600 hidden sm:inline">
                             {formatCurrency(payment.amount)}
                           </span>
                           {getStatusBadge(payment.status)}
@@ -353,7 +353,9 @@ const PaymentHistory: React.FC = () => {
                       <div className="px-2.5 pb-2 pt-1.5 bg-slate-50 border-t border-slate-100">
                         <div className="space-y-1.5 text-xs">
                           <div className="flex justify-between">
-                            <span className="text-slate-600">Mã giao dịch:</span>
+                            <span className="text-slate-600">
+                              Mã giao dịch:
+                            </span>
                             <span className="font-mono text-[10px] text-slate-800">
                               {payment.transaction_code}
                             </span>
@@ -376,7 +378,7 @@ const PaymentHistory: React.FC = () => {
                             <span className="text-slate-600 font-medium">
                               Số tiền:
                             </span>
-                            <span className="font-bold text-base text-purple-600">
+                            <span className="font-bold text-base text-violet-600">
                               {formatCurrency(payment.amount)}
                             </span>
                           </div>

@@ -209,7 +209,7 @@ const SubscriptionInfo: React.FC = () => {
           </p>
           <Link
             to="/subscription-plans"
-            className="inline-block px-6 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition"
+            className="inline-block px-6 py-2.5 bg-violet-600 text-white rounded-md hover:bg-violet-700 transition"
           >
             Xem gói Premium
           </Link>
@@ -249,18 +249,18 @@ const SubscriptionInfo: React.FC = () => {
         <div
           className={`rounded-lg shadow-md p-6 ${
             isPremium
-              ? "bg-gradient-to-br from-blue-500 to-purple-600 text-white"
+              ? "bg-gradient-to-br from-violet-800 to-violet-900 text-white"
               : "bg-white"
           }`}
         >
           <div className="flex items-center gap-3 mb-4">
             <div
               className={`p-2 rounded-lg ${
-                isPremium ? "bg-white/20" : "bg-blue-100"
+                isPremium ? "bg-white/20" : "bg-violet-100"
               }`}
             >
               <Crown
-                className={`w-6 h-6 ${isPremium ? "text-white" : "text-blue-600"}`}
+                className={`w-6 h-6 ${isPremium ? "text-white" : "text-violet-600"}`}
               />
             </div>
             <div>
@@ -316,11 +316,11 @@ const SubscriptionInfo: React.FC = () => {
             {activeSubscription.status === "active" && (
               <div
                 className={`text-center py-3 rounded-lg ${
-                  isPremium ? "bg-white/10" : "bg-blue-50"
+                  isPremium ? "bg-white/10" : "bg-violet-50"
                 }`}
               >
                 <div
-                  className={`text-2xl font-bold ${isPremium ? "text-white" : "text-blue-600"}`}
+                  className={`text-2xl font-bold ${isPremium ? "text-white" : "text-violet-600"}`}
                 >
                   {daysRemaining}
                 </div>
@@ -338,7 +338,7 @@ const SubscriptionInfo: React.FC = () => {
             {!isPremium ? (
               <Link
                 to="/subscription-plans"
-                className="block w-full text-center px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
+                className="block w-full text-center px-6 py-2.5 bg-violet-600 text-white rounded-md hover:bg-violet-700 transition"
               >
                 Nâng cấp Premium
               </Link>
@@ -346,14 +346,14 @@ const SubscriptionInfo: React.FC = () => {
               <>
                 <button
                   onClick={handleViewPlanDetails}
-                  className="w-full px-4 py-2 bg-white/20 text-white rounded-lg hover:bg-white/30 transition text-sm flex items-center justify-center gap-2"
+                  className="w-full text-center px-4 py-2 bg-white/20 text-white rounded-md hover:bg-white/30 transition text-sm flex items-center justify-center gap-2"
                 >
                   <Info className="w-4 h-4" />
                   Xem chi tiết gói
                 </button>
                 <Link
                   to="/subscription-compare"
-                  className="block w-full text-center px-4 py-2 bg-white/10 text-white rounded-lg hover:bg-white/20 transition text-sm"
+                  className="block w-full text-center px-4 py-2 bg-white/10 text-white rounded-md hover:bg-white/20 transition text-sm"
                 >
                   So sánh gói khác
                 </Link>
@@ -402,7 +402,7 @@ const SubscriptionInfo: React.FC = () => {
           <div className="space-y-2">
             <Link
               to="/subscription-plans"
-              className="block text-sm text-blue-600 hover:text-blue-700 hover:underline flex items-center gap-2"
+              className="block text-sm text-violet-600 hover:text-violet-700 hover:underline flex items-center gap-2"
             >
               <Crown className="w-4 h-4" />
               Xem tất cả gói đăng ký
@@ -410,7 +410,7 @@ const SubscriptionInfo: React.FC = () => {
             {isPremium && (
               <button
                 onClick={handleViewPlanDetails}
-                className="block text-sm text-blue-600 hover:text-blue-700 hover:underline flex items-center gap-2"
+                className="block text-sm text-violet-600 hover:text-violet-700 hover:underline flex items-center gap-2"
               >
                 <Info className="w-4 h-4" />
                 Chi tiết gói hiện tại
@@ -418,7 +418,7 @@ const SubscriptionInfo: React.FC = () => {
             )}
             <button
               onClick={() => setShowPaymentHistory(true)}
-              className="block text-sm text-blue-600 hover:text-blue-700 hover:underline flex items-center gap-2"
+              className="block text-sm text-violet-600 hover:text-violet-700 hover:underline flex items-center gap-2"
             >
               <Receipt className="w-4 h-4" />
               Lịch sử thanh toán
@@ -490,7 +490,7 @@ const SubscriptionInfo: React.FC = () => {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
           <div className="bg-white rounded-lg shadow-xl max-w-3xl w-full my-8">
             {/* Modal Header */}
-            <div className="sticky top-0 bg-gradient-to-r from-blue-500 to-purple-600 text-white p-6 rounded-t-lg">
+            <div className="sticky top-0 bg-gradient-to-r from-violet-800 to-violet-900 text-white p-6 rounded-t-lg">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="p-3 bg-white/20 rounded-lg">
@@ -518,21 +518,21 @@ const SubscriptionInfo: React.FC = () => {
             <div className="p-6 max-h-[calc(100vh-200px)] overflow-y-auto">
               {loadingPlanDetails ? (
                 <div className="flex justify-center items-center py-12">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-violet-600"></div>
                 </div>
               ) : planDetails ? (
                 <div className="space-y-6">
                   {/* AI Token Quota */}
-                  <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-lg p-4 border border-purple-200">
+                  <div className="bg-violet-50 rounded-lg p-4 border border-violet-200">
                     <div className="flex items-center gap-3">
-                      <div className="p-3 bg-purple-100 rounded-lg">
-                        <Zap className="w-6 h-6 text-purple-600" />
+                      <div className="p-3 bg-violet-100 rounded-lg">
+                        <Zap className="w-6 h-6 text-violet-600" />
                       </div>
                       <div>
                         <p className="text-sm text-slate-600">
                           AI Credits hàng tháng
                         </p>
-                        <p className="text-2xl font-bold text-purple-600">
+                        <p className="text-2xl font-bold text-violet-600">
                           {planDetails.monthly_ai_token_quota.toLocaleString()}{" "}
                           tokens
                         </p>
@@ -550,7 +550,7 @@ const SubscriptionInfo: React.FC = () => {
                       {planDetails.Subscription_Prices.map((price) => (
                         <div
                           key={price.subscription_price_id}
-                          className="bg-white border-2 border-slate-200 rounded-lg p-4 hover:border-blue-400 transition"
+                          className="bg-white border-2 border-slate-200 rounded-lg p-4 hover:border-violet-400 transition"
                         >
                           <div className="text-center">
                             <p className="text-sm font-medium text-slate-600 mb-1">
@@ -611,11 +611,11 @@ const SubscriptionInfo: React.FC = () => {
 
                   {/* Current Subscription Info */}
                   {activeSubscription && (
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                      <h4 className="text-sm font-semibold text-blue-900 mb-2">
+                    <div className="bg-violet-50 border border-violet-200 rounded-lg p-4">
+                      <h4 className="text-sm font-semibold text-violet-900 mb-2">
                         📌 Thông tin đăng ký hiện tại
                       </h4>
-                      <div className="space-y-1 text-sm text-blue-800">
+                      <div className="space-y-1 text-sm text-violet-800">
                         <p>
                           • Chu kỳ:{" "}
                           {getBillingTypeLabel(
@@ -660,7 +660,7 @@ const SubscriptionInfo: React.FC = () => {
                 </button>
                 <Link
                   to="/subscription-compare"
-                  className="flex-1 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition text-center"
+                  className="flex-1 px-4 py-2 bg-violet-600 text-white rounded-md hover:bg-violet-700 transition text-center"
                   onClick={() => setShowPlanDetailsModal(false)}
                 >
                   So sánh gói khác
@@ -678,7 +678,7 @@ const SubscriptionInfo: React.FC = () => {
             {/* Modal Header */}
             <div className="flex items-center justify-between p-6 border-b border-slate-200">
               <h3 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-                <Receipt className="w-6 h-6 text-blue-600" />
+                <Receipt className="w-6 h-6 text-violet-600" />
                 Lịch sử thanh toán
               </h3>
               <button

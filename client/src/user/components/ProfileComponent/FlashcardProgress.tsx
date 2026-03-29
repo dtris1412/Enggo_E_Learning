@@ -42,8 +42,8 @@ const FlashcardProgress: React.FC = () => {
   return (
     <div className="bg-white rounded-lg shadow-md p-8">
       <div className="flex items-center gap-3 mb-6">
-        <div className="p-3 bg-purple-100 rounded-lg">
-          <Brain className="w-6 h-6 text-purple-600" />
+        <div className="p-3 bg-violet-100 rounded-lg">
+          <Brain className="w-6 h-6 text-violet-600" />
         </div>
         <div>
           <h2 className="text-2xl font-bold text-slate-800">
@@ -57,30 +57,30 @@ const FlashcardProgress: React.FC = () => {
 
       {/* Summary Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-        <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-4">
+        <div className="bg-violet-50 rounded-lg p-4">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-purple-500 rounded-lg">
+            <div className="p-2 bg-violet-600 rounded-lg">
               <CreditCard className="w-5 h-5 text-white" />
             </div>
             <div>
-              <div className="text-2xl font-bold text-purple-700">
+              <div className="text-2xl font-bold text-violet-700">
                 {flashcardSets.length}
               </div>
-              <div className="text-sm text-purple-600">Bộ flashcard</div>
+              <div className="text-sm text-violet-600">Bộ flashcard</div>
             </div>
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4">
+        <div className="bg-slate-50 rounded-lg p-4">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-500 rounded-lg">
+            <div className="p-2 bg-slate-500 rounded-lg">
               <Target className="w-5 h-5 text-white" />
             </div>
             <div>
-              <div className="text-2xl font-bold text-blue-700">
+              <div className="text-2xl font-bold text-slate-700">
                 {totalCards}
               </div>
-              <div className="text-sm text-blue-600">Tổng số thẻ</div>
+              <div className="text-sm text-slate-600">Tổng số thẻ</div>
             </div>
           </div>
         </div>
@@ -112,7 +112,7 @@ const FlashcardProgress: React.FC = () => {
           </p>
           <Link
             to="/flashcards/create"
-            className="inline-block px-6 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition"
+            className="inline-block px-6 py-2.5 bg-violet-600 text-white rounded-md hover:bg-violet-700 transition"
           >
             Tạo flashcard
           </Link>
@@ -126,13 +126,13 @@ const FlashcardProgress: React.FC = () => {
           {paginatedSets.map((set) => (
             <div
               key={set.flashcard_set_id}
-              className="border border-slate-200 rounded-lg p-4 hover:shadow-md hover:border-purple-300 transition"
+              className="border border-slate-200 rounded-lg p-4 hover:shadow-md hover:border-violet-300 transition"
             >
               <div className="flex justify-between items-start mb-2">
                 <div className="flex-1">
                   <Link
                     to={`/flashcards/${set.flashcard_set_id}`}
-                    className="font-semibold text-slate-800 hover:text-purple-600 mb-1 inline-block"
+                    className="font-semibold text-slate-800 hover:text-violet-600 mb-1 inline-block"
                   >
                     {set.title}
                   </Link>
@@ -167,13 +167,13 @@ const FlashcardProgress: React.FC = () => {
               <div className="flex gap-2">
                 <Link
                   to={`/flashcards/${set.flashcard_set_id}/learn`}
-                  className="px-3 py-1.5 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition text-sm flex items-center gap-1"
+                  className="px-3 py-1.5 bg-violet-600 text-white rounded-md hover:bg-violet-700 transition text-sm flex items-center gap-1"
                 >
                   Học ngay
                 </Link>
                 <Link
                   to={`/flashcards/${set.flashcard_set_id}`}
-                  className="px-3 py-1.5 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition text-sm"
+                  className="px-3 py-1.5 bg-slate-100 text-slate-700 rounded-md hover:bg-slate-200 transition text-sm"
                 >
                   Chi tiết
                 </Link>
@@ -203,7 +203,7 @@ const FlashcardProgress: React.FC = () => {
                       onClick={() => setCurrentPage(p)}
                       className={`px-3 py-1.5 rounded-lg text-sm border transition ${
                         currentPage === p
-                          ? "bg-purple-500 text-white border-purple-500"
+                          ? "bg-violet-600 text-white border-violet-600"
                           : "border-slate-200 text-slate-600 hover:bg-slate-50"
                       }`}
                     >
@@ -232,13 +232,13 @@ const FlashcardProgress: React.FC = () => {
         <div className="flex flex-wrap gap-3">
           <Link
             to="/flashcards/create"
-            className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition text-sm"
+            className="px-4 py-2 bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition text-sm"
           >
             Tạo flashcard mới
           </Link>
           <Link
             to="/flashcards/my-library"
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition text-sm"
+            className="px-4 py-2 bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition text-sm"
           >
             Thư viện của tôi
           </Link>

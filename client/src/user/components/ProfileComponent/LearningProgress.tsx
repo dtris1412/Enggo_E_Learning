@@ -52,7 +52,7 @@ const LearningProgress: React.FC = () => {
 
   const getProgressColor = (progress: number) => {
     if (progress >= 80) return "bg-green-500";
-    if (progress >= 50) return "bg-blue-500";
+    if (progress >= 50) return "bg-violet-600";
     if (progress >= 20) return "bg-yellow-500";
     return "bg-slate-400";
   };
@@ -88,8 +88,8 @@ const LearningProgress: React.FC = () => {
   return (
     <div className="bg-white rounded-lg shadow-md p-8">
       <div className="flex items-center gap-3 mb-6">
-        <div className="p-3 bg-blue-100 rounded-lg">
-          <TrendingUp className="w-6 h-6 text-blue-600" />
+        <div className="p-3 bg-violet-100 rounded-lg">
+          <TrendingUp className="w-6 h-6 text-violet-600" />
         </div>
         <div>
           <h2 className="text-2xl font-bold text-slate-800">Tiến độ học tập</h2>
@@ -101,16 +101,16 @@ const LearningProgress: React.FC = () => {
 
       {/* Summary Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-        <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4">
+        <div className="bg-violet-50 rounded-lg p-4">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-500 rounded-lg">
+            <div className="p-2 bg-violet-600 rounded-lg">
               <BookOpen className="w-5 h-5 text-white" />
             </div>
             <div>
-              <div className="text-2xl font-bold text-blue-700">
+              <div className="text-2xl font-bold text-violet-700">
                 {courses.length}
               </div>
-              <div className="text-sm text-blue-600">Khóa học đã đăng ký</div>
+              <div className="text-sm text-violet-600">Khóa học đã đăng ký</div>
             </div>
           </div>
         </div>
@@ -129,28 +129,28 @@ const LearningProgress: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-4">
+        <div className="bg-violet-50 rounded-lg p-4">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-purple-500 rounded-lg">
+            <div className="p-2 bg-violet-600 rounded-lg">
               <Clock className="w-5 h-5 text-white" />
             </div>
             <div>
-              <div className="text-2xl font-bold text-purple-700">
+              <div className="text-2xl font-bold text-violet-700">
                 {inProgressCourses.length}
               </div>
-              <div className="text-sm text-purple-600">Đang học</div>
+              <div className="text-sm text-violet-600">Đang học</div>
             </div>
           </div>
         </div>
       </div>
 
       {/* Overall Progress */}
-      <div className="mb-8 p-6 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg">
+      <div className="mb-8 p-6 bg-violet-50 rounded-lg">
         <div className="flex justify-between items-center mb-2">
           <span className="text-sm font-medium text-slate-700">
             Tiến độ trung bình
           </span>
-          <span className="text-sm font-bold text-blue-600">
+          <span className="text-sm font-bold text-violet-600">
             {averageProgress.toFixed(1)}%
           </span>
         </div>
@@ -174,14 +174,16 @@ const LearningProgress: React.FC = () => {
           </p>
           <Link
             to="/courses"
-            className="inline-block px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
+            className="inline-block px-6 py-2.5 bg-violet-600 text-white rounded-md hover:bg-violet-700 transition"
           >
             Khám phá khóa học
           </Link>
         </div>
       ) : (
         <div className="space-y-4">
-          <h3 className="font-semibold text-slate-800 mb-4">Khóa học của bạn</h3>
+          <h3 className="font-semibold text-slate-800 mb-4">
+            Khóa học của bạn
+          </h3>
           {paginatedCourses.map((course) => (
             <div
               key={course.course_id}
@@ -189,13 +191,13 @@ const LearningProgress: React.FC = () => {
             >
               <div className="flex gap-4">
                 {/* Placeholder thumbnail */}
-                <div className="w-24 h-24 rounded-lg bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center">
-                  <BookOpen className="w-12 h-12 text-white" />
+                <div className="w-24 h-24 rounded-lg bg-violet-100 flex items-center justify-center">
+                  <BookOpen className="w-10 h-10 text-violet-400" />
                 </div>
                 <div className="flex-1">
                   <div className="flex justify-between items-start mb-2">
                     <div>
-                      <h4 className="font-semibold text-slate-800 hover:text-blue-600">
+                      <h4 className="font-semibold text-slate-800 hover:text-violet-600">
                         <Link to={`/courses/${course.course_id}`}>
                           {course.course_title}
                         </Link>
@@ -208,7 +210,7 @@ const LearningProgress: React.FC = () => {
                       className={`px-3 py-1 rounded-full text-xs font-medium ${
                         course.progress_percentage === 100
                           ? "bg-green-100 text-green-700"
-                          : "bg-blue-100 text-blue-700"
+                          : "bg-violet-100 text-violet-700"
                       }`}
                     >
                       {course.progress_percentage === 100
@@ -271,7 +273,7 @@ const LearningProgress: React.FC = () => {
                       onClick={() => setCurrentPage(p)}
                       className={`px-3 py-1.5 rounded-lg text-sm border transition ${
                         currentPage === p
-                          ? "bg-blue-500 text-white border-blue-500"
+                          ? "bg-violet-600 text-white border-violet-600"
                           : "border-slate-200 text-slate-600 hover:bg-slate-50"
                       }`}
                     >

@@ -59,8 +59,8 @@ const getAccuracyColor = (rate: string) => {
 
 const getExamTypeBadge = (type: string) =>
   type === "TOEIC"
-    ? "bg-blue-100 text-blue-700"
-    : "bg-purple-100 text-purple-700";
+    ? "bg-violet-100 text-violet-700"
+    : "bg-violet-100 text-violet-700";
 
 // ==================== Sub-components ====================
 
@@ -103,7 +103,7 @@ const AIAnalysisText: React.FC<{ text: string }> = ({ text }) => {
           );
         if (line.startsWith("## "))
           return (
-            <p key={i} className="font-bold text-blue-700 text-base mt-3">
+            <p key={i} className="font-bold text-violet-700 text-base mt-3">
               {line.replace("## ", "")}
             </p>
           );
@@ -117,7 +117,7 @@ const AIAnalysisText: React.FC<{ text: string }> = ({ text }) => {
           return (
             <p
               key={i}
-              className="pl-4 before:content-['•'] before:mr-2 before:text-blue-500"
+              className="pl-4 before:content-['•'] before:mr-2 before:text-violet-600"
             >
               {line.replace(/^[-•]\s/, "")}
             </p>
@@ -219,7 +219,7 @@ const ExamAnalytics: React.FC = () => {
   if (loadingOverall) {
     return (
       <div className="bg-white rounded-lg shadow-md p-12 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-blue-500 animate-spin mr-3" />
+        <Loader2 className="w-8 h-8 text-violet-600 animate-spin mr-3" />
         <span className="text-slate-500">Đang tải thống kê...</span>
       </div>
     );
@@ -232,7 +232,7 @@ const ExamAnalytics: React.FC = () => {
         <p className="text-red-600 mb-4">{errorOverall}</p>
         <button
           onClick={fetchOverallStats}
-          className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition text-sm"
+          className="px-4 py-2 bg-violet-600 text-white rounded-md hover:bg-violet-700 transition text-sm"
         >
           Thử lại
         </button>
@@ -243,14 +243,14 @@ const ExamAnalytics: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* ===== Header ===== */}
-      <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl shadow-md p-6 text-white">
+      <div className="bg-gradient-to-r from-violet-800 to-violet-900 rounded-xl shadow-md p-6 text-white">
         <div className="flex items-center gap-3 mb-4">
           <div className="p-2 bg-white/20 rounded-lg">
             <BarChart2 className="w-6 h-6" />
           </div>
           <h2 className="text-2xl font-bold">Phân tích kết quả thi</h2>
         </div>
-        <p className="text-indigo-100 text-sm">
+        <p className="text-violet-200 text-sm">
           Xem thống kê tổng hợp và nhận phân tích cá nhân hóa từ AI
         </p>
       </div>
@@ -269,7 +269,7 @@ const ExamAnalytics: React.FC = () => {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-4">
               <div className="flex items-center gap-2 mb-2">
-                <Target className="w-4 h-4 text-blue-500" />
+                <Target className="w-4 h-4 text-violet-600" />
                 <span className="text-xs text-slate-500 font-medium">
                   Số đề đã thi
                 </span>
@@ -334,8 +334,10 @@ const ExamAnalytics: React.FC = () => {
           {/* ===== Per-Exam Stats List ===== */}
           <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
             <div className="flex items-center gap-2 mb-4">
-              <BarChart2 className="w-5 h-5 text-indigo-600" />
-              <h3 className="font-bold text-slate-800">Thống kê theo từng đề</h3>
+              <BarChart2 className="w-5 h-5 text-violet-600" />
+              <h3 className="font-bold text-slate-800">
+                Thống kê theo từng đề
+              </h3>
             </div>
 
             <div className="space-y-3">
@@ -444,11 +446,11 @@ const ExamAnalytics: React.FC = () => {
           {/* ===== AI Analysis Section ===== */}
           <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
             <div className="flex items-center gap-2 mb-4">
-              <Brain className="w-5 h-5 text-purple-600" />
+              <Brain className="w-5 h-5 text-violet-600" />
               <h3 className="font-bold text-slate-800">
                 Phân tích AI & Lộ trình học
               </h3>
-              <span className="ml-auto text-xs bg-purple-100 text-purple-600 px-2 py-0.5 rounded-full font-medium">
+              <span className="ml-auto text-xs bg-violet-100 text-violet-600 px-2 py-0.5 rounded-full font-medium">
                 Dùng AI Token
               </span>
             </div>
@@ -468,7 +470,7 @@ const ExamAnalytics: React.FC = () => {
                     e.target.value ? Number(e.target.value) : null,
                   );
                 }}
-                className="flex-1 px-3 py-2 text-sm border border-slate-200 rounded-lg focus:ring-2 focus:ring-purple-400 focus:outline-none bg-white"
+                className="flex-1 px-3 py-2 text-sm border border-slate-200 rounded-lg focus:ring-2 focus:ring-violet-400 focus:outline-none bg-white"
               >
                 <option value="">-- Chọn bài thi --</option>
                 {examHistory.map((e) => (
@@ -482,7 +484,7 @@ const ExamAnalytics: React.FC = () => {
               <button
                 onClick={handleAIAnalysis}
                 disabled={!selectedUserExamId || loadingAI}
-                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-sm font-medium rounded-lg hover:from-purple-700 hover:to-indigo-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center gap-2 px-4 py-2 bg-violet-600 text-white text-sm font-medium rounded-md hover:bg-violet-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loadingAI ? (
                   <>
@@ -511,11 +513,11 @@ const ExamAnalytics: React.FC = () => {
               <div className="mt-4 space-y-4">
                 {/* Stats summary */}
                 <div className="grid grid-cols-3 gap-3">
-                  <div className="bg-indigo-50 rounded-lg p-3 text-center">
-                    <p className="text-xl font-bold text-indigo-700">
+                  <div className="bg-violet-50 rounded-lg p-3 text-center">
+                    <p className="text-xl font-bold text-violet-700">
                       {aiAnalysis.stats.accuracy_rate}
                     </p>
-                    <p className="text-xs text-indigo-500 mt-0.5">Tỷ lệ đúng</p>
+                    <p className="text-xs text-violet-500 mt-0.5">Tỷ lệ đúng</p>
                   </div>
                   <div className="bg-emerald-50 rounded-lg p-3 text-center">
                     <p className="text-xl font-bold text-emerald-700">
@@ -554,22 +556,22 @@ const ExamAnalytics: React.FC = () => {
                 {/* Historical context summary */}
                 {aiAnalysis.historical_context &&
                   aiAnalysis.historical_context.total_exams_taken > 0 && (
-                    <div className="bg-blue-50 border border-blue-100 rounded-lg p-4">
-                      <p className="text-xs font-semibold text-blue-700 mb-3 flex items-center gap-1">
+                    <div className="bg-violet-50 border border-violet-100 rounded-lg p-4">
+                      <p className="text-xs font-semibold text-violet-700 mb-3 flex items-center gap-1">
                         <TrendingDown className="w-3 h-3" /> Dữ liệu lịch sử học
                         tập ({aiAnalysis.historical_context.total_exams_taken}{" "}
                         bài đã thi)
                       </p>
                       <div className="grid grid-cols-2 gap-2 mb-3">
-                        <div className="bg-white rounded p-2 text-center border border-blue-100">
-                          <p className="text-base font-bold text-blue-700">
+                        <div className="bg-white rounded p-2 text-center border border-violet-100">
+                          <p className="text-base font-bold text-violet-700">
                             {aiAnalysis.historical_context.overall_avg_accuracy}
                           </p>
-                          <p className="text-xs text-blue-400">
+                          <p className="text-xs text-violet-400">
                             Trung bình chính xác
                           </p>
                         </div>
-                        <div className="bg-white rounded p-2 text-center border border-blue-100">
+                        <div className="bg-white rounded p-2 text-center border border-violet-100">
                           <p
                             className={`text-base font-bold ${
                               aiAnalysis.historical_context.progress_trend.includes(
@@ -590,7 +592,7 @@ const ExamAnalytics: React.FC = () => {
                                 1,
                               )}
                           </p>
-                          <p className="text-xs text-blue-400">
+                          <p className="text-xs text-violet-400">
                             Xu hướng (3 bài)
                           </p>
                         </div>
@@ -598,7 +600,7 @@ const ExamAnalytics: React.FC = () => {
                       {aiAnalysis.historical_context.recurring_weaknesses
                         .length > 0 && (
                         <div>
-                          <p className="text-xs text-blue-600 font-medium mb-1">
+                          <p className="text-xs text-violet-600 font-medium mb-1">
                             Điểm yếu lặp lại:
                           </p>
                           <div className="flex flex-wrap gap-1.5">
@@ -606,7 +608,7 @@ const ExamAnalytics: React.FC = () => {
                               (w) => (
                                 <span
                                   key={w.type}
-                                  className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full"
+                                  className="text-xs bg-violet-100 text-violet-700 px-2 py-0.5 rounded-full"
                                   title={`Xuất hiện ${w.appearances} bài, tổng ${w.total_wrong} câu sai`}
                                 >
                                   {QUESTION_TYPE_LABELS[w.type] ?? w.type} ×
@@ -621,16 +623,16 @@ const ExamAnalytics: React.FC = () => {
                   )}
 
                 {/* AI text analysis */}
-                <div className="border border-purple-100 rounded-xl bg-gradient-to-br from-purple-50 to-indigo-50 p-5">
+                <div className="border border-violet-100 rounded-xl bg-violet-50 p-5">
                   <div className="flex items-center gap-2 mb-3">
-                    <Sparkles className="w-4 h-4 text-purple-600" />
-                    <p className="font-semibold text-purple-800 text-sm">
+                    <Sparkles className="w-4 h-4 text-violet-600" />
+                    <p className="font-semibold text-violet-800 text-sm">
                       Phân tích từ AI
                     </p>
                     <button
                       onClick={() => fetchAIAnalysis(selectedUserExamId!)}
                       disabled={loadingAI}
-                      className="ml-auto text-purple-400 hover:text-purple-700 transition"
+                      className="ml-auto text-violet-400 hover:text-violet-700 transition"
                       title="Phân tích lại"
                     >
                       <RefreshCw className="w-3.5 h-3.5" />
@@ -700,10 +702,10 @@ const ExamAnalytics: React.FC = () => {
 
                 {/* Suggested Courses */}
                 {aiAnalysis.suggested_courses?.length > 0 && (
-                  <div className="border border-indigo-100 rounded-xl bg-indigo-50 p-5">
+                  <div className="border border-violet-100 rounded-xl bg-violet-50 p-5">
                     <div className="flex items-center gap-2 mb-3">
-                      <BookOpen className="w-4 h-4 text-indigo-600" />
-                      <p className="font-semibold text-indigo-800 text-sm">
+                      <BookOpen className="w-4 h-4 text-violet-600" />
+                      <p className="font-semibold text-violet-800 text-sm">
                         Khóa học được đề xuất
                       </p>
                     </div>
@@ -713,10 +715,10 @@ const ExamAnalytics: React.FC = () => {
                           <a
                             key={c.course_id}
                             href={`/courses/${c.course_id}`}
-                            className="flex items-center justify-between bg-white border border-indigo-100 rounded-lg px-4 py-3 hover:border-indigo-400 hover:shadow-sm transition group"
+                            className="flex items-center justify-between bg-white border border-violet-100 rounded-lg px-4 py-3 hover:border-violet-400 hover:shadow-sm transition group"
                           >
                             <div className="min-w-0">
-                              <p className="font-medium text-sm text-slate-800 truncate group-hover:text-indigo-700">
+                              <p className="font-medium text-sm text-slate-800 truncate group-hover:text-violet-700">
                                 {c.course_title}
                               </p>
                               <p className="text-xs text-slate-400 mt-0.5">
@@ -732,7 +734,7 @@ const ExamAnalytics: React.FC = () => {
                                   {c.course_level}
                                 </span>
                                 {c.tag && (
-                                  <span className="text-indigo-500">
+                                  <span className="text-violet-500">
                                     #{c.tag}
                                   </span>
                                 )}
@@ -743,7 +745,7 @@ const ExamAnalytics: React.FC = () => {
                                 )}
                               </p>
                             </div>
-                            <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-indigo-600 flex-shrink-0 ml-2" />
+                            <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-violet-600 flex-shrink-0 ml-2" />
                           </a>
                         ),
                       )}

@@ -121,7 +121,7 @@ const ExamHistorySimple: React.FC = () => {
     <div className="space-y-6">
       {/* Summary Statistics */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-lg shadow-md p-6">
+        <div className="bg-gradient-to-br from-violet-800 to-violet-900 text-white rounded-lg shadow-md p-6">
           <div className="flex items-center gap-3">
             <div className="p-3 bg-white/20 rounded-lg">
               <FileText className="w-6 h-6" />
@@ -149,7 +149,7 @@ const ExamHistorySimple: React.FC = () => {
       {/* Exam History List */}
       <div className="bg-white rounded-lg shadow-md p-6">
         <div className="flex items-center gap-3 mb-6">
-          <FileText className="w-6 h-6 text-blue-600" />
+          <FileText className="w-6 h-6 text-violet-600" />
           <h2 className="text-2xl font-bold text-slate-800">Lịch sử làm bài</h2>
         </div>
 
@@ -161,7 +161,7 @@ const ExamHistorySimple: React.FC = () => {
             <p className="text-slate-500 mb-4">Chưa có lịch sử làm bài</p>
             <Link
               to="/exams"
-              className="inline-block px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
+              className="inline-block px-6 py-2.5 bg-violet-600 text-white rounded-md hover:bg-violet-700 transition"
             >
               Làm bài thi ngay
             </Link>
@@ -228,7 +228,7 @@ const ExamHistorySimple: React.FC = () => {
 
                     <Link
                       to={`/exams/result/${attempt.user_exam_id}`}
-                      className="ml-4 px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition"
+                      className="ml-4 px-4 py-2 text-sm text-violet-600 hover:bg-violet-50 rounded-md transition"
                     >
                       Chi tiết
                     </Link>
@@ -278,7 +278,7 @@ const ExamHistorySimple: React.FC = () => {
                           onClick={() => setCurrentPage(p as number)}
                           className={`px-3 py-1.5 rounded-lg text-sm border transition ${
                             currentPage === p
-                              ? "bg-blue-500 text-white border-blue-500"
+                              ? "bg-violet-600 text-white border-violet-600"
                               : "border-slate-200 text-slate-600 hover:bg-slate-50"
                           }`}
                         >

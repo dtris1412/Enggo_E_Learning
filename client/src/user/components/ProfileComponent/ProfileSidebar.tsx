@@ -37,7 +37,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({
                 onClick={() => setActiveTab(item.id)}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
                   activeTab === item.id
-                    ? "bg-blue-500 text-white shadow-md"
+                    ? "bg-violet-600 text-white shadow-md"
                     : "text-slate-700 hover:bg-slate-100"
                 }`}
               >
@@ -56,3 +56,4 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({
 };
 
 export default ProfileSidebar;
+
