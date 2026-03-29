@@ -110,11 +110,11 @@ const Header = () => {
     { path: "/exams", label: "Thi thử online" },
   ];
 
-  // Learning Corner dropdown items (only shown when user is logged in)
+  // Learning Corner dropdown items
   const learningItems = [
-    { path: "/my-learning", label: "Góc học" },
-    { path: "/documents", label: "Tài liệu" },
-    { path: "/flashcards", label: "Flashcards" },
+    { path: "/my-learning", label: "Góc học", requireAuth: true },
+    { path: "/documents", label: "Tài liệu", requireAuth: false },
+    { path: "/flashcards", label: "Flashcards", requireAuth: true },
   ];
 
   // Add conditional nav items based on user status
@@ -159,48 +159,44 @@ const Header = () => {
               ))}
             </nav>
 
-            {/* Learning Corner Dropdown - Only show when logged in */}
-            {user && (
-              <div className="relative" ref={learningDropdownRef}>
-                <button
-                  onClick={() => setLearningDropdownOpen(!learningDropdownOpen)}
-                  className={`flex items-center space-x-1 px-3 py-2 text-sm font-medium transition-all duration-200 hover:scale-105 ${
-                    learningItems.some(
-                      (item) => location.pathname === item.path,
-                    )
-                      ? "text-violet-600 border-b-2 border-violet-600"
-                      : "text-slate-700 hover:text-violet-600"
+            {/* Learning Corner Dropdown */}
+            <div className="relative" ref={learningDropdownRef}>
+              <button
+                onClick={() => setLearningDropdownOpen(!learningDropdownOpen)}
+                className={`flex items-center space-x-1 px-3 py-2 text-sm font-medium transition-all duration-200 hover:scale-105 ${
+                  learningItems.some((item) => location.pathname === item.path)
+                    ? "text-violet-600 border-b-2 border-violet-600"
+                    : "text-slate-700 hover:text-violet-600"
+                }`}
+              >
+                <span>Góc học tập</span>
+                <ChevronDown
+                  className={`w-4 h-4 transition-transform duration-200 ${
+                    learningDropdownOpen ? "rotate-180" : ""
                   }`}
-                >
-                  <span>Góc học tập</span>
-                  <ChevronDown
-                    className={`w-4 h-4 transition-transform duration-200 ${
-                      learningDropdownOpen ? "rotate-180" : ""
-                    }`}
-                  />
-                </button>
+                />
+              </button>
 
-                {/* Learning Dropdown Menu */}
-                {learningDropdownOpen && (
-                  <div className="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-slate-200 py-2 z-50 animate-fade-in">
-                    {learningItems.map((item) => (
-                      <Link
-                        key={item.path}
-                        to={item.path}
-                        onClick={() => setLearningDropdownOpen(false)}
-                        className={`block px-4 py-2 text-sm transition-colors duration-150 ${
-                          location.pathname === item.path
-                            ? "text-violet-600 bg-violet-50 font-medium"
-                            : "text-slate-700 hover:bg-slate-50 hover:text-violet-600"
-                        }`}
-                      >
-                        {item.label}
-                      </Link>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
+              {/* Learning Dropdown Menu */}
+              {learningDropdownOpen && (
+                <div className="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-slate-200 py-2 z-50 animate-fade-in">
+                  {learningItems.map((item) => (
+                    <Link
+                      key={item.path}
+                      to={item.requireAuth && !user ? "/login" : item.path}
+                      onClick={() => setLearningDropdownOpen(false)}
+                      className={`block px-4 py-2 text-sm transition-colors duration-150 ${
+                        location.pathname === item.path
+                          ? "text-violet-600 bg-violet-50 font-medium"
+                          : "text-slate-700 hover:bg-slate-50 hover:text-violet-600"
+                      }`}
+                    >
+                      {item.label}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Auth Section */}
@@ -339,27 +335,25 @@ const Header = () => {
                 ))}
 
                 {/* Learning Corner Section - Mobile */}
-                {user && (
-                  <div className="pt-2 border-t border-slate-200 mt-2">
-                    <div className="px-3 py-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                      Góc học tập
-                    </div>
-                    {learningItems.map((item) => (
-                      <Link
-                        key={item.path}
-                        to={item.path}
-                        onClick={() => setIsMenuOpen(false)}
-                        className={`px-3 py-2 pl-6 rounded-md text-sm font-medium transition-all duration-200 flex ${
-                          location.pathname === item.path
-                            ? "text-violet-600 bg-violet-50"
-                            : "text-slate-700 hover:text-violet-600 hover:bg-slate-50"
-                        }`}
-                      >
-                        {item.label}
-                      </Link>
-                    ))}
+                <div className="pt-2 border-t border-slate-200 mt-2">
+                  <div className="px-3 py-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                    Góc học tập
                   </div>
-                )}
+                  {learningItems.map((item) => (
+                    <Link
+                      key={item.path}
+                      to={item.requireAuth && !user ? "/login" : item.path}
+                      onClick={() => setIsMenuOpen(false)}
+                      className={`px-3 py-2 pl-6 rounded-md text-sm font-medium transition-all duration-200 flex ${
+                        location.pathname === item.path
+                          ? "text-violet-600 bg-violet-50"
+                          : "text-slate-700 hover:text-violet-600 hover:bg-slate-50"
+                      }`}
+                    >
+                      {item.label}
+                    </Link>
+                  ))}
+                </div>
 
                 <div className="flex flex-col space-y-2 pt-4 border-t border-slate-200 mt-4">
                   {user ? (
