@@ -7,6 +7,7 @@ import {
   ChevronDown,
   UserCircle,
   Sparkles,
+  Zap,
 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { useAuth } from "../../shared/contexts/authContext";
@@ -17,6 +18,7 @@ const Header = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [learningDropdownOpen, setLearningDropdownOpen] = useState(false);
   const [userSubscription, setUserSubscription] = useState("Free");
+  const [tokenBalance, setTokenBalance] = useState<number | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const learningDropdownRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
@@ -101,6 +103,36 @@ const Header = () => {
       );
     };
   }, [user?.user_id]); // Re-fetch when user changes
+
+  // Fetch token balance
+  useEffect(() => {
+    const fetchTokenBalance = async () => {
+      if (!user) {
+        setTokenBalance(null);
+        return;
+      }
+      try {
+        const token = localStorage.getItem("accessToken");
+        if (!token) return;
+        const response = await fetch(
+          `${import.meta.env.VITE_API_URL || "http://localhost:8080/api"}/user/wallet`,
+          { headers: { Authorization: `Bearer ${token}` } },
+        );
+        const result = await response.json();
+        if (result.success) {
+          setTokenBalance(result.data.token_balance ?? 0);
+        }
+      } catch (error) {
+        console.error("Error fetching token balance:", error);
+      }
+    };
+
+    fetchTokenBalance();
+
+    const handleTokenUpdate = () => fetchTokenBalance();
+    window.addEventListener("tokensUpdated", handleTokenUpdate);
+    return () => window.removeEventListener("tokensUpdated", handleTokenUpdate);
+  }, [user?.user_id]);
 
   const navItems = [
     { path: "/", label: "Trang chủ" },
@@ -212,6 +244,14 @@ const Header = () => {
                     <Sparkles className="w-4 h-4" />
                     <span className="drop-shadow-sm">Nâng cấp</span>
                   </Link>
+                )}
+
+                {/* Token Balance - Desktop */}
+                {tokenBalance !== null && (
+                  <div className="flex items-center gap-1.5 bg-violet-50 border border-violet-200 px-3 py-1.5 rounded-full text-sm font-semibold text-violet-700">
+                    <Zap className="w-3.5 h-3.5 fill-violet-500" />
+                    <span>{tokenBalance.toLocaleString()}</span>
+                  </div>
                 )}
 
                 <div className="relative" ref={dropdownRef}>
@@ -394,10 +434,20 @@ const Header = () => {
                             <p className="text-xs text-slate-600 truncate">
                               {user.user_email}
                             </p>
-                            <div className="mt-1 inline-flex items-center px-2 py-0.5 bg-violet-50 border border-violet-200 rounded">
-                              <span className="text-xs font-semibold text-violet-700">
-                                {userSubscription}
-                              </span>
+                            <div className="flex items-center gap-2 mt-1">
+                              <div className="inline-flex items-center px-2 py-0.5 bg-violet-50 border border-violet-200 rounded">
+                                <span className="text-xs font-semibold text-violet-700">
+                                  {userSubscription}
+                                </span>
+                              </div>
+                              {tokenBalance !== null && (
+                                <div className="inline-flex items-center gap-1 px-2 py-0.5 bg-violet-50 border border-violet-200 rounded">
+                                  <Zap className="w-3 h-3 fill-violet-500 text-violet-500" />
+                                  <span className="text-xs font-semibold text-violet-700">
+                                    {tokenBalance.toLocaleString()} tokens
+                                  </span>
+                                </div>
+                              )}
                             </div>
                           </div>
                         </div>
