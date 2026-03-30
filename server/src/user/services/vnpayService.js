@@ -1,7 +1,7 @@
 import crypto from "crypto";
 import moment from "moment";
 import querystring from "querystring";
-import { vnPayConfig } from "../../config/vnPayConfig.js";
+import { vnPayConfig } from "../../config/vnpayConfig.js";
 
 /**
  * Log VNPay config for debugging
