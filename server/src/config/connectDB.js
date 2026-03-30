@@ -31,10 +31,13 @@ const sequelize = new Sequelize(
             },
           }
         : {},
-  }
+  },
 );
 
-const connectDB = async () => {
+const MAX_RETRIES = 5;
+const RETRY_DELAY_MS = 5000;
+
+const connectDB = async (attempt = 1) => {
   try {
     await sequelize.authenticate();
     console.log("✅ Database connected successfully");
@@ -42,10 +45,18 @@ const connectDB = async () => {
     console.log(`   Host: ${process.env.DB_HOST || "172.18.0.1"}`);
     console.log(`   Environment: ${process.env.NODE_ENV || "development"}`);
   } catch (err) {
-    console.error("❌ Unable to connect to database:", err.message);
-    // Không exit process khi test local
-    if (process.env.NODE_ENV === "production") {
-      process.exit(1);
+    console.error(
+      `❌ Database connection failed (attempt ${attempt}/${MAX_RETRIES}):`,
+      err.message,
+    );
+    if (attempt < MAX_RETRIES) {
+      console.log(`   Retrying in ${RETRY_DELAY_MS / 1000}s...`);
+      setTimeout(() => connectDB(attempt + 1), RETRY_DELAY_MS);
+    } else {
+      console.error(
+        "❌ Max DB connection retries reached. Server continues running but DB is unavailable.",
+      );
+      // KHÔNG gọi process.exit() - để server tiếp tục chạy, healthcheck vẫn pass
     }
   }
 };

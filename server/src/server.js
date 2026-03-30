@@ -61,9 +61,10 @@ if (process.env.NODE_ENV === "production") {
   });
 }
 
-connectDB();
-
+// Khởi động server TRƯỚC, kết nối DB SAU
+// → healthcheck của Railway luôn pass ngay cả khi DB đang warmup
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
   console.log(`Environment: ${process.env.NODE_ENV || "development"}`);
+  connectDB();
 });
