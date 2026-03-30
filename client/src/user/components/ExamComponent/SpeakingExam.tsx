@@ -5,6 +5,7 @@ import { useToast } from "../../../shared/components/Toast/Toast";
 import {
   ArrowLeft,
   CheckCircle,
+  Clock,
   Loader2,
   Mic,
   MicOff,
@@ -61,7 +62,24 @@ interface Message {
   content: string;
 }
 
-const SpeakingExam: React.FC = () => {
+interface SpeakingExamOverlayProps {
+  /** When provided, component runs as a fixed overlay inside ExamTaking */
+  overrideExamId?: number;
+  overrideUserExamId?: number;
+  overrideContainerId?: number;
+  /** Container's time_limit in minutes. Shows a countdown and auto-ends session when reached. */
+  timeLimitMinutes?: number;
+  /** Called when the user exits (false = pressed back, true = completed & continued) */
+  onClose?: (sessionCompleted: boolean) => void;
+}
+
+const SpeakingExam: React.FC<SpeakingExamOverlayProps> = ({
+  overrideExamId,
+  overrideUserExamId,
+  overrideContainerId,
+  timeLimitMinutes,
+  onClose,
+}) => {
   const { examId, userExamId, containerId } = useParams<{
     examId: string;
     userExamId: string;
@@ -70,6 +88,11 @@ const SpeakingExam: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const containerIndex: number = (location.state as any)?.containerIndex ?? 0;
+
+  // Resolve IDs — prefer override props (overlay mode) over route params
+  const resolvedExamId = overrideExamId ?? parseInt(examId!);
+  const resolvedUserExamId = overrideUserExamId ?? parseInt(userExamId!);
+  const resolvedContainerId = overrideContainerId ?? parseInt(containerId!);
   const { speakingTurn, submitSpeaking } = useExam();
   const { showToast } = useToast();
 
@@ -94,6 +117,18 @@ const SpeakingExam: React.FC = () => {
   const [isSpeakingAI, setIsSpeakingAI] = useState(false);
   const [ttsEnabled, setTtsEnabled] = useState(true);
   const ttsEnabledRef = useRef(true); // stable ref for callbacks
+
+  // ── Container timer (overlay mode with timeLimitMinutes) ─────────────────
+  const [speakingTimeLeft, setSpeakingTimeLeft] = useState<number | null>(
+    timeLimitMinutes ? timeLimitMinutes * 60 : null,
+  );
+  const handleEndSessionRef = useRef<(() => void) | null>(null);
+
+  const formatSpeakingTime = (secs: number) => {
+    const m = Math.floor(secs / 60);
+    const s = secs % 60;
+    return `${m}:${s.toString().padStart(2, "0")}`;
+  };
 
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -157,8 +192,8 @@ const SpeakingExam: React.FC = () => {
       stopSpeaking();
 
       const result = await speakingTurn(
-        parseInt(userExamId!),
-        parseInt(containerId!),
+        resolvedUserExamId,
+        resolvedContainerId,
         updatedMessages,
       );
 
@@ -273,13 +308,13 @@ const SpeakingExam: React.FC = () => {
 
   // ── Start conversation ──────────────────────────────────────────────────
   useEffect(() => {
-    if (!userExamId || !containerId) return;
+    if (!resolvedUserExamId || !resolvedContainerId) return;
 
     const init = async () => {
       setIsLoading(true);
       const result = await speakingTurn(
-        parseInt(userExamId),
-        parseInt(containerId),
+        resolvedUserExamId,
+        resolvedContainerId,
         [],
       );
       setIsLoading(false);
@@ -313,8 +348,8 @@ const SpeakingExam: React.FC = () => {
     const durationSeconds = Math.floor((Date.now() - startTime) / 1000);
 
     const result = await submitSpeaking(
-      parseInt(userExamId!),
-      parseInt(containerId!),
+      resolvedUserExamId,
+      resolvedContainerId,
       messages,
       durationSeconds,
     );
@@ -328,6 +363,34 @@ const SpeakingExam: React.FC = () => {
     }
   };
 
+  // Keep ref up-to-date so timer effect can call it safely
+  useEffect(() => {
+    handleEndSessionRef.current = handleEndSession;
+  });
+
+  // ── Container countdown timer (overlay mode) ────────────────────────────
+  useEffect(() => {
+    if (speakingTimeLeft === null || speakingTimeLeft <= 0 || sessionEnded)
+      return;
+    const t = setInterval(() => {
+      setSpeakingTimeLeft((prev) => {
+        if (prev === null || prev <= 1) {
+          clearInterval(t);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(t);
+  }, [sessionEnded]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Auto-end when container time runs out
+  useEffect(() => {
+    if (speakingTimeLeft === 0 && !sessionEnded && timeLimitMinutes) {
+      handleEndSessionRef.current?.();
+    }
+  }, [speakingTimeLeft]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // ── Text fallback send ──────────────────────────────────────────────────
   const handleTextSend = () => sendMessage(textInput);
   const handleTextKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -339,7 +402,11 @@ const SpeakingExam: React.FC = () => {
 
   // ── Render ───────────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-950 to-slate-900 flex flex-col">
+    <div
+      className={`bg-gradient-to-br from-slate-900 via-purple-950 to-slate-900 flex flex-col${
+        onClose ? " fixed inset-0 z-[60]" : " min-h-screen"
+      }`}
+    >
       {/* Header */}
       <div className="bg-black/30 backdrop-blur border-b border-white/10 sticky top-0 z-20">
         <div className="container mx-auto px-6 py-3 flex items-center justify-between">
@@ -347,7 +414,11 @@ const SpeakingExam: React.FC = () => {
             <button
               onClick={() => {
                 stopSpeaking();
-                navigate(-1);
+                if (onClose) {
+                  onClose(false);
+                } else {
+                  navigate(-1);
+                }
               }}
               className="p-2 rounded-lg hover:bg-white/10 transition-colors"
             >
@@ -375,6 +446,19 @@ const SpeakingExam: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-2">
+            {/* Container timer (overlay mode) */}
+            {speakingTimeLeft !== null && (
+              <div
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-mono font-semibold ${
+                  speakingTimeLeft < 120
+                    ? "bg-red-600/40 text-red-300"
+                    : "bg-white/10 text-white/70"
+                }`}
+              >
+                <Clock className="w-3.5 h-3.5" />
+                {formatSpeakingTime(speakingTimeLeft)}
+              </div>
+            )}
             {/* TTS toggle */}
             <button
               onClick={() => {
@@ -423,11 +507,15 @@ const SpeakingExam: React.FC = () => {
             </p>
 
             <button
-              onClick={() =>
-                navigate(`/exams/${examId}/take`, {
-                  state: { containerIndex: containerIndex + 1 },
-                })
-              }
+              onClick={() => {
+                if (onClose) {
+                  onClose(true);
+                } else {
+                  navigate(`/exams/${resolvedExamId}/take`, {
+                    state: { containerIndex: containerIndex + 1 },
+                  });
+                }
+              }}
               className="w-full px-4 py-3 bg-purple-700 text-white font-semibold rounded-xl hover:bg-purple-800 transition-colors"
             >
               Tiếp tục bài thi

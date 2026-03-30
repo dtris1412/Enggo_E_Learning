@@ -30,6 +30,11 @@ const ExamDetail: React.FC = () => {
   const [selectedContainers, setSelectedContainers] = useState<number[]>([]);
   const [isFullExam, setIsFullExam] = useState(true);
   const [startingExam, setStartingExam] = useState(false);
+  const [customDuration, setCustomDuration] = useState<number>(120);
+
+  useEffect(() => {
+    if (exam) setCustomDuration(exam.exam_duration);
+  }, [exam]);
 
   useEffect(() => {
     // Check authentication
@@ -106,7 +111,7 @@ const ExamDetail: React.FC = () => {
       if (result.success) {
         // Navigate to exam taking page with the user_exam_id
         navigate(`/exams/${id}/take`, {
-          state: { userExamId: result.data.user_exam_id },
+          state: { userExamId: result.data.user_exam_id, customDuration },
         });
       } else {
         showToast("error", result.message || "Không thể bắt đầu bài thi");
@@ -304,84 +309,125 @@ const ExamDetail: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Exam Info */}
-            <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
-              <h2 className="text-xl font-bold text-slate-900 mb-4">
-                Thông tin đề thi
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="flex items-center gap-3 p-4 bg-blue-50 rounded-lg">
-                  <Clock className="w-8 h-8 text-blue-600" />
-                  <div>
-                    <p className="text-sm text-slate-600">Thời gian</p>
-                    <p className="font-semibold text-slate-900">
-                      {formatDuration(exam.exam_duration)}
-                    </p>
+            {/* Exam Info — compact one-line strip */}
+            <div className="bg-white rounded-lg shadow-sm border border-slate-200 px-5 py-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm">
+              <div className="flex items-center gap-1.5 text-slate-700">
+                <Clock className="w-4 h-4 text-blue-500" />
+                <span className="font-medium">
+                  {formatDuration(exam.exam_duration)}
+                </span>
+              </div>
+              <div className="w-px h-4 bg-slate-200 hidden sm:block" />
+              <div className="flex items-center gap-1.5 text-slate-700">
+                <FileText className="w-4 h-4 text-green-500" />
+                <span className="font-medium">{exam.total_questions} câu</span>
+              </div>
+              <div className="w-px h-4 bg-slate-200 hidden sm:block" />
+              <div className="flex items-center gap-1.5 text-slate-700">
+                <Calendar className="w-4 h-4 text-purple-500" />
+                <span className="font-medium">{exam.year}</span>
+              </div>
+              <div className="w-px h-4 bg-slate-200 hidden sm:block" />
+              <div className="flex items-center gap-1.5 text-slate-700">
+                <Award className="w-4 h-4 text-orange-500" />
+                <span className="font-medium">{exam.exam_type}</span>
+              </div>
+              {exam.source && (
+                <>
+                  <div className="w-px h-4 bg-slate-200 hidden sm:block" />
+                  <span
+                    className="text-slate-500 truncate max-w-[200px]"
+                    title={exam.source}
+                  >
+                    {exam.source}
+                  </span>
+                </>
+              )}
+              {exam.Exam_Medias && exam.Exam_Medias.length > 0 && (
+                <>
+                  <div className="w-px h-4 bg-slate-200 hidden sm:block" />
+                  <div className="flex items-center gap-1.5 text-blue-600">
+                    <Volume2 className="w-4 h-4" />
+                    <span className="font-medium">
+                      {Math.floor(exam.Exam_Medias[0].duration / 60)} phút audio
+                    </span>
                   </div>
-                </div>
+                </>
+              )}
+            </div>
 
-                <div className="flex items-center gap-3 p-4 bg-green-50 rounded-lg">
-                  <FileText className="w-8 h-8 text-green-600" />
-                  <div>
-                    <p className="text-sm text-slate-600">Câu hỏi</p>
-                    <p className="font-semibold text-slate-900">
-                      {exam.total_questions} câu hỏi
-                    </p>
+            {/* Custom Duration */}
+            {exam && (
+              <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-5">
+                <h2 className="text-base font-bold text-slate-900 mb-3 flex items-center gap-2">
+                  <Clock className="w-4 h-4 text-blue-600" />
+                  Thời gian làm bài
+                </h2>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="range"
+                      min={30}
+                      max={190}
+                      step={5}
+                      value={customDuration}
+                      onChange={(e) =>
+                        setCustomDuration(Number(e.target.value))
+                      }
+                      className="flex-1 h-2 accent-blue-600 cursor-pointer"
+                    />
+                    <span className="text-xl font-bold text-blue-700 w-20 text-right shrink-0">
+                      {customDuration} phút
+                    </span>
                   </div>
-                </div>
-
-                <div className="flex items-center gap-3 p-4 bg-purple-50 rounded-lg">
-                  <Calendar className="w-8 h-8 text-purple-600" />
-                  <div>
-                    <p className="text-sm text-slate-600">Năm</p>
-                    <p className="font-semibold text-slate-900">{exam.year}</p>
+                  {/* Quick presets */}
+                  <div className="flex gap-2 flex-wrap">
+                    {[60, 90, 120, 150, 175, 190].map((v) => (
+                      <button
+                        key={v}
+                        onClick={() => setCustomDuration(v)}
+                        className={`px-3 py-1 text-xs rounded-lg border font-medium transition-colors ${
+                          customDuration === v
+                            ? "bg-blue-600 text-white border-blue-600"
+                            : "border-slate-300 text-slate-600 hover:border-blue-400"
+                        }`}
+                      >
+                        {v}p
+                      </button>
+                    ))}
                   </div>
-                </div>
-
-                <div className="flex items-center gap-3 p-4 bg-orange-50 rounded-lg">
-                  <Award className="w-8 h-8 text-orange-600" />
-                  <div>
-                    <p className="text-sm text-slate-600">Loại</p>
-                    <p className="font-semibold text-slate-900">
-                      {exam.exam_type}
-                    </p>
+                  {/* Hints */}
+                  <div className="flex flex-wrap gap-2 text-xs">
+                    <span
+                      className={`flex items-center gap-1 px-2 py-0.5 rounded-full border ${
+                        customDuration === 120
+                          ? "bg-blue-50 border-blue-300 text-blue-700 font-semibold"
+                          : "border-slate-200 text-slate-400"
+                      }`}
+                    >
+                      <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                      120p — TOEIC
+                    </span>
+                    <span
+                      className={`flex items-center gap-1 px-2 py-0.5 rounded-full border ${
+                        customDuration === 190
+                          ? "bg-green-50 border-green-300 text-green-700 font-semibold"
+                          : "border-slate-200 text-slate-400"
+                      }`}
+                    >
+                      <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                      190p — IELTS + Speaking
+                    </span>
+                    {customDuration !== exam.exam_duration && (
+                      <span className="flex items-center gap-1 text-amber-600">
+                        <AlertCircle className="w-3 h-3" />
+                        Mặc định: {exam.exam_duration}p
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>
-
-              {exam.source && (
-                <div className="mt-6 p-4 bg-slate-50 rounded-lg">
-                  <p className="text-sm text-slate-600 mb-1">Nguồn</p>
-                  <p className="font-medium text-slate-900">{exam.source}</p>
-                </div>
-              )}
-
-              {exam.Exam_Medias && exam.Exam_Medias.length > 0 && (
-                <div className="mt-6">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Volume2 className="w-5 h-5 text-blue-600" />
-                    <h3 className="font-semibold text-slate-900">
-                      Tài liệu âm thanh
-                    </h3>
-                  </div>
-                  <div className="space-y-2">
-                    {exam.Exam_Medias.map((media: any) => (
-                      <div
-                        key={media.media_id}
-                        className="flex items-center justify-between p-3 bg-blue-50 rounded-lg"
-                      >
-                        <span className="text-sm text-slate-700">
-                          Thời lượng: {Math.floor(media.duration / 60)} phút
-                        </span>
-                        <span className="text-xs text-slate-500">
-                          Có âm thanh
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
+            )}
 
             {/* Exam Parts Selection */}
             {exam.Exam_Containers && exam.Exam_Containers.length > 0 && (

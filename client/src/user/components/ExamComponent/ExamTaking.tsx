@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useExam } from "../../contexts/examContext";
 import { useToast } from "../../../shared/components/Toast/Toast";
+import SpeakingExam from "./SpeakingExam";
 
 import {
   Clock,
@@ -53,6 +54,8 @@ const ExamTaking: React.FC = () => {
   const [completedSpeakingCqIds, setCompletedSpeakingCqIds] = useState<
     Set<number>
   >(new Set());
+  const [activeSpeakingContainer, setActiveSpeakingContainer] =
+    useState<any>(null);
   const [timeRemaining, setTimeRemaining] = useState(0);
   const [isSaving, setIsSaving] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -139,7 +142,10 @@ const ExamTaking: React.FC = () => {
         const examData = await getExamForTaking(parseInt(id), examId);
         if (examData) {
           setExam(examData);
-          const totalSeconds = examData.exam_duration * 60;
+          const customDuration = (location.state as any)?.customDuration as
+            | number
+            | undefined;
+          const totalSeconds = (customDuration ?? examData.exam_duration) * 60;
           if (resumedStartedAt) {
             const elapsed = Math.floor(
               (Date.now() - new Date(resumedStartedAt).getTime()) / 1000,
@@ -1131,22 +1137,7 @@ const ExamTaking: React.FC = () => {
                       <button
                         onClick={async () => {
                           await handleSave(false);
-                          // Persist unsubmitted writing drafts across navigation
-                          if (
-                            userExamId &&
-                            Object.keys(writingTexts).length > 0
-                          ) {
-                            sessionStorage.setItem(
-                              `writingDraft_${userExamId}`,
-                              JSON.stringify(writingTexts),
-                            );
-                          }
-                          navigate(
-                            `/speaking-exam/${id}/${userExamId}/${currentContainer.container_id}`,
-                            {
-                              state: { containerIndex: currentContainerIndex },
-                            },
-                          );
+                          setActiveSpeakingContainer(currentContainer);
                         }}
                         className={`w-full px-5 py-3 font-semibold rounded-lg transition-colors flex items-center justify-center gap-2 ${
                           isDone
@@ -1660,6 +1651,32 @@ const ExamTaking: React.FC = () => {
             </div>
           </div>
         </div>
+      )}
+      {/* Speaking Exam Overlay */}
+      {activeSpeakingContainer && userExamId && (
+        <SpeakingExam
+          overrideExamId={parseInt(id!)}
+          overrideUserExamId={userExamId}
+          overrideContainerId={activeSpeakingContainer.container_id}
+          timeLimitMinutes={activeSpeakingContainer.time_limit ?? undefined}
+          onClose={(sessionCompleted) => {
+            if (sessionCompleted) {
+              const firstCqId =
+                activeSpeakingContainer?.Container_Questions?.[0]
+                  ?.container_question_id;
+              if (firstCqId != null) {
+                setCompletedSpeakingCqIds(
+                  (prev) => new Set([...prev, firstCqId as number]),
+                );
+              }
+              const containers = getFlattenedContainers();
+              if (currentContainerIndex < containers.length - 1) {
+                setCurrentContainerIndex((ci) => ci + 1);
+              }
+            }
+            setActiveSpeakingContainer(null);
+          }}
+        />
       )}
     </div>
   );
