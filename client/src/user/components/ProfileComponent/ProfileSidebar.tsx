@@ -5,6 +5,7 @@ import {
   ClipboardList,
   CreditCard,
   BarChart2,
+  Coins,
 } from "lucide-react";
 import SubscriptionInfo from "./SubscriptionInfo";
 
@@ -23,6 +24,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({
     { id: "exam-history", label: "Lịch sử thi", icon: ClipboardList },
     { id: "flashcard", label: "Flashcard", icon: CreditCard },
     { id: "exam-analytics", label: "Phân tích AI", icon: BarChart2 },
+    { id: "token-transactions", label: "Token AI", icon: Coins },
   ];
 
   return (
@@ -56,4 +58,3 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({
 };
 
 export default ProfileSidebar;
-

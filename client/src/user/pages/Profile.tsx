@@ -6,6 +6,7 @@ import LearningProgress from "../components/ProfileComponent/LearningProgress";
 import FlashcardProgress from "../components/ProfileComponent/FlashcardProgress";
 import ExamHistorySimple from "../components/ProfileComponent/ExamHistorySimple";
 import ExamAnalytics from "../components/ProfileComponent/ExamAnalytics";
+import TokenTransactions from "../components/ProfileComponent/TokenTransactions";
 import { useUserProfile } from "../contexts/userContext";
 import { ExamAnalyticsProvider } from "../contexts/examAnalyticsContext";
 
@@ -27,6 +28,8 @@ const Profile: React.FC = () => {
         return <FlashcardProgress />;
       case "exam-analytics":
         return <ExamAnalytics />;
+      case "token-transactions":
+        return <TokenTransactions />;
       default:
         return <ProfileInfo />;
     }

@@ -315,14 +315,14 @@ const initUserRoutes = (app) => {
   // ===========User Token Transaction Routes===========
   router.get(
     "/api/user/transactions",
-    requireUser,
     verifyToken,
+    requireUser,
     getUserTransactions,
   );
   router.get(
     "/api/user/transactions/:transactionId",
-    requireUser,
     verifyToken,
+    requireUser,
     getTransactionById,
   );
 
