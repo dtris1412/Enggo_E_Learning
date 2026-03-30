@@ -15,6 +15,7 @@ import {
   ChevronDown,
   ChevronUp,
   Home,
+  Mic,
 } from "lucide-react";
 
 const ExamResult: React.FC = () => {
@@ -515,6 +516,270 @@ const ExamResult: React.FC = () => {
                       </div>
                     );
                   })}
+                </div>
+              </div>
+            )}
+
+            {/* Speaking Results Section */}
+            {result.speaking_results && (
+              <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center gap-3">
+                    <Mic className="w-6 h-6 text-purple-600" />
+                    <h3 className="text-xl font-bold text-slate-900">
+                      Kết quả Speaking
+                    </h3>
+                  </div>
+                  {result.speaking_results.final_band != null && (
+                    <div className="flex items-center gap-2 px-4 py-2 bg-purple-50 border border-purple-200 rounded-xl">
+                      <span className="text-sm font-medium text-purple-700">
+                        Speaking Band
+                      </span>
+                      <span className="text-3xl font-black text-purple-800">
+                        {result.speaking_results.final_band}
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="space-y-4">
+                  {result.speaking_results.records.map(
+                    (rec: any, idx: number) => {
+                      const fb = rec.Speaking_Feedbacks?.[0];
+                      const comments = fb
+                        ? (() => {
+                            try {
+                              return JSON.parse(fb.comments);
+                            } catch {
+                              return null;
+                            }
+                          })()
+                        : null;
+                      const isExpanded =
+                        writingExpandedTasks[-rec.record_id] ?? false;
+
+                      return (
+                        <div
+                          key={rec.record_id}
+                          className="border border-slate-200 rounded-xl overflow-hidden"
+                        >
+                          {/* Part header */}
+                          <button
+                            onClick={() =>
+                              setWritingExpandedTasks((prev) => ({
+                                ...prev,
+                                [-rec.record_id]: !prev[-rec.record_id],
+                              }))
+                            }
+                            className="w-full flex items-center justify-between p-4 bg-slate-50 hover:bg-slate-100 transition-colors"
+                          >
+                            <div className="flex items-center gap-3">
+                              <span className="px-2 py-0.5 bg-purple-100 text-purple-700 text-xs font-semibold rounded uppercase">
+                                Part {idx + 1}
+                              </span>
+                              <span className="text-sm text-slate-500">
+                                {rec.duration}s
+                              </span>
+                              {rec.final_score != null ? (
+                                <span className="text-sm font-semibold text-purple-700">
+                                  Band {rec.final_score}
+                                </span>
+                              ) : (
+                                <span className="text-sm text-red-500">
+                                  Chưa chấm được
+                                </span>
+                              )}
+                            </div>
+                            {isExpanded ? (
+                              <ChevronUp className="w-4 h-4 text-slate-400" />
+                            ) : (
+                              <ChevronDown className="w-4 h-4 text-slate-400" />
+                            )}
+                          </button>
+
+                          {isExpanded && (
+                            <div className="p-4 space-y-4">
+                              {/* Criteria scores */}
+                              {fb?.criteria_scores && (
+                                <div className="space-y-2">
+                                  <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
+                                    Phân tích tiêu chí
+                                  </p>
+                                  {Object.entries(fb.criteria_scores).map(
+                                    ([k, v]: [string, any]) => {
+                                      const score = Number(v);
+                                      const pct = Math.round((score / 9) * 100);
+                                      const barColor =
+                                        score >= 7
+                                          ? "bg-green-500"
+                                          : score >= 5.5
+                                            ? "bg-blue-500"
+                                            : score >= 4
+                                              ? "bg-amber-500"
+                                              : "bg-red-500";
+                                      const textColor =
+                                        score >= 7
+                                          ? "text-green-700"
+                                          : score >= 5.5
+                                            ? "text-blue-700"
+                                            : score >= 4
+                                              ? "text-amber-700"
+                                              : "text-red-700";
+                                      const criteriaComment =
+                                        comments?.criteria_comments?.[k];
+                                      return (
+                                        <div
+                                          key={k}
+                                          className="bg-slate-50 rounded-lg p-3 border border-slate-200"
+                                        >
+                                          <div className="flex items-center justify-between mb-1">
+                                            <p className="text-xs font-semibold text-slate-600 capitalize">
+                                              {k.replace(/_/g, " ")}
+                                            </p>
+                                            <span
+                                              className={`text-sm font-bold ${textColor}`}
+                                            >
+                                              {v}
+                                            </span>
+                                          </div>
+                                          <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden mb-1">
+                                            <div
+                                              className={`h-full rounded-full ${barColor}`}
+                                              style={{ width: `${pct}%` }}
+                                            />
+                                          </div>
+                                          {criteriaComment && (
+                                            <p className="text-xs text-slate-500">
+                                              {criteriaComment}
+                                            </p>
+                                          )}
+                                        </div>
+                                      );
+                                    },
+                                  )}
+                                </div>
+                              )}
+
+                              {/* Overall comment */}
+                              {comments?.feedback?.overall_comment && (
+                                <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
+                                  <p className="text-xs font-semibold text-blue-700 uppercase mb-1">
+                                    Nhận xét tổng quát
+                                  </p>
+                                  <p className="text-sm text-blue-900 leading-relaxed">
+                                    {comments.feedback.overall_comment}
+                                  </p>
+                                </div>
+                              )}
+
+                              {/* Strengths */}
+                              {(comments?.feedback?.strengths?.length ?? 0) >
+                                0 && (
+                                <div className="bg-green-50 rounded-lg p-4 border border-green-200">
+                                  <p className="text-xs font-semibold text-green-700 uppercase mb-2">
+                                    ✓ Điểm mạnh
+                                  </p>
+                                  <ul className="space-y-1">
+                                    {comments.feedback.strengths.map(
+                                      (s: string, i: number) => (
+                                        <li
+                                          key={i}
+                                          className="text-sm text-green-900 flex items-start gap-2"
+                                        >
+                                          <span className="mt-1.5 flex-shrink-0 w-1.5 h-1.5 rounded-full bg-green-500" />
+                                          {s}
+                                        </li>
+                                      ),
+                                    )}
+                                  </ul>
+                                </div>
+                              )}
+
+                              {/* Improvements */}
+                              {(comments?.feedback?.improvements?.length ?? 0) >
+                                0 && (
+                                <div className="bg-amber-50 rounded-lg p-4 border border-amber-200">
+                                  <p className="text-xs font-semibold text-amber-700 uppercase mb-2">
+                                    ✗ Cần cải thiện
+                                  </p>
+                                  <ul className="space-y-1">
+                                    {comments.feedback.improvements.map(
+                                      (s: string, i: number) => (
+                                        <li
+                                          key={i}
+                                          className="text-sm text-amber-900 flex items-start gap-2"
+                                        >
+                                          <span className="mt-1.5 flex-shrink-0 w-1.5 h-1.5 rounded-full bg-amber-500" />
+                                          {s}
+                                        </li>
+                                      ),
+                                    )}
+                                  </ul>
+                                </div>
+                              )}
+
+                              {/* Pronunciation notes */}
+                              {(comments?.feedback?.pronunciation_notes
+                                ?.length ?? 0) > 0 && (
+                                <div className="bg-indigo-50 rounded-lg p-4 border border-indigo-200">
+                                  <p className="text-xs font-semibold text-indigo-700 uppercase mb-2">
+                                    🗣 Phát âm
+                                  </p>
+                                  <ul className="space-y-1">
+                                    {comments.feedback.pronunciation_notes.map(
+                                      (note: string, i: number) => (
+                                        <li
+                                          key={i}
+                                          className="text-sm text-indigo-900 flex items-start gap-2"
+                                        >
+                                          <span className="mt-1.5 flex-shrink-0 w-1.5 h-1.5 rounded-full bg-indigo-500" />
+                                          {note}
+                                        </li>
+                                      ),
+                                    )}
+                                  </ul>
+                                </div>
+                              )}
+
+                              {/* Tips */}
+                              {(comments?.feedback?.tips?.length ?? 0) > 0 && (
+                                <div className="bg-cyan-50 rounded-lg p-4 border border-cyan-200">
+                                  <p className="text-xs font-semibold text-cyan-700 uppercase mb-2">
+                                    💡 Gợi ý
+                                  </p>
+                                  <ul className="space-y-1">
+                                    {comments.feedback.tips.map(
+                                      (tip: string, i: number) => (
+                                        <li
+                                          key={i}
+                                          className="text-sm text-cyan-900 flex items-start gap-2"
+                                        >
+                                          <span className="mt-1.5 flex-shrink-0 w-1.5 h-1.5 rounded-full bg-cyan-500" />
+                                          {tip}
+                                        </li>
+                                      ),
+                                    )}
+                                  </ul>
+                                </div>
+                              )}
+
+                              {/* Transcript */}
+                              {comments?.transcript && (
+                                <details className="group">
+                                  <summary className="cursor-pointer text-xs font-semibold text-slate-500 uppercase tracking-wide hover:text-slate-700 select-none">
+                                    Transcript cuộc trò chuyện
+                                  </summary>
+                                  <div className="mt-2 p-3 bg-slate-50 rounded-lg border border-slate-200 text-xs text-slate-700 whitespace-pre-wrap leading-relaxed max-h-64 overflow-y-auto">
+                                    {comments.transcript}
+                                  </div>
+                                </details>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    },
+                  )}
                 </div>
               </div>
             )}

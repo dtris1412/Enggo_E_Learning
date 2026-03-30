@@ -169,6 +169,7 @@ import {
   submitAllWriting,
   speakingTurn,
   submitSpeaking,
+  evaluateAllSpeaking,
 } from "../controllers/userExamController.js";
 
 // ===========Exam Analytics Controllers===========
@@ -807,12 +808,20 @@ const initUserRoutes = (app) => {
     speakingTurn,
   );
 
-  // Submit & evaluate full speaking session
+  // Submit speaking part transcript (save draft, no AI yet)
   router.post(
     "/api/user/user-exams/:user_exam_id/speaking-submit",
     verifyToken,
     requireUser,
     submitSpeaking,
+  );
+
+  // Evaluate all saved speaking transcripts at exam submission
+  router.post(
+    "/api/user/user-exams/:user_exam_id/speaking-evaluate-all",
+    verifyToken,
+    requireUser,
+    evaluateAllSpeaking,
   );
 
   // ===========AI Assistant Routes===========

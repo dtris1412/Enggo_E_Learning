@@ -12,6 +12,7 @@ import {
   submitAllWritingTasks as submitAllWritingTasksService,
   handleSpeakingTurn as handleSpeakingTurnService,
   submitSpeakingSession as submitSpeakingSessionService,
+  evaluateAllSpeakingService,
 } from "../services/userExamService.js";
 
 /**
@@ -310,6 +311,18 @@ const submitSpeaking = async (req, res) => {
   }
 };
 
+const evaluateAllSpeaking = async (req, res) => {
+  try {
+    const { user_exam_id } = req.params;
+    const result = await evaluateAllSpeakingService(parseInt(user_exam_id));
+    if (!result.success) return res.status(400).json(result);
+    res.status(200).json(result);
+  } catch (err) {
+    console.error("Error in evaluateAllSpeaking:", err);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
 export {
   startExam,
   saveAnswers,
@@ -324,4 +337,5 @@ export {
   submitAllWriting,
   speakingTurn,
   submitSpeaking,
+  evaluateAllSpeaking,
 };

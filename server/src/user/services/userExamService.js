@@ -7,6 +7,7 @@ import {
   gradeIeltsWriting,
   speakingConversationTurn,
   evaluateIeltsSpeaking,
+  evaluateIeltsSpeakingAll,
 } from "./aiService.js";
 import {
   deductTokenUsage,
@@ -375,6 +376,30 @@ export const getExamResult = async (user_exam_id, user_id) => {
               submissions: writingSubmissions,
             }
           : null,
+      speaking_results: await (async () => {
+        const speakingRecords = await db.Speaking_Record.findAll({
+          where: { user_exam_id },
+          include: [{ model: db.Speaking_Feedback, required: false }],
+          order: [["record_id", "ASC"]],
+        });
+        if (speakingRecords.length === 0) return null;
+        const gradedSpeaking = speakingRecords.filter(
+          (r) => r.final_score != null,
+        );
+        let speakingBand = null;
+        if (gradedSpeaking.length > 0) {
+          speakingBand =
+            gradedSpeaking.reduce((s, r) => s + r.final_score, 0) /
+            gradedSpeaking.length;
+          speakingBand = Math.round(speakingBand * 2) / 2;
+        }
+        return {
+          final_band: speakingBand,
+          graded_count: gradedSpeaking.length,
+          total_count: speakingRecords.length,
+          records: speakingRecords,
+        };
+      })(),
     },
   };
 };
@@ -1069,13 +1094,7 @@ export const submitSpeakingSession = async (
     }
 
     const container_question_id =
-      container.Container_Questions?.[0]?.container_question_id;
-    if (!container_question_id) {
-      return {
-        success: false,
-        message: "No questions found for this speaking part",
-      };
-    }
+      container.Container_Questions?.[0]?.container_question_id ?? null;
 
     const transcript = messages
       .map(
@@ -1095,53 +1114,21 @@ export const submitSpeakingSession = async (
       submitted_at: new Date(),
     });
 
-    let feedbackData = null;
-    try {
-      const evaluation = await evaluateIeltsSpeaking({
-        transcript,
-        part_context,
-      });
-
-      feedbackData = await db.Speaking_Feedback.create({
-        record_id: record.record_id,
-        model_name: "gpt-4o-mini",
-        overall_score: evaluation.overall_band || 0,
-        criteria_scores: evaluation.criteria_scores || {},
-        comments: JSON.stringify({
-          feedback: evaluation.feedback,
-          transcript_excerpt: transcript.substring(0, 800),
-        }),
-        created_at: new Date(),
-        updated_at: new Date(),
-      });
-
-      await record.update({ final_score: evaluation.overall_band });
-    } catch (aiError) {
-      console.error("[submitSpeakingSession] AI evaluation error:", aiError);
-    }
+    // Save transcript as draft — AI evaluation happens when exam is submitted
+    await db.Speaking_Feedback.create({
+      record_id: record.record_id,
+      model_name: "draft",
+      overall_score: 0,
+      criteria_scores: {},
+      comments: JSON.stringify({ status: "draft", transcript }),
+      created_at: new Date(),
+      updated_at: new Date(),
+    });
 
     return {
       success: true,
-      message: "Phiên speaking đã được đánh giá",
-      data: {
-        record: {
-          record_id: record.record_id,
-          final_score: record.final_score,
-        },
-        feedback: feedbackData
-          ? {
-              overall_score: feedbackData.overall_score,
-              criteria_scores: feedbackData.criteria_scores,
-              comments: (() => {
-                try {
-                  return JSON.parse(feedbackData.comments);
-                } catch {
-                  return feedbackData.comments;
-                }
-              })(),
-            }
-          : null,
-      },
+      message: "Đã lưu phần speaking. AI sẽ đánh giá khi bạn nộp bài.",
+      data: { record_id: record.record_id, status: "saved" },
     };
   } catch (error) {
     console.error("[submitSpeakingSession] ERROR:", error);
@@ -1149,5 +1136,105 @@ export const submitSpeakingSession = async (
       success: false,
       message: error.message || "Failed to submit speaking session",
     };
+  }
+};
+
+// Evaluate all speaking parts at once (called at exam submission)
+export const evaluateAllSpeakingService = async (user_exam_id) => {
+  try {
+    const records = await db.Speaking_Record.findAll({
+      where: { user_exam_id },
+      include: [{ model: db.Speaking_Feedback, required: false }],
+      order: [["record_id", "ASC"]],
+    });
+
+    if (records.length === 0) return { success: true, data: null };
+
+    // Skip if already evaluated
+    const alreadyDone = records.some(
+      (r) => r.final_score != null && r.final_score > 0,
+    );
+    if (alreadyDone) return { success: true, data: null };
+
+    // Collect draft transcripts
+    const parts = records.map((record, idx) => {
+      const fb = record.Speaking_Feedbacks?.[0];
+      const parsed = fb
+        ? (() => {
+            try {
+              return JSON.parse(fb.comments);
+            } catch {
+              return {};
+            }
+          })()
+        : {};
+      return {
+        part_number: idx + 1,
+        transcript: parsed.transcript || "",
+        record_id: record.record_id,
+        feedback_id: fb?.speaking_feedback_id ?? null,
+      };
+    });
+
+    // One AI call for all parts combined
+    const evaluation = await evaluateIeltsSpeakingAll({ parts });
+
+    const combinedTranscript = parts
+      .map(
+        (p) =>
+          `=== PART ${p.part_number} ===\n${p.transcript || "(Không có transcript)"}`,
+      )
+      .join("\n\n");
+
+    const commentsJson = JSON.stringify({
+      feedback: evaluation.feedback,
+      criteria_comments: evaluation.criteria_comments || {},
+      transcript: combinedTranscript,
+    });
+
+    // Update each record's final_score and save full feedback on first record
+    for (let i = 0; i < records.length; i++) {
+      const record = records[i];
+      await record.update({ final_score: evaluation.overall_band || 0 });
+
+      const part = parts[i];
+      if (part.feedback_id) {
+        const fb = record.Speaking_Feedbacks[0];
+        await fb.update({
+          model_name: "gpt-4o-mini",
+          overall_score: evaluation.overall_band || 0,
+          criteria_scores: evaluation.criteria_scores || {},
+          comments:
+            i === 0
+              ? commentsJson
+              : JSON.stringify({
+                  status: "graded",
+                  transcript: part.transcript,
+                }),
+        });
+      } else {
+        await db.Speaking_Feedback.create({
+          record_id: record.record_id,
+          model_name: "gpt-4o-mini",
+          overall_score: evaluation.overall_band || 0,
+          criteria_scores: i === 0 ? evaluation.criteria_scores || {} : {},
+          comments:
+            i === 0 ? commentsJson : JSON.stringify({ status: "graded" }),
+          created_at: new Date(),
+          updated_at: new Date(),
+        });
+      }
+    }
+
+    return {
+      success: true,
+      data: {
+        overall_band: evaluation.overall_band,
+        records_evaluated: records.length,
+      },
+    };
+  } catch (error) {
+    console.error("[evaluateAllSpeakingService] ERROR:", error);
+    return { success: false, message: error.message };
   }
 };

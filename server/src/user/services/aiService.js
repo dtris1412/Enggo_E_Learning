@@ -556,24 +556,114 @@ Rules:
  * @param {string} part_context - Context của part
  * @returns {Promise<{overall_band, criteria_scores, feedback, usage}>}
  */
+export const evaluateIeltsSpeakingAll = async ({ parts }) => {
+  const partsText = parts
+    .map(
+      (p) =>
+        `[PART ${p.part_number}]\n${p.transcript || "(No response recorded)"}`,
+    )
+    .join("\n\n");
+
+  const systemPrompt = `You are an expert IELTS examiner grading a full Speaking test (Parts 1, 2 and/or 3).
+Evaluate ONLY the CANDIDATE's responses across all provided parts.
+Use official IELTS Speaking band descriptors.
+
+Respond ONLY with valid JSON — no markdown, no code fences:
+{
+  "overall_band": <number 0-9, step 0.5>,
+  "criteria_scores": {
+    "fluency_coherence": <0-9, step 0.5>,
+    "lexical_resource": <0-9, step 0.5>,
+    "grammatical_range_accuracy": <0-9, step 0.5>,
+    "pronunciation": <0-9, step 0.5>
+  },
+  "criteria_comments": {
+    "fluency_coherence": "<one sentence>",
+    "lexical_resource": "<one sentence>",
+    "grammatical_range_accuracy": "<one sentence>",
+    "pronunciation": "<one sentence>"
+  },
+  "feedback": {
+    "overall_comment": "<2-3 sentences overall>",
+    "strengths": ["<strength 1>", "<strength 2>"],
+    "improvements": ["<improvement 1>", "<improvement 2>"],
+    "pronunciation_notes": ["<pronunciation observation 1>", "<observation 2>"],
+    "tips": ["<actionable tip 1>", "<actionable tip 2>"]
+  }
+}`;
+
+  const response = await axios.post(
+    "https://api.openai.com/v1/chat/completions",
+    {
+      model: "gpt-4o-mini",
+      messages: [
+        { role: "system", content: systemPrompt },
+        {
+          role: "user",
+          content: `FULL SPEAKING TEST TRANSCRIPTS:\n\n${partsText}`,
+        },
+      ],
+      max_tokens: 1000,
+      temperature: 0.2,
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+    },
+  );
+
+  const raw = response.data.choices[0].message.content.trim();
+  const usage = response.data.usage;
+
+  let parsed;
+  try {
+    parsed = JSON.parse(raw);
+  } catch {
+    parsed = {
+      overall_band: null,
+      criteria_scores: {},
+      feedback: { overall_comment: raw },
+    };
+  }
+
+  return {
+    ...parsed,
+    usage: {
+      prompt_tokens: usage?.prompt_tokens || 0,
+      completion_tokens: usage?.completion_tokens || 0,
+      total_tokens: usage?.total_tokens || 0,
+    },
+  };
+};
+
 export const evaluateIeltsSpeaking = async ({ transcript, part_context }) => {
   const systemPrompt = `You are an expert IELTS examiner grading a Speaking test.
 Evaluate the CANDIDATE's responses only (not the examiner's questions).
 Use official IELTS Speaking band descriptors.
 
-Respond ONLY with valid JSON:
+Respond ONLY with valid JSON — no markdown, no code fences:
 {
   "overall_band": <number 0-9, step 0.5>,
   "criteria_scores": {
-    "fluency_coherence": <0-9>,
-    "lexical_resource": <0-9>,
-    "grammatical_range_accuracy": <0-9>,
-    "pronunciation": <0-9>
+    "fluency_coherence": <0-9, step 0.5>,
+    "lexical_resource": <0-9, step 0.5>,
+    "grammatical_range_accuracy": <0-9, step 0.5>,
+    "pronunciation": <0-9, step 0.5>
+  },
+  "criteria_comments": {
+    "fluency_coherence": "<one sentence about this criterion>",
+    "lexical_resource": "<one sentence>",
+    "grammatical_range_accuracy": "<one sentence>",
+    "pronunciation": "<one sentence>"
   },
   "feedback": {
-    "strengths": ["..."],
-    "improvements": ["..."],
-    "overall_comment": "..."
+    "overall_comment": "<2-3 sentences overall>",
+    "strengths": ["<specific strength 1>", "<specific strength 2>"],
+    "improvements": ["<area to improve 1>", "<area to improve 2>"],
+    "pronunciation_notes": ["<specific pronunciation observation 1>", "<observation 2>"],
+    "tips": ["<actionable tip 1>", "<actionable tip 2>"]
   }
 }`;
 

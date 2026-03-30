@@ -76,7 +76,6 @@ const SpeakingExam: React.FC = () => {
   const [textInput, setTextInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [sessionEnded, setSessionEnded] = useState(false);
-  const [feedback, setFeedback] = useState<any>(null);
   const [startTime] = useState(() => Date.now());
   const [showTextFallback, setShowTextFallback] = useState(false);
 
@@ -299,10 +298,10 @@ const SpeakingExam: React.FC = () => {
     init();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // ── Submit evaluation ───────────────────────────────────────────────────
+  // ── Save transcript (no AI yet — AI evaluates on final submit) ───────────
   const handleEndSession = async () => {
     if (messages.length < 2) {
-      showToast("error", "Cần có ít nhất 1 lượt trả lời để đánh giá.");
+      showToast("error", "Cần có ít nhất 1 lượt trả lời để lưu.");
       return;
     }
     stopSpeaking();
@@ -320,14 +319,10 @@ const SpeakingExam: React.FC = () => {
     setIsLoading(false);
 
     if (result.success) {
-      setFeedback(result.data);
       setSessionEnded(true);
-      showToast(
-        "success",
-        `Đánh giá xong! Band ${result.data?.record?.final_score ?? "N/A"}`,
-      );
+      showToast("success", "Đã lưu! AI sẽ đánh giá khi bạn nộp bài.");
     } else {
-      showToast("error", result.message || "Không thể đánh giá bài thi");
+      showToast("error", result.message || "Không thể lưu phần speaking");
     }
   };
 
@@ -338,14 +333,6 @@ const SpeakingExam: React.FC = () => {
       e.preventDefault();
       handleTextSend();
     }
-  };
-
-  // ── Helpers ─────────────────────────────────────────────────────────────
-  const getBandColor = (band: number) => {
-    if (band >= 7) return "text-green-700";
-    if (band >= 5.5) return "text-blue-700";
-    if (band >= 4) return "text-amber-700";
-    return "text-red-700";
   };
 
   // ── Render ───────────────────────────────────────────────────────────────
@@ -402,7 +389,7 @@ const SpeakingExam: React.FC = () => {
               )}
             </button>
 
-            {!feedback && (
+            {!sessionEnded && (
               <button
                 onClick={handleEndSession}
                 disabled={isLoading || messages.length < 2}
@@ -413,7 +400,7 @@ const SpeakingExam: React.FC = () => {
                 ) : (
                   <CheckCircle className="w-4 h-4" />
                 )}
-                Kết thúc & Đánh giá
+                Kết thúc Part này
               </button>
             )}
           </div>
@@ -421,106 +408,23 @@ const SpeakingExam: React.FC = () => {
       </div>
 
       <div className="flex-1 container mx-auto px-4 py-6 max-w-2xl flex flex-col gap-4">
-        {/* ── Feedback Panel ─────────────────────────────────────────── */}
-        {feedback && (
-          <div className="bg-white rounded-2xl shadow-xl p-6 space-y-4">
-            <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-              <CheckCircle className="w-5 h-5 text-green-600" />
-              Kết quả Speaking
+        {/* ── Saved Confirmation ────────────────────────────────────── */}
+        {sessionEnded && (
+          <div className="bg-white rounded-2xl shadow-xl p-8 text-center space-y-4">
+            <CheckCircle className="w-14 h-14 text-green-500 mx-auto" />
+            <h2 className="text-xl font-bold text-slate-900">
+              Transcript đã được lưu!
             </h2>
-
-            <div className="flex items-center justify-center p-5 bg-purple-50 rounded-xl border border-purple-200">
-              <div className="text-center">
-                <p className="text-xs text-purple-600 font-semibold uppercase mb-1">
-                  Overall Band
-                </p>
-                <p
-                  className={`text-5xl font-black ${getBandColor(feedback.record?.final_score)}`}
-                >
-                  {feedback.record?.final_score ?? "N/A"}
-                </p>
-              </div>
-            </div>
-
-            {feedback.feedback?.criteria_scores && (
-              <div className="grid grid-cols-2 gap-2">
-                {Object.entries(feedback.feedback.criteria_scores).map(
-                  ([k, v]: [string, any]) => (
-                    <div
-                      key={k}
-                      className="bg-slate-50 rounded-xl p-3 border border-slate-200"
-                    >
-                      <p className="text-xs text-slate-500 capitalize">
-                        {k.replace(/_/g, " ")}
-                      </p>
-                      <p className={`text-2xl font-bold ${getBandColor(v)}`}>
-                        {v}
-                      </p>
-                    </div>
-                  ),
-                )}
-              </div>
-            )}
-
-            {feedback.feedback?.comments?.feedback?.overall_comment && (
-              <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
-                <p className="text-sm font-semibold text-blue-800 mb-1">
-                  Nhận xét tổng quan
-                </p>
-                <p className="text-sm text-blue-900 leading-relaxed">
-                  {feedback.feedback.comments.feedback.overall_comment}
-                </p>
-              </div>
-            )}
-
-            {feedback.feedback?.comments?.feedback?.strengths?.length > 0 && (
-              <div className="bg-green-50 rounded-xl p-4 border border-green-200">
-                <p className="text-sm font-semibold text-green-800 mb-2">
-                  Điểm mạnh
-                </p>
-                <ul className="space-y-1">
-                  {feedback.feedback.comments.feedback.strengths.map(
-                    (s: string, i: number) => (
-                      <li
-                        key={i}
-                        className="text-sm text-green-900 flex items-start gap-2"
-                      >
-                        <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-green-500 flex-shrink-0" />
-                        {s}
-                      </li>
-                    ),
-                  )}
-                </ul>
-              </div>
-            )}
-
-            {feedback.feedback?.comments?.feedback?.improvements?.length >
-              0 && (
-              <div className="bg-amber-50 rounded-xl p-4 border border-amber-200">
-                <p className="text-sm font-semibold text-amber-800 mb-2">
-                  Cần cải thiện
-                </p>
-                <ul className="space-y-1">
-                  {feedback.feedback.comments.feedback.improvements.map(
-                    (imp: string, i: number) => (
-                      <li
-                        key={i}
-                        className="text-sm text-amber-900 flex items-start gap-2"
-                      >
-                        <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-amber-500 flex-shrink-0" />
-                        {imp}
-                      </li>
-                    ),
-                  )}
-                </ul>
-              </div>
-            )}
+            <p className="text-sm text-slate-500">
+              AI sẽ phân tích và đánh giá band điểm cho Speaking khi bạn nộp bài
+              thi.
+            </p>
 
             <button
-              onClick={() => navigate(`/exams/${examId}`)}
-              className="w-full px-4 py-3 bg-slate-800 text-white font-semibold rounded-xl hover:bg-slate-900 transition-colors"
+              onClick={() => navigate(`/exams/${examId}/take`)}
+              className="w-full px-4 py-3 bg-purple-700 text-white font-semibold rounded-xl hover:bg-purple-800 transition-colors"
             >
-              Quay lại đề thi
+              Tiếp tục bài thi
             </button>
           </div>
         )}
@@ -616,7 +520,7 @@ const SpeakingExam: React.FC = () => {
         )}
 
         {/* ── Voice Input Controls ────────────────────────────────────── */}
-        {!sessionEnded && !feedback && (
+        {!sessionEnded && (
           <div className="flex flex-col items-center gap-4 py-2">
             {/* Big mic button */}
             <button

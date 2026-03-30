@@ -31,6 +31,7 @@ const ExamTaking: React.FC = () => {
     submitExam,
     getOngoingExam,
     submitAllWriting,
+    evaluateAllSpeaking,
   } = useExam();
   const { showToast } = useToast();
 
@@ -272,6 +273,14 @@ const ExamTaking: React.FC = () => {
           setIsSubmittingAllWriting(false);
           if (wResult.success) setWritingResults(wResult.data);
         }
+      }
+
+      // 2.5. Evaluate all speaking parts (AI scoring)
+      const speakingContainers = getFlattenedContainers().filter(
+        (c: any) => c.type === "speaking_part",
+      );
+      if (speakingContainers.length > 0) {
+        await evaluateAllSpeaking(userExamId);
       }
 
       // 3. Submit exam (MCQ scoring)

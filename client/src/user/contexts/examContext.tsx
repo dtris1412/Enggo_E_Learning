@@ -175,6 +175,9 @@ interface ExamContextType {
     messages: Array<{ role: string; content: string }>,
     duration_seconds?: number,
   ) => Promise<{ success: boolean; data?: any; message?: string }>;
+  evaluateAllSpeaking: (
+    user_exam_id: number,
+  ) => Promise<{ success: boolean; data?: any; message?: string }>;
 }
 
 const ExamContext = createContext<ExamContextType | undefined>(undefined);
@@ -575,6 +578,23 @@ export const ExamProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const evaluateAllSpeaking = async (user_exam_id: number) => {
+    try {
+      const response = await fetch(
+        `${API_URL}/user/user-exams/${user_exam_id}/speaking-evaluate-all`,
+        {
+          method: "POST",
+          headers: getAuthHeaders(),
+        },
+      );
+      const result = await response.json();
+      return result;
+    } catch (err: any) {
+      console.error("Error evaluating all speaking:", err);
+      return { success: false, message: err.message };
+    }
+  };
+
   return (
     <ExamContext.Provider
       value={{
@@ -599,6 +619,7 @@ export const ExamProvider = ({ children }: { children: ReactNode }) => {
         submitAllWriting,
         speakingTurn,
         submitSpeaking,
+        evaluateAllSpeaking,
       }}
     >
       {children}
