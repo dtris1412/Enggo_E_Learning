@@ -286,10 +286,30 @@ const getExamWithDetails = async (exam_id) => {
     return { success: false, message: "Exam not found." };
   }
 
+  // Sort containers and questions by order field (Sequelize nested include order is unreliable with joins)
+  const examData = exam.toJSON();
+  if (examData.Exam_Containers) {
+    examData.Exam_Containers.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+    examData.Exam_Containers.forEach((container) => {
+      if (container.Container_Questions) {
+        container.Container_Questions.sort(
+          (a, b) => (a.order ?? 0) - (b.order ?? 0),
+        );
+        container.Container_Questions.forEach((cq) => {
+          if (cq.Question_Options) {
+            cq.Question_Options.sort(
+              (a, b) => (a.order_index ?? 0) - (b.order_index ?? 0),
+            );
+          }
+        });
+      }
+    });
+  }
+
   return {
     success: true,
     message: "Exam details retrieved successfully",
-    data: exam,
+    data: examData,
   };
 };
 

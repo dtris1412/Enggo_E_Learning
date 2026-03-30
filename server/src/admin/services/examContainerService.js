@@ -185,10 +185,45 @@ const getContainersByExamId = async (exam_id) => {
     order: [["order", "ASC"]],
   });
 
+  // Sort containers and nested data by order field (Sequelize nested include order is unreliable with joins)
+  const sorted = containers.map((c) => c.toJSON());
+  sorted.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+  sorted.forEach((container) => {
+    if (container.children) {
+      container.children.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+      container.children.forEach((child) => {
+        if (child.Container_Questions) {
+          child.Container_Questions.sort(
+            (a, b) => (a.order ?? 0) - (b.order ?? 0),
+          );
+          child.Container_Questions.forEach((cq) => {
+            if (cq.Question_Options) {
+              cq.Question_Options.sort(
+                (a, b) => (a.order_index ?? 0) - (b.order_index ?? 0),
+              );
+            }
+          });
+        }
+      });
+    }
+    if (container.Container_Questions) {
+      container.Container_Questions.sort(
+        (a, b) => (a.order ?? 0) - (b.order ?? 0),
+      );
+      container.Container_Questions.forEach((cq) => {
+        if (cq.Question_Options) {
+          cq.Question_Options.sort(
+            (a, b) => (a.order_index ?? 0) - (b.order_index ?? 0),
+          );
+        }
+      });
+    }
+  });
+
   return {
     success: true,
     message: "Containers retrieved successfully",
-    data: containers,
+    data: sorted,
   };
 };
 

@@ -292,9 +292,32 @@ export const getExamForTaking = async (exam_id, user_exam_id = null) => {
     return { success: false, message: "Exam not found." };
   }
 
+  // Sort containers and questions by order field (Sequelize nested include order is unreliable with joins)
+  const examData = exam.toJSON();
+  if (examData.Exam_Containers) {
+    examData.Exam_Containers.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+    examData.Exam_Containers.forEach((container) => {
+      if (container.children) {
+        container.children.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+        container.children.forEach((child) => {
+          if (child.Container_Questions) {
+            child.Container_Questions.sort(
+              (a, b) => (a.order ?? 0) - (b.order ?? 0),
+            );
+          }
+        });
+      }
+      if (container.Container_Questions) {
+        container.Container_Questions.sort(
+          (a, b) => (a.order ?? 0) - (b.order ?? 0),
+        );
+      }
+    });
+  }
+
   return {
     success: true,
     message: "Exam for taking retrieved successfully",
-    data: exam,
+    data: examData,
   };
 };

@@ -364,11 +364,18 @@ const ExamTaking: React.FC = () => {
   const getFlattenedContainers = () => {
     if (!exam || !exam.Exam_Containers) return [];
 
+    const sortedParents = [...exam.Exam_Containers].sort(
+      (a: any, b: any) => (a.order ?? 0) - (b.order ?? 0),
+    );
+
     const flattened: any[] = [];
-    exam.Exam_Containers.forEach((container: any) => {
+    sortedParents.forEach((container: any) => {
       // For parent containers with children, add children only
       if (container.children && container.children.length > 0) {
-        flattened.push(...container.children);
+        const sortedChildren = [...container.children].sort(
+          (a: any, b: any) => (a.order ?? 0) - (b.order ?? 0),
+        );
+        flattened.push(...sortedChildren);
       } else {
         // For containers without children (Part 1, 2, 5), add the container itself
         flattened.push(container);
