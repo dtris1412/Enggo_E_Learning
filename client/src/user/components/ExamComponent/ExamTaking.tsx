@@ -30,7 +30,7 @@ const ExamTaking: React.FC = () => {
     saveAnswers,
     submitExam,
     getOngoingExam,
-    submitWriting,
+    submitAllWriting,
   } = useExam();
   const { showToast } = useToast();
 
@@ -40,16 +40,15 @@ const ExamTaking: React.FC = () => {
   const [answers, setAnswers] = useState<Record<number, number | null>>({});
   // Writing: text per container_question_id
   const [writingTexts, setWritingTexts] = useState<Record<number, string>>({});
-  const [writingFeedbacks, setWritingFeedbacks] = useState<Record<number, any>>(
-    {},
-  );
-  const [writingSubmitting, setWritingSubmitting] = useState<
-    Record<number, boolean>
-  >({});
+  const [writingResults, setWritingResults] = useState<any>(null);
+  const [isSubmittingAllWriting, setIsSubmittingAllWriting] = useState(false);
+  const [showWritingSubmitModal, setShowWritingSubmitModal] = useState(false);
+  const [showWritingResultsModal, setShowWritingResultsModal] = useState(false);
   const [currentContainerIndex, setCurrentContainerIndex] = useState(0);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [timeRemaining, setTimeRemaining] = useState(0);
   const [isSaving, setIsSaving] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSubmitModal, setShowSubmitModal] = useState(false);
   const [showOverviewModal, setShowOverviewModal] = useState(false);
   const [autoSaveTimer, setAutoSaveTimer] = useState<NodeJS.Timeout | null>(
@@ -188,42 +187,36 @@ const ExamTaking: React.FC = () => {
     }
   }, [currentContainerIndex, exam]);
 
-  const handleWritingSubmit = async (container_question_id: number) => {
+  const handleSubmitAllWriting = async () => {
     if (!userExamId) return;
-    const content = writingTexts[container_question_id] || "";
-    if (content.trim().split(/\s+/).filter(Boolean).length < 5) {
-      showToast("error", "Vui lòng viết ít nhất 5 từ trước khi nộp.");
+    const allWritingTasks = getFlattenedContainers()
+      .filter((c: any) => c.type === "writing_task")
+      .flatMap((c: any) => c.Container_Questions || []);
+    const tasks = allWritingTasks
+      .map((cq: any) => ({
+        container_question_id: cq.container_question_id,
+        content: writingTexts[cq.container_question_id] || "",
+      }))
+      .filter(
+        (t: any) => t.content.trim().split(/\s+/).filter(Boolean).length >= 5,
+      );
+    if (tasks.length === 0) {
+      showToast(
+        "error",
+        "Vui lòng viết ít nhất một bài (tối thiểu 5 từ) trước khi nộp.",
+      );
       return;
     }
-    setWritingSubmitting((prev) => ({
-      ...prev,
-      [container_question_id]: true,
-    }));
-    try {
-      const result = await submitWriting(
-        userExamId,
-        container_question_id,
-        content,
-      );
-      if (result.success) {
-        setWritingFeedbacks((prev) => ({
-          ...prev,
-          [container_question_id]: result.data,
-        }));
-        showToast(
-          "success",
-          `Bài viết đã được chấm: Band ${result.data?.submission?.final_score ?? "N/A"}`,
-        );
-      } else {
-        showToast("error", result.message || "Không thể nộp bài viết");
-      }
-    } catch (e) {
-      showToast("error", "Lỗi kết nối");
-    } finally {
-      setWritingSubmitting((prev) => ({
-        ...prev,
-        [container_question_id]: false,
-      }));
+    setShowWritingSubmitModal(false);
+    setIsSubmittingAllWriting(true);
+    const result = await submitAllWriting(userExamId, tasks);
+    setIsSubmittingAllWriting(false);
+    if (result.success) {
+      setWritingResults(result.data);
+      setShowWritingResultsModal(true);
+      showToast("success", `Writing Band: ${result.data?.final_band ?? "N/A"}`);
+    } else {
+      showToast("error", result.message || "Không thể nộp bài writing");
     }
   };
 
@@ -253,17 +246,44 @@ const ExamTaking: React.FC = () => {
 
   const handleSubmit = async () => {
     if (!userExamId) return;
+    setIsSubmitting(true);
+    try {
+      // 1. Save MCQ answers
+      await handleSave(false);
 
-    // Save answers first
-    await handleSave(false);
+      // 2. Auto-submit writing tasks if present and not yet submitted
+      const writingContainers = getFlattenedContainers().filter(
+        (c: any) => c.type === "writing_task",
+      );
+      if (writingContainers.length > 0 && !writingResults) {
+        const tasks = writingContainers
+          .flatMap((c: any) => c.Container_Questions || [])
+          .map((cq: any) => ({
+            container_question_id: cq.container_question_id,
+            content: writingTexts[cq.container_question_id] || "",
+          }))
+          .filter(
+            (t: any) =>
+              t.content.trim().split(/\s+/).filter(Boolean).length >= 5,
+          );
+        if (tasks.length > 0) {
+          setIsSubmittingAllWriting(true);
+          const wResult = await submitAllWriting(userExamId, tasks);
+          setIsSubmittingAllWriting(false);
+          if (wResult.success) setWritingResults(wResult.data);
+        }
+      }
 
-    // Submit exam
-    const result = await submitExam(userExamId);
-    if (result.success) {
-      showToast("success", "Đã nộp bài thi thành công!");
-      navigate(`/exams/result/${userExamId}`);
-    } else {
-      showToast("error", result.message || "Không thể nộp bài thi");
+      // 3. Submit exam (MCQ scoring)
+      const result = await submitExam(userExamId);
+      if (result.success) {
+        showToast("success", "Đã nộp bài thi thành công!");
+        navigate(`/exams/result/${userExamId}`);
+      } else {
+        showToast("error", result.message || "Không thể nộp bài thi");
+      }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -355,11 +375,15 @@ const ExamTaking: React.FC = () => {
   const getAnsweredQuestionsCount = () => {
     const containers = getFlattenedContainers();
     let count = Object.values(answers).filter((ans) => ans !== null).length;
-    // Also count submitted writing tasks
+    // Count writing tasks where user has typed >= 5 words
     containers.forEach((container: any) => {
       if (container.type === "writing_task") {
         container.Container_Questions?.forEach((cq: any) => {
-          if (writingFeedbacks[cq.container_question_id]) count++;
+          const wc = (writingTexts[cq.container_question_id] || "")
+            .trim()
+            .split(/\s+/)
+            .filter(Boolean).length;
+          if (wc >= 5) count++;
         });
       }
     });
@@ -533,6 +557,44 @@ const ExamTaking: React.FC = () => {
                 <LayoutGrid className="w-5 h-5 text-slate-600" />
               </button>
 
+              {/* Nộp Writing button - shown when exam has writing tasks */}
+              {(() => {
+                const hasWritingTasks = getFlattenedContainers().some(
+                  (c: any) => c.type === "writing_task",
+                );
+                if (!hasWritingTasks) return null;
+                if (writingResults) {
+                  return (
+                    <button
+                      onClick={() => setShowWritingResultsModal(true)}
+                      className="px-4 py-2 bg-green-100 text-green-700 text-sm font-medium rounded-lg border border-green-300 flex items-center gap-2"
+                    >
+                      <CheckCircle className="w-4 h-4" />
+                      Writing Band {writingResults.final_band}
+                    </button>
+                  );
+                }
+                return (
+                  <button
+                    onClick={() => setShowWritingSubmitModal(true)}
+                    disabled={isSubmittingAllWriting}
+                    className="px-4 py-2 bg-emerald-600 text-white text-sm font-medium rounded-lg hover:bg-emerald-700 transition-colors disabled:opacity-50 flex items-center gap-2"
+                  >
+                    {isSubmittingAllWriting ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Đang chấm...
+                      </>
+                    ) : (
+                      <>
+                        <FileText className="w-4 h-4" />
+                        Nộp Writing
+                      </>
+                    )}
+                  </button>
+                );
+              })()}
+
               {/* Save */}
               <button
                 onClick={() => handleSave(true)}
@@ -636,8 +698,9 @@ const ExamTaking: React.FC = () => {
                   .trim()
                   .split(/\s+/)
                   .filter(Boolean).length;
-                const feedback = writingFeedbacks[cqId];
-                const isSubmitting = writingSubmitting[cqId];
+                const taskResult = writingResults?.tasks?.find(
+                  (t: any) => t.container_question_id === cqId,
+                );
 
                 return (
                   <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6 space-y-5">
@@ -656,115 +719,263 @@ const ExamTaking: React.FC = () => {
                       </div>
                     </div>
 
-                    {/* Textarea */}
-                    {!feedback ? (
-                      <>
-                        <textarea
-                          className="w-full h-64 border border-slate-300 rounded-lg p-3 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-green-500 resize-y"
-                          placeholder="Viết bài của bạn ở đây..."
-                          value={text}
-                          onChange={(e) =>
-                            setWritingTexts((prev) => ({
-                              ...prev,
-                              [cqId]: e.target.value,
-                            }))
-                          }
-                          disabled={isSubmitting}
-                        />
-                        <div className="flex items-center justify-between">
-                          <span
-                            className={`text-sm font-medium ${wordCount < 50 ? "text-red-500" : "text-slate-500"}`}
-                          >
-                            {wordCount} từ
-                          </span>
-                          <button
-                            onClick={() => handleWritingSubmit(cqId)}
-                            disabled={isSubmitting || wordCount < 5}
-                            className="px-5 py-2 bg-green-600 text-white text-sm font-semibold rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 flex items-center gap-2"
-                          >
-                            {isSubmitting ? (
-                              <>
-                                <Loader2 className="w-4 h-4 animate-spin" />
-                                Đang chấm...
-                              </>
-                            ) : (
-                              <>
-                                <Send className="w-4 h-4" />
-                                Nộp & Chấm điểm
-                              </>
-                            )}
-                          </button>
-                        </div>
-                      </>
-                    ) : (
-                      /* Feedback display */
+                    {/* Textarea - always visible; read-only after grading */}
+                    <textarea
+                      placeholder="Viết bài của bạn ở đây... Sau khi viết xong các task, nhấn 'Nộp Writing' ở trên để nộp."
+                      value={text}
+                      onChange={(e) => {
+                        if (!writingResults) {
+                          setWritingTexts((prev) => ({
+                            ...prev,
+                            [cqId]: e.target.value,
+                          }));
+                        }
+                      }}
+                      readOnly={!!writingResults}
+                      className={`w-full h-64 border rounded-lg p-3 text-sm text-slate-800 focus:outline-none focus:ring-2 resize-y ${
+                        writingResults
+                          ? "border-slate-200 bg-slate-50 text-slate-600 cursor-default"
+                          : "border-slate-300 focus:ring-green-500"
+                      }`}
+                    />
+                    <div className="flex items-center justify-between">
+                      <span
+                        className={`text-sm font-medium ${wordCount < 50 ? "text-red-500" : "text-slate-500"}`}
+                      >
+                        {wordCount} từ
+                      </span>
+                      {!writingResults && (
+                        <p className="text-xs text-slate-400 italic">
+                          Dùng nút &ldquo;Nộp Writing&rdquo; ở thanh trên để nộp
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Rich Feedback — shown after all-tasks grading */}
+                    {taskResult?.feedback && (
                       <div className="space-y-4">
-                        <div className="flex items-center gap-3 p-4 bg-green-50 rounded-lg border border-green-200">
-                          <CheckCircle className="w-8 h-8 text-green-600 flex-shrink-0" />
-                          <div>
-                            <p className="text-sm font-semibold text-green-800">
-                              Đã chấm điểm
+                        {/* Band score banner */}
+                        <div className="flex items-center justify-between p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-green-200">
+                          <div className="flex items-center gap-3">
+                            <CheckCircle className="w-8 h-8 text-green-600 flex-shrink-0" />
+                            <div>
+                              <p className="text-xs font-semibold text-green-700 uppercase tracking-wide">
+                                Đã chấm điểm
+                              </p>
+                              <p className="text-3xl font-black text-green-800">
+                                Band{" "}
+                                {taskResult.submission?.final_score ?? "N/A"}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-xs text-slate-500">Số từ</p>
+                            <p className="text-lg font-bold text-slate-700">
+                              {taskResult.submission?.word_count ?? wordCount}
                             </p>
-                            <p className="text-2xl font-bold text-green-700">
-                              Band {feedback.submission?.final_score ?? "N/A"}
+                            <p className="text-xs text-slate-400 capitalize">
+                              {taskResult.task_type ?? ""}
                             </p>
                           </div>
                         </div>
 
-                        {feedback.feedback?.criteria_scores && (
-                          <div className="grid grid-cols-2 gap-2">
-                            {Object.entries(
-                              feedback.feedback.criteria_scores,
-                            ).map(([k, v]: [string, any]) => (
-                              <div
-                                key={k}
-                                className="bg-slate-50 rounded-lg p-3 border border-slate-200"
-                              >
-                                <p className="text-xs text-slate-500 capitalize mb-1">
-                                  {k.replace(/_/g, " ")}
-                                </p>
-                                <p className="text-lg font-bold text-slate-800">
-                                  {v}
-                                </p>
-                              </div>
-                            ))}
+                        {/* Word count warning */}
+                        {taskResult.feedback.comments?.word_count_note && (
+                          <div className="flex items-start gap-2 px-4 py-3 bg-orange-50 rounded-lg border border-orange-200">
+                            <span className="text-orange-500 text-sm mt-0.5">
+                              ⚠
+                            </span>
+                            <p className="text-sm text-orange-800">
+                              {taskResult.feedback.comments.word_count_note}
+                            </p>
                           </div>
                         )}
 
-                        {feedback.feedback?.comments?.feedback
+                        {/* Criteria scores + per-criterion comment */}
+                        {taskResult.feedback.criteria_scores && (
+                          <div className="space-y-2">
+                            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
+                              Phân tích tiêu chí
+                            </p>
+                            {Object.entries(
+                              taskResult.feedback.criteria_scores,
+                            ).map(([k, v]: [string, any]) => {
+                              const comment =
+                                taskResult.feedback.criteria_comments?.[k];
+                              const score = Number(v);
+                              const pct = Math.round((score / 9) * 100);
+                              const barColor =
+                                score >= 7
+                                  ? "bg-green-500"
+                                  : score >= 5.5
+                                    ? "bg-blue-500"
+                                    : score >= 4
+                                      ? "bg-amber-500"
+                                      : "bg-red-500";
+                              const textColor =
+                                score >= 7
+                                  ? "text-green-700"
+                                  : score >= 5.5
+                                    ? "text-blue-700"
+                                    : score >= 4
+                                      ? "text-amber-700"
+                                      : "text-red-700";
+                              return (
+                                <div
+                                  key={k}
+                                  className="bg-slate-50 rounded-xl p-3 border border-slate-200"
+                                >
+                                  <div className="flex items-center justify-between mb-1.5">
+                                    <p className="text-xs font-semibold text-slate-600 capitalize">
+                                      {k.replace(/_/g, " ")}
+                                    </p>
+                                    <span
+                                      className={`text-sm font-bold ${textColor}`}
+                                    >
+                                      {v}
+                                    </span>
+                                  </div>
+                                  <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden mb-2">
+                                    <div
+                                      className={`h-full rounded-full transition-all ${barColor}`}
+                                      style={{ width: `${pct}%` }}
+                                    />
+                                  </div>
+                                  {comment && (
+                                    <p className="text-xs text-slate-500 leading-relaxed">
+                                      {comment}
+                                    </p>
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+
+                        {/* Overall comment */}
+                        {taskResult.feedback.comments?.feedback
                           ?.overall_comment && (
-                          <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
-                            <p className="text-sm font-semibold text-blue-800 mb-2">
-                              Nhận xét chung
+                          <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
+                            <p className="text-xs font-semibold text-blue-700 uppercase tracking-wide mb-2">
+                              Nhận xét tổng quát
                             </p>
                             <p className="text-sm text-blue-900 leading-relaxed">
                               {
-                                feedback.feedback.comments.feedback
+                                taskResult.feedback.comments.feedback
                                   .overall_comment
                               }
                             </p>
                           </div>
                         )}
 
-                        {feedback.feedback?.comments?.feedback?.improvements
-                          ?.length > 0 && (
-                          <div className="bg-amber-50 rounded-lg p-4 border border-amber-200">
-                            <p className="text-sm font-semibold text-amber-800 mb-2">
-                              Cần cải thiện
+                        {/* Strengths */}
+                        {(taskResult.feedback.comments?.feedback?.strengths
+                          ?.length ?? 0) > 0 && (
+                          <div className="bg-green-50 rounded-xl p-4 border border-green-200">
+                            <p className="text-xs font-semibold text-green-700 uppercase tracking-wide mb-2">
+                              ✓ Điểm mạnh
                             </p>
-                            <ul className="space-y-1">
-                              {feedback.feedback.comments.feedback.improvements.map(
+                            <ul className="space-y-1.5">
+                              {taskResult.feedback.comments.feedback.strengths.map(
+                                (s: string, i: number) => (
+                                  <li
+                                    key={i}
+                                    className="text-sm text-green-900 flex items-start gap-2"
+                                  >
+                                    <span className="mt-1.5 flex-shrink-0 w-1.5 h-1.5 rounded-full bg-green-500" />
+                                    {s}
+                                  </li>
+                                ),
+                              )}
+                            </ul>
+                          </div>
+                        )}
+
+                        {/* Improvements */}
+                        {(taskResult.feedback.comments?.feedback?.improvements
+                          ?.length ?? 0) > 0 && (
+                          <div className="bg-amber-50 rounded-xl p-4 border border-amber-200">
+                            <p className="text-xs font-semibold text-amber-700 uppercase tracking-wide mb-2">
+                              ✗ Cần cải thiện
+                            </p>
+                            <ul className="space-y-1.5">
+                              {taskResult.feedback.comments.feedback.improvements.map(
                                 (imp: string, i: number) => (
                                   <li
                                     key={i}
                                     className="text-sm text-amber-900 flex items-start gap-2"
                                   >
-                                    <span className="mt-1 flex-shrink-0 w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                                    <span className="mt-1.5 flex-shrink-0 w-1.5 h-1.5 rounded-full bg-amber-500" />
                                     {imp}
                                   </li>
                                 ),
                               )}
                             </ul>
+                          </div>
+                        )}
+
+                        {/* Tips */}
+                        {(taskResult.feedback.comments?.feedback?.tips
+                          ?.length ?? 0) > 0 && (
+                          <div className="bg-cyan-50 rounded-xl p-4 border border-cyan-200">
+                            <p className="text-xs font-semibold text-cyan-700 uppercase tracking-wide mb-2">
+                              💡 Gợi ý cải thiện
+                            </p>
+                            <ul className="space-y-1.5">
+                              {taskResult.feedback.comments.feedback.tips.map(
+                                (tip: string, i: number) => (
+                                  <li
+                                    key={i}
+                                    className="text-sm text-cyan-900 flex items-start gap-2"
+                                  >
+                                    <span className="mt-1.5 flex-shrink-0 w-1.5 h-1.5 rounded-full bg-cyan-500" />
+                                    {tip}
+                                  </li>
+                                ),
+                              )}
+                            </ul>
+                          </div>
+                        )}
+
+                        {/* Sample improvements */}
+                        {(taskResult.feedback.comments?.sample_improvements
+                          ?.length ?? 0) > 0 && (
+                          <div className="bg-purple-50 rounded-xl p-4 border border-purple-200">
+                            <p className="text-xs font-semibold text-purple-700 uppercase tracking-wide mb-3">
+                              ✏ Câu được sửa mẫu
+                            </p>
+                            <div className="space-y-3">
+                              {taskResult.feedback.comments.sample_improvements.map(
+                                (ex: string, i: number) => {
+                                  const parts = ex
+                                    .split(/→|->/)
+                                    .map((p: string) => p.trim());
+                                  return parts.length === 2 ? (
+                                    <div key={i} className="space-y-1.5">
+                                      <p className="text-xs text-purple-600 font-medium">
+                                        Câu gốc:
+                                      </p>
+                                      <p className="text-sm text-purple-900 bg-purple-100 rounded-lg px-3 py-2 line-through opacity-70">
+                                        {parts[0].replace(/^Original:\s*/i, "")}
+                                      </p>
+                                      <p className="text-xs text-purple-600 font-medium">
+                                        Câu tốt hơn:
+                                      </p>
+                                      <p className="text-sm text-purple-900 bg-white rounded-lg px-3 py-2 border border-purple-300">
+                                        {parts[1].replace(/^Improved:\s*/i, "")}
+                                      </p>
+                                    </div>
+                                  ) : (
+                                    <p
+                                      key={i}
+                                      className="text-sm text-purple-900"
+                                    >
+                                      {ex}
+                                    </p>
+                                  );
+                                },
+                              )}
+                            </div>
                           </div>
                         )}
                       </div>
@@ -1060,6 +1271,166 @@ const ExamTaking: React.FC = () => {
         </div>
       )}
 
+      {/* Writing Submit Confirmation Modal */}
+      {showWritingSubmitModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-bold text-slate-900">
+                Nộp tất cả bài Writing?
+              </h3>
+              <button
+                onClick={() => setShowWritingSubmitModal(false)}
+                className="text-slate-400 hover:text-slate-600"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+
+            <div className="mb-6 space-y-3">
+              <p className="text-slate-600 text-sm">
+                AI sẽ chấm điểm từng task và tính band tổng. Bạn không thể chỉnh
+                sửa sau khi nộp.
+              </p>
+              <div className="space-y-2">
+                {getFlattenedContainers()
+                  .filter((c: any) => c.type === "writing_task")
+                  .flatMap((c: any) => c.Container_Questions || [])
+                  .map((cq: any) => {
+                    const wc = (writingTexts[cq.container_question_id] || "")
+                      .trim()
+                      .split(/\s+/)
+                      .filter(Boolean).length;
+                    return (
+                      <div
+                        key={cq.container_question_id}
+                        className={`flex items-center justify-between px-3 py-2 rounded-lg text-sm ${
+                          wc >= 5
+                            ? "bg-green-50 border border-green-200"
+                            : "bg-red-50 border border-red-200"
+                        }`}
+                      >
+                        <span className="text-slate-700 truncate max-w-[260px]">
+                          {cq.Question?.question_content?.slice(0, 60) ||
+                            `Task ${cq.container_question_id}`}
+                          ...
+                        </span>
+                        <span
+                          className={`ml-3 font-semibold flex-shrink-0 ${wc >= 5 ? "text-green-700" : "text-red-600"}`}
+                        >
+                          {wc} từ{wc < 5 ? " ⚠" : ""}
+                        </span>
+                      </div>
+                    );
+                  })}
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowWritingSubmitModal(false)}
+                className="flex-1 px-4 py-3 border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors font-medium"
+              >
+                Hủy
+              </button>
+              <button
+                onClick={handleSubmitAllWriting}
+                disabled={isSubmittingAllWriting}
+                className="flex-1 px-4 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors font-medium disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                {isSubmittingAllWriting ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Đang chấm...
+                  </>
+                ) : (
+                  "Nộp & Chấm điểm"
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Writing Results Summary Modal */}
+      {showWritingResultsModal && writingResults && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-lg w-full p-6 max-h-[85vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-bold text-slate-900">
+                Kết quả Writing
+              </h3>
+              <button
+                onClick={() => setShowWritingResultsModal(false)}
+                className="text-slate-400 hover:text-slate-600"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+
+            {/* Final band */}
+            <div className="flex items-center justify-center p-6 mb-6 bg-gradient-to-br from-emerald-50 to-green-100 rounded-xl border border-green-200">
+              <div className="text-center">
+                <p className="text-sm font-semibold text-green-700 uppercase tracking-wide mb-1">
+                  Writing Band Score
+                </p>
+                <p className="text-6xl font-black text-green-800">
+                  {writingResults.final_band ?? "N/A"}
+                </p>
+                <p className="text-xs text-green-600 mt-1">
+                  Đã chấm {writingResults.graded_count}/
+                  {writingResults.total_count} task
+                </p>
+              </div>
+            </div>
+
+            {/* Per-task summary */}
+            <div className="space-y-3">
+              {(writingResults.tasks || []).map((t: any) => (
+                <div
+                  key={t.container_question_id}
+                  className={`p-4 rounded-xl border ${
+                    t.feedback
+                      ? "bg-slate-50 border-slate-200"
+                      : "bg-red-50 border-red-200"
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-xs font-semibold text-slate-500 uppercase">
+                      {t.task_type === "task1" ? "Task 1" : "Task 2"}
+                    </span>
+                    {t.feedback ? (
+                      <span className="text-lg font-black text-green-700">
+                        Band {t.submission?.final_score ?? "N/A"}
+                      </span>
+                    ) : (
+                      <span className="text-sm text-red-600 font-medium">
+                        Không chấm được
+                      </span>
+                    )}
+                  </div>
+                  {t.feedback?.comments?.feedback?.overall_comment && (
+                    <p className="text-xs text-slate-600 leading-relaxed line-clamp-2">
+                      {t.feedback.comments.feedback.overall_comment}
+                    </p>
+                  )}
+                  {!t.feedback && t.message && (
+                    <p className="text-xs text-red-600">{t.message}</p>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            <button
+              onClick={() => setShowWritingResultsModal(false)}
+              className="mt-6 w-full px-4 py-3 bg-slate-800 text-white rounded-lg hover:bg-slate-900 transition-colors font-medium"
+            >
+              Đóng
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Submit Confirmation Modal */}
       {showSubmitModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -1104,15 +1475,26 @@ const ExamTaking: React.FC = () => {
             <div className="flex gap-3">
               <button
                 onClick={() => setShowSubmitModal(false)}
-                className="flex-1 px-4 py-3 border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors font-medium"
+                disabled={isSubmitting || isSubmittingAllWriting}
+                className="flex-1 px-4 py-3 border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors font-medium disabled:opacity-50"
               >
                 Hủy
               </button>
               <button
                 onClick={handleSubmit}
-                className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                disabled={isSubmitting || isSubmittingAllWriting}
+                className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium disabled:opacity-60 flex items-center justify-center gap-2"
               >
-                Nộp bài thi
+                {isSubmitting || isSubmittingAllWriting ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    {isSubmittingAllWriting
+                      ? "Đang chấm writing..."
+                      : "Đang nộp bài..."}
+                  </>
+                ) : (
+                  "Nộp bài thi"
+                )}
               </button>
             </div>
           </div>

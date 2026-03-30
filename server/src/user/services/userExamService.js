@@ -8,6 +8,10 @@ import {
   speakingConversationTurn,
   evaluateIeltsSpeaking,
 } from "./aiService.js";
+import {
+  deductTokenUsage,
+  getSystemQuota,
+} from "../../admin/services/systemAIQuotaService.js";
 
 /**
  * USER EXAM SERVICE
@@ -311,6 +315,40 @@ export const getExamResult = async (user_exam_id, user_id) => {
   const percentage =
     totalQuestions > 0 ? (correctAnswers / totalQuestions) * 100 : 0;
 
+  // Lấy writing submissions + feedback
+  const writingSubmissions = await db.Writing_Submission.findAll({
+    where: { user_exam_id },
+    include: [{ model: db.Writing_Feedback, required: false }],
+    order: [["submission_id", "ASC"]],
+  });
+
+  // Tính writing band (IELTS: Task1 = 1/3, Task2 = 2/3)
+  let writingBand = null;
+  const gradedWriting = writingSubmissions.filter((s) => s.final_score != null);
+  if (gradedWriting.length > 0) {
+    const getTaskType = (sub) => {
+      const fb = sub.Writing_Feedbacks?.[0];
+      if (!fb) return "task2";
+      try {
+        return JSON.parse(fb.comments)?.task_type || "task2";
+      } catch {
+        return "task2";
+      }
+    };
+    const t1 = gradedWriting.filter((s) => getTaskType(s) === "task1");
+    const t2 = gradedWriting.filter((s) => getTaskType(s) !== "task1");
+    if (t1.length > 0 && t2.length > 0) {
+      const t1Avg = t1.reduce((s, t) => s + t.final_score, 0) / t1.length;
+      const t2Avg = t2.reduce((s, t) => s + t.final_score, 0) / t2.length;
+      writingBand = t1Avg * (1 / 3) + t2Avg * (2 / 3);
+    } else {
+      writingBand =
+        gradedWriting.reduce((s, t) => s + t.final_score, 0) /
+        gradedWriting.length;
+    }
+    writingBand = Math.round(writingBand * 2) / 2;
+  }
+
   return {
     success: true,
     message: "Exam result retrieved successfully",
@@ -328,6 +366,15 @@ export const getExamResult = async (user_exam_id, user_id) => {
         percentage: percentage.toFixed(2),
       },
       answers: userExam.User_Answers,
+      writing_results:
+        writingSubmissions.length > 0
+          ? {
+              final_band: writingBand,
+              graded_count: gradedWriting.length,
+              total_count: writingSubmissions.length,
+              submissions: writingSubmissions,
+            }
+          : null,
     },
   };
 };
@@ -542,6 +589,7 @@ export const submitWritingTask = async (
   user_exam_id,
   container_question_id,
   content,
+  user_id,
 ) => {
   try {
     if (!content || content.trim().split(/\s+/).filter(Boolean).length < 5) {
@@ -579,11 +627,18 @@ export const submitWritingTask = async (
       .filter(Boolean)
       .join("\n\n");
 
-    const skill = containerQuestion.Exam_Container?.skill;
-    // Determine task type: Writing Task 1 is typically the shorter report/chart task
-    const task_type = skill === "writing" ? "task2" : "task1";
+    // Detect task type from the instruction field: "Task 1" → task1, otherwise → task2
+    const instruction = (
+      containerQuestion.Exam_Container?.instruction || ""
+    ).toLowerCase();
+    const task_type =
+      instruction.includes("task 1") || instruction.includes("task1")
+        ? "task1"
+        : "task2";
+
     const word_count = content.trim().split(/\s+/).filter(Boolean).length;
 
+    // ── 1. Lưu submission ──────────────────────────────────────────────────
     const submission = await db.Writing_Submission.create({
       user_exam_id,
       container_question_id,
@@ -593,56 +648,111 @@ export const submitWritingTask = async (
       submitted_at: new Date(),
     });
 
+    // ── 2. Gọi AI chấm điểm ───────────────────────────────────────────────
     let feedbackData = null;
-    try {
-      const grading = await gradeIeltsWriting({
-        task_prompt,
-        user_content: content,
-        task_type,
-      });
+    let aiError = null;
 
+    const grading = await gradeIeltsWriting({
+      task_prompt,
+      user_content: content,
+      task_type,
+    }).catch((err) => {
+      aiError = err;
+      console.error("[submitWritingTask] AI grading error:", err.message);
+      return null;
+    });
+
+    if (grading) {
+      // ── 3. Lưu Writing_Feedback ─────────────────────────────────────────
       feedbackData = await db.Writing_Feedback.create({
         submission_id: submission.submission_id,
         model_name: "gpt-4o-mini",
         overall_score: grading.overall_band || 0,
         criteria_scores: grading.criteria_scores || {},
         comments: JSON.stringify({
-          feedback: grading.feedback,
+          criteria_comments: grading.criteria_comments || {},
+          feedback: grading.feedback || {},
           sample_improvements: grading.sample_improvements || [],
           word_count_note: grading.word_count_note || "",
+          task_type,
         }),
         created_at: new Date(),
       });
 
+      // Update submission status
       await submission.update({
         status: "graded",
         final_score: grading.overall_band,
       });
-    } catch (aiError) {
-      console.error("[submitWritingTask] AI grading error:", aiError);
+
+      // ── 4. Trừ token user + ghi transaction ─────────────────────────────
+      try {
+        const totalOpenAITokens = grading.usage?.total_tokens || 0;
+        if (user_id && totalOpenAITokens > 0) {
+          const quota = await getSystemQuota();
+          const aiTokensUsed = Math.ceil(
+            totalOpenAITokens / (quota.ai_token_unit || 1000),
+          );
+
+          const wallet = await db.User_Token_Wallet.findOne({
+            where: { user_id },
+          });
+
+          if (wallet && wallet.token_balance >= aiTokensUsed) {
+            await wallet.update({
+              token_balance: wallet.token_balance - aiTokensUsed,
+              updated_at: new Date(),
+            });
+
+            await db.User_Token_Transaction.create({
+              user_id,
+              amount: -aiTokensUsed,
+              transaction_type: "usage",
+              reference_id: submission.submission_id,
+              created_at: new Date(),
+            });
+          }
+
+          await deductTokenUsage(totalOpenAITokens, aiTokensUsed);
+        }
+      } catch (tokenErr) {
+        // Token deduction failure should NOT block returning feedback
+        console.error(
+          "[submitWritingTask] Token deduction error:",
+          tokenErr.message,
+        );
+      }
     }
+
+    const parsedComments = (() => {
+      try {
+        return feedbackData ? JSON.parse(feedbackData.comments) : null;
+      } catch {
+        return null;
+      }
+    })();
 
     return {
       success: true,
-      message: "Bài viết đã được nộp và chấm điểm",
+      message: feedbackData
+        ? "Bài viết đã được nộp và chấm điểm"
+        : "Bài viết đã được nộp (chưa chấm được: " +
+          (aiError?.message || "lỗi AI") +
+          ")",
       data: {
         submission: {
           submission_id: submission.submission_id,
           word_count: submission.word_count,
           status: submission.status,
           final_score: submission.final_score,
+          task_type,
         },
         feedback: feedbackData
           ? {
               overall_score: feedbackData.overall_score,
               criteria_scores: feedbackData.criteria_scores,
-              comments: (() => {
-                try {
-                  return JSON.parse(feedbackData.comments);
-                } catch {
-                  return feedbackData.comments;
-                }
-              })(),
+              criteria_comments: parsedComments?.criteria_comments || {},
+              comments: parsedComments,
             }
           : null,
       },
@@ -668,6 +778,213 @@ export const getWritingSubmissions = async (user_exam_id) => {
     console.error("[getWritingSubmissions] ERROR:", error);
     return { success: false, message: error.message };
   }
+};
+
+// ─────────────────────────────────────────────
+// Submit ALL writing tasks at once + final band
+// ─────────────────────────────────────────────
+export const submitAllWritingTasks = async (user_exam_id, tasks, user_id) => {
+  if (!tasks || tasks.length === 0) {
+    return { success: false, message: "Không có bài writing nào để nộp." };
+  }
+
+  const results = [];
+  let totalOpenAITokens = 0;
+
+  for (const task of tasks) {
+    const { container_question_id, content } = task;
+
+    if (!content || content.trim().split(/\s+/).filter(Boolean).length < 5) {
+      results.push({
+        container_question_id,
+        success: false,
+        message: "Bài viết quá ngắn",
+        feedback: null,
+      });
+      continue;
+    }
+
+    const containerQuestion = await db.Container_Question.findByPk(
+      container_question_id,
+      {
+        include: [
+          { model: db.Question },
+          {
+            model: db.Exam_Container,
+            attributes: [
+              "container_id",
+              "content",
+              "type",
+              "instruction",
+              "skill",
+            ],
+          },
+        ],
+      },
+    );
+
+    if (!containerQuestion) {
+      results.push({
+        container_question_id,
+        success: false,
+        message: "Không tìm thấy câu hỏi",
+        feedback: null,
+      });
+      continue;
+    }
+
+    const task_prompt = [
+      containerQuestion.Exam_Container?.instruction,
+      containerQuestion.Exam_Container?.content,
+      containerQuestion.Question?.question_content,
+    ]
+      .filter(Boolean)
+      .join("\n\n");
+
+    const instr = (
+      containerQuestion.Exam_Container?.instruction || ""
+    ).toLowerCase();
+    const task_type =
+      instr.includes("task 1") || instr.includes("task1") ? "task1" : "task2";
+
+    const word_count = content.trim().split(/\s+/).filter(Boolean).length;
+
+    const submission = await db.Writing_Submission.create({
+      user_exam_id,
+      container_question_id,
+      content: content.trim(),
+      word_count,
+      status: "submitted",
+      submitted_at: new Date(),
+    });
+
+    const grading = await gradeIeltsWriting({
+      task_prompt,
+      user_content: content,
+      task_type,
+    }).catch((err) => {
+      console.error(
+        "[submitAllWriting] AI error task",
+        container_question_id,
+        err.message,
+      );
+      return null;
+    });
+
+    let feedbackData = null;
+    if (grading) {
+      feedbackData = await db.Writing_Feedback.create({
+        submission_id: submission.submission_id,
+        model_name: "gpt-4o-mini",
+        overall_score: grading.overall_band || 0,
+        criteria_scores: grading.criteria_scores || {},
+        comments: JSON.stringify({
+          criteria_comments: grading.criteria_comments || {},
+          feedback: grading.feedback || {},
+          sample_improvements: grading.sample_improvements || [],
+          word_count_note: grading.word_count_note || "",
+          task_type,
+        }),
+        created_at: new Date(),
+      });
+
+      await submission.update({
+        status: "graded",
+        final_score: grading.overall_band,
+      });
+      totalOpenAITokens += grading.usage?.total_tokens || 0;
+    }
+
+    const parsedComments = (() => {
+      try {
+        return feedbackData ? JSON.parse(feedbackData.comments) : null;
+      } catch {
+        return null;
+      }
+    })();
+
+    results.push({
+      container_question_id,
+      task_type,
+      instruction: containerQuestion.Exam_Container?.instruction || "",
+      success: !!feedbackData,
+      submission: {
+        submission_id: submission.submission_id,
+        word_count,
+        status: submission.status,
+        final_score: submission.final_score,
+        task_type,
+      },
+      feedback: feedbackData
+        ? {
+            overall_score: feedbackData.overall_score,
+            criteria_scores: feedbackData.criteria_scores,
+            criteria_comments: parsedComments?.criteria_comments || {},
+            comments: parsedComments,
+          }
+        : null,
+    });
+  }
+
+  // ── Calculate final writing band ────────────────────────────────
+  // IELTS standard weight: Task 1 = 1/3, Task 2 = 2/3
+  const gradedTasks = results.filter((r) => r.feedback?.overall_score != null);
+  let finalBand = null;
+
+  if (gradedTasks.length > 0) {
+    const task1 = gradedTasks.find((r) => r.task_type === "task1");
+    const task2List = gradedTasks.filter((r) => r.task_type === "task2");
+
+    if (task1 && task2List.length > 0) {
+      const task2Avg =
+        task2List.reduce((s, t) => s + t.feedback.overall_score, 0) /
+        task2List.length;
+      finalBand = task1.feedback.overall_score * (1 / 3) + task2Avg * (2 / 3);
+    } else {
+      finalBand =
+        gradedTasks.reduce((s, t) => s + t.feedback.overall_score, 0) /
+        gradedTasks.length;
+    }
+    finalBand = Math.round(finalBand * 2) / 2; // round to nearest 0.5
+  }
+
+  // ── Token deduction ─────────────────────────────────────────────
+  if (user_id && totalOpenAITokens > 0) {
+    try {
+      const quota = await getSystemQuota();
+      const aiTokensUsed = Math.ceil(
+        totalOpenAITokens / (quota.ai_token_unit || 1000),
+      );
+      const wallet = await db.User_Token_Wallet.findOne({ where: { user_id } });
+      if (wallet && wallet.token_balance >= aiTokensUsed) {
+        await wallet.update({
+          token_balance: wallet.token_balance - aiTokensUsed,
+          updated_at: new Date(),
+        });
+        await db.User_Token_Transaction.create({
+          user_id,
+          amount: -aiTokensUsed,
+          transaction_type: "usage",
+          reference_id: user_exam_id,
+          created_at: new Date(),
+        });
+      }
+      await deductTokenUsage(totalOpenAITokens, aiTokensUsed);
+    } catch (tokenErr) {
+      console.error("[submitAllWriting] Token error:", tokenErr.message);
+    }
+  }
+
+  return {
+    success: true,
+    message: `Đã chấm ${gradedTasks.length}/${results.length} bài writing`,
+    data: {
+      tasks: results,
+      final_band: finalBand,
+      graded_count: gradedTasks.length,
+      total_count: results.length,
+    },
+  };
 };
 
 // ─────────────────────────────────────────────

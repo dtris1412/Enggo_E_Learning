@@ -9,6 +9,7 @@ import {
   getUserExamHistory as getUserExamHistoryService,
   submitWritingTask as submitWritingTaskService,
   getWritingSubmissions as getWritingSubmissionsService,
+  submitAllWritingTasks as submitAllWritingTasksService,
   handleSpeakingTurn as handleSpeakingTurnService,
   submitSpeakingSession as submitSpeakingSessionService,
 } from "../services/userExamService.js";
@@ -189,20 +190,20 @@ const submitWritingTask = async (req, res) => {
   try {
     const { user_exam_id } = req.params;
     const { container_question_id, content } = req.body;
+    const user_id = req.user?.user_id;
 
     if (!container_question_id || !content) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "container_question_id and content are required.",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "container_question_id and content are required.",
+      });
     }
 
     const result = await submitWritingTaskService(
       parseInt(user_exam_id),
       parseInt(container_question_id),
       content,
+      user_id,
     );
 
     if (!result.success) return res.status(400).json(result);
@@ -225,6 +226,32 @@ const getWritingSubmissions = async (req, res) => {
   }
 };
 
+const submitAllWriting = async (req, res) => {
+  try {
+    const { user_exam_id } = req.params;
+    const { tasks } = req.body;
+    const user_id = req.user?.user_id;
+
+    if (!Array.isArray(tasks) || tasks.length === 0) {
+      return res
+        .status(400)
+        .json({ success: false, message: "tasks array is required." });
+    }
+
+    const result = await submitAllWritingTasksService(
+      parseInt(user_exam_id),
+      tasks,
+      user_id,
+    );
+
+    if (!result.success) return res.status(400).json(result);
+    res.status(200).json(result);
+  } catch (err) {
+    console.error("Error in submitAllWriting:", err);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
 // ──────────────────────────────────────────────
 // IELTS Speaking controllers
 // ──────────────────────────────────────────────
@@ -235,12 +262,10 @@ const speakingTurn = async (req, res) => {
     const { container_id, messages, part_type } = req.body;
 
     if (!container_id || !Array.isArray(messages)) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "container_id and messages array are required.",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "container_id and messages array are required.",
+      });
     }
 
     const result = await handleSpeakingTurnService(
@@ -264,12 +289,10 @@ const submitSpeaking = async (req, res) => {
     const { container_id, messages, duration_seconds } = req.body;
 
     if (!container_id || !Array.isArray(messages)) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "container_id and messages array are required.",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "container_id and messages array are required.",
+      });
     }
 
     const result = await submitSpeakingSessionService(
@@ -298,6 +321,7 @@ export {
   getUserExamHistory,
   submitWritingTask,
   getWritingSubmissions,
+  submitAllWriting,
   speakingTurn,
   submitSpeaking,
 };

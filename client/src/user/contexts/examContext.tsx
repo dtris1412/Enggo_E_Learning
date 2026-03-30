@@ -158,6 +158,10 @@ interface ExamContextType {
   getWritingSubmissions: (
     user_exam_id: number,
   ) => Promise<{ success: boolean; data?: any; message?: string }>;
+  submitAllWriting: (
+    user_exam_id: number,
+    tasks: Array<{ container_question_id: number; content: string }>,
+  ) => Promise<{ success: boolean; data?: any; message?: string }>;
   // IELTS Speaking
   speakingTurn: (
     user_exam_id: number,
@@ -500,6 +504,27 @@ export const ExamProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const submitAllWriting = async (
+    user_exam_id: number,
+    tasks: Array<{ container_question_id: number; content: string }>,
+  ) => {
+    try {
+      const response = await fetch(
+        `${API_URL}/user/user-exams/${user_exam_id}/submit-all-writing`,
+        {
+          method: "POST",
+          headers: getAuthHeaders(),
+          body: JSON.stringify({ tasks }),
+        },
+      );
+      const result = await response.json();
+      return result;
+    } catch (err: any) {
+      console.error("Error submitting all writing tasks:", err);
+      return { success: false, message: err.message };
+    }
+  };
+
   // ──────────────────────────────────────────────
   // IELTS Speaking
   // ──────────────────────────────────────────────
@@ -571,6 +596,7 @@ export const ExamProvider = ({ children }: { children: ReactNode }) => {
         getOngoingExam,
         submitWriting,
         getWritingSubmissions,
+        submitAllWriting,
         speakingTurn,
         submitSpeaking,
       }}

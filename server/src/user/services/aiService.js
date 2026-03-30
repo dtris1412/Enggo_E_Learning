@@ -379,33 +379,40 @@ export const gradeIeltsWriting = async ({
 }) => {
   const wordCount = user_content.trim().split(/\s+/).filter(Boolean).length;
   const minWords = task_type === "task1" ? 150 : 250;
+  const firstCriterion =
+    task_type === "task1" ? "task_achievement" : "task_response";
 
-  const systemPrompt = `You are an expert IELTS examiner with 15+ years of experience grading Writing tasks.
-Grade the following ${task_type === "task1" ? "Task 1 (report/graph description)" : "Task 2 (essay)"} response strictly according to the official IELTS Writing band descriptors.
+  const systemPrompt = `You are an expert IELTS examiner with 15+ years of experience grading Academic Writing tasks.
+Grade the following ${task_type === "task1" ? "Task 1 (report/graph/chart description)" : "Task 2 (argumentative/discursive essay)"} strictly according to the official IELTS Writing band descriptors.
 
-Respond ONLY with valid JSON (no markdown, no extra text):
+IMPORTANT: Respond ONLY with valid JSON (no markdown fences, no extra text before or after).
+
+JSON schema:
 {
-  "overall_band": <number 0-9, step 0.5>,
+  "overall_band": <number 0-9, multiples of 0.5>,
   "criteria_scores": {
-    ${
-      task_type === "task1"
-        ? `"task_achievement": <0-9>,
-    "coherence_cohesion": <0-9>,
-    "lexical_resource": <0-9>,
-    "grammatical_range_accuracy": <0-9>`
-        : `"task_response": <0-9>,
-    "coherence_cohesion": <0-9>,
-    "lexical_resource": <0-9>,
-    "grammatical_range_accuracy": <0-9>`
-    }
+    "${firstCriterion}": <0-9, multiples of 0.5>,
+    "coherence_cohesion": <0-9, multiples of 0.5>,
+    "lexical_resource": <0-9, multiples of 0.5>,
+    "grammatical_range_accuracy": <0-9, multiples of 0.5>
+  },
+  "criteria_comments": {
+    "${firstCriterion}": "<1-2 sentence specific comment on this criterion>",
+    "coherence_cohesion": "<1-2 sentence specific comment>",
+    "lexical_resource": "<1-2 sentence specific comment>",
+    "grammatical_range_accuracy": "<1-2 sentence specific comment>"
   },
   "feedback": {
-    "strengths": ["..."],
-    "improvements": ["..."],
-    "overall_comment": "..."
+    "overall_comment": "<3-4 sentence holistic evaluation of the response>",
+    "strengths": ["<specific strength 1>", "<specific strength 2>", "<specific strength 3>"],
+    "improvements": ["<specific improvement point 1>", "<specific improvement point 2>", "<specific improvement point 3>"],
+    "tips": ["<actionable tip to improve score 1>", "<actionable tip 2>", "<actionable tip 3>"]
   },
-  "word_count_note": "...",
-  "sample_improvements": ["up to 2 corrected example sentences from the essay"]
+  "sample_improvements": [
+    "<quote a weak sentence from essay then rewrite it — format: 'Original: ... → Improved: ...'>",
+    "<another example if available>"
+  ],
+  "word_count_note": "<comment only if word count is below minimum or if padding detected; empty string otherwise>"
 }`;
 
   const userMessage = `TASK PROMPT:\n${task_prompt}\n\nCANDIDATE RESPONSE (${wordCount} words, minimum required: ${minWords}):\n${user_content}`;
@@ -418,7 +425,7 @@ Respond ONLY with valid JSON (no markdown, no extra text):
         { role: "system", content: systemPrompt },
         { role: "user", content: userMessage },
       ],
-      max_tokens: 1200,
+      max_tokens: 1500,
       temperature: 0.3,
     },
     {
@@ -434,14 +441,25 @@ Respond ONLY with valid JSON (no markdown, no extra text):
 
   let parsed;
   try {
-    parsed = JSON.parse(raw);
+    // Strip any accidental markdown fences
+    const cleaned = raw
+      .replace(/^```json\s*/i, "")
+      .replace(/```\s*$/, "")
+      .trim();
+    parsed = JSON.parse(cleaned);
   } catch {
-    // Fallback if JSON parse fails
     parsed = {
       overall_band: null,
       criteria_scores: {},
-      feedback: { overall_comment: raw },
+      criteria_comments: {},
+      feedback: {
+        overall_comment: raw,
+        strengths: [],
+        improvements: [],
+        tips: [],
+      },
       sample_improvements: [],
+      word_count_note: "",
     };
   }
 

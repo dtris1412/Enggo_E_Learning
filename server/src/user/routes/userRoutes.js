@@ -166,6 +166,7 @@ import {
   getUserExamHistory,
   submitWritingTask,
   getWritingSubmissions,
+  submitAllWriting,
   speakingTurn,
   submitSpeaking,
 } from "../controllers/userExamController.js";
@@ -784,6 +785,14 @@ const initUserRoutes = (app) => {
     verifyToken,
     requireUser,
     getWritingSubmissions,
+  );
+
+  // Submit ALL writing tasks at once + compute final writing band
+  router.post(
+    "/api/user/user-exams/:user_exam_id/submit-all-writing",
+    verifyToken,
+    requireUser,
+    submitAllWriting,
   );
 
   // ──────────────────────────────────────────────
