@@ -40,31 +40,35 @@ if (process.env.DB_NAME) {
               },
             }
           : {},
-    }
+    },
   );
-} else if (config.use_env_variable) {
+} else if (config && config.use_env_variable) {
   // Fallback: DATABASE_URL
   sequelize = new Sequelize(process.env[config.use_env_variable], config);
-} else {
+} else if (config) {
   // Fallback: config.json
   sequelize = new Sequelize(
     config.database,
     config.username,
     config.password,
-    config
+    config,
+  );
+} else {
+  throw new Error(
+    `No database config found for environment: ${env}. Set DB_NAME env variable.`,
   );
 }
 
 const modelsDir = path.resolve(
   path
     .dirname(new URL(import.meta.url).pathname)
-    .replace(/^\/([A-Za-z]:)/, "$1")
+    .replace(/^\/([A-Za-z]:)/, "$1"),
 );
 const files = fs
   .readdirSync(modelsDir)
   .filter(
     (file) =>
-      file.indexOf(".") !== 0 && file !== basename && file.slice(-3) === ".js"
+      file.indexOf(".") !== 0 && file !== basename && file.slice(-3) === ".js",
   );
 
 for (const file of files) {
