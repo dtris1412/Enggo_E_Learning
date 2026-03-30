@@ -78,11 +78,7 @@ const AdminLayout = () => {
       path: "/admin/news",
       icon: Newspaper,
     },
-    {
-      name: "Quản lý phản hồi",
-      path: "/admin/feedback",
-      icon: MessageSquare,
-    },
+
     {
       name: "Quản lý báo cáo",
       path: "/admin/reports",

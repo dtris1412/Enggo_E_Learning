@@ -13,7 +13,7 @@ import QuestionManagement from "../pages/QuestionManagement";
 import TestManagement from "../pages/TestManagement";
 import NewsManagement from "../pages/NewsManagement";
 import BlogDetail from "../pages/BlogDetail";
-import FeedbackManagement from "../pages/FeedbackManagement";
+// import FeedbackManagement from "../pages/FeedbackManagement";
 import ReportManagement from "../pages/ReportManagementNew";
 import CertificateManagement from "../pages/CertificateManagement";
 import RoadmapManagement from "../pages/RoadmapManagement";
@@ -64,8 +64,8 @@ export const AdminRoutes = () => {
         <Route path="news" element={<NewsManagement />} />
         <Route path="blogs/:slug" element={<BlogDetail />} />
 
-        {/* Feedback Management */}
-        <Route path="feedback" element={<FeedbackManagement />} />
+        {/* Feedback Management
+        <Route path="feedback" element={<FeedbackManagement />} /> */}
 
         {/* Report Management */}
         <Route path="reports" element={<ReportManagement />} />

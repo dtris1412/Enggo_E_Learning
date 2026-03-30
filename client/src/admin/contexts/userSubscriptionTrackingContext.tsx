@@ -9,28 +9,33 @@ import {
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080/api";
 
 export interface UserSubscription {
-  subscription_id: number;
+  user_subscription_id: number;
   user_id: number;
-  subscription_plan_id: number;
-  start_date: string;
-  end_date: string;
-  monthly_ai_token_quota: number;
-  status: "active" | "expired" | "cancelled";
-  created_at: string;
-  updated_at: string;
-  order_id?: number;
+  subscription_price_id: number;
+  order_id?: number | null;
+  started_at: string;
+  expired_at: string;
+  status: "active" | "expired" | "canceled";
   User?: {
     user_id: number;
-    name: string;
-    email: string;
-    avatar: string;
+    user_name: string;
+    full_name?: string;
+    user_email: string;
+    avatar?: string | null;
   };
-  Subscription_Plan?: {
-    plan_id: number;
-    name: string;
-    code: string;
-    features: string[];
-    monthly_ai_token_quota: number;
+  Subscription_Price?: {
+    subscription_price_id: number;
+    billing_type: string;
+    duration_days: number;
+    price: number;
+    discount_percentage: number | null;
+    Subscription_Plan?: {
+      subscription_plan_id: number;
+      name: string;
+      code: string;
+      monthly_ai_token_quota: number;
+      features?: string[] | null;
+    };
   };
   Order?: {
     order_id: number;
@@ -134,9 +139,18 @@ export const UserSubscriptionTrackingProvider = ({
 
         const result = await response.json();
         if (result.success) {
-          setSubscriptions(result.data.subscriptions || []);
-          setTotalSubscriptions(result.data.pagination?.total || 0);
-          setPagination(result.data.pagination || null);
+          setSubscriptions(result.data || []);
+          setTotalSubscriptions(result.pagination?.total || 0);
+          setPagination(
+            result.pagination
+              ? {
+                  currentPage: result.pagination.page,
+                  totalPages: result.pagination.pages,
+                  total: result.pagination.total,
+                  limit: result.pagination.limit,
+                }
+              : null,
+          );
         }
       } catch (err: any) {
         setError(err.message || "Failed to fetch subscriptions");

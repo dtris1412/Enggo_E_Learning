@@ -126,7 +126,13 @@ export const getAllSubscriptions = async (
       include: [
         {
           model: User,
-          attributes: ["user_id", "user_name", "full_name", "user_email"],
+          attributes: [
+            "user_id",
+            "user_name",
+            "full_name",
+            "user_email",
+            "avatar",
+          ],
         },
         {
           model: Subscription_Price,

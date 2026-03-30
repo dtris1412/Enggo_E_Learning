@@ -33,20 +33,21 @@ const UserSubscriptionsTable = ({
         "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800",
       expired:
         "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800",
-      cancelled:
+      canceled:
         "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800",
     };
     const labels: { [key: string]: string } = {
       active: "Đang hoạt động",
       expired: "Hết hạn",
-      cancelled: "Đã hủy",
+      canceled: "Đã hủy",
     };
     return { className: colors[status], label: labels[status] };
   };
 
-  const isExpiringSoon = (endDate: string) => {
+  const isExpiringSoon = (expiredAt: string) => {
+    if (!expiredAt) return false;
     const days = Math.ceil(
-      (new Date(endDate).getTime() - new Date().getTime()) /
+      (new Date(expiredAt).getTime() - new Date().getTime()) /
         (1000 * 60 * 60 * 24),
     );
     return days > 0 && days <= 7;
@@ -95,25 +96,35 @@ const UserSubscriptionsTable = ({
               <tbody className="divide-y divide-gray-200">
                 {subscriptions.map((sub) => {
                   const statusBadge = getStatusBadge(sub.status);
-                  const expiringSoon = isExpiringSoon(sub.end_date);
+                  const expiringSoon = isExpiringSoon(sub.expired_at);
                   return (
                     <tr
-                      key={sub.subscription_id}
+                      key={sub.user_subscription_id}
                       className={`hover:bg-gray-50 transition-colors ${
                         expiringSoon ? "bg-yellow-50" : ""
                       }`}
                     >
                       <td className="px-6 py-4 text-sm">
                         <div className="flex items-center gap-2">
-                          <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
-                            <User className="h-4 w-4 text-gray-600" />
-                          </div>
+                          {sub.User?.avatar ? (
+                            <img
+                              src={sub.User.avatar}
+                              alt={sub.User.full_name || sub.User.user_name}
+                              className="w-8 h-8 rounded-full object-cover flex-shrink-0"
+                            />
+                          ) : (
+                            <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center flex-shrink-0">
+                              <User className="h-4 w-4 text-gray-600" />
+                            </div>
+                          )}
                           <div>
                             <p className="font-medium text-gray-900">
-                              {sub.User?.name || "N/A"}
+                              {sub.User?.full_name ||
+                                sub.User?.user_name ||
+                                "N/A"}
                             </p>
                             <p className="text-xs text-gray-500">
-                              {sub.User?.email || "N/A"}
+                              {sub.User?.user_email || "N/A"}
                             </p>
                           </div>
                         </div>
@@ -121,19 +132,23 @@ const UserSubscriptionsTable = ({
                       <td className="px-6 py-4 text-sm">
                         <div>
                           <p className="font-medium text-gray-900">
-                            {sub.Subscription_Plan?.name || "N/A"}
+                            {sub.Subscription_Price?.Subscription_Plan?.name ||
+                              "N/A"}
                           </p>
                           <p className="text-xs text-gray-500">
-                            {sub.Subscription_Plan?.code || "N/A"}
+                            {sub.Subscription_Price?.Subscription_Plan?.code ||
+                              "N/A"}
                           </p>
                         </div>
                       </td>
                       <td className="px-6 py-4 text-sm font-medium text-gray-900">
-                        {sub.monthly_ai_token_quota?.toLocaleString("vi-VN") ||
-                          0}
+                        {(
+                          sub.Subscription_Price?.Subscription_Plan
+                            ?.monthly_ai_token_quota ?? 0
+                        ).toLocaleString("vi-VN")}
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-600">
-                        {new Date(sub.start_date).toLocaleDateString("vi-VN")}
+                        {new Date(sub.started_at).toLocaleDateString("vi-VN")}
                       </td>
                       <td className="px-6 py-4 text-sm">
                         <div
@@ -143,7 +158,11 @@ const UserSubscriptionsTable = ({
                               : "text-gray-600"
                           }`}
                         >
-                          {new Date(sub.end_date).toLocaleDateString("vi-VN")}
+                          {sub.expired_at
+                            ? new Date(sub.expired_at).toLocaleDateString(
+                                "vi-VN",
+                              )
+                            : "—"}
                           {expiringSoon && (
                             <p className="text-xs text-red-600 mt-1">
                               Sắp hết hạn
@@ -168,7 +187,7 @@ const UserSubscriptionsTable = ({
                           {sub.status === "active" && (
                             <button
                               onClick={() =>
-                                onExpireSubscription(sub.subscription_id)
+                                onExpireSubscription(sub.user_subscription_id)
                               }
                               className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
                               title="Hủy subscription"
