@@ -32,6 +32,10 @@ app.use(cookieParser());
 app.use(express.json({ limit: "5mb" }));
 app.use(express.urlencoded({ limit: "5mb", extended: true }));
 
+// Health check (Railway dùng để kiểm tra service đã sẵn sàng chưa)
+app.get("/api/health", (req, res) => {
+  res.status(200).json({ status: "ok", env: process.env.NODE_ENV });
+});
 // Serve uploaded files
 app.use("/api/upload", uploadRoutes);
 
@@ -52,7 +56,7 @@ if (process.env.NODE_ENV === "production") {
   app.use(express.static(frontendPath));
 
   // SPA fallback - trả về index.html cho mọi route không phải API
-  app.get("*", (req, res) => {
+  app.get(/^(?!\/api).*$/, (req, res) => {
     res.sendFile(path.join(frontendPath, "index.html"));
   });
 }

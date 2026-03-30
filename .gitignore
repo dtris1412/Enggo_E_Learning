@@ -1,0 +1,25 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+client/dist/
+
+# Environment files (tất cả .env của server và docker - chứa secrets)
+server/.env
+docker/.env
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Upload temp files
+server/upload/reports/*.xlsx
