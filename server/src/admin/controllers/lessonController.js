@@ -28,7 +28,7 @@ const createLesson = async (req, res) => {
       is_exam_format,
       estimated_time,
       skill_id,
-      lesson_status
+      lesson_status,
     );
     if (!result.success) {
       return res.status(400).json(result);
@@ -59,7 +59,7 @@ const updateLessonById = async (req, res) => {
       lesson_content,
       is_exam_format,
       estimated_time,
-      skill_id
+      skill_id,
     );
     if (!result.success) {
       return res.status(404).json(result);
@@ -101,7 +101,7 @@ const getLessonsPaginated = async (req, res) => {
       lesson_type,
       difficulty_level,
       is_exam_format,
-      lesson_status
+      lesson_status,
     );
     if (!result.success) {
       return res.status(404).json(result);

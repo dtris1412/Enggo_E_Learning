@@ -1,4 +1,4 @@
-import { getLessonById as getLessonByIdService } from "../services/lessonService.js";
+import { getLessonById as getLessonByIdService } from "../services/LessonService.js";
 
 const getLessonById = async (req, res) => {
   try {
