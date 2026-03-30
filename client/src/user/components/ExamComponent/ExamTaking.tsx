@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useExam } from "../../contexts/examContext";
 import { useToast } from "../../../shared/components/Toast/Toast";
 
@@ -24,6 +24,7 @@ import {
 const ExamTaking: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   const {
     getExamForTaking,
     startExam,
@@ -45,8 +46,13 @@ const ExamTaking: React.FC = () => {
   const [isSubmittingAllWriting, setIsSubmittingAllWriting] = useState(false);
   const [showWritingSubmitModal, setShowWritingSubmitModal] = useState(false);
   const [showWritingResultsModal, setShowWritingResultsModal] = useState(false);
-  const [currentContainerIndex, setCurrentContainerIndex] = useState(0);
+  const [currentContainerIndex, setCurrentContainerIndex] = useState<number>(
+    (location.state as any)?.containerIndex ?? 0,
+  );
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [completedSpeakingCqIds, setCompletedSpeakingCqIds] = useState<
+    Set<number>
+  >(new Set());
   const [timeRemaining, setTimeRemaining] = useState(0);
   const [isSaving, setIsSaving] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -71,18 +77,46 @@ const ExamTaking: React.FC = () => {
         // Check for ongoing exam first
         const ongoingResult = await getOngoingExam();
         let examId = null;
+        let resumedStartedAt: string | null = null;
 
         if (ongoingResult.success && ongoingResult.data) {
           // Resume ongoing exam
           examId = ongoingResult.data.user_exam_id;
+          resumedStartedAt = ongoingResult.data.started_at;
           setUserExamId(examId);
 
-          // Load saved answers
+          // Load saved MCQ answers
           const savedAnswers: Record<number, number | null> = {};
           ongoingResult.data.saved_answers.forEach((ans: any) => {
             savedAnswers[ans.container_question_id] = ans.question_option_id;
           });
           setAnswers(savedAnswers);
+
+          // Restore writing texts
+          if (ongoingResult.data.writing_texts?.length) {
+            const savedWritingTexts: Record<number, string> = {};
+            ongoingResult.data.writing_texts.forEach((wt: any) => {
+              savedWritingTexts[wt.container_question_id] = wt.content || "";
+            });
+            setWritingTexts(savedWritingTexts);
+          }
+
+          // Restore writing drafts saved in sessionStorage (unsubmitted text)
+          const draftKey = `writingDraft_${ongoingResult.data.user_exam_id}`;
+          const draft = sessionStorage.getItem(draftKey);
+          if (draft) {
+            try {
+              const parsed: Record<number, string> = JSON.parse(draft);
+              setWritingTexts((prev) => ({ ...parsed, ...prev }));
+            } catch {}
+          }
+
+          // Restore completed speaking parts
+          if (ongoingResult.data.completed_speaking_cq_ids?.length) {
+            setCompletedSpeakingCqIds(
+              new Set<number>(ongoingResult.data.completed_speaking_cq_ids),
+            );
+          }
 
           showToast("info", "Đang tiếp tục bài thi...");
         } else {
@@ -105,7 +139,15 @@ const ExamTaking: React.FC = () => {
         const examData = await getExamForTaking(parseInt(id), examId);
         if (examData) {
           setExam(examData);
-          setTimeRemaining(examData.exam_duration * 60); // Convert to seconds
+          const totalSeconds = examData.exam_duration * 60;
+          if (resumedStartedAt) {
+            const elapsed = Math.floor(
+              (Date.now() - new Date(resumedStartedAt).getTime()) / 1000,
+            );
+            setTimeRemaining(Math.max(0, totalSeconds - elapsed));
+          } else {
+            setTimeRemaining(totalSeconds);
+          }
         } else {
           showToast("error", "Không thể tải đề thi");
           navigate(`/exams/${id}`);
@@ -394,6 +436,12 @@ const ExamTaking: React.FC = () => {
             .filter(Boolean).length;
           if (wc >= 5) count++;
         });
+      }
+      // Count speaking parts that have been completed
+      if (container.type === "speaking_part") {
+        const firstCqId =
+          container.Container_Questions?.[0]?.container_question_id;
+        if (firstCqId && completedSpeakingCqIds.has(firstCqId)) count++;
       }
     });
     return count;
@@ -1024,67 +1072,113 @@ const ExamTaking: React.FC = () => {
               })()}
 
             {/* ── SPEAKING PART ────────────────────────── */}
-            {currentContainer?.type === "speaking_part" && (
-              <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6 space-y-5">
-                <div className="flex items-start gap-3">
-                  <span className="flex-shrink-0 w-9 h-9 bg-purple-600 text-white rounded-full flex items-center justify-center">
-                    <Mic className="w-4 h-4" />
-                  </span>
-                  <div>
-                    <p className="text-xs font-semibold text-purple-700 uppercase mb-1">
-                      Speaking Part
-                    </p>
-                    <p className="text-base font-medium text-slate-900">
-                      {currentContainer.instruction ||
-                        currentContainer.content ||
-                        "IELTS Speaking"}
-                    </p>
+            {currentContainer?.type === "speaking_part" &&
+              (() => {
+                const firstCqId =
+                  currentContainer.Container_Questions?.[0]
+                    ?.container_question_id;
+                const isDone =
+                  firstCqId != null && completedSpeakingCqIds.has(firstCqId);
+                return (
+                  <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6 space-y-5">
+                    <div className="flex items-start gap-3">
+                      <span className="flex-shrink-0 w-9 h-9 bg-purple-600 text-white rounded-full flex items-center justify-center">
+                        <Mic className="w-4 h-4" />
+                      </span>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <p className="text-xs font-semibold text-purple-700 uppercase">
+                            Speaking Part
+                          </p>
+                          {isDone && (
+                            <span className="flex items-center gap-1 px-2 py-0.5 bg-green-100 text-green-700 text-xs font-semibold rounded-full">
+                              <CheckCircle className="w-3 h-3" />
+                              Đã hoàn thành
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-base font-medium text-slate-900">
+                          {currentContainer.instruction ||
+                            currentContainer.content ||
+                            "IELTS Speaking"}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div
+                      className={`rounded-lg p-4 border ${isDone ? "bg-green-50 border-green-200" : "bg-purple-50 border-purple-200"}`}
+                    >
+                      {isDone ? (
+                        <p className="text-sm text-green-800 leading-relaxed mb-4">
+                          Bạn đã hoàn thành phần Speaking này. AI sẽ đánh giá
+                          khi nộp bài. Bạn có thể vào lại để ghi âm lại nếu
+                          muốn.
+                        </p>
+                      ) : (
+                        <p className="text-sm text-purple-900 leading-relaxed mb-4">
+                          Phần Speaking sẽ diễn ra dưới dạng đối thoại 1-1 với
+                          AI Examiner. Sau khi kết thúc, AI sẽ đánh giá dựa trên
+                          transcript ghi lại.
+                        </p>
+                      )}
+                      <button
+                        onClick={async () => {
+                          await handleSave(false);
+                          // Persist unsubmitted writing drafts across navigation
+                          if (
+                            userExamId &&
+                            Object.keys(writingTexts).length > 0
+                          ) {
+                            sessionStorage.setItem(
+                              `writingDraft_${userExamId}`,
+                              JSON.stringify(writingTexts),
+                            );
+                          }
+                          navigate(
+                            `/speaking-exam/${id}/${userExamId}/${currentContainer.container_id}`,
+                            {
+                              state: { containerIndex: currentContainerIndex },
+                            },
+                          );
+                        }}
+                        className={`w-full px-5 py-3 font-semibold rounded-lg transition-colors flex items-center justify-center gap-2 ${
+                          isDone
+                            ? "bg-green-600 text-white hover:bg-green-700"
+                            : "bg-purple-600 text-white hover:bg-purple-700"
+                        }`}
+                      >
+                        <Mic className="w-4 h-4" />
+                        {isDone
+                          ? "Vào lại phòng Speaking"
+                          : "Vào phòng Speaking"}
+                      </button>
+                    </div>
+
+                    {/* Navigation */}
+                    <div className="flex items-center justify-between pt-4 border-t">
+                      <button
+                        onClick={handlePreviousQuestion}
+                        disabled={currentContainerIndex === 0}
+                        className="px-6 py-3 border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors disabled:opacity-40 flex items-center gap-2 text-sm font-medium text-slate-700"
+                      >
+                        <ChevronLeft className="w-4 h-4" />
+                        Trước
+                      </button>
+                      <button
+                        onClick={handleNextQuestion}
+                        disabled={
+                          currentContainerIndex ===
+                          getFlattenedContainers().length - 1
+                        }
+                        className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-40 flex items-center gap-2 text-sm font-medium"
+                      >
+                        Tiếp
+                        <ChevronRight className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
-                </div>
-
-                <div className="bg-purple-50 rounded-lg p-4 border border-purple-200">
-                  <p className="text-sm text-purple-900 leading-relaxed mb-4">
-                    Phần Speaking sẽ diễn ra dưới dạng đối thoại 1-1 với AI
-                    Examiner. Sau khi kết thúc, AI sẽ đánh giá dựa trên
-                    transcript ghi lại.
-                  </p>
-                  <button
-                    onClick={() =>
-                      navigate(
-                        `/speaking-exam/${id}/${userExamId}/${currentContainer.container_id}`,
-                      )
-                    }
-                    className="w-full px-5 py-3 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 transition-colors flex items-center justify-center gap-2"
-                  >
-                    <Mic className="w-4 h-4" />
-                    Vào phòng Speaking
-                  </button>
-                </div>
-
-                {/* Navigation */}
-                <div className="flex items-center justify-between pt-4 border-t">
-                  <button
-                    onClick={handlePreviousQuestion}
-                    disabled={currentContainerIndex === 0}
-                    className="px-6 py-3 border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors disabled:opacity-40 flex items-center gap-2 text-sm font-medium text-slate-700"
-                  >
-                    <ChevronLeft className="w-4 h-4" />
-                    Trước
-                  </button>
-                  <button
-                    onClick={handleNextQuestion}
-                    disabled={
-                      currentContainerIndex ===
-                      getFlattenedContainers().length - 1
-                    }
-                    className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-40 flex items-center gap-2 text-sm font-medium"
-                  >
-                    Tiếp
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-            )}
+                );
+              })()}
 
             {/* ── MCQ (default) ────────────────────────── */}
             {currentContainer?.type !== "writing_task" &&
@@ -1204,6 +1298,41 @@ const ExamTaking: React.FC = () => {
                 (container: any, containerIdx: number) => {
                   const containerQuestions =
                     container.Container_Questions || [];
+
+                  // Speaking part: show as a single status tile
+                  if (container.type === "speaking_part") {
+                    const firstCqId =
+                      containerQuestions[0]?.container_question_id;
+                    const isDone =
+                      firstCqId != null &&
+                      completedSpeakingCqIds.has(firstCqId);
+                    const isCurrent = containerIdx === currentContainerIndex;
+                    return (
+                      <div key={container.container_id}>
+                        <h4 className="text-sm font-semibold text-slate-900 mb-3">
+                          {container.instruction || `Phần ${containerIdx + 1}`}{" "}
+                          - SPEAKING
+                        </h4>
+                        <button
+                          onClick={() => {
+                            goToQuestion(containerIdx, 0);
+                            setShowOverviewModal(false);
+                          }}
+                          className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 ${
+                            isCurrent
+                              ? "bg-blue-600 text-white shadow-md ring-2 ring-blue-300"
+                              : isDone
+                                ? "bg-green-100 text-green-700 hover:bg-green-200"
+                                : "bg-purple-100 text-purple-700 hover:bg-purple-200"
+                          }`}
+                        >
+                          <Mic className="w-4 h-4" />
+                          {isDone ? "Đã hoàn thành" : "Chưa làm"}
+                        </button>
+                      </div>
+                    );
+                  }
+
                   if (containerQuestions.length === 0) return null;
 
                   return (
@@ -1216,10 +1345,19 @@ const ExamTaking: React.FC = () => {
                         {containerQuestions.map(
                           (question: any, questionIdx: number) => {
                             const isAnswered =
-                              answers[question.container_question_id] !==
-                                null &&
-                              answers[question.container_question_id] !==
-                                undefined;
+                              container.type === "writing_task"
+                                ? (
+                                    writingTexts[
+                                      question.container_question_id
+                                    ] || ""
+                                  )
+                                    .trim()
+                                    .split(/\s+/)
+                                    .filter(Boolean).length >= 5
+                                : answers[question.container_question_id] !==
+                                    null &&
+                                  answers[question.container_question_id] !==
+                                    undefined;
                             const isCurrent =
                               containerIdx === currentContainerIndex &&
                               questionIdx === currentQuestionIndex;
@@ -1227,9 +1365,10 @@ const ExamTaking: React.FC = () => {
                             // Calculate global question number
                             let globalNum = 0;
                             for (let i = 0; i < containerIdx; i++) {
-                              globalNum +=
-                                getFlattenedContainers()[i].Container_Questions
-                                  ?.length || 0;
+                              const c = getFlattenedContainers()[i];
+                              if (c.type !== "speaking_part") {
+                                globalNum += c.Container_Questions?.length || 0;
+                              }
                             }
                             globalNum += questionIdx + 1;
 
@@ -1262,7 +1401,7 @@ const ExamTaking: React.FC = () => {
             </div>
 
             {/* Legend */}
-            <div className="flex items-center gap-6 mt-6 pt-6 border-t">
+            <div className="flex items-center gap-6 mt-6 pt-6 border-t flex-wrap">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 bg-blue-600 rounded-lg"></div>
                 <span className="text-sm text-slate-600">Hiện tại</span>
@@ -1274,6 +1413,12 @@ const ExamTaking: React.FC = () => {
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 bg-slate-100 border border-slate-200 rounded-lg"></div>
                 <span className="text-sm text-slate-600">Chưa trả lời</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 bg-purple-100 border border-purple-200 rounded-lg"></div>
+                <span className="text-sm text-slate-600">
+                  Speaking chưa làm
+                </span>
               </div>
             </div>
           </div>

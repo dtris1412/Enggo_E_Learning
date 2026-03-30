@@ -16,6 +16,9 @@ import {
   ChevronUp,
   Home,
   Mic,
+  Headphones,
+  BookOpen,
+  PenLine,
 } from "lucide-react";
 
 const ExamResult: React.FC = () => {
@@ -163,37 +166,121 @@ const ExamResult: React.FC = () => {
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
             {/* Score Card */}
-            <div
-              className={`rounded-lg shadow-lg border-2 p-8 ${getScoreBgColor(
-                percentage,
-              )}`}
-            >
-              <div className="text-center">
-                <Award
-                  className={`w-20 h-20 mx-auto mb-4 ${getScoreColor(percentage)}`}
-                />
-                <h2 className="text-4xl font-bold text-slate-900 mb-2">
-                  {percentage.toFixed(1)}%
-                </h2>
-                <p className="text-lg text-slate-700 mb-4">
-                  Điểm: {result.total_score} điểm
-                </p>
-                <div className="flex items-center justify-center gap-6 text-sm">
-                  <div className="flex items-center gap-2">
-                    <CheckCircle className="w-5 h-5 text-green-600" />
-                    <span className="text-slate-700">
-                      {result.statistics.correct_answers} Đúng
+            {result.skill_bands ? (
+              // ── IELTS Band Score Card ─────────────────────────────────────
+              <div className="bg-gradient-to-br from-blue-900 to-blue-700 rounded-2xl shadow-xl p-8 text-white">
+                <div className="text-center mb-8">
+                  <p className="text-blue-200 text-sm font-semibold uppercase tracking-widest mb-2">
+                    IELTS Overall Band Score
+                  </p>
+                  <div className="inline-flex items-center justify-center w-32 h-32 rounded-full bg-white/15 border-4 border-white/40 mb-3">
+                    <span className="text-6xl font-black text-white">
+                      {result.skill_bands.overall ?? "—"}
                     </span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <XCircle className="w-5 h-5 text-red-600" />
-                    <span className="text-slate-700">
-                      {result.statistics.incorrect_answers} Sai
-                    </span>
+                  {result.skill_bands.overall == null && (
+                    <p className="text-blue-200 text-xs mt-1">
+                      Hoàn thành Writing &amp; Speaking để tính band tổng
+                    </p>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {/* Listening */}
+                  <div className="bg-white/10 rounded-xl p-4 flex flex-col items-center gap-2">
+                    <Headphones className="w-7 h-7 text-cyan-300" />
+                    <p className="text-xs font-semibold text-blue-200 uppercase">
+                      Listening
+                    </p>
+                    <p className="text-3xl font-black text-white">
+                      {result.skill_bands.listening?.band ?? "—"}
+                    </p>
+                    {result.skill_bands.listening && (
+                      <p className="text-xs text-blue-200">
+                        {result.skill_bands.listening.correct}/
+                        {result.skill_bands.listening.total} đúng
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Reading */}
+                  <div className="bg-white/10 rounded-xl p-4 flex flex-col items-center gap-2">
+                    <BookOpen className="w-7 h-7 text-emerald-300" />
+                    <p className="text-xs font-semibold text-blue-200 uppercase">
+                      Reading
+                    </p>
+                    <p className="text-3xl font-black text-white">
+                      {result.skill_bands.reading?.band ?? "—"}
+                    </p>
+                    {result.skill_bands.reading && (
+                      <p className="text-xs text-blue-200">
+                        {result.skill_bands.reading.correct}/
+                        {result.skill_bands.reading.total} đúng
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Writing */}
+                  <div className="bg-white/10 rounded-xl p-4 flex flex-col items-center gap-2">
+                    <PenLine className="w-7 h-7 text-amber-300" />
+                    <p className="text-xs font-semibold text-blue-200 uppercase">
+                      Writing
+                    </p>
+                    <p className="text-3xl font-black text-white">
+                      {result.skill_bands.writing?.band ?? "—"}
+                    </p>
+                    {result.skill_bands.writing == null && (
+                      <p className="text-xs text-blue-200">Chưa chấm</p>
+                    )}
+                  </div>
+
+                  {/* Speaking */}
+                  <div className="bg-white/10 rounded-xl p-4 flex flex-col items-center gap-2">
+                    <Mic className="w-7 h-7 text-violet-300" />
+                    <p className="text-xs font-semibold text-blue-200 uppercase">
+                      Speaking
+                    </p>
+                    <p className="text-3xl font-black text-white">
+                      {result.skill_bands.speaking?.band ?? "—"}
+                    </p>
+                    {result.skill_bands.speaking == null && (
+                      <p className="text-xs text-blue-200">Chưa chấm</p>
+                    )}
                   </div>
                 </div>
               </div>
-            </div>
+            ) : (
+              // ── Non-IELTS Score Card ──────────────────────────────────────
+              <div
+                className={`rounded-lg shadow-lg border-2 p-8 ${getScoreBgColor(percentage)}`}
+              >
+                <div className="text-center">
+                  <Award
+                    className={`w-20 h-20 mx-auto mb-4 ${getScoreColor(percentage)}`}
+                  />
+                  <h2 className="text-4xl font-bold text-slate-900 mb-2">
+                    {percentage.toFixed(1)}%
+                  </h2>
+                  <p className="text-lg text-slate-700 mb-4">
+                    Điểm: {result.total_score} điểm
+                  </p>
+                  <div className="flex items-center justify-center gap-6 text-sm">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="w-5 h-5 text-green-600" />
+                      <span className="text-slate-700">
+                        {result.statistics.correct_answers} Đúng
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <XCircle className="w-5 h-5 text-red-600" />
+                      <span className="text-slate-700">
+                        {result.statistics.incorrect_answers} Sai
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Statistics */}
             <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
@@ -213,7 +300,7 @@ const ExamResult: React.FC = () => {
                   <p className="text-2xl font-bold text-slate-900">
                     {result.statistics.correct_answers}
                   </p>
-                  <p className="text-sm text-slate-600">Câu đúng</p>
+                  <p className="text-sm text-slate-600">Câu đúng (L+R)</p>
                 </div>
                 <div className="text-center p-4 bg-red-50 rounded-lg">
                   <XCircle className="w-8 h-8 text-red-600 mx-auto mb-2" />
@@ -227,8 +314,153 @@ const ExamResult: React.FC = () => {
                   <p className="text-2xl font-bold text-slate-900">
                     {result.total_score}
                   </p>
-                  <p className="text-sm text-slate-600">Điểm số</p>
+                  <p className="text-sm text-slate-600">Điểm số (L+R)</p>
                 </div>
+              </div>
+            </div>
+
+            {/* Detailed Answers */}
+            <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+              <h3 className="text-xl font-bold text-slate-900 mb-4">
+                Đáp án chi tiết
+              </h3>
+
+              <div className="space-y-4">
+                {result.answers.map((answer: any, index: number) => {
+                  const isExpanded =
+                    expandedQuestions[answer.user_answer_id] || false;
+                  const isCorrect = answer.is_correct;
+
+                  return (
+                    <div
+                      key={answer.user_answer_id}
+                      className={`border-2 rounded-lg overflow-hidden ${
+                        isCorrect
+                          ? "border-green-200 bg-green-50"
+                          : "border-red-200 bg-red-50"
+                      }`}
+                    >
+                      <div
+                        onClick={() => toggleQuestion(answer.user_answer_id)}
+                        className="p-4 cursor-pointer hover:bg-opacity-80 transition-colors"
+                      >
+                        <div className="flex items-start justify-between">
+                          <div className="flex items-start gap-3 flex-1">
+                            {isCorrect ? (
+                              <CheckCircle className="w-6 h-6 text-green-600 flex-shrink-0 mt-0.5" />
+                            ) : (
+                              <XCircle className="w-6 h-6 text-red-600 flex-shrink-0 mt-0.5" />
+                            )}
+                            <div className="flex-1">
+                              <p className="font-semibold text-slate-900 mb-1">
+                                Câu {index + 1}
+                              </p>
+                              <p className="text-slate-700 line-clamp-2">
+                                {
+                                  answer.Container_Question.Question
+                                    .question_content
+                                }
+                              </p>
+                            </div>
+                          </div>
+                          {isExpanded ? (
+                            <ChevronUp className="w-5 h-5 text-slate-400 flex-shrink-0" />
+                          ) : (
+                            <ChevronDown className="w-5 h-5 text-slate-400 flex-shrink-0" />
+                          )}
+                        </div>
+                      </div>
+
+                      {isExpanded && (
+                        <div className="px-4 pb-4 border-t border-slate-200 pt-4 bg-white">
+                          <div className="mb-4">
+                            <p className="font-medium text-slate-900 mb-3">
+                              {
+                                answer.Container_Question.Question
+                                  .question_content
+                              }
+                            </p>
+
+                            {answer.Container_Question.image_url && (
+                              <img
+                                src={answer.Container_Question.image_url}
+                                alt="Question"
+                                className="max-w-sm rounded-lg shadow-sm mb-4"
+                              />
+                            )}
+
+                            {/* Options */}
+                            <div className="space-y-2">
+                              {answer.Container_Question.Question_Options.map(
+                                (option: any) => {
+                                  const isUserAnswer =
+                                    answer.Question_Option
+                                      ?.question_option_id ===
+                                    option.question_option_id;
+                                  const isCorrectOption = option.is_correct;
+
+                                  return (
+                                    <div
+                                      key={option.question_option_id}
+                                      className={`p-3 rounded-lg border-2 ${
+                                        isCorrectOption
+                                          ? "border-green-500 bg-green-50"
+                                          : isUserAnswer && !isCorrectOption
+                                            ? "border-red-500 bg-red-50"
+                                            : "border-slate-200 bg-slate-50"
+                                      }`}
+                                    >
+                                      <div className="flex items-start gap-3">
+                                        <span
+                                          className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center font-semibold ${
+                                            isCorrectOption
+                                              ? "bg-green-600 text-white"
+                                              : isUserAnswer
+                                                ? "bg-red-600 text-white"
+                                                : "bg-slate-300 text-slate-700"
+                                          }`}
+                                        >
+                                          {option.label}
+                                        </span>
+                                        <div className="flex-1">
+                                          <span className="text-slate-900">
+                                            {option.content}
+                                          </span>
+                                          {isCorrectOption && (
+                                            <span className="ml-2 text-green-600 font-semibold text-sm">
+                                              (Đáp án đúng)
+                                            </span>
+                                          )}
+                                          {isUserAnswer && !isCorrectOption && (
+                                            <span className="ml-2 text-red-600 font-semibold text-sm">
+                                              (Câu trả lời của bạn)
+                                            </span>
+                                          )}
+                                        </div>
+                                      </div>
+                                    </div>
+                                  );
+                                },
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Explanation */}
+                          {answer.Container_Question.Question.explanation && (
+                            <div className="mt-4 p-4 bg-blue-50 border-l-4 border-blue-500 rounded">
+                              <p className="font-semibold text-blue-900 mb-2">
+                                Giải thích:
+                              </p>
+                              <p className="text-blue-800">
+                                {answer.Container_Question.Question.explanation}
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
@@ -783,151 +1015,6 @@ const ExamResult: React.FC = () => {
                 </div>
               </div>
             )}
-
-            {/* Detailed Answers */}
-            <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
-              <h3 className="text-xl font-bold text-slate-900 mb-4">
-                Đáp án chi tiết
-              </h3>
-
-              <div className="space-y-4">
-                {result.answers.map((answer: any, index: number) => {
-                  const isExpanded =
-                    expandedQuestions[answer.user_answer_id] || false;
-                  const isCorrect = answer.is_correct;
-
-                  return (
-                    <div
-                      key={answer.user_answer_id}
-                      className={`border-2 rounded-lg overflow-hidden ${
-                        isCorrect
-                          ? "border-green-200 bg-green-50"
-                          : "border-red-200 bg-red-50"
-                      }`}
-                    >
-                      <div
-                        onClick={() => toggleQuestion(answer.user_answer_id)}
-                        className="p-4 cursor-pointer hover:bg-opacity-80 transition-colors"
-                      >
-                        <div className="flex items-start justify-between">
-                          <div className="flex items-start gap-3 flex-1">
-                            {isCorrect ? (
-                              <CheckCircle className="w-6 h-6 text-green-600 flex-shrink-0 mt-0.5" />
-                            ) : (
-                              <XCircle className="w-6 h-6 text-red-600 flex-shrink-0 mt-0.5" />
-                            )}
-                            <div className="flex-1">
-                              <p className="font-semibold text-slate-900 mb-1">
-                                Câu {index + 1}
-                              </p>
-                              <p className="text-slate-700 line-clamp-2">
-                                {
-                                  answer.Container_Question.Question
-                                    .question_content
-                                }
-                              </p>
-                            </div>
-                          </div>
-                          {isExpanded ? (
-                            <ChevronUp className="w-5 h-5 text-slate-400 flex-shrink-0" />
-                          ) : (
-                            <ChevronDown className="w-5 h-5 text-slate-400 flex-shrink-0" />
-                          )}
-                        </div>
-                      </div>
-
-                      {isExpanded && (
-                        <div className="px-4 pb-4 border-t border-slate-200 pt-4 bg-white">
-                          <div className="mb-4">
-                            <p className="font-medium text-slate-900 mb-3">
-                              {
-                                answer.Container_Question.Question
-                                  .question_content
-                              }
-                            </p>
-
-                            {answer.Container_Question.image_url && (
-                              <img
-                                src={answer.Container_Question.image_url}
-                                alt="Question"
-                                className="max-w-sm rounded-lg shadow-sm mb-4"
-                              />
-                            )}
-
-                            {/* Options */}
-                            <div className="space-y-2">
-                              {answer.Container_Question.Question_Options.map(
-                                (option: any) => {
-                                  const isUserAnswer =
-                                    answer.Question_Option
-                                      ?.question_option_id ===
-                                    option.question_option_id;
-                                  const isCorrectOption = option.is_correct;
-
-                                  return (
-                                    <div
-                                      key={option.question_option_id}
-                                      className={`p-3 rounded-lg border-2 ${
-                                        isCorrectOption
-                                          ? "border-green-500 bg-green-50"
-                                          : isUserAnswer && !isCorrectOption
-                                            ? "border-red-500 bg-red-50"
-                                            : "border-slate-200 bg-slate-50"
-                                      }`}
-                                    >
-                                      <div className="flex items-start gap-3">
-                                        <span
-                                          className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center font-semibold ${
-                                            isCorrectOption
-                                              ? "bg-green-600 text-white"
-                                              : isUserAnswer
-                                                ? "bg-red-600 text-white"
-                                                : "bg-slate-300 text-slate-700"
-                                          }`}
-                                        >
-                                          {option.label}
-                                        </span>
-                                        <div className="flex-1">
-                                          <span className="text-slate-900">
-                                            {option.content}
-                                          </span>
-                                          {isCorrectOption && (
-                                            <span className="ml-2 text-green-600 font-semibold text-sm">
-                                              (Đáp án đúng)
-                                            </span>
-                                          )}
-                                          {isUserAnswer && !isCorrectOption && (
-                                            <span className="ml-2 text-red-600 font-semibold text-sm">
-                                              (Câu trả lời của bạn)
-                                            </span>
-                                          )}
-                                        </div>
-                                      </div>
-                                    </div>
-                                  );
-                                },
-                              )}
-                            </div>
-                          </div>
-
-                          {/* Explanation */}
-                          {answer.Container_Question.Question.explanation && (
-                            <div className="mt-4 p-4 bg-blue-50 border-l-4 border-blue-500 rounded">
-                              <p className="font-semibold text-blue-900 mb-2">
-                                Giải thích:
-                              </p>
-                              <p className="text-blue-800">
-                                {answer.Container_Question.Question.explanation}
-                              </p>
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
           </div>
 
           {/* Sidebar */}

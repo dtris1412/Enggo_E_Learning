@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { useExam } from "../../contexts/examContext";
 import { useToast } from "../../../shared/components/Toast/Toast";
 import {
@@ -68,6 +68,8 @@ const SpeakingExam: React.FC = () => {
     containerId: string;
   }>();
   const navigate = useNavigate();
+  const location = useLocation();
+  const containerIndex: number = (location.state as any)?.containerIndex ?? 0;
   const { speakingTurn, submitSpeaking } = useExam();
   const { showToast } = useToast();
 
@@ -421,7 +423,11 @@ const SpeakingExam: React.FC = () => {
             </p>
 
             <button
-              onClick={() => navigate(`/exams/${examId}/take`)}
+              onClick={() =>
+                navigate(`/exams/${examId}/take`, {
+                  state: { containerIndex: containerIndex + 1 },
+                })
+              }
               className="w-full px-4 py-3 bg-purple-700 text-white font-semibold rounded-xl hover:bg-purple-800 transition-colors"
             >
               Tiếp tục bài thi

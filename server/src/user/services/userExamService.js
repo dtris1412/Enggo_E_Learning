@@ -273,6 +273,10 @@ export const getExamResult = async (user_exam_id, user_id) => {
             attributes: ["container_question_id", "order", "score"],
             include: [
               {
+                model: db.Exam_Container,
+                attributes: ["container_id", "skill"],
+              },
+              {
                 model: db.Question,
                 attributes: ["question_id", "question_content", "explanation"],
               },
@@ -350,6 +354,83 @@ export const getExamResult = async (user_exam_id, user_id) => {
     writingBand = Math.round(writingBand * 2) / 2;
   }
 
+  // IELTS per-skill band calculation
+  const isIelts = userExam.Exam?.exam_type?.toUpperCase() === "IELTS";
+
+  const ieltsListeningBand = (correct, total) => {
+    const scaled = total > 0 ? Math.round((correct / total) * 40) : 0;
+    if (scaled >= 39) return 9.0;
+    if (scaled >= 37) return 8.5;
+    if (scaled >= 35) return 8.0;
+    if (scaled >= 32) return 7.5;
+    if (scaled >= 30) return 7.0;
+    if (scaled >= 26) return 6.5;
+    if (scaled >= 23) return 6.0;
+    if (scaled >= 18) return 5.5;
+    if (scaled >= 16) return 5.0;
+    if (scaled >= 13) return 4.5;
+    if (scaled >= 10) return 4.0;
+    if (scaled >= 8) return 3.5;
+    if (scaled >= 6) return 3.0;
+    if (scaled >= 4) return 2.5;
+    if (scaled >= 1) return 1.0;
+    return 0;
+  };
+
+  const ieltsReadingBand = (correct, total) => {
+    const scaled = total > 0 ? Math.round((correct / total) * 40) : 0;
+    if (scaled >= 39) return 9.0;
+    if (scaled >= 37) return 8.5;
+    if (scaled >= 35) return 8.0;
+    if (scaled >= 33) return 7.5;
+    if (scaled >= 30) return 7.0;
+    if (scaled >= 27) return 6.5;
+    if (scaled >= 23) return 6.0;
+    if (scaled >= 19) return 5.5;
+    if (scaled >= 15) return 5.0;
+    if (scaled >= 13) return 4.5;
+    if (scaled >= 10) return 4.0;
+    if (scaled >= 8) return 3.5;
+    if (scaled >= 6) return 3.0;
+    if (scaled >= 4) return 2.5;
+    if (scaled >= 1) return 1.0;
+    return 0;
+  };
+
+  let skill_bands = null;
+  if (isIelts) {
+    const bySkill = { listening: [], reading: [] };
+    (userExam.User_Answers || []).forEach((ans) => {
+      const skill =
+        ans.Container_Question?.Exam_Container?.skill?.toLowerCase();
+      if (skill === "listening") bySkill.listening.push(ans);
+      else if (skill === "reading") bySkill.reading.push(ans);
+    });
+
+    const lTotal = bySkill.listening.length;
+    const lCorrect = bySkill.listening.filter((a) => a.is_correct).length;
+    const rTotal = bySkill.reading.length;
+    const rCorrect = bySkill.reading.filter((a) => a.is_correct).length;
+
+    const lBand = lTotal > 0 ? ieltsListeningBand(lCorrect, lTotal) : null;
+    const rBand = rTotal > 0 ? ieltsReadingBand(rCorrect, rTotal) : null;
+    const wBand = writingBand;
+    const sBand = (() => {
+      // Inline: reuse from speakingResults computed below
+      return null; // will be patched after speaking calc
+    })();
+
+    skill_bands = {
+      listening:
+        lTotal > 0 ? { band: lBand, correct: lCorrect, total: lTotal } : null,
+      reading:
+        rTotal > 0 ? { band: rBand, correct: rCorrect, total: rTotal } : null,
+      writing: wBand != null ? { band: wBand } : null,
+      speaking: null, // filled after speaking calc
+      overall: null, // filled after speaking calc
+    };
+  }
+
   return {
     success: true,
     message: "Exam result retrieved successfully",
@@ -393,6 +474,23 @@ export const getExamResult = async (user_exam_id, user_id) => {
             gradedSpeaking.length;
           speakingBand = Math.round(speakingBand * 2) / 2;
         }
+
+        // Patch skill_bands with speaking + overall
+        if (isIelts && skill_bands) {
+          skill_bands.speaking =
+            speakingBand != null ? { band: speakingBand } : null;
+          const allBands = [
+            skill_bands.listening?.band,
+            skill_bands.reading?.band,
+            skill_bands.writing?.band,
+            speakingBand,
+          ].filter((b) => b != null);
+          if (allBands.length > 0) {
+            const avg = allBands.reduce((s, b) => s + b, 0) / allBands.length;
+            skill_bands.overall = Math.round(avg * 2) / 2;
+          }
+        }
+
         return {
           final_band: speakingBand,
           graded_count: gradedSpeaking.length,
@@ -400,6 +498,7 @@ export const getExamResult = async (user_exam_id, user_id) => {
           records: speakingRecords,
         };
       })(),
+      skill_bands,
     },
   };
 };
@@ -478,6 +577,16 @@ export const getOngoingExam = async (user_id) => {
     attributes: ["container_question_id", "question_option_id"],
   });
 
+  const writingTexts = await db.Writing_Submission.findAll({
+    where: { user_exam_id: userExam.user_exam_id },
+    attributes: ["container_question_id", "content"],
+  });
+
+  const speakingRecords = await db.Speaking_Record.findAll({
+    where: { user_exam_id: userExam.user_exam_id },
+    attributes: ["container_question_id"],
+  });
+
   return {
     success: true,
     message: "Ongoing exam retrieved successfully",
@@ -486,6 +595,10 @@ export const getOngoingExam = async (user_id) => {
       exam: userExam.Exam,
       started_at: userExam.started_at,
       saved_answers: savedAnswers,
+      writing_texts: writingTexts,
+      completed_speaking_cq_ids: speakingRecords.map(
+        (r) => r.container_question_id,
+      ),
     },
   };
 };
