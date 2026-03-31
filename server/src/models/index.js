@@ -14,8 +14,29 @@ const db = {};
 
 let sequelize;
 
-// Ưu tiên đọc từ environment variables
-if (process.env.DB_NAME) {
+// Ưu tiên: DB_HOST (Railway private network) → MYSQL_URL → DB_NAME → config file
+if (process.env.DB_HOST && process.env.DB_NAME) {
+  sequelize = new Sequelize(
+    process.env.DB_NAME,
+    process.env.DB_USER || "root",
+    process.env.DB_PASS || null,
+    {
+      host: process.env.DB_HOST,
+      port: parseInt(process.env.DB_PORT || "3306"),
+      dialect: "mysql",
+      logging: process.env.NODE_ENV === "development" ? console.log : false,
+      pool: { max: 5, min: 0, acquire: 30000, idle: 10000 },
+      dialectOptions: { connectTimeout: 60000 },
+    },
+  );
+} else if (process.env.MYSQL_URL) {
+  sequelize = new Sequelize(process.env.MYSQL_URL, {
+    dialect: "mysql",
+    logging: process.env.NODE_ENV === "development" ? console.log : false,
+    pool: { max: 5, min: 0, acquire: 30000, idle: 10000 },
+    dialectOptions: { connectTimeout: 60000 },
+  });
+} else if (process.env.DB_NAME) {
   sequelize = new Sequelize(
     process.env.DB_NAME,
     process.env.DB_USER || "root",
@@ -23,30 +44,14 @@ if (process.env.DB_NAME) {
     {
       host: process.env.DB_HOST || "127.0.0.1",
       port: parseInt(process.env.DB_PORT || "3306"),
-      dialect: process.env.DB_DIALECT || "mysql",
+      dialect: "mysql",
       logging: process.env.NODE_ENV === "development" ? console.log : false,
-      pool: {
-        max: 5,
-        min: 0,
-        acquire: 30000,
-        idle: 10000,
-      },
-      dialectOptions:
-        process.env.NODE_ENV === "production" && process.env.DB_SSL === "true"
-          ? {
-              ssl: {
-                require: true,
-                rejectUnauthorized: false,
-              },
-            }
-          : {},
+      pool: { max: 5, min: 0, acquire: 30000, idle: 10000 },
     },
   );
 } else if (config && config.use_env_variable) {
-  // Fallback: DATABASE_URL
   sequelize = new Sequelize(process.env[config.use_env_variable], config);
 } else if (config) {
-  // Fallback: config.json
   sequelize = new Sequelize(
     config.database,
     config.username,
@@ -55,7 +60,7 @@ if (process.env.DB_NAME) {
   );
 } else {
   throw new Error(
-    `No database config found for environment: ${env}. Set DB_NAME env variable.`,
+    `No database config found for environment: ${env}. Set MYSQL_URL or DB_NAME env variable.`,
   );
 }
 
