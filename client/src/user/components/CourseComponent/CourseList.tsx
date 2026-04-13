@@ -1,13 +1,14 @@
 import { useState, useEffect } from "react";
+import { useLocation, useSearchParams } from "react-router-dom";
 import { useCourse } from "../../contexts/courseContext";
 import CourseCard from "./CourseCard";
 import { Search, Filter, Loader2 } from "lucide-react";
+import Pagination from "../../../shared/components/Pagination";
 
 const CourseList: React.FC = () => {
   const {
     courses,
     totalCourses,
-    currentPage,
     totalPages,
     loading,
     error,
@@ -20,21 +21,33 @@ const CourseList: React.FC = () => {
   const [sortBy, setSortBy] = useState("created_at");
   const [sortOrder, setSortOrder] = useState("DESC");
   const [showFilters, setShowFilters] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
+
+  const urlPage = Math.max(1, parseInt(searchParams.get("page") || "1", 10));
 
   useEffect(() => {
     fetchCoursesPaginated(
       search,
-      currentPage,
-      12,
+      urlPage,
+      2,
       courseLevel,
       accessType,
       undefined,
       sortBy,
       sortOrder,
     );
-  }, [currentPage, courseLevel, accessType, sortBy, sortOrder]);
+  }, [urlPage, courseLevel, accessType, sortBy, sortOrder]);
+
+  const resetPage = () =>
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.set("page", "1");
+      return next;
+    });
 
   const handleSearch = () => {
+    resetPage();
     fetchCoursesPaginated(
       search,
       1,
@@ -47,23 +60,14 @@ const CourseList: React.FC = () => {
     );
   };
 
-  const handlePageChange = (page: number) => {
-    fetchCoursesPaginated(
-      search,
-      page,
-      12,
-      courseLevel,
-      accessType,
-      undefined,
-      sortBy,
-      sortOrder,
-    );
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") handleSearch();
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      handleSearch();
-    }
+  const buildPageUrl = (page: number) => {
+    const params = new URLSearchParams(searchParams);
+    params.set("page", String(page));
+    return `${location.pathname}?${params.toString()}`;
   };
 
   return (
@@ -203,43 +207,12 @@ const CourseList: React.FC = () => {
             )}
 
             {/* Pagination */}
-            {totalPages > 1 && (
-              <div className="flex justify-center items-center gap-2">
-                <button
-                  onClick={() => handlePageChange(currentPage - 1)}
-                  disabled={currentPage === 1}
-                  className="px-4 py-2 border border-slate-300 rounded-lg hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Trước
-                </button>
-
-                <div className="flex gap-2">
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                    (page) => (
-                      <button
-                        key={page}
-                        onClick={() => handlePageChange(page)}
-                        className={`px-4 py-2 rounded-lg ${
-                          currentPage === page
-                            ? "bg-violet-600 text-white"
-                            : "border border-slate-300 hover:bg-slate-50"
-                        }`}
-                      >
-                        {page}
-                      </button>
-                    ),
-                  )}
-                </div>
-
-                <button
-                  onClick={() => handlePageChange(currentPage + 1)}
-                  disabled={currentPage === totalPages}
-                  className="px-4 py-2 border border-slate-300 rounded-lg hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Sau
-                </button>
-              </div>
-            )}
+            <Pagination
+              currentPage={urlPage}
+              totalPages={totalPages}
+              buildPageUrl={buildPageUrl}
+              className="mb-8"
+            />
           </>
         )}
       </div>

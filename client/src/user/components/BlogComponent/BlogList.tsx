@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
+import { useLocation, useSearchParams } from "react-router-dom";
 import { useBlog } from "../../contexts/blogContext";
 import BlogCard from "./BlogCard";
 import BlogLayout from "./BlogLayout";
+import Pagination from "../../../shared/components/Pagination";
 
 const CATEGORIES = [
   { id: "all", name: "Tất cả" },
@@ -13,56 +15,58 @@ const CATEGORIES = [
 ];
 
 const BlogList: React.FC = () => {
-  const {
-    blogs,
-    currentPage,
-    totalPages,
-    loading,
-    error,
-    fetchBlogsPaginated,
-  } = useBlog();
+  const { blogs, totalPages, loading, error, fetchBlogsPaginated } = useBlog();
 
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
 
+  // Derive page from URL (?page=N), default 1
+  const urlPage = Math.max(1, parseInt(searchParams.get("page") || "1", 10));
+
+  // Fetch whenever URL page, category, or search changes
   useEffect(() => {
     fetchBlogsPaginated(
-      "",
-      1,
+      searchTerm,
+      urlPage,
       9,
       selectedCategory === "all" ? undefined : selectedCategory,
       "created_at",
       "DESC",
     );
-  }, [selectedCategory]);
+  }, [urlPage, selectedCategory, searchTerm]);
 
-  const handlePageChange = (page: number) => {
-    fetchBlogsPaginated(
-      "",
-      page,
-      9,
-      selectedCategory === "all" ? undefined : selectedCategory,
-      "created_at",
-      "DESC",
-    );
-    window.scrollTo({ top: 0, behavior: "smooth" });
+  // Reset to page 1 in URL when category or search changes
+  const handleCategoryChange = (cat: string) => {
+    setSelectedCategory(cat);
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.set("page", "1");
+      return next;
+    });
   };
 
   const handleSearch = (term: string) => {
-    fetchBlogsPaginated(
-      term,
-      1,
-      9,
-      selectedCategory === "all" ? undefined : selectedCategory,
-      "created_at",
-      "DESC",
-    );
+    setSearchTerm(term);
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.set("page", "1");
+      return next;
+    });
+  };
+
+  const buildPageUrl = (page: number) => {
+    const params = new URLSearchParams(searchParams);
+    params.set("page", String(page));
+    return `${location.pathname}?${params.toString()}`;
   };
 
   return (
     <BlogLayout
       categories={CATEGORIES}
       selectedCategory={selectedCategory}
-      onCategoryChange={setSelectedCategory}
+      onCategoryChange={handleCategoryChange}
       onSearch={handleSearch}
     >
       <div>
@@ -105,51 +109,12 @@ const BlogList: React.FC = () => {
             )}
 
             {/* Pagination */}
-            {totalPages > 1 && (
-              <div className="mt-8 flex justify-center items-center gap-2">
-                <button
-                  onClick={() => handlePageChange(currentPage - 1)}
-                  disabled={currentPage === 1}
-                  className="px-4 py-2 border border-slate-300 rounded-xl text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed text-sm bg-white transition-colors"
-                >
-                  Trước
-                </button>
-
-                {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
-                  let page;
-                  if (totalPages <= 5) {
-                    page = i + 1;
-                  } else if (currentPage <= 3) {
-                    page = i + 1;
-                  } else if (currentPage >= totalPages - 2) {
-                    page = totalPages - 4 + i;
-                  } else {
-                    page = currentPage - 2 + i;
-                  }
-                  return (
-                    <button
-                      key={page}
-                      onClick={() => handlePageChange(page)}
-                      className={`px-4 py-2 rounded-xl text-sm transition-colors ${
-                        currentPage === page
-                          ? "bg-slate-900 text-white"
-                          : "border border-slate-300 text-slate-600 hover:bg-slate-50 bg-white"
-                      }`}
-                    >
-                      {page}
-                    </button>
-                  );
-                })}
-
-                <button
-                  onClick={() => handlePageChange(currentPage + 1)}
-                  disabled={currentPage === totalPages}
-                  className="px-4 py-2 border border-slate-300 rounded-xl text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed text-sm bg-white transition-colors"
-                >
-                  Tiếp
-                </button>
-              </div>
-            )}
+            <Pagination
+              currentPage={urlPage}
+              totalPages={totalPages}
+              buildPageUrl={buildPageUrl}
+              className="mt-8"
+            />
           </>
         )}
       </div>

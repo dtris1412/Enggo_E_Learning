@@ -268,26 +268,40 @@ const TokenTransactions: React.FC = () => {
 
       {/* Pagination */}
       {pagination && pagination.pages > 1 && (
-        <div className="flex items-center justify-between pt-2 border-t border-slate-100">
-          <span className="text-xs text-slate-500">
-            Trang {pagination.page} / {pagination.pages}
-          </span>
-          <div className="flex gap-2">
+        <div className="flex justify-center items-center gap-5 pt-3 border-t border-slate-100">
+          {page > 1 ? (
             <button
               onClick={() => setPage((p) => p - 1)}
-              disabled={page <= 1}
-              className="p-1.5 rounded-lg border border-slate-200 text-slate-600 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50"
+              aria-label="Trang trước"
+              className="text-slate-400 hover:text-violet-600 transition-colors"
             >
-              <ChevronLeft className="w-4 h-4" />
+              <ChevronLeft className="w-5 h-5" />
             </button>
+          ) : (
+            <span className="text-slate-200 cursor-not-allowed">
+              <ChevronLeft className="w-5 h-5" />
+            </span>
+          )}
+          <span className="text-sm text-slate-500">
+            Trang{" "}
+            <span className="font-semibold text-violet-600">
+              {pagination.page}
+            </span>{" "}
+            / {pagination.pages}
+          </span>
+          {page < pagination.pages ? (
             <button
               onClick={() => setPage((p) => p + 1)}
-              disabled={page >= pagination.pages}
-              className="p-1.5 rounded-lg border border-slate-200 text-slate-600 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50"
+              aria-label="Trang tiếp"
+              className="text-slate-400 hover:text-violet-600 transition-colors"
             >
-              <ChevronRight className="w-4 h-4" />
+              <ChevronRight className="w-5 h-5" />
             </button>
-          </div>
+          ) : (
+            <span className="text-slate-200 cursor-not-allowed">
+              <ChevronRight className="w-5 h-5" />
+            </span>
+          )}
         </div>
       )}
     </div>

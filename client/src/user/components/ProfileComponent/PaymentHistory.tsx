@@ -392,28 +392,42 @@ const PaymentHistory: React.FC = () => {
           </div>
         )}
 
-        {/* Compact Pagination */}
+        {/* Pagination */}
         {pagination && pagination.pages > 1 && (
-          <div className="flex items-center justify-between pt-2 mt-0.5 border-t">
-            <p className="text-[10px] text-slate-600">
-              {pagination?.page}/{pagination?.pages} ({pagination?.total})
-            </p>
-            <div className="flex gap-1">
+          <div className="flex justify-center items-center gap-5 pt-3 mt-1 border-t border-slate-100">
+            {currentPage > 1 ? (
               <button
                 onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-                className="p-1 rounded border border-slate-300 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                aria-label="Trang trước"
+                className="text-slate-400 hover:text-violet-600 transition-colors"
               >
-                <ChevronLeft className="w-3.5 h-3.5" />
+                <ChevronLeft className="w-5 h-5" />
               </button>
+            ) : (
+              <span className="text-slate-200 cursor-not-allowed">
+                <ChevronLeft className="w-5 h-5" />
+              </span>
+            )}
+            <span className="text-sm text-slate-500">
+              Trang{" "}
+              <span className="font-semibold text-violet-600">
+                {pagination.page}
+              </span>{" "}
+              / {pagination.pages}
+            </span>
+            {currentPage < pagination.pages ? (
               <button
                 onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === (pagination?.pages || 1)}
-                className="p-1 rounded border border-slate-300 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                aria-label="Trang tiếp"
+                className="text-slate-400 hover:text-violet-600 transition-colors"
               >
-                <ChevronRight className="w-3.5 h-3.5" />
+                <ChevronRight className="w-5 h-5" />
               </button>
-            </div>
+            ) : (
+              <span className="text-slate-200 cursor-not-allowed">
+                <ChevronRight className="w-5 h-5" />
+              </span>
+            )}
           </div>
         )}
       </div>

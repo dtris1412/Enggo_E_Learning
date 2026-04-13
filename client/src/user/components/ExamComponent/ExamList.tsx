@@ -1,39 +1,42 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import { useExam } from "../../contexts/examContext";
 import ExamCard from "./ExamCard";
-import {
-  Search,
-  ChevronLeft,
-  ChevronRight,
-  FileText,
-  BookOpen,
-  TrendingUp,
-  Award,
-} from "lucide-react";
+import Pagination from "../../../shared/components/Pagination";
+import { Search, FileText, BookOpen, TrendingUp, Award } from "lucide-react";
 
 const ExamList: React.FC = () => {
   const navigate = useNavigate();
-  const {
-    exams,
-    totalExams,
-    currentPage,
-    totalPages,
-    loading,
-    error,
-    fetchExamsPaginated,
-  } = useExam();
+  const { exams, totalExams, totalPages, loading, error, fetchExamsPaginated } =
+    useExam();
 
   const [searchTerm, setSearchTerm] = useState("");
   const [examTypeFilter, setExamTypeFilter] = useState("");
   const [yearFilter, setYearFilter] = useState("");
-  const [itemsPerPage] = useState(12);
+  const [itemsPerPage] = useState(2);
   const [recentExams, setRecentExams] = useState<any[]>([]);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
+
+  const urlPage = Math.max(1, parseInt(searchParams.get("page") || "1", 10));
+
+  const buildPageUrl = (page: number) => {
+    const params = new URLSearchParams(searchParams);
+    params.set("page", String(page));
+    return `${location.pathname}?${params.toString()}`;
+  };
+
+  const resetPage = () =>
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.set("page", "1");
+      return next;
+    });
 
   // Initial load
   useEffect(() => {
-    fetchExamsPaginated(searchTerm, 1, itemsPerPage);
-  }, []);
+    fetchExamsPaginated(searchTerm, urlPage, itemsPerPage);
+  }, [urlPage]);
 
   // Fetch recent exams for sidebar (independent of search/filter)
   useEffect(() => {
@@ -56,6 +59,7 @@ const ExamList: React.FC = () => {
   // Auto-search with debounce
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
+      resetPage();
       fetchExamsPaginated(
         searchTerm,
         1,
@@ -70,6 +74,7 @@ const ExamList: React.FC = () => {
 
   // Auto-fetch when filters change
   useEffect(() => {
+    resetPage();
     fetchExamsPaginated(
       searchTerm,
       1,
@@ -87,7 +92,6 @@ const ExamList: React.FC = () => {
       examTypeFilter,
       yearFilter ? parseInt(yearFilter) : undefined,
     );
-    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -100,35 +104,6 @@ const ExamList: React.FC = () => {
 
   const handleYearChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setYearFilter(e.target.value);
-  };
-
-  const renderPagination = () => {
-    const pages = [];
-    const maxVisiblePages = 5;
-    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-
-    if (endPage - startPage + 1 < maxVisiblePages) {
-      startPage = Math.max(1, endPage - maxVisiblePages + 1);
-    }
-
-    for (let i = startPage; i <= endPage; i++) {
-      pages.push(
-        <button
-          key={i}
-          onClick={() => handlePageChange(i)}
-          className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-            currentPage === i
-              ? "bg-violet-600 text-white"
-              : "bg-white text-slate-700 hover:bg-slate-100 border border-slate-300"
-          }`}
-        >
-          {i}
-        </button>,
-      );
-    }
-
-    return pages;
   };
 
   // Generate year options (last 10 years)
@@ -250,27 +225,13 @@ const ExamList: React.FC = () => {
                 </div>
 
                 {/* Pagination */}
-                {totalPages > 1 && (
-                  <div className="flex justify-center items-center gap-2">
-                    <button
-                      onClick={() => handlePageChange(currentPage - 1)}
-                      disabled={currentPage === 1}
-                      className="p-2 rounded-lg border border-slate-300 hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      <ChevronLeft className="w-5 h-5" />
-                    </button>
-
-                    {renderPagination()}
-
-                    <button
-                      onClick={() => handlePageChange(currentPage + 1)}
-                      disabled={currentPage === totalPages}
-                      className="p-2 rounded-lg border border-slate-300 hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      <ChevronRight className="w-5 h-5" />
-                    </button>
-                  </div>
-                )}
+                <Pagination
+                  currentPage={urlPage}
+                  totalPages={totalPages}
+                  buildPageUrl={buildPageUrl}
+                  onPageChange={handlePageChange}
+                  className="mb-8"
+                />
               </>
             )}
 

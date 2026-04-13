@@ -1,17 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import { useDocument } from "../../contexts/documentContext.tsx";
 import { useToast } from "../../../shared/components/Toast/Toast.tsx";
 import DocumentListItem from "./DocumentListItem";
-import {
-  Search,
-  ChevronLeft,
-  ChevronRight,
-  FileText,
-  TrendingUp,
-  Eye,
-  Download,
-} from "lucide-react";
+import Pagination from "../../../shared/components/Pagination";
+import { Search, FileText, TrendingUp, Eye, Download } from "lucide-react";
 
 const DocumentList: React.FC = () => {
   const navigate = useNavigate();
@@ -31,9 +24,26 @@ const DocumentList: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [documentTypeFilter, setDocumentTypeFilter] = useState("");
   const [accessTypeFilter, setAccessTypeFilter] = useState("");
-  const [itemsPerPage] = useState(12);
+  const [itemsPerPage] = useState(2);
   const [topDocuments, setTopDocuments] = useState<any[]>([]);
   const [userHasPremium, setUserHasPremium] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
+
+  const urlPage = Math.max(1, parseInt(searchParams.get("page") || "1", 10));
+
+  const buildPageUrl = (page: number) => {
+    const params = new URLSearchParams(searchParams);
+    params.set("page", String(page));
+    return `${location.pathname}?${params.toString()}`;
+  };
+
+  const resetPage = () =>
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.set("page", "1");
+      return next;
+    });
 
   // Fetch user subscription status
   useEffect(() => {
@@ -75,12 +85,12 @@ const DocumentList: React.FC = () => {
   useEffect(() => {
     fetchDocumentsPaginated(
       searchTerm,
-      1,
+      urlPage,
       itemsPerPage,
       documentTypeFilter,
       accessTypeFilter,
     );
-  }, []);
+  }, [urlPage, documentTypeFilter, accessTypeFilter]);
 
   // Fetch top documents for sidebar (independent of search/filter)
   useEffect(() => {
@@ -105,6 +115,7 @@ const DocumentList: React.FC = () => {
   // Auto-search with debounce
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
+      resetPage();
       fetchDocumentsPaginated(
         searchTerm,
         1,
@@ -117,8 +128,9 @@ const DocumentList: React.FC = () => {
     return () => clearTimeout(delayDebounceFn);
   }, [searchTerm]);
 
-  // Auto-fetch when filters change
+  // Reset to page 1 when filters change
   useEffect(() => {
+    resetPage();
     fetchDocumentsPaginated(
       searchTerm,
       1,
@@ -136,7 +148,6 @@ const DocumentList: React.FC = () => {
       documentTypeFilter,
       accessTypeFilter,
     );
-    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleDownload = async (document_id: number) => {
@@ -310,60 +321,13 @@ const DocumentList: React.FC = () => {
                 </div>
 
                 {/* Pagination */}
-                {totalPages > 1 && (
-                  <div className="flex justify-center items-center gap-2 mt-8">
-                    <button
-                      onClick={() => handlePageChange(currentPage - 1)}
-                      disabled={currentPage === 1}
-                      className="p-2 rounded-lg border border-slate-300 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                    >
-                      <ChevronLeft className="w-5 h-5" />
-                    </button>
-
-                    <div className="flex items-center gap-2">
-                      {[...Array(totalPages)].map((_, index) => {
-                        const page = index + 1;
-                        if (
-                          page === 1 ||
-                          page === totalPages ||
-                          (page >= currentPage - 1 && page <= currentPage + 1)
-                        ) {
-                          return (
-                            <button
-                              key={page}
-                              onClick={() => handlePageChange(page)}
-                              className={`px-4 py-2 rounded-lg transition-colors ${
-                                currentPage === page
-                                  ? "bg-violet-600 text-white"
-                                  : "border border-slate-300 hover:bg-slate-50"
-                              }`}
-                            >
-                              {page}
-                            </button>
-                          );
-                        } else if (
-                          page === currentPage - 2 ||
-                          page === currentPage + 2
-                        ) {
-                          return (
-                            <span key={page} className="px-2">
-                              ...
-                            </span>
-                          );
-                        }
-                        return null;
-                      })}
-                    </div>
-
-                    <button
-                      onClick={() => handlePageChange(currentPage + 1)}
-                      disabled={currentPage === totalPages}
-                      className="p-2 rounded-lg border border-slate-300 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                    >
-                      <ChevronRight className="w-5 h-5" />
-                    </button>
-                  </div>
-                )}
+                <Pagination
+                  currentPage={urlPage}
+                  totalPages={totalPages}
+                  buildPageUrl={buildPageUrl}
+                  onPageChange={handlePageChange}
+                  className="mt-8"
+                />
               </>
             )}
           </div>

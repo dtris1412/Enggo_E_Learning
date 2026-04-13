@@ -9,6 +9,8 @@ import {
   Clock,
   Award,
   FileText,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { useExam } from "../contexts/examContext";
 import { AddExamModal, EditExamModal } from "../components/ExamManagement";
@@ -279,102 +281,85 @@ const ExamManagement = () => {
         )}
 
         {/* Pagination */}
-        {pagination && pagination.totalPages > 1 && (
-          <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
-            <div className="flex-1 flex justify-between sm:hidden">
-              <button
-                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                disabled={currentPage === 1}
-                className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
-              >
-                Trước
-              </button>
-              <button
-                onClick={() =>
-                  setCurrentPage((p) =>
-                    Math.min(pagination?.totalPages || 1, p + 1),
-                  )
-                }
-                disabled={currentPage === (pagination?.totalPages || 1)}
-                className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
-              >
-                Sau
-              </button>
-            </div>
-            <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-              <div>
-                <p className="text-sm text-gray-700">
-                  Hiển thị{" "}
-                  <span className="font-medium">
-                    {(currentPage - 1) * (pagination?.limit || 10) + 1}
-                  </span>{" "}
-                  đến{" "}
-                  <span className="font-medium">
-                    {Math.min(
-                      currentPage * (pagination?.limit || 10),
-                      pagination?.total || 0,
-                    )}
-                  </span>{" "}
-                  trong tổng số{" "}
-                  <span className="font-medium">{pagination?.total || 0}</span>{" "}
-                  kết quả
-                </p>
-              </div>
-              <div>
-                <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+        {pagination &&
+          pagination.totalPages > 1 &&
+          (() => {
+            const totalPages = pagination.totalPages;
+            const getPageNums = (): (number | "...")[] => {
+              if (totalPages <= 7)
+                return Array.from({ length: totalPages }, (_, i) => i + 1);
+              const startGroup = [1, 2];
+              const endGroup = [totalPages - 1, totalPages];
+              const midGroup = [
+                currentPage - 1,
+                currentPage,
+                currentPage + 1,
+              ].filter((p) => p > 2 && p < totalPages - 1);
+              const all = new Set([...startGroup, ...midGroup, ...endGroup]);
+              const sorted = Array.from(all).sort((a, b) => a - b);
+              const result: (number | "...")[] = [];
+              for (let i = 0; i < sorted.length; i++) {
+                if (i > 0 && sorted[i] - sorted[i - 1] > 1) result.push("...");
+                result.push(sorted[i]);
+              }
+              return result;
+            };
+            return (
+              <div className="flex justify-center items-center gap-5 flex-wrap px-4 py-4 border-t border-gray-200">
+                {currentPage > 1 ? (
                   <button
-                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                    disabled={currentPage === 1}
-                    className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+                    onClick={() => setCurrentPage((p) => p - 1)}
+                    aria-label="Trang trước"
+                    className="text-slate-400 hover:text-violet-600 transition-colors"
                   >
-                    Trước
+                    <ChevronLeft className="w-5 h-5" />
                   </button>
-                  {Array.from(
-                    { length: pagination?.totalPages || 0 },
-                    (_, i) => i + 1,
-                  )
-                    .filter(
-                      (page) =>
-                        page === 1 ||
-                        page === (pagination?.totalPages || 1) ||
-                        Math.abs(page - currentPage) <= 2,
-                    )
-                    .map((page, index, array) => (
-                      <>
-                        {index > 0 && array[index - 1] !== page - 1 && (
-                          <span className="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">
-                            ...
-                          </span>
-                        )}
-                        <button
-                          key={page}
-                          onClick={() => setCurrentPage(page)}
-                          className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
-                            currentPage === page
-                              ? "z-10 bg-blue-50 border-blue-500 text-blue-600"
-                              : "bg-white border-gray-300 text-gray-500 hover:bg-gray-50"
-                          }`}
-                        >
-                          {page}
-                        </button>
-                      </>
-                    ))}
+                ) : (
+                  <span className="text-slate-200 cursor-not-allowed">
+                    <ChevronLeft className="w-5 h-5" />
+                  </span>
+                )}
+                {getPageNums().map((p, idx) =>
+                  p === "..." ? (
+                    <span
+                      key={`e-${idx}`}
+                      className="text-sm text-slate-300 select-none tracking-widest"
+                      aria-hidden="true"
+                    >
+                      ···
+                    </span>
+                  ) : (
+                    <button
+                      key={p}
+                      onClick={() => setCurrentPage(p as number)}
+                      aria-label={`Trang ${p}`}
+                      aria-current={currentPage === p ? "page" : undefined}
+                      className={
+                        currentPage === p
+                          ? "text-base font-semibold text-violet-600 border-b-2 border-violet-600 pb-0.5 pointer-events-none"
+                          : "text-base font-medium text-slate-500 hover:text-violet-600 transition-colors pb-0.5 border-b-2 border-transparent hover:border-violet-300"
+                      }
+                    >
+                      {p}
+                    </button>
+                  ),
+                )}
+                {currentPage < totalPages ? (
                   <button
-                    onClick={() =>
-                      setCurrentPage((p) =>
-                        Math.min(pagination?.totalPages || 1, p + 1),
-                      )
-                    }
-                    disabled={currentPage === (pagination?.totalPages || 1)}
-                    className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+                    onClick={() => setCurrentPage((p) => p + 1)}
+                    aria-label="Trang tiếp"
+                    className="text-slate-400 hover:text-violet-600 transition-colors"
                   >
-                    Sau
+                    <ChevronRight className="w-5 h-5" />
                   </button>
-                </nav>
+                ) : (
+                  <span className="text-slate-200 cursor-not-allowed">
+                    <ChevronRight className="w-5 h-5" />
+                  </span>
+                )}
               </div>
-            </div>
-          </div>
-        )}
+            );
+          })()}
       </div>
 
       {/* Modals */}

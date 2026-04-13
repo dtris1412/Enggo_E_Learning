@@ -33,7 +33,10 @@ const initSharedRoutes = (app) => {
   // Social Auth Routes - Google
   router.get(
     "/api/auth/google",
-    passport.authenticate("google", { scope: ["profile", "email"] }),
+    passport.authenticate("google", {
+      scope: ["profile", "email"],
+      session: false,
+    }),
   );
   router.get(
     "/api/auth/google/callback",
@@ -46,7 +49,7 @@ const initSharedRoutes = (app) => {
   // Social Auth Routes - Facebook
   router.get(
     "/api/auth/facebook",
-    passport.authenticate("facebook", { scope: ["email"] }),
+    passport.authenticate("facebook", { scope: ["email"], session: false }),
   );
   router.get(
     "/api/auth/facebook/callback",

@@ -7,6 +7,8 @@ import {
   TrendingUp,
   CheckCircle,
   XCircle,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { useExam } from "../../contexts/examContext";
 
@@ -238,66 +240,88 @@ const ExamHistorySimple: React.FC = () => {
             })}
 
             {/* Pagination */}
-            {totalPages > 1 && (
-              <div className="flex items-center justify-between pt-4 border-t border-slate-100">
-                <p className="text-sm text-slate-500">
-                  Trang {currentPage}/{totalPages} &bull; {totalExams} bài thi
-                </p>
-                <div className="flex gap-1">
-                  <button
-                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                    disabled={currentPage === 1}
-                    className="px-3 py-1.5 rounded-lg text-sm border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition"
-                  >
-                    ‹ Trước
-                  </button>
-                  {Array.from({ length: totalPages }, (_, i) => i + 1)
-                    .filter(
-                      (p) =>
-                        p === 1 ||
-                        p === totalPages ||
-                        Math.abs(p - currentPage) <= 1,
-                    )
-                    .reduce<(number | "...")[]>((acc, p, i, arr) => {
-                      if (i > 0 && (arr[i - 1] as number) < p - 1)
-                        acc.push("...");
-                      acc.push(p);
-                      return acc;
-                    }, [])
-                    .map((p, i) =>
+            {totalPages > 1 &&
+              (() => {
+                const getPageNums = (): (number | "...")[] => {
+                  if (totalPages <= 7)
+                    return Array.from({ length: totalPages }, (_, i) => i + 1);
+                  const startGroup = [1, 2];
+                  const endGroup = [totalPages - 1, totalPages];
+                  const midGroup = [
+                    currentPage - 1,
+                    currentPage,
+                    currentPage + 1,
+                  ].filter((p) => p > 2 && p < totalPages - 1);
+                  const all = new Set([
+                    ...startGroup,
+                    ...midGroup,
+                    ...endGroup,
+                  ]);
+                  const sorted = Array.from(all).sort((a, b) => a - b);
+                  const result: (number | "...")[] = [];
+                  for (let i = 0; i < sorted.length; i++) {
+                    if (i > 0 && sorted[i] - sorted[i - 1] > 1)
+                      result.push("...");
+                    result.push(sorted[i]);
+                  }
+                  return result;
+                };
+                return (
+                  <div className="flex justify-center items-center gap-5 flex-wrap pt-4 border-t border-slate-100">
+                    {currentPage > 1 ? (
+                      <button
+                        onClick={() => setCurrentPage((p) => p - 1)}
+                        aria-label="Trang trước"
+                        className="text-slate-400 hover:text-violet-600 transition-colors"
+                      >
+                        <ChevronLeft className="w-5 h-5" />
+                      </button>
+                    ) : (
+                      <span className="text-slate-200 cursor-not-allowed">
+                        <ChevronLeft className="w-5 h-5" />
+                      </span>
+                    )}
+                    {getPageNums().map((p, idx) =>
                       p === "..." ? (
                         <span
-                          key={`ellipsis-${i}`}
-                          className="px-2 py-1.5 text-sm text-slate-400"
+                          key={`e-${idx}`}
+                          className="text-sm text-slate-300 select-none tracking-widest"
+                          aria-hidden="true"
                         >
-                          ...
+                          ···
                         </span>
                       ) : (
                         <button
                           key={p}
                           onClick={() => setCurrentPage(p as number)}
-                          className={`px-3 py-1.5 rounded-lg text-sm border transition ${
+                          aria-label={`Trang ${p}`}
+                          aria-current={currentPage === p ? "page" : undefined}
+                          className={
                             currentPage === p
-                              ? "bg-violet-600 text-white border-violet-600"
-                              : "border-slate-200 text-slate-600 hover:bg-slate-50"
-                          }`}
+                              ? "text-base font-semibold text-violet-600 border-b-2 border-violet-600 pb-0.5 pointer-events-none"
+                              : "text-base font-medium text-slate-500 hover:text-violet-600 transition-colors pb-0.5 border-b-2 border-transparent hover:border-violet-300"
+                          }
                         >
                           {p}
                         </button>
                       ),
                     )}
-                  <button
-                    onClick={() =>
-                      setCurrentPage((p) => Math.min(totalPages, p + 1))
-                    }
-                    disabled={currentPage === totalPages}
-                    className="px-3 py-1.5 rounded-lg text-sm border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition"
-                  >
-                    Sau ›
-                  </button>
-                </div>
-              </div>
-            )}
+                    {currentPage < totalPages ? (
+                      <button
+                        onClick={() => setCurrentPage((p) => p + 1)}
+                        aria-label="Trang tiếp"
+                        className="text-slate-400 hover:text-violet-600 transition-colors"
+                      >
+                        <ChevronRight className="w-5 h-5" />
+                      </button>
+                    ) : (
+                      <span className="text-slate-200 cursor-not-allowed">
+                        <ChevronRight className="w-5 h-5" />
+                      </span>
+                    )}
+                  </div>
+                );
+              })()}
           </div>
         )}
       </div>

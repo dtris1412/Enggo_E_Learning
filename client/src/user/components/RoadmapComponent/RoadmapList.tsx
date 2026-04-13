@@ -1,13 +1,14 @@
 import { useState, useEffect } from "react";
+import { useLocation, useSearchParams } from "react-router-dom";
 import { useRoadmap } from "../../contexts/roadmapContext";
 import RoadmapCard from "./RoadmapCard";
 import { Search, Filter, Loader2, MapPin } from "lucide-react";
+import Pagination from "../../../shared/components/Pagination";
 
 const RoadmapList: React.FC = () => {
   const {
     roadmaps,
     totalRoadmaps,
-    currentPage,
     totalPages,
     loading,
     error,
@@ -19,24 +20,42 @@ const RoadmapList: React.FC = () => {
   const [sortBy, setSortBy] = useState("created_at");
   const [sortOrder, setSortOrder] = useState("DESC");
   const [showFilters, setShowFilters] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
+
+  const urlPage = Math.max(1, parseInt(searchParams.get("page") || "1", 10));
+
+  const buildPageUrl = (page: number) => {
+    const params = new URLSearchParams(searchParams);
+    params.set("page", String(page));
+    return `${location.pathname}?${params.toString()}`;
+  };
+
+  const resetPage = () =>
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.set("page", "1");
+      return next;
+    });
 
   useEffect(() => {
     fetchRoadmapsPaginated(
       search,
-      currentPage,
-      12,
+      urlPage,
+      2,
       roadmapLevel,
       undefined,
       sortBy,
       sortOrder,
     );
-  }, [currentPage, roadmapLevel, sortBy, sortOrder]);
+  }, [urlPage, roadmapLevel, sortBy, sortOrder]);
 
   const handleSearch = () => {
+    resetPage();
     fetchRoadmapsPaginated(
       search,
       1,
-      12,
+      2,
       roadmapLevel,
       undefined,
       sortBy,
@@ -57,9 +76,7 @@ const RoadmapList: React.FC = () => {
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      handleSearch();
-    }
+    if (e.key === "Enter") handleSearch();
   };
 
   return (
@@ -185,43 +202,13 @@ const RoadmapList: React.FC = () => {
             )}
 
             {/* Pagination */}
-            {totalPages > 1 && (
-              <div className="flex justify-center items-center gap-2">
-                <button
-                  onClick={() => handlePageChange(currentPage - 1)}
-                  disabled={currentPage === 1}
-                  className="px-4 py-2 border border-slate-300 rounded-lg hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Trước
-                </button>
-
-                <div className="flex gap-2">
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                    (page) => (
-                      <button
-                        key={page}
-                        onClick={() => handlePageChange(page)}
-                        className={`px-4 py-2 rounded-lg ${
-                          currentPage === page
-                            ? "bg-violet-600 text-white"
-                            : "border border-slate-300 hover:bg-slate-50"
-                        }`}
-                      >
-                        {page}
-                      </button>
-                    ),
-                  )}
-                </div>
-
-                <button
-                  onClick={() => handlePageChange(currentPage + 1)}
-                  disabled={currentPage === totalPages}
-                  className="px-4 py-2 border border-slate-300 rounded-lg hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Sau
-                </button>
-              </div>
-            )}
+            <Pagination
+              currentPage={urlPage}
+              totalPages={totalPages}
+              buildPageUrl={buildPageUrl}
+              onPageChange={handlePageChange}
+              className="mb-8"
+            />
           </>
         )}
       </div>

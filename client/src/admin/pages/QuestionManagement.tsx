@@ -1,5 +1,12 @@
 import { useEffect, useState } from "react";
-import { Search, Edit2, Lock, Unlock } from "lucide-react";
+import {
+  Search,
+  Edit2,
+  Lock,
+  Unlock,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import {
   useLessonQuestion,
   LessonQuestion,
@@ -227,65 +234,86 @@ const QuestionManagement = () => {
             </div>
 
             {/* Pagination */}
-            {totalPages > 1 && (
-              <div className="bg-gray-50 px-6 py-4 border-t border-gray-200">
-                <div className="flex items-center justify-between">
-                  <div className="text-sm text-gray-700">
-                    Hiển thị {(page - 1) * limit + 1} -{" "}
-                    {Math.min(page * limit, totalQuestions)} của{" "}
-                    {totalQuestions} câu hỏi
+            {totalPages > 1 &&
+              (() => {
+                const getPageNums = (): (number | "...")[] => {
+                  if (totalPages <= 7)
+                    return Array.from({ length: totalPages }, (_, i) => i + 1);
+                  const startGroup = [1, 2];
+                  const endGroup = [totalPages - 1, totalPages];
+                  const midGroup = [page - 1, page, page + 1].filter(
+                    (p) => p > 2 && p < totalPages - 1,
+                  );
+                  const all = new Set([
+                    ...startGroup,
+                    ...midGroup,
+                    ...endGroup,
+                  ]);
+                  const sorted = Array.from(all).sort((a, b) => a - b);
+                  const result: (number | "...")[] = [];
+                  for (let i = 0; i < sorted.length; i++) {
+                    if (i > 0 && sorted[i] - sorted[i - 1] > 1)
+                      result.push("...");
+                    result.push(sorted[i]);
+                  }
+                  return result;
+                };
+                return (
+                  <div className="flex justify-center items-center gap-5 flex-wrap bg-gray-50 px-6 py-4 border-t border-gray-200">
+                    {page > 1 ? (
+                      <button
+                        onClick={() => setPage((p) => p - 1)}
+                        aria-label="Trang trước"
+                        className="text-slate-400 hover:text-violet-600 transition-colors"
+                      >
+                        <ChevronLeft className="w-5 h-5" />
+                      </button>
+                    ) : (
+                      <span className="text-slate-200 cursor-not-allowed">
+                        <ChevronLeft className="w-5 h-5" />
+                      </span>
+                    )}
+                    {getPageNums().map((p, idx) =>
+                      p === "..." ? (
+                        <span
+                          key={`e-${idx}`}
+                          className="text-sm text-slate-300 select-none tracking-widest"
+                          aria-hidden="true"
+                        >
+                          ···
+                        </span>
+                      ) : (
+                        <button
+                          key={p}
+                          onClick={() => setPage(p as number)}
+                          aria-label={`Trang ${p}`}
+                          aria-current={page === p ? "page" : undefined}
+                          className={
+                            page === p
+                              ? "text-base font-semibold text-violet-600 border-b-2 border-violet-600 pb-0.5 pointer-events-none"
+                              : "text-base font-medium text-slate-500 hover:text-violet-600 transition-colors pb-0.5 border-b-2 border-transparent hover:border-violet-300"
+                          }
+                        >
+                          {p}
+                        </button>
+                      ),
+                    )}
+                    {page < totalPages ? (
+                      <button
+                        onClick={() => setPage((p) => p + 1)}
+                        aria-label="Trang tiếp"
+                        className="text-slate-400 hover:text-violet-600 transition-colors"
+                      >
+                        <ChevronRight className="w-5 h-5" />
+                      </button>
+                    ) : (
+                      <span className="text-slate-200 cursor-not-allowed">
+                        <ChevronRight className="w-5 h-5" />
+                      </span>
+                    )}
                   </div>
-                  <div className="flex space-x-2">
-                    <button
-                      onClick={() => setPage((p) => Math.max(1, p - 1))}
-                      disabled={page === 1}
-                      className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      Trước
-                    </button>
-                    <div className="flex items-center space-x-1">
-                      {[...Array(totalPages)].map((_, i) => {
-                        const pageNum = i + 1;
-                        if (
-                          pageNum === 1 ||
-                          pageNum === totalPages ||
-                          (pageNum >= page - 1 && pageNum <= page + 1)
-                        ) {
-                          return (
-                            <button
-                              key={pageNum}
-                              onClick={() => setPage(pageNum)}
-                              className={`px-4 py-2 rounded-lg ${
-                                page === pageNum
-                                  ? "bg-blue-600 text-white"
-                                  : "border border-gray-300 hover:bg-gray-50"
-                              }`}
-                            >
-                              {pageNum}
-                            </button>
-                          );
-                        } else if (
-                          pageNum === page - 2 ||
-                          pageNum === page + 2
-                        ) {
-                          return <span key={pageNum}>...</span>;
-                        }
-                        return null;
-                      })}
-                    </div>
-                    <button
-                      onClick={() =>
-                        setPage((p) => Math.min(totalPages, p + 1))
-                      }
-                      disabled={page === totalPages}
-                      className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      Sau
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
+                );
+              })()}
           </>
         )}
       </div>

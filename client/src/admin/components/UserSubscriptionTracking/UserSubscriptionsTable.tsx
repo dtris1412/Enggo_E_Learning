@@ -206,36 +206,40 @@ const UserSubscriptionsTable = ({
 
           {/* Pagination */}
           {pagination && pagination.totalPages > 1 && (
-            <div className="bg-gray-50 px-6 py-4 flex items-center justify-between border-t border-gray-200">
-              <p className="text-sm text-gray-600">
-                Trang {pagination.currentPage} của {pagination.totalPages} •
-                Tổng: {pagination.total} đăng ký
-              </p>
-              <div className="flex gap-2">
+            <div className="flex justify-center items-center gap-5 px-6 py-4 border-t border-gray-200">
+              {pagination.currentPage > 1 ? (
                 <button
-                  onClick={() =>
-                    onPageChange(Math.max(1, pagination.currentPage - 1))
-                  }
-                  disabled={pagination.currentPage === 1}
-                  className="p-2 border border-gray-300 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                  onClick={() => onPageChange(pagination.currentPage - 1)}
+                  aria-label="Trang trước"
+                  className="text-slate-400 hover:text-violet-600 transition-colors"
                 >
-                  <ChevronLeft className="h-4 w-4" />
+                  <ChevronLeft className="h-5 w-5" />
                 </button>
+              ) : (
+                <span className="text-slate-200 cursor-not-allowed">
+                  <ChevronLeft className="h-5 w-5" />
+                </span>
+              )}
+              <span className="text-sm text-slate-500">
+                Trang{" "}
+                <span className="font-semibold text-violet-600">
+                  {pagination.currentPage}
+                </span>{" "}
+                / {pagination.totalPages}
+              </span>
+              {pagination.currentPage < pagination.totalPages ? (
                 <button
-                  onClick={() =>
-                    onPageChange(
-                      Math.min(
-                        pagination.totalPages,
-                        pagination.currentPage + 1,
-                      ),
-                    )
-                  }
-                  disabled={pagination.currentPage === pagination.totalPages}
-                  className="p-2 border border-gray-300 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                  onClick={() => onPageChange(pagination.currentPage + 1)}
+                  aria-label="Trang tiếp"
+                  className="text-slate-400 hover:text-violet-600 transition-colors"
                 >
-                  <ChevronRight className="h-4 w-4" />
+                  <ChevronRight className="h-5 w-5" />
                 </button>
-              </div>
+              ) : (
+                <span className="text-slate-200 cursor-not-allowed">
+                  <ChevronRight className="h-5 w-5" />
+                </span>
+              )}
             </div>
           )}
         </>
