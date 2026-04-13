@@ -37,7 +37,7 @@ const CourseManagement = () => {
   const [selectedLevel, setSelectedLevel] = useState<string>("");
   const [selectedTag, setSelectedTag] = useState<string>("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [limit] = useState(10);
+  const [limit] = useState(12);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingCourse, setEditingCourse] = useState<any>(null);

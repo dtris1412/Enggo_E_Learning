@@ -19,7 +19,7 @@ const UserSubscriptionTracking = () => {
   } = useUserSubscriptionTracking();
 
   const [page, setPage] = useState(1);
-  const [limit] = useState(10);
+  const [limit] = useState(12);
   const [status, setStatus] = useState("");
   const [search, setSearch] = useState("");
   const [selectedSubscription, setSelectedSubscription] =

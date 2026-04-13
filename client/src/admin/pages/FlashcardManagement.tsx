@@ -35,7 +35,7 @@ const FlashcardManagement: React.FC = () => {
   const [selectedSet, setSelectedSet] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10);
+  const [itemsPerPage] = useState(12);
   const [visibilityFilter, setVisibilityFilter] = useState("");
   const [createdByTypeFilter, setCreatedByTypeFilter] = useState("");
 

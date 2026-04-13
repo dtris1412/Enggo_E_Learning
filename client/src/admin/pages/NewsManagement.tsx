@@ -45,7 +45,7 @@ const NewsManagement = () => {
   const loadBlogs = () => {
     fetchBlogsPaginated({
       page: currentPage,
-      limit: 10,
+      limit: 12,
       search: searchTerm,
       category: selectedCategory,
       status: selectedStatus,

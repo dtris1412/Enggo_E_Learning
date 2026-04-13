@@ -13,7 +13,7 @@ const ExamList: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [examTypeFilter, setExamTypeFilter] = useState("");
   const [yearFilter, setYearFilter] = useState("");
-  const [itemsPerPage] = useState(2);
+  const [itemsPerPage] = useState(12);
   const [recentExams, setRecentExams] = useState<any[]>([]);
   const [searchParams, setSearchParams] = useSearchParams();
   const location = useLocation();

@@ -30,7 +30,7 @@ const DocumentManagement: React.FC = () => {
   const [selectedDocument, setSelectedDocument] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [itemsPerPage, setItemsPerPage] = useState(12);
   const [documentTypeFilter, setDocumentTypeFilter] = useState("");
   const [fileTypeFilter, setFileTypeFilter] = useState("");
 

@@ -30,7 +30,7 @@ const BlogList: React.FC = () => {
     fetchBlogsPaginated(
       searchTerm,
       urlPage,
-      9,
+      12,
       selectedCategory === "all" ? undefined : selectedCategory,
       "created_at",
       "DESC",

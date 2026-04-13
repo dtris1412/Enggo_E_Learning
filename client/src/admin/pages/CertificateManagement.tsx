@@ -28,7 +28,7 @@ const CertificateManagement = () => {
 
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [limit] = useState(10);
+  const [limit] = useState(12);
 
   const totalPages = Math.ceil(totalCertificates / limit);
   const [showAddModal, setShowAddModal] = useState(false);
