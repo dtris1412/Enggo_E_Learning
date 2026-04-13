@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import {
   Search,
   Plus,
@@ -11,9 +11,8 @@ import {
   Calendar,
   Eye,
   Users,
-  ChevronLeft,
-  ChevronRight,
 } from "lucide-react";
+import Pagination from "../../shared/components/Pagination";
 import { useCourse } from "../contexts/courseContext";
 import AddCourseModal from "../components/CourseManagement/Course/AddCourseModal";
 import EditCourseModal from "../components/CourseManagement/Course/EditCourseModal";
@@ -36,8 +35,21 @@ const CourseManagement = () => {
   const [selectedStatus, setSelectedStatus] = useState<string>("");
   const [selectedLevel, setSelectedLevel] = useState<string>("");
   const [selectedTag, setSelectedTag] = useState<string>("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [limit] = useState(12);
+  const [limit] = useState(2);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
+  const urlPage = Math.max(1, parseInt(searchParams.get("page") || "1", 10));
+  const resetPage = () =>
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.set("page", "1");
+      return next;
+    });
+  const buildPageUrl = (page: number) => {
+    const params = new URLSearchParams(searchParams);
+    params.set("page", String(page));
+    return `${location.pathname}?${params.toString()}`;
+  };
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingCourse, setEditingCourse] = useState<any>(null);
@@ -45,7 +57,7 @@ const CourseManagement = () => {
   const totalPages = Math.ceil(totalCourses / limit);
 
   useEffect(() => {
-    fetchCoursesPaginated("", limit, currentPage);
+    fetchCoursesPaginated("", limit, urlPage);
   }, [fetchCoursesPaginated]);
 
   useEffect(() => {
@@ -55,7 +67,7 @@ const CourseManagement = () => {
       fetchCoursesPaginated(
         searchTerm,
         limit,
-        currentPage,
+        urlPage,
         statusFilter,
         selectedLevel || undefined,
         selectedTag || undefined,
@@ -68,7 +80,7 @@ const CourseManagement = () => {
     selectedStatus,
     selectedLevel,
     selectedTag,
-    currentPage,
+    urlPage,
     limit,
     fetchCoursesPaginated,
   ]);
@@ -379,86 +391,12 @@ const CourseManagement = () => {
         )}
       </div>
 
-      {/* Pagination */}
-      {!loading &&
-        courses.length > 0 &&
-        totalPages > 1 &&
-        (() => {
-          const getPageNums = (): (number | "...")[] => {
-            if (totalPages <= 7)
-              return Array.from({ length: totalPages }, (_, i) => i + 1);
-            const startGroup = [1, 2];
-            const endGroup = [totalPages - 1, totalPages];
-            const midGroup = [
-              currentPage - 1,
-              currentPage,
-              currentPage + 1,
-            ].filter((p) => p > 2 && p < totalPages - 1);
-            const all = new Set([...startGroup, ...midGroup, ...endGroup]);
-            const sorted = Array.from(all).sort((a, b) => a - b);
-            const result: (number | "...")[] = [];
-            for (let i = 0; i < sorted.length; i++) {
-              if (i > 0 && sorted[i] - sorted[i - 1] > 1) result.push("...");
-              result.push(sorted[i]);
-            }
-            return result;
-          };
-          return (
-            <div className="flex justify-center items-center gap-5 flex-wrap py-4">
-              {currentPage > 1 ? (
-                <button
-                  onClick={() => setCurrentPage((p) => p - 1)}
-                  aria-label="Trang trước"
-                  className="text-slate-400 hover:text-violet-600 transition-colors"
-                >
-                  <ChevronLeft className="w-5 h-5" />
-                </button>
-              ) : (
-                <span className="text-slate-200 cursor-not-allowed">
-                  <ChevronLeft className="w-5 h-5" />
-                </span>
-              )}
-              {getPageNums().map((p, idx) =>
-                p === "..." ? (
-                  <span
-                    key={`e-${idx}`}
-                    className="text-sm text-slate-300 select-none tracking-widest"
-                    aria-hidden="true"
-                  >
-                    ···
-                  </span>
-                ) : (
-                  <button
-                    key={p}
-                    onClick={() => setCurrentPage(p as number)}
-                    aria-label={`Trang ${p}`}
-                    aria-current={currentPage === p ? "page" : undefined}
-                    className={
-                      currentPage === p
-                        ? "text-base font-semibold text-violet-600 border-b-2 border-violet-600 pb-0.5 pointer-events-none"
-                        : "text-base font-medium text-slate-500 hover:text-violet-600 transition-colors pb-0.5 border-b-2 border-transparent hover:border-violet-300"
-                    }
-                  >
-                    {p}
-                  </button>
-                ),
-              )}
-              {currentPage < totalPages ? (
-                <button
-                  onClick={() => setCurrentPage((p) => p + 1)}
-                  aria-label="Trang tiếp"
-                  className="text-slate-400 hover:text-violet-600 transition-colors"
-                >
-                  <ChevronRight className="w-5 h-5" />
-                </button>
-              ) : (
-                <span className="text-slate-200 cursor-not-allowed">
-                  <ChevronRight className="w-5 h-5" />
-                </span>
-              )}
-            </div>
-          );
-        })()}
+      <Pagination
+        currentPage={urlPage}
+        totalPages={totalPages}
+        buildPageUrl={buildPageUrl}
+        className="py-4"
+      />
 
       {/* Modals */}
       <AddCourseModal

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useSearchParams, useLocation } from "react-router-dom";
 import { useSkill } from "../contexts/skillContext";
 import { useCertificate } from "../contexts/certificateContext";
 import {
@@ -9,12 +10,11 @@ import {
   Calendar,
   Link2,
   Trash2,
-  ChevronLeft,
-  ChevronRight,
 } from "lucide-react";
 import AddSkillModal from "../components/SkillManagement/AddSkillModal";
 import EditSkillModal from "../components/SkillManagement/EditSkillModal.tsx";
 import LinkCertificateSkillModal from "../components/SkillManagement/LinkCertificateSkillModal.tsx";
+import Pagination from "../../shared/components/Pagination";
 
 const SkillManagement = () => {
   const {
@@ -33,10 +33,21 @@ const SkillManagement = () => {
   const { certificates, fetchCertificates } = useCertificate();
 
   const [searchTerm, setSearchTerm] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [limit] = useState(10);
-
-  const totalPages = Math.ceil(totalItems / limit);
+  const [limit] = useState(2);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
+  const urlPage = Math.max(1, parseInt(searchParams.get("page") || "1", 10));
+  const resetPage = () =>
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.set("page", "1");
+      return next;
+    });
+  const buildPageUrl = (page: number) => {
+    const params = new URLSearchParams(searchParams);
+    params.set("page", String(page));
+    return `${location.pathname}?${params.toString()}`;
+  };
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showLinkModal, setShowLinkModal] = useState(false);
@@ -44,13 +55,13 @@ const SkillManagement = () => {
   const [linkingSkill, setLinkingSkill] = useState<any>(null);
 
   useEffect(() => {
-    fetchSkills("", limit, currentPage);
+    fetchSkills("", limit, urlPage);
     fetchCertificates("", 100, 1);
-  }, [fetchSkills, fetchCertificates, currentPage]);
+  }, [fetchSkills, fetchCertificates, urlPage]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      setCurrentPage(1);
+      resetPage();
       fetchSkills(searchTerm, limit, 1);
     }, 300);
 
@@ -75,7 +86,7 @@ const SkillManagement = () => {
     const success = await createSkill(data.skill_name);
     if (success) {
       setShowAddModal(false);
-      fetchSkills(searchTerm, limit, currentPage);
+      fetchSkills(searchTerm, limit, urlPage);
     }
   };
 
@@ -84,7 +95,7 @@ const SkillManagement = () => {
       const success = await updateSkill(editingSkill.skill_id, data.skill_name);
       if (success) {
         setShowEditModal(false);
-        fetchSkills(searchTerm, limit, currentPage);
+        fetchSkills(searchTerm, limit, urlPage);
       }
     }
   };
@@ -99,7 +110,7 @@ const SkillManagement = () => {
       );
       if (success) {
         setShowLinkModal(false);
-        fetchSkills(searchTerm, limit, currentPage);
+        fetchSkills(searchTerm, limit, urlPage);
       }
     }
   };
@@ -108,7 +119,7 @@ const SkillManagement = () => {
     if (window.confirm("Bạn có chắc chắn muốn xóa liên kết này?")) {
       const success = await deleteCertificateSkill(certificateSkillId);
       if (success) {
-        fetchSkills(searchTerm, limit, currentPage);
+        fetchSkills(searchTerm, limit, urlPage);
       }
     }
   };
@@ -274,84 +285,12 @@ const SkillManagement = () => {
       </div>
 
       {/* Pagination */}
-      {/* Pagination */}
-      {totalPages > 1 &&
-        (() => {
-          const getPageNums = (): (number | "...")[] => {
-            if (totalPages <= 7)
-              return Array.from({ length: totalPages }, (_, i) => i + 1);
-            const startGroup = [1, 2];
-            const endGroup = [totalPages - 1, totalPages];
-            const midGroup = [
-              currentPage - 1,
-              currentPage,
-              currentPage + 1,
-            ].filter((p) => p > 2 && p < totalPages - 1);
-            const all = new Set([...startGroup, ...midGroup, ...endGroup]);
-            const sorted = Array.from(all).sort((a, b) => a - b);
-            const result: (number | "...")[] = [];
-            for (let i = 0; i < sorted.length; i++) {
-              if (i > 0 && sorted[i] - sorted[i - 1] > 1) result.push("...");
-              result.push(sorted[i]);
-            }
-            return result;
-          };
-          return (
-            <div className="flex justify-center items-center gap-5 flex-wrap py-4">
-              {currentPage > 1 ? (
-                <button
-                  onClick={() => setCurrentPage((p) => p - 1)}
-                  aria-label="Trang trước"
-                  className="text-slate-400 hover:text-violet-600 transition-colors"
-                >
-                  <ChevronLeft className="w-5 h-5" />
-                </button>
-              ) : (
-                <span className="text-slate-200 cursor-not-allowed">
-                  <ChevronLeft className="w-5 h-5" />
-                </span>
-              )}
-              {getPageNums().map((p, idx) =>
-                p === "..." ? (
-                  <span
-                    key={`e-${idx}`}
-                    className="text-sm text-slate-300 select-none tracking-widest"
-                    aria-hidden="true"
-                  >
-                    ···
-                  </span>
-                ) : (
-                  <button
-                    key={p}
-                    onClick={() => setCurrentPage(p as number)}
-                    aria-label={`Trang ${p}`}
-                    aria-current={currentPage === p ? "page" : undefined}
-                    className={
-                      currentPage === p
-                        ? "text-base font-semibold text-violet-600 border-b-2 border-violet-600 pb-0.5 pointer-events-none"
-                        : "text-base font-medium text-slate-500 hover:text-violet-600 transition-colors pb-0.5 border-b-2 border-transparent hover:border-violet-300"
-                    }
-                  >
-                    {p}
-                  </button>
-                ),
-              )}
-              {currentPage < totalPages ? (
-                <button
-                  onClick={() => setCurrentPage((p) => p + 1)}
-                  aria-label="Trang tiếp"
-                  className="text-slate-400 hover:text-violet-600 transition-colors"
-                >
-                  <ChevronRight className="w-5 h-5" />
-                </button>
-              ) : (
-                <span className="text-slate-200 cursor-not-allowed">
-                  <ChevronRight className="w-5 h-5" />
-                </span>
-              )}
-            </div>
-          );
-        })()}
+      <Pagination
+        currentPage={urlPage}
+        totalPages={Math.ceil(totalItems / limit)}
+        buildPageUrl={buildPageUrl}
+        className="py-4"
+      />
 
       {/* Modals */}
       <AddSkillModal

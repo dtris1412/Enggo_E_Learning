@@ -1,17 +1,12 @@
 import { useEffect, useState } from "react";
-import {
-  Search,
-  Edit2,
-  Lock,
-  Unlock,
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react";
+import { useSearchParams, useLocation } from "react-router-dom";
+import { Search, Edit2, Lock, Unlock } from "lucide-react";
 import {
   useLessonQuestion,
   LessonQuestion,
 } from "../contexts/lessonQuestionContext.tsx";
 import EditLessonQuestionModal from "../components/LessonManagement/EditLessonQuestionModal.tsx";
+import Pagination from "../../shared/components/Pagination";
 
 const QuestionManagement = () => {
   const {
@@ -23,24 +18,37 @@ const QuestionManagement = () => {
     unlockQuestion,
   } = useLessonQuestion();
 
-  const [page, setPage] = useState(1);
-  const [limit] = useState(12);
+  const [limit] = useState(2);
   const [searchTerm, setSearchTerm] = useState("");
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedQuestion, setSelectedQuestion] =
     useState<LessonQuestion | null>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
+  const urlPage = Math.max(1, parseInt(searchParams.get("page") || "1", 10));
+  const resetPage = () =>
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.set("page", "1");
+      return next;
+    });
+  const buildPageUrl = (pg: number) => {
+    const params = new URLSearchParams(searchParams);
+    params.set("page", String(pg));
+    return `${location.pathname}?${params.toString()}`;
+  };
 
   useEffect(() => {
     loadQuestions();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page]);
+  }, [urlPage]);
 
   const loadQuestions = () => {
-    fetchQuestionsPaginated(page, limit, searchTerm);
+    fetchQuestionsPaginated(searchTerm, limit, urlPage);
   };
 
   const handleSearch = () => {
-    setPage(1);
+    resetPage();
     loadQuestions();
   };
 
@@ -76,8 +84,6 @@ const QuestionManagement = () => {
     };
     return colors[level] || "bg-gray-100 text-gray-800";
   };
-
-  const totalPages = Math.ceil(totalQuestions / limit);
 
   return (
     <div className="p-6">
@@ -159,7 +165,7 @@ const QuestionManagement = () => {
                       className={!question.status ? "bg-gray-50" : ""}
                     >
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {(page - 1) * limit + index + 1}
+                        {(urlPage - 1) * limit + index + 1}
                       </td>
                       <td className="px-6 py-4">
                         <div className="max-w-md">
@@ -234,86 +240,12 @@ const QuestionManagement = () => {
             </div>
 
             {/* Pagination */}
-            {totalPages > 1 &&
-              (() => {
-                const getPageNums = (): (number | "...")[] => {
-                  if (totalPages <= 7)
-                    return Array.from({ length: totalPages }, (_, i) => i + 1);
-                  const startGroup = [1, 2];
-                  const endGroup = [totalPages - 1, totalPages];
-                  const midGroup = [page - 1, page, page + 1].filter(
-                    (p) => p > 2 && p < totalPages - 1,
-                  );
-                  const all = new Set([
-                    ...startGroup,
-                    ...midGroup,
-                    ...endGroup,
-                  ]);
-                  const sorted = Array.from(all).sort((a, b) => a - b);
-                  const result: (number | "...")[] = [];
-                  for (let i = 0; i < sorted.length; i++) {
-                    if (i > 0 && sorted[i] - sorted[i - 1] > 1)
-                      result.push("...");
-                    result.push(sorted[i]);
-                  }
-                  return result;
-                };
-                return (
-                  <div className="flex justify-center items-center gap-5 flex-wrap bg-gray-50 px-6 py-4 border-t border-gray-200">
-                    {page > 1 ? (
-                      <button
-                        onClick={() => setPage((p) => p - 1)}
-                        aria-label="Trang trước"
-                        className="text-slate-400 hover:text-violet-600 transition-colors"
-                      >
-                        <ChevronLeft className="w-5 h-5" />
-                      </button>
-                    ) : (
-                      <span className="text-slate-200 cursor-not-allowed">
-                        <ChevronLeft className="w-5 h-5" />
-                      </span>
-                    )}
-                    {getPageNums().map((p, idx) =>
-                      p === "..." ? (
-                        <span
-                          key={`e-${idx}`}
-                          className="text-sm text-slate-300 select-none tracking-widest"
-                          aria-hidden="true"
-                        >
-                          ···
-                        </span>
-                      ) : (
-                        <button
-                          key={p}
-                          onClick={() => setPage(p as number)}
-                          aria-label={`Trang ${p}`}
-                          aria-current={page === p ? "page" : undefined}
-                          className={
-                            page === p
-                              ? "text-base font-semibold text-violet-600 border-b-2 border-violet-600 pb-0.5 pointer-events-none"
-                              : "text-base font-medium text-slate-500 hover:text-violet-600 transition-colors pb-0.5 border-b-2 border-transparent hover:border-violet-300"
-                          }
-                        >
-                          {p}
-                        </button>
-                      ),
-                    )}
-                    {page < totalPages ? (
-                      <button
-                        onClick={() => setPage((p) => p + 1)}
-                        aria-label="Trang tiếp"
-                        className="text-slate-400 hover:text-violet-600 transition-colors"
-                      >
-                        <ChevronRight className="w-5 h-5" />
-                      </button>
-                    ) : (
-                      <span className="text-slate-200 cursor-not-allowed">
-                        <ChevronRight className="w-5 h-5" />
-                      </span>
-                    )}
-                  </div>
-                );
-              })()}
+            <Pagination
+              currentPage={urlPage}
+              totalPages={Math.ceil(totalQuestions / limit)}
+              buildPageUrl={buildPageUrl}
+              className="bg-gray-50 px-6 py-4 border-t border-gray-200"
+            />
           </>
         )}
       </div>

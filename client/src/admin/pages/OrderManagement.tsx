@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import {
   Search,
   Filter,
@@ -41,16 +42,37 @@ const OrderManagement = () => {
   } = useOrderPayment();
 
   // Order filters
-  const [orderPage, setOrderPage] = useState(1);
-  const [orderLimit] = useState(10);
+  const [orderLimit] = useState(2);
   const [orderStatus, setOrderStatus] = useState("");
   const [orderSearch, setOrderSearch] = useState("");
 
   // Payment filters
-  const [paymentPage, setPaymentPage] = useState(1);
-  const [paymentLimit] = useState(10);
+  const [paymentLimit] = useState(2);
   const [paymentStatus, setPaymentStatus] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("");
+
+  // URL-based pagination
+  const [searchParams, setSearchParams] = useSearchParams();
+  const orderPage = Math.max(
+    1,
+    parseInt(searchParams.get("orderPage") || "1", 10),
+  );
+  const paymentPage = Math.max(
+    1,
+    parseInt(searchParams.get("paymentPage") || "1", 10),
+  );
+  const setOrderPage = (page: number) =>
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.set("orderPage", String(page));
+      return next;
+    });
+  const setPaymentPage = (page: number) =>
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.set("paymentPage", String(page));
+      return next;
+    });
 
   // Modal states
   const [activeTab, setActiveTab] = useState<"orders" | "payments">("orders");

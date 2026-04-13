@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Search, Eye, XCircle, Calendar, User, Award } from "lucide-react";
 import {
   useUserSubscriptionTracking,
@@ -18,17 +19,24 @@ const UserSubscriptionTracking = () => {
     expireSubscription,
   } = useUserSubscriptionTracking();
 
-  const [page, setPage] = useState(1);
-  const [limit] = useState(12);
+  const [limit] = useState(2);
   const [status, setStatus] = useState("");
   const [search, setSearch] = useState("");
   const [selectedSubscription, setSelectedSubscription] =
     useState<UserSubscription | null>(null);
   const [showViewModal, setShowViewModal] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const urlPage = Math.max(1, parseInt(searchParams.get("page") || "1", 10));
+  const resetPage = () =>
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.set("page", "1");
+      return next;
+    });
 
   useEffect(() => {
-    fetchSubscriptions(page, limit, status, search);
-  }, [page, limit, status, search]);
+    fetchSubscriptions(urlPage, limit, status, search);
+  }, [urlPage, limit, status, search]);
 
   const handleViewSubscription = (subscription: UserSubscription) => {
     setSelectedSubscription(subscription);
@@ -43,7 +51,7 @@ const UserSubscriptionTracking = () => {
     const success = await expireSubscription(subscriptionId);
     if (success) {
       alert("Hủy đăng ký thành công");
-      fetchSubscriptions(page, limit, status, search);
+      fetchSubscriptions(urlPage, limit, status, search);
     } else {
       alert("Lỗi khi hủy đăng ký");
     }
@@ -138,7 +146,7 @@ const UserSubscriptionTracking = () => {
               value={search}
               onChange={(e) => {
                 setSearch(e.target.value);
-                setPage(1);
+                resetPage();
               }}
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
@@ -149,7 +157,7 @@ const UserSubscriptionTracking = () => {
             value={status}
             onChange={(e) => {
               setStatus(e.target.value);
-              setPage(1);
+              resetPage();
             }}
             className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
@@ -175,7 +183,13 @@ const UserSubscriptionTracking = () => {
         pagination={pagination}
         onViewSubscription={handleViewSubscription}
         onExpireSubscription={handleExpireSubscription}
-        onPageChange={setPage}
+        onPageChange={(newPage) =>
+          setSearchParams((prev) => {
+            const next = new URLSearchParams(prev);
+            next.set("page", String(newPage));
+            return next;
+          })
+        }
       />
 
       {/* View Subscription Modal */}

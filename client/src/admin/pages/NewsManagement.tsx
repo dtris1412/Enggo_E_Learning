@@ -7,8 +7,6 @@ import {
   Calendar,
   User,
   Tag,
-  ChevronLeft,
-  ChevronRight,
   Heart,
   MessageCircle,
 } from "lucide-react";
@@ -16,8 +14,9 @@ import { useState, useEffect } from "react";
 import { useBlog } from "../contexts/blogContext";
 import AddBlogModal from "../components/BlogManagement/AddBlogModal";
 import EditBlogModal from "../components/BlogManagement/EditBlogModal";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import ExportButton from "../components/ExportButton";
+import Pagination from "../../shared/components/Pagination";
 
 const NewsManagement = () => {
   const navigate = useNavigate();
@@ -33,19 +32,32 @@ const NewsManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
+  const urlPage = Math.max(1, parseInt(searchParams.get("page") || "1", 10));
+  const resetPage = () =>
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.set("page", "1");
+      return next;
+    });
+  const buildPageUrl = (page: number) => {
+    const params = new URLSearchParams(searchParams);
+    params.set("page", String(page));
+    return `${location.pathname}?${params.toString()}`;
+  };
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedBlogId, setSelectedBlogId] = useState<number | null>(null);
 
   useEffect(() => {
     loadBlogs();
-  }, [currentPage, searchTerm, selectedCategory, selectedStatus]);
+  }, [urlPage, searchTerm, selectedCategory, selectedStatus]);
 
   const loadBlogs = () => {
     fetchBlogsPaginated({
-      page: currentPage,
-      limit: 12,
+      page: urlPage,
+      limit: 2,
       search: searchTerm,
       category: selectedCategory,
       status: selectedStatus,
@@ -145,7 +157,7 @@ const NewsManagement = () => {
                 value={searchTerm}
                 onChange={(e) => {
                   setSearchTerm(e.target.value);
-                  setCurrentPage(1);
+                  resetPage();
                 }}
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
@@ -155,7 +167,7 @@ const NewsManagement = () => {
             value={selectedCategory}
             onChange={(e) => {
               setSelectedCategory(e.target.value);
-              setCurrentPage(1);
+              resetPage();
             }}
             className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           >
@@ -170,7 +182,7 @@ const NewsManagement = () => {
             value={selectedStatus}
             onChange={(e) => {
               setSelectedStatus(e.target.value);
-              setCurrentPage(1);
+              resetPage();
             }}
             className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           >
@@ -328,84 +340,12 @@ const NewsManagement = () => {
         </div>
 
         {/* Pagination */}
-        {pagination.totalPages > 1 &&
-          (() => {
-            const totalPages = pagination.totalPages;
-            const getPageNums = (): (number | "...")[] => {
-              if (totalPages <= 7)
-                return Array.from({ length: totalPages }, (_, i) => i + 1);
-              const startGroup = [1, 2];
-              const endGroup = [totalPages - 1, totalPages];
-              const midGroup = [
-                currentPage - 1,
-                currentPage,
-                currentPage + 1,
-              ].filter((p) => p > 2 && p < totalPages - 1);
-              const all = new Set([...startGroup, ...midGroup, ...endGroup]);
-              const sorted = Array.from(all).sort((a, b) => a - b);
-              const result: (number | "...")[] = [];
-              for (let i = 0; i < sorted.length; i++) {
-                if (i > 0 && sorted[i] - sorted[i - 1] > 1) result.push("...");
-                result.push(sorted[i]);
-              }
-              return result;
-            };
-            return (
-              <div className="flex justify-center items-center gap-5 flex-wrap px-6 py-4 border-t">
-                {currentPage > 1 ? (
-                  <button
-                    onClick={() => setCurrentPage((p) => p - 1)}
-                    aria-label="Trang trước"
-                    className="text-slate-400 hover:text-violet-600 transition-colors"
-                  >
-                    <ChevronLeft className="h-5 w-5" />
-                  </button>
-                ) : (
-                  <span className="text-slate-200 cursor-not-allowed">
-                    <ChevronLeft className="h-5 w-5" />
-                  </span>
-                )}
-                {getPageNums().map((p, idx) =>
-                  p === "..." ? (
-                    <span
-                      key={`e-${idx}`}
-                      className="text-sm text-slate-300 select-none tracking-widest"
-                      aria-hidden="true"
-                    >
-                      ···
-                    </span>
-                  ) : (
-                    <button
-                      key={p}
-                      onClick={() => setCurrentPage(p as number)}
-                      aria-label={`Trang ${p}`}
-                      aria-current={currentPage === p ? "page" : undefined}
-                      className={
-                        currentPage === p
-                          ? "text-base font-semibold text-violet-600 border-b-2 border-violet-600 pb-0.5 pointer-events-none"
-                          : "text-base font-medium text-slate-500 hover:text-violet-600 transition-colors pb-0.5 border-b-2 border-transparent hover:border-violet-300"
-                      }
-                    >
-                      {p}
-                    </button>
-                  ),
-                )}
-                {currentPage < totalPages ? (
-                  <button
-                    onClick={() => setCurrentPage((p) => p + 1)}
-                    aria-label="Trang tiếp"
-                    className="text-slate-400 hover:text-violet-600 transition-colors"
-                  >
-                    <ChevronRight className="h-5 w-5" />
-                  </button>
-                ) : (
-                  <span className="text-slate-200 cursor-not-allowed">
-                    <ChevronRight className="h-5 w-5" />
-                  </span>
-                )}
-              </div>
-            );
-          })()}
+        <Pagination
+          currentPage={urlPage}
+          totalPages={pagination.totalPages}
+          buildPageUrl={buildPageUrl}
+          className="px-6 py-4 border-t"
+        />
       </div>
 
       {/* Statistics */}
