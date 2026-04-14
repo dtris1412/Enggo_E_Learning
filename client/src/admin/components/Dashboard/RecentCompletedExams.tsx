@@ -1,16 +1,23 @@
-import React from "react";
-import { CheckCircle, Clock } from "lucide-react";
+import React, { useEffect } from "react";
+import { CheckCircle, Clock, BookOpen } from "lucide-react";
 
 interface CompletedExam {
   user_exam_id: number;
+  started_at: string;
   submitted_at: string;
   total_score: number;
+  status: string;
+  selected_parts: string;
   User: {
+    user_id: number;
     user_name: string;
     full_name: string;
   };
   Exam: {
+    exam_id: number;
     exam_name: string;
+    exam_type: string;
+    exam_title: string;
   };
 }
 
@@ -33,10 +40,38 @@ const timeAgo = (dateString: string) => {
   return `${diffDays} ngày trước`;
 };
 
+// Calculate duration in minutes
+const calculateDuration = (startTime: string, endTime: string): number => {
+  const start = new Date(startTime).getTime();
+  const end = new Date(endTime).getTime();
+  return Math.round((end - start) / 60000); // convert to minutes
+};
+
+// Parse selected parts to display
+const getSelectedPartsDisplay = (selectedParts: string): string => {
+  try {
+    const parts = JSON.parse(selectedParts);
+    if (Array.isArray(parts)) {
+      if (parts.includes("all")) return "Tất cả phần";
+      return `Phần: ${parts.join(", ")}`;
+    }
+  } catch {
+    return selectedParts;
+  }
+  return selectedParts;
+};
+
 const RecentCompletedExams: React.FC<RecentCompletedExamsProps> = ({
   exams,
   loading = false,
 }) => {
+  // Debug log
+  useEffect(() => {
+    console.log("[RecentCompletedExams] Received exams prop:", exams);
+    console.log("[RecentCompletedExams] Loading state:", loading);
+    console.log("[RecentCompletedExams] Exams count:", exams.length);
+  }, [exams, loading]);
+
   return (
     <div className="bg-white rounded-lg border border-gray-200 p-5 h-full flex flex-col">
       <h2 className="text-base font-semibold text-gray-900 mb-3">
@@ -53,27 +88,50 @@ const RecentCompletedExams: React.FC<RecentCompletedExamsProps> = ({
           exams.map((exam) => (
             <div
               key={exam.user_exam_id}
-              className="flex items-start gap-2 p-2 rounded-lg hover:bg-gray-50 transition-colors border border-gray-100"
+              className="border border-gray-200 rounded-lg p-3 hover:bg-gray-50 transition-colors"
             >
-              <div className="flex-shrink-0 mt-0.5">
-                <CheckCircle className="h-4 w-4 text-green-600" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 truncate">
-                  {exam.User.full_name || exam.User.user_name}
-                </p>
-                <p className="text-xs text-gray-600 truncate">
-                  {exam.Exam.exam_name}
-                </p>
-                <div className="flex items-center gap-2 mt-1">
-                  <span className="text-xs font-semibold text-green-700 bg-green-50 px-2 py-0.5 rounded">
-                    Điểm: {exam.total_score}
-                  </span>
-                  <span className="text-xs text-gray-500 flex items-center gap-1">
-                    <Clock className="h-3 w-3" />
-                    {timeAgo(exam.submitted_at)}
-                  </span>
+              {/* Header: Exam Name + Status */}
+              <div className="flex items-start justify-between mb-2">
+                <div className="flex items-start gap-2 flex-1">
+                  <CheckCircle className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-gray-900 truncate">
+                      {exam.Exam.exam_name}
+                    </p>
+                    <p className="text-xs text-gray-500 truncate">
+                      {exam.Exam.exam_type}
+                    </p>
+                  </div>
                 </div>
+                <span className="text-xs font-semibold text-green-700 bg-green-100 px-2 py-1 rounded flex-shrink-0">
+                  {exam.total_score}
+                </span>
+              </div>
+
+              {/* Student Info */}
+              <p className="text-xs text-gray-600 mb-2">
+                Nộp bởi:{" "}
+                <span className="font-medium text-gray-800">
+                  {exam.User.full_name || exam.User.user_name}
+                </span>
+              </p>
+
+              {/* Selected Parts */}
+              <div className="flex items-center gap-2 mb-2 text-xs text-gray-600">
+                <BookOpen className="h-3 w-3 text-gray-400" />
+                <span>{getSelectedPartsDisplay(exam.selected_parts)}</span>
+              </div>
+
+              {/* Time Info */}
+              <div className="flex items-center justify-between text-xs text-gray-500 pt-2 border-t border-gray-100">
+                <div className="flex items-center gap-1">
+                  <Clock className="h-3 w-3" />
+                  <span>{timeAgo(exam.submitted_at)}</span>
+                </div>
+                <span>
+                  Thời lượng:{" "}
+                  {calculateDuration(exam.started_at, exam.submitted_at)} phút
+                </span>
               </div>
             </div>
           ))

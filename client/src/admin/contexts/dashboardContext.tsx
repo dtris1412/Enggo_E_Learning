@@ -176,7 +176,12 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({
       }
 
       const result = await response.json();
+      console.log("[DashboardContext] API Response:", result);
       if (result.success) {
+        console.log(
+          "[DashboardContext] Recent Completed Exams:",
+          result.data.recentCompletedExams,
+        );
         setDashboardData(result.data);
       } else {
         setError(result.message || "Failed to fetch dashboard statistics");

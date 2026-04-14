@@ -101,6 +101,7 @@ export const getRecentSubscriptions = async (limit = 10) => {
 // Get all dashboard statistics
 export const getDashboardStatistics = async () => {
   try {
+    console.log("[Dashboard] Fetching all dashboard statistics...");
     const [
       totalUsersResult,
       activeCoursesResult,
@@ -126,6 +127,20 @@ export const getDashboardStatistics = async () => {
       getTopRoadmaps(5),
       getTopLearnedFlashcards(5),
     ]);
+
+    console.log("[Dashboard] Result statuses:", {
+      totalUsers: totalUsersResult.success,
+      activeCourses: activeCoursesResult.success,
+      testStats: testStatsResult.success,
+      recentSubs: recentSubsResult.success,
+      recentExams: recentExamsResult.success,
+      recentFlashcards: recentFlashcardsResult.success,
+      topDocuments: topDocumentsResult.success,
+      topBlogs: topBlogsResult.success,
+      topCourses: topCoursesResult.success,
+      topRoadmaps: topRoadmapsResult.success,
+      topLearnedFlashcards: topLearnedFlashcardsResult.success,
+    });
 
     if (!totalUsersResult.success) {
       throw new Error(`Failed to get total users: ${totalUsersResult.message}`);
@@ -177,6 +192,7 @@ export const getDashboardStatistics = async () => {
 // Get recent completed exams
 export const getRecentCompletedExams = async (limit = 5) => {
   try {
+    console.log("[Dashboard] getRecentCompletedExams: Starting query...");
     const exams = await User_Exam.findAll({
       where: { status: "graded" },
       limit,
@@ -188,18 +204,27 @@ export const getRecentCompletedExams = async (limit = 5) => {
         },
         {
           model: Exam,
-          attributes: ["exam_id", "exam_name"],
+          attributes: ["exam_id", "exam_title", "exam_type", "exam_title"],
         },
       ],
       attributes: [
         "user_exam_id",
-        "submitted_at",
-        "total_score",
-        "status",
+        "user_id",
+        "exam_id",
+        "selected_parts",
         "started_at",
+        "submitted_at",
+        "status",
+        "total_score",
       ],
     });
 
+    console.log(
+      `[Dashboard] getRecentCompletedExams: Found ${exams.length} completed exams`,
+    );
+    if (exams.length > 0) {
+      console.log("[Dashboard] First exam:", JSON.stringify(exams[0], null, 2));
+    }
     return { success: true, data: exams };
   } catch (error) {
     console.error("Error in getRecentCompletedExams:", error);

@@ -1,5 +1,6 @@
 import StatCard from "./StatCard";
 import RecentSubscriptionsList from "./RecentSubscriptionsList";
+import RecentNewUsers from "./RecentNewUsers";
 import TestCompletionChart from "./TestCompletionChart";
 import AIPlaceholders from "./AIPlaceholders";
 import RecentCompletedExams from "./RecentCompletedExams";
@@ -15,6 +16,7 @@ import SystemAIQuotaCard from "./SystemAIQuotaCard";
 export {
   StatCard,
   RecentSubscriptionsList,
+  RecentNewUsers,
   TestCompletionChart,
   AIPlaceholders,
   RecentCompletedExams,
