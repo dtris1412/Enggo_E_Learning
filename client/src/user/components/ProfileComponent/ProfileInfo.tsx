@@ -33,6 +33,7 @@ const ProfileInfo: React.FC = () => {
     text: string;
   } | null>(null);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [isSocialLoginUser, setIsSocialLoginUser] = useState(false);
 
   // Change password states
   const [passwordData, setPasswordData] = useState({
@@ -47,8 +48,6 @@ const ProfileInfo: React.FC = () => {
   });
 
   // Check if user is logged in via social providers
-  const isSocialLogin = profile?.google_id || profile?.facebook_id;
-
   useEffect(() => {
     if (profile) {
       setFormData({
@@ -57,8 +56,13 @@ const ProfileInfo: React.FC = () => {
         user_address: profile.user_address || "",
       });
       setPreviewUrl(profile.avatar || "");
+      // Set social login status based on current profile
+      setIsSocialLoginUser(!!(profile.google_id || profile.facebook_id));
+    } else {
+      // Reset social login status when profile is not available
+      setIsSocialLoginUser(false);
     }
-  }, [profile]);
+  }, [profile]); // Depend on entire profile object to catch all changes
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -479,7 +483,7 @@ const ProfileInfo: React.FC = () => {
               <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-violet-700"></div>
             )}
           </button>
-          {!isSocialLogin && (
+          {!isSocialLoginUser && (
             <button
               onClick={() => {
                 setActiveTab("password");
@@ -567,7 +571,7 @@ const ProfileInfo: React.FC = () => {
             </div>
 
             {/* Social Login Info */}
-            {isSocialLogin && (
+            {isSocialLoginUser && (
               <div className="p-4 bg-violet-50 border border-violet-200 rounded-lg">
                 <p className="text-sm text-violet-800">
                   <span className="font-medium">Phương thức đăng nhập:</span>{" "}
