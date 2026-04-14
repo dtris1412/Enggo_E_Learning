@@ -5,6 +5,7 @@ import {
   useCallback,
   ReactNode,
 } from "react";
+import { authenticatedFetch } from "../../utils/authUtils";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080/api";
 
@@ -171,11 +172,10 @@ export const OrderPaymentProvider = ({ children }: { children: ReactNode }) => {
         if (status) params.append("status", status);
         if (search) params.append("search", search);
 
-        const response = await fetch(
+        const response = await authenticatedFetch(
           `${API_URL}/admin/orders?${params.toString()}`,
           {
             method: "GET",
-            headers: getAuthHeaders(),
           },
         );
 
@@ -203,10 +203,12 @@ export const OrderPaymentProvider = ({ children }: { children: ReactNode }) => {
     setOrderLoading(true);
     setOrderError(null);
     try {
-      const response = await fetch(`${API_URL}/admin/orders/${orderId}`, {
-        method: "GET",
-        headers: getAuthHeaders(),
-      });
+      const response = await authenticatedFetch(
+        `${API_URL}/admin/orders/${orderId}`,
+        {
+          method: "GET",
+        },
+      );
 
       if (!response.ok) {
         throw new Error("Order not found");
@@ -233,11 +235,11 @@ export const OrderPaymentProvider = ({ children }: { children: ReactNode }) => {
     setOrderLoading(true);
     setOrderError(null);
     try {
-      const response = await fetch(
+      const response = await authenticatedFetch(
         `${API_URL}/admin/orders/${orderId}/status`,
         {
           method: "PATCH",
-          headers: getAuthHeaders(),
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ status }),
         },
       );
@@ -264,10 +266,12 @@ export const OrderPaymentProvider = ({ children }: { children: ReactNode }) => {
     setOrderLoading(true);
     setOrderError(null);
     try {
-      const response = await fetch(`${API_URL}/admin/orders/statistics`, {
-        method: "GET",
-        headers: getAuthHeaders(),
-      });
+      const response = await authenticatedFetch(
+        `${API_URL}/admin/orders/statistics`,
+        {
+          method: "GET",
+        },
+      );
 
       if (!response.ok) {
         throw new Error("Failed to fetch order statistics");
@@ -298,11 +302,10 @@ export const OrderPaymentProvider = ({ children }: { children: ReactNode }) => {
         if (status) params.append("status", status);
         if (paymentMethod) params.append("payment_method", paymentMethod);
 
-        const response = await fetch(
+        const response = await authenticatedFetch(
           `${API_URL}/admin/payments?${params.toString()}`,
           {
             method: "GET",
-            headers: getAuthHeaders(),
           },
         );
 
@@ -330,10 +333,12 @@ export const OrderPaymentProvider = ({ children }: { children: ReactNode }) => {
     setPaymentLoading(true);
     setPaymentError(null);
     try {
-      const response = await fetch(`${API_URL}/admin/payments/${paymentId}`, {
-        method: "GET",
-        headers: getAuthHeaders(),
-      });
+      const response = await authenticatedFetch(
+        `${API_URL}/admin/payments/${paymentId}`,
+        {
+          method: "GET",
+        },
+      );
 
       if (!response.ok) {
         throw new Error("Payment not found");
@@ -360,11 +365,11 @@ export const OrderPaymentProvider = ({ children }: { children: ReactNode }) => {
     setPaymentLoading(true);
     setPaymentError(null);
     try {
-      const response = await fetch(
+      const response = await authenticatedFetch(
         `${API_URL}/admin/payments/${paymentId}/status`,
         {
           method: "PATCH",
-          headers: getAuthHeaders(),
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ status }),
         },
       );
@@ -391,11 +396,10 @@ export const OrderPaymentProvider = ({ children }: { children: ReactNode }) => {
     setPaymentLoading(true);
     setPaymentError(null);
     try {
-      const response = await fetch(
+      const response = await authenticatedFetch(
         `${API_URL}/admin/orders/${orderId}/payments`,
         {
           method: "GET",
-          headers: getAuthHeaders(),
         },
       );
 
@@ -421,10 +425,12 @@ export const OrderPaymentProvider = ({ children }: { children: ReactNode }) => {
     setPaymentLoading(true);
     setPaymentError(null);
     try {
-      const response = await fetch(`${API_URL}/admin/payments/statistics`, {
-        method: "GET",
-        headers: getAuthHeaders(),
-      });
+      const response = await authenticatedFetch(
+        `${API_URL}/admin/payments/statistics`,
+        {
+          method: "GET",
+        },
+      );
 
       if (!response.ok) {
         throw new Error("Failed to fetch payment statistics");

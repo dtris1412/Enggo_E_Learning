@@ -357,34 +357,16 @@ const Header = () => {
 
           {/* Mobile Navigation */}
           {isMenuOpen && (
-            <div className="lg:hidden border-t border-slate-200 py-4 animate-fade-in">
-              <nav className="flex flex-col space-y-2">
-                {allNavItems.map((item) => (
-                  <Link
-                    key={item.path}
-                    to={item.path}
-                    onClick={() => setIsMenuOpen(false)}
-                    className={`px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
-                      location.pathname === item.path
-                        ? "text-violet-600 bg-violet-50"
-                        : "text-slate-700 hover:text-violet-600 hover:bg-slate-50"
-                    }`}
-                  >
-                    {item.label}
-                  </Link>
-                ))}
-
-                {/* Learning Corner Section - Mobile */}
-                <div className="pt-2 border-t border-slate-200 mt-2">
-                  <div className="px-3 py-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                    Góc học tập
-                  </div>
-                  {learningItems.map((item) => (
+            <div className="lg:hidden fixed left-0 right-0 top-16 bottom-0 bg-white border-t border-slate-200 overflow-y-auto animate-fade-in">
+              <nav className="flex flex-col space-y-4 p-4">
+                {/* Main Nav Items - Grid 2 columns */}
+                <div className="grid grid-cols-2 gap-2">
+                  {allNavItems.map((item) => (
                     <Link
                       key={item.path}
-                      to={item.requireAuth && !user ? "/login" : item.path}
+                      to={item.path}
                       onClick={() => setIsMenuOpen(false)}
-                      className={`px-3 py-2 pl-6 rounded-md text-sm font-medium transition-all duration-200 flex ${
+                      className={`px-3 py-2 rounded-md text-xs sm:text-sm font-medium transition-all duration-200 text-center ${
                         location.pathname === item.path
                           ? "text-violet-600 bg-violet-50"
                           : "text-slate-700 hover:text-violet-600 hover:bg-slate-50"
@@ -395,7 +377,30 @@ const Header = () => {
                   ))}
                 </div>
 
-                <div className="flex flex-col space-y-2 pt-4 border-t border-slate-200 mt-4">
+                {/* Learning Corner Section - Mobile */}
+                <div className="pt-4 border-t border-slate-200">
+                  <div className="px-3 py-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                    Góc học tập
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    {learningItems.map((item) => (
+                      <Link
+                        key={item.path}
+                        to={item.requireAuth && !user ? "/login" : item.path}
+                        onClick={() => setIsMenuOpen(false)}
+                        className={`px-3 py-2 rounded-md text-xs sm:text-sm font-medium transition-all duration-200 text-center ${
+                          location.pathname === item.path
+                            ? "text-violet-600 bg-violet-50"
+                            : "text-slate-700 hover:text-violet-600 hover:bg-slate-50"
+                        }`}
+                      >
+                        {item.label}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="flex flex-col space-y-3 pt-4 border-t border-slate-200">
                   {user ? (
                     <>
                       {/* Upgrade Button - Mobile */}
@@ -403,48 +408,46 @@ const Header = () => {
                         <Link
                           to="/subscription"
                           onClick={() => setIsMenuOpen(false)}
-                          className="flex items-center justify-center space-x-2 bg-violet-600 text-white px-4 py-3 rounded-md text-sm font-semibold mx-3 hover:bg-violet-700 transition-colors duration-200"
+                          className="flex items-center justify-center space-x-2 bg-violet-600 text-white px-3 py-2.5 rounded-md text-xs sm:text-sm font-semibold hover:bg-violet-700 transition-colors duration-200"
                         >
-                          <Sparkles className="w-5 h-5" />
-                          <span className="drop-shadow-sm">
-                            Nâng cấp gói subscription
-                          </span>
+                          <Sparkles className="w-4 h-4 sm:w-5 sm:h-5" />
+                          <span className="drop-shadow-sm">Nâng cấp</span>
                         </Link>
                       )}
 
                       {/* User Info Card - Mobile */}
-                      <div className="bg-violet-50 rounded-md p-4 mx-3 mb-2">
-                        <div className="flex items-center space-x-3">
+                      <div className="bg-violet-50 rounded-md p-3">
+                        <div className="flex items-start space-x-2">
                           {/* Avatar with Badge */}
                           <div className="relative flex-shrink-0">
-                            <div className="w-12 h-12 bg-violet-600 rounded-full flex items-center justify-center text-white font-semibold">
+                            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-violet-600 rounded-full flex items-center justify-center text-white font-semibold text-xs sm:text-sm">
                               {user.user_name?.charAt(0).toUpperCase() || "U"}
                             </div>
                             {/* Subscription Badge */}
-                            <div className="absolute -bottom-1.5 left-7 bg-violet-700 text-[10px] font-bold text-white px-2 py-0.5 rounded-full border-2 border-white">
+                            <div className="absolute -bottom-1 left-5 sm:left-7 bg-violet-700 text-[8px] sm:text-[10px] font-bold text-white px-1.5 py-0.5 rounded-full border-2 border-white whitespace-nowrap">
                               {userSubscription.toLowerCase()}
                             </div>
                           </div>
 
                           {/* User Details */}
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm font-semibold text-slate-900 truncate">
+                            <p className="text-xs sm:text-sm font-semibold text-slate-900 truncate">
                               {user.user_name}
                             </p>
                             <p className="text-xs text-slate-600 truncate">
                               {user.user_email}
                             </p>
-                            <div className="flex items-center gap-2 mt-1">
-                              <div className="inline-flex items-center px-2 py-0.5 bg-violet-50 border border-violet-200 rounded">
-                                <span className="text-xs font-semibold text-violet-700">
+                            <div className="flex items-center gap-1 mt-1 flex-wrap">
+                              <div className="inline-flex items-center px-2 py-0.5 bg-white border border-violet-200 rounded text-xs">
+                                <span className="font-semibold text-violet-700">
                                   {userSubscription}
                                 </span>
                               </div>
                               {tokenBalance !== null && (
-                                <div className="inline-flex items-center gap-1 px-2 py-0.5 bg-violet-50 border border-violet-200 rounded">
-                                  <Zap className="w-3 h-3 fill-violet-500 text-violet-500" />
-                                  <span className="text-xs font-semibold text-violet-700">
-                                    {tokenBalance.toLocaleString()} tokens
+                                <div className="inline-flex items-center gap-0.5 px-2 py-0.5 bg-white border border-violet-200 rounded text-xs">
+                                  <Zap className="w-2.5 h-2.5 fill-violet-500 text-violet-500" />
+                                  <span className="font-semibold text-violet-700">
+                                    {(tokenBalance / 1000).toFixed(0)}K
                                   </span>
                                 </div>
                               )}
@@ -457,9 +460,9 @@ const Header = () => {
                       <Link
                         to="/profile"
                         onClick={() => setIsMenuOpen(false)}
-                        className="flex items-center space-x-3 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-violet-50 hover:text-violet-600 rounded-md mx-3 transition-all duration-200"
+                        className="flex items-center space-x-3 px-3 py-2 text-xs sm:text-sm font-medium text-slate-700 hover:bg-violet-50 hover:text-violet-600 rounded-md transition-all duration-200"
                       >
-                        <UserCircle className="h-5 w-5" />
+                        <UserCircle className="h-4 w-4 sm:h-5 sm:w-5" />
                         <span>Trang cá nhân</span>
                       </Link>
 
@@ -470,9 +473,9 @@ const Header = () => {
                           setIsMenuOpen(false);
                           navigate("/");
                         }}
-                        className="flex items-center space-x-3 bg-red-600 text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-red-700 mx-3 transition-all duration-200 hover:shadow-md"
+                        className="flex items-center space-x-3 bg-red-600 text-white px-3 py-2 rounded-md text-xs sm:text-sm font-medium hover:bg-red-700 transition-all duration-200"
                       >
-                        <LogOut className="h-5 w-5" />
+                        <LogOut className="h-4 w-4 sm:h-5 sm:w-5" />
                         <span>Đăng xuất</span>
                       </button>
                     </>
@@ -481,14 +484,14 @@ const Header = () => {
                       <Link
                         to="/login"
                         onClick={() => setIsMenuOpen(false)}
-                        className="text-slate-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 hover:bg-slate-50"
+                        className="text-slate-700 hover:text-blue-600 px-3 py-2 rounded-md text-xs sm:text-sm font-medium transition-all duration-200 hover:bg-slate-50 text-center"
                       >
                         Đăng nhập
                       </Link>
                       <Link
                         to="/register"
                         onClick={() => setIsMenuOpen(false)}
-                        className="bg-gradient-to-r from-amber-400 to-orange-500 text-slate-900 px-3 py-2 rounded-lg text-sm font-bold mx-3 transition-all duration-200 hover:shadow-md"
+                        className="bg-gradient-to-r from-amber-400 to-orange-500 text-slate-900 px-3 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all duration-200 hover:shadow-md text-center"
                       >
                         Đăng ký
                       </Link>

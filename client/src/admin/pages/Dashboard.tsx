@@ -11,9 +11,9 @@ import {
   TopDocuments,
   TopBlogs,
   FeaturedBanner,
-  TsopCourses,
   TopRoadmaps,
   TopLearnedFlashcards,
+  TopCourses,
 } from "../components/Dashboard";
 
 const Dashboard = () => {

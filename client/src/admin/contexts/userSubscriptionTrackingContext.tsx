@@ -5,6 +5,7 @@ import {
   useCallback,
   ReactNode,
 } from "react";
+import { authenticatedFetch } from "../../utils/authUtils";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080/api";
 
@@ -106,14 +107,6 @@ export const UserSubscriptionTrackingProvider = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const getAuthHeaders = () => {
-    const token = localStorage.getItem("accessToken");
-    return {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    };
-  };
-
   const fetchSubscriptions = useCallback(
     async (page = 1, limit = 10, status = "", search = "") => {
       setLoading(true);
@@ -125,11 +118,10 @@ export const UserSubscriptionTrackingProvider = ({
         if (status) params.append("status", status);
         if (search) params.append("search", search);
 
-        const response = await fetch(
+        const response = await authenticatedFetch(
           `${API_URL}/admin/user-subscriptions?${params.toString()}`,
           {
             method: "GET",
-            headers: getAuthHeaders(),
           },
         );
 
@@ -166,11 +158,10 @@ export const UserSubscriptionTrackingProvider = ({
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(
+      const response = await authenticatedFetch(
         `${API_URL}/admin/user-subscriptions/${subscriptionId}`,
         {
           method: "GET",
-          headers: getAuthHeaders(),
         },
       );
 
@@ -196,11 +187,10 @@ export const UserSubscriptionTrackingProvider = ({
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(
+      const response = await authenticatedFetch(
         `${API_URL}/admin/users/${userId}/subscriptions`,
         {
           method: "GET",
-          headers: getAuthHeaders(),
         },
       );
 
@@ -228,11 +218,10 @@ export const UserSubscriptionTrackingProvider = ({
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(
+      const response = await authenticatedFetch(
         `${API_URL}/admin/user-subscriptions/${subscriptionId}/expire`,
         {
           method: "PATCH",
-          headers: getAuthHeaders(),
         },
       );
 
@@ -258,11 +247,10 @@ export const UserSubscriptionTrackingProvider = ({
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(
+      const response = await authenticatedFetch(
         `${API_URL}/admin/user-subscriptions/statistics`,
         {
           method: "GET",
-          headers: getAuthHeaders(),
         },
       );
 
