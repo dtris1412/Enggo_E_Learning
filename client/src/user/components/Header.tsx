@@ -1,6 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
-  BookOpen,
   Menu,
   X,
   LogOut,
@@ -115,9 +114,12 @@ const Header = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="h-16 flex items-center justify-between">
             {/* Logo */}
-            <Link to="/" className="flex items-center gap-3">
-              <BookOpen className="h-9 w-9 text-violet-600" />
-              <span className="text-2xl font-black text-slate-900">Enggo</span>
+            <Link to="/" className="flex items-center">
+              <img
+                src="./dist/public/img/logo/logo.png"
+                alt="Enggo"
+                className="h-20 w-auto"
+              />
             </Link>
 
             {/* Desktop Navigation - Hidden on mobile/tablet */}
