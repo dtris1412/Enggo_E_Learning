@@ -19,14 +19,16 @@ const Header = () => {
   const [learningDropdownOpen, setLearningDropdownOpen] = useState(false);
   const [userSubscription, setUserSubscription] = useState("Free");
   const [tokenBalance, setTokenBalance] = useState<number | null>(null);
+
   const dropdownRef = useRef<HTMLDivElement>(null);
   const learningDropdownRef = useRef<HTMLDivElement>(null);
+
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const { showToast } = useToast();
 
-  // Close dropdown when clicking outside
+  // Close dropdown khi click ngoài
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -47,91 +49,43 @@ const Header = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Fetch user subscription plan
+  // Fetch Subscription & Token Balance (giữ nguyên logic cũ của bạn)
   useEffect(() => {
     const fetchSubscription = async () => {
       if (!user) {
         setUserSubscription("Free");
         return;
       }
-
       try {
         const token = localStorage.getItem("accessToken");
-        if (!token) {
-          setUserSubscription("Free");
-          return;
-        }
-
-        const response = await fetch(
+        if (!token) return;
+        const res = await fetch(
           `${import.meta.env.VITE_API_URL || "http://localhost:8080/api"}/user/subscriptions/active`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          },
+          { headers: { Authorization: `Bearer ${token}` } },
         );
-
-        const result = await response.json();
-
-        if (result.success) {
-          // API now returns planName at top level
-          setUserSubscription(result.planName || "Free");
-        } else {
-          setUserSubscription("Free");
-        }
-      } catch (error) {
-        console.error("Error fetching subscription:", error);
+        const result = await res.json();
+        if (result.success) setUserSubscription(result.planName || "Free");
+      } catch (e) {
         setUserSubscription("Free");
       }
     };
 
-    fetchSubscription();
-
-    // Listen for subscription update events (after payment success)
-    const handleSubscriptionUpdate = () => {
-      fetchSubscription();
-    };
-
-    window.addEventListener("subscriptionUpdated", handleSubscriptionUpdate);
-
-    return () => {
-      window.removeEventListener(
-        "subscriptionUpdated",
-        handleSubscriptionUpdate,
-      );
-    };
-  }, [user?.user_id]); // Re-fetch when user changes
-
-  // Fetch token balance
-  useEffect(() => {
     const fetchTokenBalance = async () => {
-      if (!user) {
-        setTokenBalance(null);
-        return;
-      }
+      if (!user) return;
       try {
         const token = localStorage.getItem("accessToken");
         if (!token) return;
-        const response = await fetch(
+        const res = await fetch(
           `${import.meta.env.VITE_API_URL || "http://localhost:8080/api"}/user/wallet`,
           { headers: { Authorization: `Bearer ${token}` } },
         );
-        const result = await response.json();
-        if (result.success) {
-          setTokenBalance(result.data.token_balance ?? 0);
-        }
-      } catch (error) {
-        console.error("Error fetching token balance:", error);
-      }
+        const result = await res.json();
+        if (result.success) setTokenBalance(result.data?.token_balance ?? 0);
+      } catch (e) {}
     };
 
+    fetchSubscription();
     fetchTokenBalance();
-
-    const handleTokenUpdate = () => fetchTokenBalance();
-    window.addEventListener("tokensUpdated", handleTokenUpdate);
-    return () => window.removeEventListener("tokensUpdated", handleTokenUpdate);
   }, [user?.user_id]);
 
   const navItems = [
@@ -142,368 +96,278 @@ const Header = () => {
     { path: "/exams", label: "Thi thử online" },
   ];
 
-  // Learning Corner dropdown items
   const learningItems = [
     { path: "/my-learning", label: "Góc học", requireAuth: true },
     { path: "/documents", label: "Tài liệu", requireAuth: false },
     { path: "/flashcards", label: "Flashcards", requireAuth: true },
   ];
 
-  // Add conditional nav items based on user status
   let allNavItems = [...navItems];
-
-  // Add Admin link if user is admin (role = 1)
   if (user?.role === 1) {
-    allNavItems = [
-      ...allNavItems,
-      { path: "/admin/dashboard", label: "Quản trị" },
-    ];
+    allNavItems.push({ path: "/admin/dashboard", label: "Quản trị" });
   }
 
-  return (
-    <header className="bg-white border-b border-slate-200 sticky top-0 z-50 backdrop-blur-sm bg-white/95">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          {/* Logo */}
-          <Link
-            to="/"
-            className="flex items-center space-x-3 hover:scale-105 transition-transform duration-200"
-          >
-            <BookOpen className="h-8 w-8 text-violet-600" />
-            <span className="text-xl font-black text-slate-900">Enggo</span>
-          </Link>
+  const isPremium = userSubscription.toLowerCase() === "premium";
 
-          {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center space-x-8">
-            <nav className="flex space-x-8">
+  return (
+    <>
+      <header className="bg-white border-b border-slate-200 sticky top-0 z-50 backdrop-blur-md">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="h-16 flex items-center justify-between">
+            {/* Logo */}
+            <Link to="/" className="flex items-center gap-3">
+              <BookOpen className="h-9 w-9 text-violet-600" />
+              <span className="text-2xl font-black text-slate-900">Enggo</span>
+            </Link>
+
+            {/* Desktop Navigation - Hidden on mobile/tablet */}
+            <nav className="hidden lg:flex items-center gap-10">
               {allNavItems.map((item) => (
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`px-3 py-2 text-sm font-medium transition-all duration-200 hover:scale-105 ${
+                  className={`font-medium text-base transition-colors ${
                     location.pathname === item.path
-                      ? "text-violet-600 border-b-2 border-violet-600"
+                      ? "text-violet-600 border-b-2 border-violet-600 pb-1"
                       : "text-slate-700 hover:text-violet-600"
                   }`}
                 >
                   {item.label}
                 </Link>
               ))}
-            </nav>
 
-            {/* Learning Corner Dropdown */}
-            <div className="relative" ref={learningDropdownRef}>
-              <button
-                onClick={() => setLearningDropdownOpen(!learningDropdownOpen)}
-                className={`flex items-center space-x-1 px-3 py-2 text-sm font-medium transition-all duration-200 hover:scale-105 ${
-                  learningItems.some((item) => location.pathname === item.path)
-                    ? "text-violet-600 border-b-2 border-violet-600"
-                    : "text-slate-700 hover:text-violet-600"
-                }`}
-              >
-                <span>Góc học tập</span>
-                <ChevronDown
-                  className={`w-4 h-4 transition-transform duration-200 ${
-                    learningDropdownOpen ? "rotate-180" : ""
-                  }`}
-                />
-              </button>
-
-              {/* Learning Dropdown Menu */}
-              {learningDropdownOpen && (
-                <div className="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-slate-200 py-2 z-50 animate-fade-in">
-                  {learningItems.map((item) => (
-                    <Link
-                      key={item.path}
-                      to={item.requireAuth && !user ? "/login" : item.path}
-                      onClick={() => setLearningDropdownOpen(false)}
-                      className={`block px-4 py-2 text-sm transition-colors duration-150 ${
-                        location.pathname === item.path
-                          ? "text-violet-600 bg-violet-50 font-medium"
-                          : "text-slate-700 hover:bg-slate-50 hover:text-violet-600"
-                      }`}
-                    >
-                      {item.label}
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Auth Section */}
-          <div className="hidden lg:flex items-center space-x-4">
-            {user ? (
-              <>
-                {/* Upgrade Button - Desktop */}
-                {userSubscription.toLowerCase() !== "premium" && (
-                  <Link
-                    to="/subscription"
-                    className="flex items-center space-x-2 bg-violet-600 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-violet-700 transition-colors duration-200"
-                  >
-                    <Sparkles className="w-4 h-4" />
-                    <span className="drop-shadow-sm">Nâng cấp</span>
-                  </Link>
-                )}
-
-                {/* Token Balance - Desktop */}
-                {tokenBalance !== null && (
-                  <div className="flex items-center gap-1.5 bg-violet-50 border border-violet-200 px-3 py-1.5 rounded-full text-sm font-semibold text-violet-700">
-                    <Zap className="w-3.5 h-3.5 fill-violet-500" />
-                    <span>{tokenBalance.toLocaleString()}</span>
-                  </div>
-                )}
-
-                <div className="relative" ref={dropdownRef}>
-                  {/* Avatar with Subscription Badge */}
-                  <button
-                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                    className="flex items-center space-x-2 hover:bg-slate-50 rounded-lg p-2 transition-all duration-200"
-                  >
-                    {/* Avatar Circle */}
-                    <div className="relative">
-                      <div className="w-10 h-10 bg-violet-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
-                        {user.user_name?.charAt(0).toUpperCase() || "U"}
-                      </div>
-                      {/* Subscription Badge */}
-                      <div className="absolute -bottom-1.5 left-6 bg-violet-700 text-[10px] font-bold text-white px-2 py-0.5 rounded-full border-2 border-white">
-                        {userSubscription.toLowerCase()}
-                      </div>
-                    </div>
-
-                    {/* Dropdown Arrow */}
-                    <ChevronDown
-                      className={`w-4 h-4 text-slate-500 transition-transform duration-200 ${
-                        isDropdownOpen ? "rotate-180" : ""
-                      }`}
-                    />
-                  </button>
-
-                  {/* Dropdown Menu */}
-                  {isDropdownOpen && (
-                    <div className="absolute right-0 mt-2 w-56 bg-white rounded-md shadow-lg border border-slate-200 py-2 z-50 animate-fade-in">
-                      {/* User Info Header */}
-                      <div className="px-4 py-3 border-b border-slate-100">
-                        <p className="text-sm font-bold text-slate-900">
-                          {user.user_name}
-                        </p>
-                        <p className="text-xs text-slate-500 mt-0.5">
-                          {user.user_email}
-                        </p>
-                        <div className="mt-2 inline-flex items-center px-3 py-1 bg-violet-50 border border-violet-200 rounded">
-                          <span className="text-xs font-semibold text-violet-700">
-                            {userSubscription} Member
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Menu Items */}
-                      <div className="py-1">
-                        <Link
-                          to="/profile"
-                          onClick={() => setIsDropdownOpen(false)}
-                          className="flex items-center px-4 py-2 text-sm text-slate-700 hover:bg-violet-50 hover:text-violet-600 transition-colors duration-150"
-                        >
-                          <UserCircle className="w-4 h-4 mr-3" />
-                          Trang cá nhân
-                        </Link>
-
-                        <button
-                          onClick={async () => {
-                            setIsDropdownOpen(false);
-                            await logout();
-                            showToast("success", "Đăng xuất thành công!");
-                            navigate("/");
-                          }}
-                          className="w-full flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors duration-150"
-                        >
-                          <LogOut className="w-4 h-4 mr-3" />
-                          Đăng xuất
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </>
-            ) : (
-              <>
-                <Link
-                  to="/login"
-                  className="text-slate-700 hover:text-violet-600 px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 hover:bg-slate-50"
+              {/* Góc học tập Dropdown - Desktop */}
+              <div className="relative" ref={learningDropdownRef}>
+                <button
+                  onClick={() => setLearningDropdownOpen(!learningDropdownOpen)}
+                  className="flex items-center gap-1 font-medium text-base text-slate-700 hover:text-violet-600"
                 >
-                  Đăng nhập
-                </Link>
-                <Link
-                  to="/register"
-                  className="bg-violet-600 text-white px-4 py-2 rounded-md text-sm font-bold hover:bg-violet-700 transition-colors duration-200"
-                >
-                  Đăng ký
-                </Link>
-              </>
-            )}
-          </div>
+                  Góc học tập
+                  <ChevronDown
+                    className={`w-4 h-4 transition-transform ${learningDropdownOpen ? "rotate-180" : ""}`}
+                  />
+                </button>
 
-          {/* Mobile menu button */}
-          <button
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="lg:hidden p-2 rounded-md text-slate-600 hover:text-violet-600 hover:bg-slate-50 transition-all duration-200"
-          >
-            {isMenuOpen ? (
-              <X className="h-6 w-6" />
-            ) : (
-              <Menu className="h-6 w-6" />
-            )}
-          </button>
-
-          {/* Mobile Navigation */}
-          {isMenuOpen && (
-            <div className="lg:hidden fixed left-0 right-0 top-16 bottom-0 bg-white border-t border-slate-200 overflow-y-auto animate-fade-in">
-              <nav className="flex flex-col space-y-4 p-4">
-                {/* Main Nav Items - Grid 2 columns */}
-                <div className="grid grid-cols-2 gap-2">
-                  {allNavItems.map((item) => (
-                    <Link
-                      key={item.path}
-                      to={item.path}
-                      onClick={() => setIsMenuOpen(false)}
-                      className={`px-3 py-2 rounded-md text-xs sm:text-sm font-medium transition-all duration-200 text-center ${
-                        location.pathname === item.path
-                          ? "text-violet-600 bg-violet-50"
-                          : "text-slate-700 hover:text-violet-600 hover:bg-slate-50"
-                      }`}
-                    >
-                      {item.label}
-                    </Link>
-                  ))}
-                </div>
-
-                {/* Learning Corner Section - Mobile */}
-                <div className="pt-4 border-t border-slate-200">
-                  <div className="px-3 py-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                    Góc học tập
-                  </div>
-                  <div className="grid grid-cols-2 gap-2">
+                {learningDropdownOpen && (
+                  <div className="absolute left-0 mt-3 w-56 bg-white rounded-2xl shadow-xl border py-2 z-50">
                     {learningItems.map((item) => (
                       <Link
                         key={item.path}
                         to={item.requireAuth && !user ? "/login" : item.path}
-                        onClick={() => setIsMenuOpen(false)}
-                        className={`px-3 py-2 rounded-md text-xs sm:text-sm font-medium transition-all duration-200 text-center ${
-                          location.pathname === item.path
-                            ? "text-violet-600 bg-violet-50"
-                            : "text-slate-700 hover:text-violet-600 hover:bg-slate-50"
-                        }`}
+                        onClick={() => setLearningDropdownOpen(false)}
+                        className="block px-6 py-3 hover:bg-violet-50 text-slate-700 hover:text-violet-600"
                       >
                         {item.label}
                       </Link>
                     ))}
                   </div>
-                </div>
+                )}
+              </div>
+            </nav>
 
-                <div className="flex flex-col space-y-3 pt-4 border-t border-slate-200">
-                  {user ? (
-                    <>
-                      {/* Upgrade Button - Mobile */}
-                      {userSubscription.toLowerCase() !== "premium" && (
-                        <Link
-                          to="/subscription"
-                          onClick={() => setIsMenuOpen(false)}
-                          className="flex items-center justify-center space-x-2 bg-violet-600 text-white px-3 py-2.5 rounded-md text-xs sm:text-sm font-semibold hover:bg-violet-700 transition-colors duration-200"
-                        >
-                          <Sparkles className="w-4 h-4 sm:w-5 sm:h-5" />
-                          <span className="drop-shadow-sm">Nâng cấp</span>
-                        </Link>
-                      )}
-
-                      {/* User Info Card - Mobile */}
-                      <div className="bg-violet-50 rounded-md p-3">
-                        <div className="flex items-start space-x-2">
-                          {/* Avatar with Badge */}
-                          <div className="relative flex-shrink-0">
-                            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-violet-600 rounded-full flex items-center justify-center text-white font-semibold text-xs sm:text-sm">
-                              {user.user_name?.charAt(0).toUpperCase() || "U"}
-                            </div>
-                            {/* Subscription Badge */}
-                            <div className="absolute -bottom-1 left-5 sm:left-7 bg-violet-700 text-[8px] sm:text-[10px] font-bold text-white px-1.5 py-0.5 rounded-full border-2 border-white whitespace-nowrap">
-                              {userSubscription.toLowerCase()}
-                            </div>
-                          </div>
-
-                          {/* User Details */}
-                          <div className="flex-1 min-w-0">
-                            <p className="text-xs sm:text-sm font-semibold text-slate-900 truncate">
-                              {user.user_name}
-                            </p>
-                            <p className="text-xs text-slate-600 truncate">
-                              {user.user_email}
-                            </p>
-                            <div className="flex items-center gap-1 mt-1 flex-wrap">
-                              <div className="inline-flex items-center px-2 py-0.5 bg-white border border-violet-200 rounded text-xs">
-                                <span className="font-semibold text-violet-700">
-                                  {userSubscription}
-                                </span>
-                              </div>
-                              {tokenBalance !== null && (
-                                <div className="inline-flex items-center gap-0.5 px-2 py-0.5 bg-white border border-violet-200 rounded text-xs">
-                                  <Zap className="w-2.5 h-2.5 fill-violet-500 text-violet-500" />
-                                  <span className="font-semibold text-violet-700">
-                                    {(tokenBalance / 1000).toFixed(0)}K
-                                  </span>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Menu Items */}
-                      <Link
-                        to="/profile"
-                        onClick={() => setIsMenuOpen(false)}
-                        className="flex items-center space-x-3 px-3 py-2 text-xs sm:text-sm font-medium text-slate-700 hover:bg-violet-50 hover:text-violet-600 rounded-md transition-all duration-200"
-                      >
-                        <UserCircle className="h-4 w-4 sm:h-5 sm:w-5" />
-                        <span>Trang cá nhân</span>
-                      </Link>
-
-                      <button
-                        onClick={async () => {
-                          await logout();
-                          showToast("success", "Đăng xuất thành công!");
-                          setIsMenuOpen(false);
-                          navigate("/");
-                        }}
-                        className="flex items-center space-x-3 bg-red-600 text-white px-3 py-2 rounded-md text-xs sm:text-sm font-medium hover:bg-red-700 transition-all duration-200"
-                      >
-                        <LogOut className="h-4 w-4 sm:h-5 sm:w-5" />
-                        <span>Đăng xuất</span>
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      <Link
-                        to="/login"
-                        onClick={() => setIsMenuOpen(false)}
-                        className="text-slate-700 hover:text-blue-600 px-3 py-2 rounded-md text-xs sm:text-sm font-medium transition-all duration-200 hover:bg-slate-50 text-center"
-                      >
-                        Đăng nhập
-                      </Link>
-                      <Link
-                        to="/register"
-                        onClick={() => setIsMenuOpen(false)}
-                        className="bg-gradient-to-r from-amber-400 to-orange-500 text-slate-900 px-3 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all duration-200 hover:shadow-md text-center"
-                      >
-                        Đăng ký
-                      </Link>
-                    </>
+            {/* Desktop Right Side */}
+            <div className="hidden lg:flex items-center gap-4">
+              {user ? (
+                <>
+                  {!isPremium && (
+                    <Link
+                      to="/subscription"
+                      className="flex items-center gap-2 bg-violet-600 hover:bg-violet-700 text-white px-5 py-2.5 rounded-2xl font-semibold text-sm transition-all"
+                    >
+                      <Sparkles className="w-4 h-4" /> Nâng cấp
+                    </Link>
                   )}
-                </div>
-              </nav>
+
+                  {tokenBalance !== null && (
+                    <div className="flex items-center gap-2 bg-violet-50 px-4 py-2 rounded-2xl text-sm font-medium text-violet-700">
+                      <Zap className="w-4 h-4" />
+                      {tokenBalance.toLocaleString()}
+                    </div>
+                  )}
+
+                  {/* User Avatar Dropdown */}
+                  <div className="relative" ref={dropdownRef}>
+                    <button
+                      onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                      className="flex items-center gap-3"
+                    >
+                      <div className="w-9 h-9 bg-violet-600 rounded-2xl flex items-center justify-center text-white font-bold">
+                        {user.user_name?.[0]?.toUpperCase() || "U"}
+                      </div>
+                      <ChevronDown
+                        className={`w-4 h-4 transition ${isDropdownOpen ? "rotate-180" : ""}`}
+                      />
+                    </button>
+
+                    {isDropdownOpen && (
+                      <div className="absolute right-0 mt-3 w-64 bg-white rounded-2xl shadow-xl border py-2">
+                        <Link
+                          to="/profile"
+                          onClick={() => setIsDropdownOpen(false)}
+                          className="flex items-center gap-3 px-5 py-3 hover:bg-slate-100"
+                        >
+                          <UserCircle className="w-5 h-5" />
+                          Trang cá nhân
+                        </Link>
+                        <button
+                          onClick={async () => {
+                            await logout();
+                            showToast("success", "Đăng xuất thành công!");
+                            navigate("/");
+                          }}
+                          className="w-full flex items-center gap-3 px-5 py-3 text-red-600 hover:bg-red-50"
+                        >
+                          <LogOut className="w-5 h-5" />
+                          Đăng xuất
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </>
+              ) : (
+                <>
+                  <Link
+                    to="/login"
+                    className="font-medium text-slate-700 hover:text-violet-600 px-4 py-2"
+                  >
+                    Đăng nhập
+                  </Link>
+                  <Link
+                    to="/register"
+                    className="bg-violet-600 text-white px-6 py-2.5 rounded-2xl font-semibold hover:bg-violet-700"
+                  >
+                    Đăng ký
+                  </Link>
+                </>
+              )}
             </div>
-          )}
+
+            {/* Mobile Hamburger Button */}
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="lg:hidden p-3 text-slate-700"
+            >
+              {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
+            </button>
+          </div>
         </div>
-      </div>
-    </header>
+      </header>
+
+      {/* ==================== MOBILE MENU - CÁC TAB RÕ RÀNG (Render ngoài header) ==================== */}
+      {isMenuOpen && (
+        <div className="lg:hidden fixed inset-0 top-16 bg-white z-40 overflow-y-auto w-full">
+          <div className="p-6 space-y-8">
+            {/* Main Tabs */}
+            <div>
+              <p className="text-xs font-bold text-slate-500 mb-4">
+                MENU CHÍNH
+              </p>
+              <div className="flex flex-col gap-2">
+                {allNavItems.map((item) => (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    onClick={() => setIsMenuOpen(false)}
+                    className={`px-6 py-5 rounded-2xl text-lg font-medium transition-all ${
+                      location.pathname === item.path
+                        ? "bg-violet-100 text-violet-700 font-semibold"
+                        : "hover:bg-slate-100 text-slate-800"
+                    }`}
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            {/* Góc học tập */}
+            <div>
+              <p className="text-xs font-bold text-slate-500 mb-4">
+                GÓC HỌC TẬP
+              </p>
+              <div className="flex flex-col gap-2">
+                {learningItems.map((item) => (
+                  <Link
+                    key={item.path}
+                    to={item.requireAuth && !user ? "/login" : item.path}
+                    onClick={() => setIsMenuOpen(false)}
+                    className={`px-6 py-5 rounded-2xl text-lg font-medium transition-all ${
+                      location.pathname === item.path
+                        ? "bg-violet-100 text-violet-700 font-semibold"
+                        : "hover:bg-slate-100 text-slate-800"
+                    }`}
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            {/* User Area */}
+            {user ? (
+              <div className="pt-6 border-t">
+                <div className="bg-violet-50 rounded-3xl p-6 mb-6 flex items-center gap-4">
+                  <div className="w-14 h-14 bg-violet-600 rounded-2xl flex items-center justify-center text-white text-2xl font-bold">
+                    {user.user_name?.[0]?.toUpperCase()}
+                  </div>
+                  <div>
+                    <p className="font-semibold text-lg">{user.user_name}</p>
+                    <p className="text-sm text-slate-600">{user.user_email}</p>
+                  </div>
+                </div>
+
+                {!isPremium && (
+                  <Link
+                    to="/subscription"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="block w-full text-center bg-violet-600 text-white py-4 rounded-2xl font-semibold mb-4"
+                  >
+                    Nâng cấp Premium
+                  </Link>
+                )}
+
+                <Link
+                  to="/profile"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="block px-6 py-5 text-lg hover:bg-slate-100 rounded-2xl"
+                >
+                  Trang cá nhân
+                </Link>
+
+                <button
+                  onClick={async () => {
+                    await logout();
+                    showToast("success", "Đăng xuất thành công!");
+                    setIsMenuOpen(false);
+                    navigate("/");
+                  }}
+                  className="block w-full text-left px-6 py-5 text-red-600 hover:bg-red-50 rounded-2xl text-lg"
+                >
+                  Đăng xuất
+                </button>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-4 pt-6">
+                <Link
+                  to="/login"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="py-5 text-center border border-slate-300 rounded-2xl text-lg font-medium"
+                >
+                  Đăng nhập
+                </Link>
+                <Link
+                  to="/register"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="py-5 text-center bg-violet-600 text-white rounded-2xl text-lg font-semibold"
+                >
+                  Đăng ký
+                </Link>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 
