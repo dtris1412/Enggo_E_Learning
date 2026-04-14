@@ -1,5 +1,6 @@
 import { Users, BookOpen, FileText, TrendingUp } from "lucide-react";
 import { useEffect } from "react";
+import { formatCurrency } from "../../utils/formatters";
 import { useDashboard } from "../contexts/dashboardContext";
 import {
   StatCard,
@@ -10,7 +11,7 @@ import {
   TopDocuments,
   TopBlogs,
   FeaturedBanner,
-  TopCourses,
+  TsopCourses,
   TopRoadmaps,
   TopLearnedFlashcards,
 } from "../components/Dashboard";

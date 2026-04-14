@@ -28,7 +28,7 @@ const AccountManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRole, setSelectedRole] = useState<string>("all");
   const [selectedStatus, setSelectedStatus] = useState<string>("all");
-  const [limit] = useState(2);
+  const [limit] = useState(9);
   const [searchParams, setSearchParams] = useSearchParams();
   const location = useLocation();
   const urlPage = Math.max(1, parseInt(searchParams.get("page") || "1", 10));

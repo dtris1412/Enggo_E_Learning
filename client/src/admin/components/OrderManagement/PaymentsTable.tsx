@@ -1,13 +1,7 @@
 import * as React from "react";
-import {
-  Eye,
-  Edit2,
-  ChevronLeft,
-  ChevronRight,
-  Calendar,
-  User,
-  DollarSign,
-} from "lucide-react";
+import { Eye, Edit2, Calendar, User, DollarSign } from "lucide-react";
+import Pagination from "../../../shared/components/Pagination";
+import { formatCurrency } from "../../../utils/formatters";
 import { Payment } from "../../contexts/orderPaymentContext";
 
 interface PaymentsTableProps {
@@ -18,6 +12,9 @@ interface PaymentsTableProps {
   onViewPayment: (payment: Payment) => void;
   onUpdatePayment: (payment: Payment) => void;
   onPageChange: (page: number) => void;
+  currentPage: number;
+  buildPageUrl: (page: number) => string;
+  totalPages: number;
 }
 
 const PaymentsTable = ({
@@ -28,6 +25,9 @@ const PaymentsTable = ({
   onViewPayment,
   onUpdatePayment,
   onPageChange,
+  currentPage,
+  buildPageUrl,
+  totalPages,
 }: PaymentsTableProps) => {
   const getStatusBadge = (status: string) => {
     const colors: { [key: string]: string } = {
@@ -121,7 +121,7 @@ const PaymentsTable = ({
                         {payment.transaction_code}
                       </td>
                       <td className="px-6 py-4 text-sm font-medium text-gray-900">
-                        {payment.amount.toLocaleString("vi-VN")} VNĐ
+                        {formatCurrency(payment.amount)}
                       </td>
                       <td className="px-6 py-4 text-sm">
                         <span className={statusBadge.className}>
@@ -163,44 +163,12 @@ const PaymentsTable = ({
             </table>
           </div>
 
-          {/* Pagination */}
-          {pagination && pagination.totalPages > 1 && (
-            <div className="flex justify-center items-center gap-5 px-6 py-4 border-t border-gray-200">
-              {pagination.currentPage > 1 ? (
-                <button
-                  onClick={() => onPageChange(pagination.currentPage - 1)}
-                  aria-label="Trang trước"
-                  className="text-slate-400 hover:text-violet-600 transition-colors"
-                >
-                  <ChevronLeft className="h-5 w-5" />
-                </button>
-              ) : (
-                <span className="text-slate-200 cursor-not-allowed">
-                  <ChevronLeft className="h-5 w-5" />
-                </span>
-              )}
-              <span className="text-sm text-slate-500">
-                Trang{" "}
-                <span className="font-semibold text-violet-600">
-                  {pagination.currentPage}
-                </span>{" "}
-                / {pagination.totalPages}
-              </span>
-              {pagination.currentPage < pagination.totalPages ? (
-                <button
-                  onClick={() => onPageChange(pagination.currentPage + 1)}
-                  aria-label="Trang tiếp"
-                  className="text-slate-400 hover:text-violet-600 transition-colors"
-                >
-                  <ChevronRight className="h-5 w-5" />
-                </button>
-              ) : (
-                <span className="text-slate-200 cursor-not-allowed">
-                  <ChevronRight className="h-5 w-5" />
-                </span>
-              )}
-            </div>
-          )}
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            buildPageUrl={buildPageUrl}
+            className="py-4"
+          />
         </>
       )}
     </div>

@@ -7,6 +7,7 @@ import {
   Search,
   Plus,
 } from "lucide-react";
+import { formatCurrency } from "../../utils/formatters";
 import { useSubscription } from "../contexts/subscriptionContext";
 import EditSubscriptionPriceModal from "../components/SubscriptionManagement/EditSubscriptionPriceModal";
 
@@ -384,7 +385,7 @@ const SubscriptionManagement = () => {
                                     {price.duration_days} ngày
                                   </td>
                                   <td className="px-4 py-3 text-gray-900 font-medium">
-                                    {price.price.toLocaleString("vi-VN")} VNĐ
+                                    {formatCurrency(price.price)}
                                   </td>
                                   <td className="px-4 py-3 text-gray-600">
                                     {price.discount_percentage
@@ -392,8 +393,7 @@ const SubscriptionManagement = () => {
                                       : "-"}
                                   </td>
                                   <td className="px-4 py-3 text-blue-600 font-bold">
-                                    {price.final_price.toLocaleString("vi-VN")}{" "}
-                                    VNĐ
+                                    {formatCurrency(price.final_price)}
                                   </td>
                                   <td className="px-4 py-3">
                                     <span

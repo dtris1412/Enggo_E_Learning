@@ -24,7 +24,7 @@ const DocumentList: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [documentTypeFilter, setDocumentTypeFilter] = useState("");
   const [accessTypeFilter, setAccessTypeFilter] = useState("");
-  const [itemsPerPage] = useState(2);
+  const [itemsPerPage] = useState(12);
   const [topDocuments, setTopDocuments] = useState<any[]>([]);
   const [userHasPremium, setUserHasPremium] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();

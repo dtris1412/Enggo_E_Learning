@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useLocation } from "react-router-dom";
 import {
   Search,
   Filter,
@@ -10,6 +10,7 @@ import {
   CreditCard,
   TrendingUp,
 } from "lucide-react";
+import { formatCurrency } from "../../utils/formatters";
 import {
   useOrderPayment,
   Order,
@@ -42,37 +43,47 @@ const OrderManagement = () => {
   } = useOrderPayment();
 
   // Order filters
-  const [orderLimit] = useState(2);
+  const [orderLimit] = useState(9);
   const [orderStatus, setOrderStatus] = useState("");
   const [orderSearch, setOrderSearch] = useState("");
 
   // Payment filters
-  const [paymentLimit] = useState(2);
+  const [paymentLimit] = useState(9);
   const [paymentStatus, setPaymentStatus] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("");
 
   // URL-based pagination
   const [searchParams, setSearchParams] = useSearchParams();
-  const orderPage = Math.max(
+  const location = useLocation();
+  const currentPage = Math.max(
     1,
-    parseInt(searchParams.get("orderPage") || "1", 10),
+    parseInt(searchParams.get("page") || "1", 10),
   );
-  const paymentPage = Math.max(
-    1,
-    parseInt(searchParams.get("paymentPage") || "1", 10),
-  );
-  const setOrderPage = (page: number) =>
+
+  const setPage = (page: number) =>
     setSearchParams((prev) => {
       const next = new URLSearchParams(prev);
-      next.set("orderPage", String(page));
+      next.set("page", String(page));
       return next;
     });
-  const setPaymentPage = (page: number) =>
-    setSearchParams((prev) => {
-      const next = new URLSearchParams(prev);
-      next.set("paymentPage", String(page));
-      return next;
-    });
+
+  const buildPageUrl = (page: number) => {
+    const params = new URLSearchParams(searchParams);
+    params.set("page", String(page));
+    return `${location.pathname}?${params.toString()}`;
+  };
+
+  // For internal tracking
+  const orderPage = currentPage;
+  const paymentPage = currentPage;
+  const setOrderPage = setPage;
+  const setPaymentPage = setPage;
+  const buildOrderPageUrl = buildPageUrl;
+  const buildPaymentPageUrl = buildPageUrl;
+
+  // Calculate totalPages
+  const orderTotalPages = Math.ceil(totalOrders / orderLimit) || 1;
+  const paymentTotalPages = Math.ceil(totalPayments / paymentLimit) || 1;
 
   // Modal states
   const [activeTab, setActiveTab] = useState<"orders" | "payments">("orders");
@@ -83,14 +94,27 @@ const OrderManagement = () => {
   const [showUpdatePaymentStatus, setShowUpdatePaymentStatus] = useState(false);
 
   // Fetch data
+  // Fetch initial data on component mount
+  useEffect(() => {
+    fetchOrders(1, orderLimit, "", "");
+    fetchPayments(1, paymentLimit, "", "");
+    getOrderStatistics();
+    getPaymentStatistics();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Fetch orders when filters/page changes
   useEffect(() => {
     fetchOrders(orderPage, orderLimit, orderStatus, orderSearch);
     getOrderStatistics();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [orderPage, orderLimit, orderStatus, orderSearch]);
 
+  // Fetch payments when filters/page changes
   useEffect(() => {
     fetchPayments(paymentPage, paymentLimit, paymentStatus, paymentMethod);
     getPaymentStatistics();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [paymentPage, paymentLimit, paymentStatus, paymentMethod]);
 
   const handleViewOrder = (order: Order) => {
@@ -153,7 +177,7 @@ const OrderManagement = () => {
                 <div className="text-right">
                   <p className="text-xs text-gray-500">Tổng tiền</p>
                   <p className="text-lg font-bold text-blue-600">
-                    {parseFloat(stat.total_amount).toLocaleString("vi-VN")} VNĐ
+                    {formatCurrency(stat.total_amount)}
                   </p>
                 </div>
               </div>
@@ -187,7 +211,7 @@ const OrderManagement = () => {
                 <div className="text-right">
                   <p className="text-xs text-gray-500">Tổng tiền</p>
                   <p className="text-lg font-bold text-green-600">
-                    {parseFloat(stat.total_amount).toLocaleString("vi-VN")} VNĐ
+                    {formatCurrency(stat.total_amount)}
                   </p>
                 </div>
               </div>
@@ -272,6 +296,9 @@ const OrderManagement = () => {
             pagination={orderPagination}
             onViewOrder={handleViewOrder}
             onPageChange={setOrderPage}
+            currentPage={orderPage}
+            buildPageUrl={buildOrderPageUrl}
+            totalPages={orderTotalPages}
           />
         </div>
       )}
@@ -323,6 +350,9 @@ const OrderManagement = () => {
             onViewPayment={handleViewPayment}
             onUpdatePayment={handleUpdatePayment}
             onPageChange={setPaymentPage}
+            currentPage={paymentPage}
+            buildPageUrl={buildPaymentPageUrl}
+            totalPages={paymentTotalPages}
           />
         </div>
       )}

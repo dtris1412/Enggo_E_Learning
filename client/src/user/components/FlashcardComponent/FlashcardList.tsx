@@ -22,7 +22,7 @@ const FlashcardList: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [visibilityFilter, setVisibilityFilter] = useState("");
   const [createdByFilter, setCreatedByFilter] = useState("");
-  const [itemsPerPage] = useState(2);
+  const [itemsPerPage] = useState(12);
 
   // Check if user is logged in
   const [isLoggedIn, setIsLoggedIn] = useState(false);

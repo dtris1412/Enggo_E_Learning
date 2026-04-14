@@ -35,7 +35,7 @@ const CourseManagement = () => {
   const [selectedStatus, setSelectedStatus] = useState<string>("");
   const [selectedLevel, setSelectedLevel] = useState<string>("");
   const [selectedTag, setSelectedTag] = useState<string>("");
-  const [limit] = useState(2);
+  const [limit] = useState(9);
   const [searchParams, setSearchParams] = useSearchParams();
   const location = useLocation();
   const urlPage = Math.max(1, parseInt(searchParams.get("page") || "1", 10));

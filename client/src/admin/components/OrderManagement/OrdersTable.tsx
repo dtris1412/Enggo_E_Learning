@@ -1,12 +1,7 @@
 import * as React from "react";
-import {
-  Eye,
-  ChevronLeft,
-  ChevronRight,
-  Calendar,
-  User,
-  DollarSign,
-} from "lucide-react";
+import { Eye, Calendar, User, DollarSign } from "lucide-react";
+import Pagination from "../../../shared/components/Pagination";
+import { formatCurrency } from "../../../utils/formatters";
 import { Order } from "../../contexts/orderPaymentContext";
 
 interface OrdersTableProps {
@@ -16,6 +11,9 @@ interface OrdersTableProps {
   pagination: any;
   onViewOrder: (order: Order) => void;
   onPageChange: (page: number) => void;
+  currentPage: number;
+  buildPageUrl: (page: number) => string;
+  totalPages: number;
 }
 
 const OrdersTable = ({
@@ -25,6 +23,9 @@ const OrdersTable = ({
   pagination,
   onViewOrder,
   onPageChange,
+  currentPage,
+  buildPageUrl,
+  totalPages,
 }: OrdersTableProps) => {
   const getStatusBadge = (status: string) => {
     const colors: { [key: string]: string } = {
@@ -122,7 +123,7 @@ const OrdersTable = ({
                         </div>
                       </td>
                       <td className="px-6 py-4 text-sm font-medium text-gray-900">
-                        {order.amount.toLocaleString("vi-VN")} VNĐ
+                        {formatCurrency(order.amount)}
                       </td>
                       <td className="px-6 py-4 text-sm">
                         <span className={statusBadge.className}>
@@ -153,44 +154,12 @@ const OrdersTable = ({
             </table>
           </div>
 
-          {/* Pagination */}
-          {pagination && pagination.totalPages > 1 && (
-            <div className="flex justify-center items-center gap-5 px-6 py-4 border-t border-gray-200">
-              {pagination.currentPage > 1 ? (
-                <button
-                  onClick={() => onPageChange(pagination.currentPage - 1)}
-                  aria-label="Trang trước"
-                  className="text-slate-400 hover:text-violet-600 transition-colors"
-                >
-                  <ChevronLeft className="h-5 w-5" />
-                </button>
-              ) : (
-                <span className="text-slate-200 cursor-not-allowed">
-                  <ChevronLeft className="h-5 w-5" />
-                </span>
-              )}
-              <span className="text-sm text-slate-500">
-                Trang{" "}
-                <span className="font-semibold text-violet-600">
-                  {pagination.currentPage}
-                </span>{" "}
-                / {pagination.totalPages}
-              </span>
-              {pagination.currentPage < pagination.totalPages ? (
-                <button
-                  onClick={() => onPageChange(pagination.currentPage + 1)}
-                  aria-label="Trang tiếp"
-                  className="text-slate-400 hover:text-violet-600 transition-colors"
-                >
-                  <ChevronRight className="h-5 w-5" />
-                </button>
-              ) : (
-                <span className="text-slate-200 cursor-not-allowed">
-                  <ChevronRight className="h-5 w-5" />
-                </span>
-              )}
-            </div>
-          )}
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            buildPageUrl={buildPageUrl}
+            className="py-4"
+          />
         </>
       )}
     </div>

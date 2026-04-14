@@ -1,13 +1,5 @@
 import * as React from "react";
-import {
-  Eye,
-  XCircle,
-  ChevronLeft,
-  ChevronRight,
-  Calendar,
-  User,
-  Award,
-} from "lucide-react";
+import { Eye, XCircle, Calendar, User, Award } from "lucide-react";
 import { UserSubscription } from "../../contexts/userSubscriptionTrackingContext";
 
 interface UserSubscriptionsTableProps {
@@ -17,12 +9,18 @@ interface UserSubscriptionsTableProps {
   onViewSubscription: (subscription: UserSubscription) => void;
   onExpireSubscription: (subscriptionId: number) => void;
   onPageChange: (page: number) => void;
+  currentPage: number;
+  totalPages: number;
+  buildPageUrl: (page: number) => string;
 }
 
 const UserSubscriptionsTable = ({
   subscriptions,
   loading,
   pagination,
+  currentPage,
+  totalPages,
+  buildPageUrl,
   onViewSubscription,
   onExpireSubscription,
   onPageChange,
@@ -203,45 +201,6 @@ const UserSubscriptionsTable = ({
               </tbody>
             </table>
           </div>
-
-          {/* Pagination */}
-          {pagination && pagination.totalPages > 1 && (
-            <div className="flex justify-center items-center gap-5 px-6 py-4 border-t border-gray-200">
-              {pagination.currentPage > 1 ? (
-                <button
-                  onClick={() => onPageChange(pagination.currentPage - 1)}
-                  aria-label="Trang trước"
-                  className="text-slate-400 hover:text-violet-600 transition-colors"
-                >
-                  <ChevronLeft className="h-5 w-5" />
-                </button>
-              ) : (
-                <span className="text-slate-200 cursor-not-allowed">
-                  <ChevronLeft className="h-5 w-5" />
-                </span>
-              )}
-              <span className="text-sm text-slate-500">
-                Trang{" "}
-                <span className="font-semibold text-violet-600">
-                  {pagination.currentPage}
-                </span>{" "}
-                / {pagination.totalPages}
-              </span>
-              {pagination.currentPage < pagination.totalPages ? (
-                <button
-                  onClick={() => onPageChange(pagination.currentPage + 1)}
-                  aria-label="Trang tiếp"
-                  className="text-slate-400 hover:text-violet-600 transition-colors"
-                >
-                  <ChevronRight className="h-5 w-5" />
-                </button>
-              ) : (
-                <span className="text-slate-200 cursor-not-allowed">
-                  <ChevronRight className="h-5 w-5" />
-                </span>
-              )}
-            </div>
-          )}
         </>
       )}
     </div>

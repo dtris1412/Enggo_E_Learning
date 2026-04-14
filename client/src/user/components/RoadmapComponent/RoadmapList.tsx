@@ -42,7 +42,7 @@ const RoadmapList: React.FC = () => {
     fetchRoadmapsPaginated(
       search,
       urlPage,
-      2,
+      12,
       roadmapLevel,
       undefined,
       sortBy,
@@ -55,7 +55,7 @@ const RoadmapList: React.FC = () => {
     fetchRoadmapsPaginated(
       search,
       1,
-      2,
+      12,
       roadmapLevel,
       undefined,
       sortBy,

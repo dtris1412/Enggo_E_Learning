@@ -41,7 +41,7 @@ const RoadmapManagement = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingRoadmap, setEditingRoadmap] = useState<any>(null);
   const [levelFilter, setLevelFilter] = useState("");
-  const [limit] = useState(2);
+  const [limit] = useState(9);
   const [searchParams] = useSearchParams();
   const location = useLocation();
   const urlPage = Math.max(1, parseInt(searchParams.get("page") || "1", 10));

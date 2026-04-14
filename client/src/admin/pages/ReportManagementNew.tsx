@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useSearchParams, useLocation } from "react-router-dom";
 import {
   FileText,
   Download,
@@ -8,9 +9,8 @@ import {
   Filter,
   Calendar,
   FileSpreadsheet,
-  ChevronLeft,
-  ChevronRight,
 } from "lucide-react";
+import Pagination from "../../shared/components/Pagination";
 import { useToast } from "../../shared/components/Toast/Toast";
 import { useReport } from "../contexts/reportContext";
 import { AddReportModal } from "../components/ReportManagement";
@@ -44,10 +44,28 @@ const ReportManagementNew = () => {
     deleteReport,
   } = useReport();
 
-  const [currentPage, setCurrentPage] = useState(1);
   const [search, setSearch] = useState("");
   const [filterType, setFilterType] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
+  const currentPage = Math.max(
+    1,
+    parseInt(searchParams.get("page") || "1", 10),
+  );
+
+  const resetPage = () =>
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.set("page", "1");
+      return next;
+    });
+
+  const buildPageUrl = (page: number) => {
+    const params = new URLSearchParams(searchParams);
+    params.set("page", String(page));
+    return `${location.pathname}?${params.toString()}`;
+  };
 
   const reportTypes = [
     { value: "users", label: "Người dùng" },
@@ -61,7 +79,7 @@ const ReportManagementNew = () => {
 
   useEffect(() => {
     loadReports();
-  }, [currentPage, search, filterType]);
+  }, [currentPage, search, filterType, searchParams]);
 
   useEffect(() => {
     if (error) {
@@ -70,13 +88,17 @@ const ReportManagementNew = () => {
   }, [error, showToast]);
 
   const loadReports = () => {
+    const limit = 9;
     fetchReportsPaginated({
       page: currentPage,
-      limit: 10,
+      limit,
       search,
       report_type: filterType,
     });
   };
+
+  // Calculate totalPages
+  const totalPages = Math.ceil((pagination?.total || 0) / 10) || 1;
 
   const handleGenerateReport = async (data: {
     report_name: string;
@@ -155,13 +177,19 @@ const ReportManagementNew = () => {
             type="text"
             placeholder="Tìm kiếm báo cáo..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              resetPage();
+            }}
             className="w-full rounded-lg border border-gray-300 py-2 pl-10 pr-4 focus:border-blue-500 focus:outline-none"
           />
         </div>
         <select
           value={filterType}
-          onChange={(e) => setFilterType(e.target.value)}
+          onChange={(e) => {
+            setFilterType(e.target.value);
+            resetPage();
+          }}
           className="rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none"
         >
           <option value="">Tất cả loại báo cáo</option>
@@ -266,30 +294,12 @@ const ReportManagementNew = () => {
         </table>
       </div>
 
-      {/* Pagination */}
-      {pagination.totalPages > 1 && (
-        <div className="mt-4 flex justify-center gap-2">
-          <button
-            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-            disabled={currentPage === 1}
-            className="rounded-lg border px-4 py-2 disabled:opacity-50"
-          >
-            Trước
-          </button>
-          <span className="flex items-center px-4 py-2">
-            Trang {currentPage} / {pagination.totalPages}
-          </span>
-          <button
-            onClick={() =>
-              setCurrentPage((p) => Math.min(pagination.totalPages, p + 1))
-            }
-            disabled={currentPage === pagination.totalPages}
-            className="rounded-lg border px-4 py-2 disabled:opacity-50"
-          >
-            Sau
-          </button>
-        </div>
-      )}
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        buildPageUrl={buildPageUrl}
+        className="py-4"
+      />
 
       {/* Add Report Modal */}
       <AddReportModal

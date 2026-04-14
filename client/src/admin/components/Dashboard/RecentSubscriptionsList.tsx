@@ -1,5 +1,6 @@
 import React from "react";
 import { Users } from "lucide-react";
+import { formatCurrency } from "../../../utils/formatters";
 
 interface RecentSubscription {
   user_subscription_id: number;
@@ -79,8 +80,8 @@ const RecentSubscriptionsList: React.FC<RecentSubscriptionsListProps> = ({
                 <p className="text-xs text-gray-600">
                   Đăng ký gói {item.Subscription_Price.Subscription_Plan.name} •{" "}
                   {item.Order
-                    ? `${item.Order.amount.toLocaleString("vi-VN")} VNĐ`
-                    : `${item.Subscription_Price.price.toLocaleString("vi-VN")} VNĐ`}
+                    ? formatCurrency(item.Order.amount)
+                    : formatCurrency(item.Subscription_Price.price)}
                 </p>
                 <p className="text-xs text-gray-500 mt-0.5">
                   {timeAgo(item.started_at)}

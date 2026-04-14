@@ -30,7 +30,7 @@ const CourseList: React.FC = () => {
     fetchCoursesPaginated(
       search,
       urlPage,
-      2,
+      12,
       courseLevel,
       accessType,
       undefined,

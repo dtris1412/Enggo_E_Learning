@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useLocation } from "react-router-dom";
 import { Search, Eye, XCircle, Calendar, User, Award } from "lucide-react";
+import Pagination from "../../shared/components/Pagination";
 import {
   useUserSubscriptionTracking,
   UserSubscription,
@@ -19,14 +20,16 @@ const UserSubscriptionTracking = () => {
     expireSubscription,
   } = useUserSubscriptionTracking();
 
-  const [limit] = useState(2);
+  const [limit] = useState(9);
   const [status, setStatus] = useState("");
   const [search, setSearch] = useState("");
   const [selectedSubscription, setSelectedSubscription] =
     useState<UserSubscription | null>(null);
   const [showViewModal, setShowViewModal] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
   const urlPage = Math.max(1, parseInt(searchParams.get("page") || "1", 10));
+
   const resetPage = () =>
     setSearchParams((prev) => {
       const next = new URLSearchParams(prev);
@@ -34,9 +37,23 @@ const UserSubscriptionTracking = () => {
       return next;
     });
 
+  const buildPageUrl = (page: number) => {
+    const params = new URLSearchParams(searchParams);
+    params.set("page", String(page));
+    return `${location.pathname}?${params.toString()}`;
+  };
+
+  const totalPages = Math.ceil(totalSubscriptions / limit) || 1;
+
+  // Fetch initial data on component mount
+  useEffect(() => {
+    fetchSubscriptions(1, limit, "", "");
+  }, []);
+
+  // Fetch data when filters or pagination changes
   useEffect(() => {
     fetchSubscriptions(urlPage, limit, status, search);
-  }, [urlPage, limit, status, search]);
+  }, [urlPage, limit, status, search, fetchSubscriptions]);
 
   const handleViewSubscription = (subscription: UserSubscription) => {
     setSelectedSubscription(subscription);
@@ -183,13 +200,23 @@ const UserSubscriptionTracking = () => {
         pagination={pagination}
         onViewSubscription={handleViewSubscription}
         onExpireSubscription={handleExpireSubscription}
-        onPageChange={(newPage) =>
+        currentPage={urlPage}
+        totalPages={totalPages}
+        buildPageUrl={buildPageUrl}
+        onPageChange={(newPage) => {
           setSearchParams((prev) => {
             const next = new URLSearchParams(prev);
             next.set("page", String(newPage));
             return next;
-          })
-        }
+          });
+        }}
+      />
+
+      <Pagination
+        currentPage={urlPage}
+        totalPages={totalPages}
+        buildPageUrl={buildPageUrl}
+        className="py-4"
       />
 
       {/* View Subscription Modal */}

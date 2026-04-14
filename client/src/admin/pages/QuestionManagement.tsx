@@ -18,7 +18,7 @@ const QuestionManagement = () => {
     unlockQuestion,
   } = useLessonQuestion();
 
-  const [limit] = useState(2);
+  const [limit] = useState(9);
   const [searchTerm, setSearchTerm] = useState("");
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedQuestion, setSelectedQuestion] =

@@ -47,7 +47,7 @@ const ExamManagement = () => {
   const loadExams = () => {
     const params: any = {
       page: urlPage,
-      limit: 2,
+      limit: 9,
     };
 
     if (searchTerm) params.search = searchTerm;
