@@ -1,4 +1,5 @@
 import db from "../../models/index.js";
+import { Op } from "sequelize";
 
 const { User_Subscription, User, Subscription_Price, Subscription_Plan } = db;
 
@@ -326,7 +327,42 @@ export const cancelSubscription = async (subscriptionId) => {
   }
 };
 
+// Get all users with active free plan subscriptions
+export const getActiveFreePlanUsers = async () => {
+  try {
+    const users = await User_Subscription.findAll({
+      where: {
+        status: "active",
+      },
+      attributes: ["user_id"],
+      include: [
+        {
+          model: Subscription_Price,
+          attributes: [],
+          include: [
+            {
+              model: Subscription_Plan,
+              attributes: [],
+              where: { code: "free" },
+            },
+          ],
+        },
+      ],
+      raw: true,
+      subQuery: false,
+    });
+
+    // Get unique user_ids
+    const uniqueUserIds = [...new Set(users.map((u) => u.user_id))];
+    return uniqueUserIds.map((user_id) => ({ user_id }));
+  } catch (error) {
+    console.error("Error fetching active free plan users:", error);
+    throw new Error(`Error fetching active free plan users: ${error.message}`);
+  }
+};
+
 // Refresh free plan tokens for user (call periodically - daily/monthly)
+// Creates NEW subscription (renewal) + resets tokens
 export const refreshFreeTokensForUser = async (userId) => {
   try {
     // Get user's active free subscription
@@ -358,10 +394,28 @@ export const refreshFreeTokensForUser = async (userId) => {
       return { success: false, message: "No active free subscription found" };
     }
 
-    const monthlyQuota =
-      subscription.Subscription_Price.Subscription_Plan.monthly_ai_token_quota;
+    const freePrice = subscription.Subscription_Price;
+    const monthlyQuota = freePrice.Subscription_Plan.monthly_ai_token_quota;
 
-    // Get or create wallet
+    // Step 1: Mark old subscription as expired
+    const oldSubscriptionId = subscription.user_subscription_id;
+    subscription.status = "expired";
+    await subscription.save();
+    console.log(
+      `Marked old free subscription ${oldSubscriptionId} as expired for renewal`,
+    );
+
+    // Step 2: Create NEW free subscription (renewal/refresh)
+    const newSubscription = await createSubscription(
+      userId,
+      freePrice.subscription_price_id,
+      null,
+    );
+    console.log(
+      `Created NEW free subscription for user ${userId}: ${newSubscription.user_subscription_id} (renewed from ${oldSubscriptionId})`,
+    );
+
+    // Step 3: Reset tokens in wallet to new subscription's quota
     let wallet = await db.User_Token_Wallet.findOne({
       where: { user_id: userId },
     });
@@ -372,21 +426,27 @@ export const refreshFreeTokensForUser = async (userId) => {
         token_balance: monthlyQuota,
         updated_at: new Date(),
       });
+      console.log(
+        `Created wallet for user ${userId} with ${monthlyQuota} free tokens on renewal`,
+      );
     } else {
       // RESET to monthly quota (not add)
       await db.User_Token_Wallet.update(
         { token_balance: monthlyQuota, updated_at: new Date() },
         { where: { user_id: userId } },
       );
+      console.log(
+        `Reset wallet for user ${userId} to ${monthlyQuota} free tokens on renewal`,
+      );
     }
 
-    console.log(
-      `Refreshed free tokens for user ${userId}: reset to ${monthlyQuota} tokens`,
-    );
+    console.log(`Free subscription renewed successfully for user ${userId}`);
     return {
       success: true,
-      message: "Free tokens refreshed",
-      tokens: monthlyQuota,
+      message: "Free subscription renewed and tokens refreshed",
+      old_subscription_id: oldSubscriptionId,
+      new_subscription_id: newSubscription.user_subscription_id,
+      tokens_reset_to: monthlyQuota,
     };
   } catch (error) {
     console.error("Error refreshing free tokens:", error);
@@ -394,11 +454,50 @@ export const refreshFreeTokensForUser = async (userId) => {
   }
 };
 
+// Helper: Reset tokens for a subscription (used when renewal happens)
+const resetTokensForSubscription = async (userId, subscriptionPrice) => {
+  try {
+    const monthlyQuota =
+      subscriptionPrice.Subscription_Plan.monthly_ai_token_quota;
+
+    let wallet = await db.User_Token_Wallet.findOne({
+      where: { user_id: userId },
+    });
+
+    if (!wallet) {
+      // Create new wallet
+      await db.User_Token_Wallet.create({
+        user_id: userId,
+        token_balance: monthlyQuota,
+        updated_at: new Date(),
+      });
+      console.log(
+        `Created wallet for user ${userId} with ${monthlyQuota} tokens on renewal`,
+      );
+    } else {
+      // RESET to new plan's monthly quota
+      await db.User_Token_Wallet.update(
+        { token_balance: monthlyQuota, updated_at: new Date() },
+        { where: { user_id: userId } },
+      );
+      console.log(
+        `Reset wallet for user ${userId} to ${monthlyQuota} tokens on renewal`,
+      );
+    }
+
+    return monthlyQuota;
+  } catch (error) {
+    console.error("Error resetting tokens for subscription:", error);
+    throw new Error(
+      `Error resetting tokens for subscription: ${error.message}`,
+    );
+  }
+};
+
 // Handle subscription expiry - auto-renew or downgrade to free
 export const handleExpiredSubscriptions = async () => {
   try {
     const now = new Date();
-    const { Op } = require("sequelize");
 
     // Find all active subscriptions that have expired
     const expiredSubscriptions = await User_Subscription.findAll({
@@ -520,12 +619,18 @@ export const handleExpiredSubscriptions = async () => {
             subscription.order_id,
           );
 
-          // Don't add tokens for paid plans - token consumption continues
+          // Reset tokens for renewed subscription (all plans get tokens reset on renewal)
+          const monthlyQuota = await resetTokensForSubscription(
+            userId,
+            subscription.Subscription_Price,
+          );
+
           results.push({
             user_id: userId,
             action: "auto_renewed",
             new_subscription_id: newSubscription.user_subscription_id,
             renewed_until: newSubscription.expired_at,
+            tokens_reset_to: monthlyQuota,
           });
         }
       } catch (error) {
@@ -556,7 +661,6 @@ export const handleExpiredSubscriptions = async () => {
 // Auto-renew active subscriptions before expiry (optional - proactive renewal)
 export const autoRenewUpcomingSubscriptions = async (daysBeforeExpiry = 7) => {
   try {
-    const { Op } = require("sequelize");
     const now = new Date();
     const renewalDate = new Date(
       now.getTime() + daysBeforeExpiry * 24 * 60 * 60 * 1000,
@@ -574,10 +678,11 @@ export const autoRenewUpcomingSubscriptions = async (daysBeforeExpiry = 7) => {
       include: [
         {
           model: Subscription_Price,
+          attributes: ["subscription_price_id", "billing_type"],
           include: [
             {
               model: Subscription_Plan,
-              attributes: ["code"],
+              attributes: ["code", "monthly_ai_token_quota"],
             },
           ],
         },
@@ -597,10 +702,17 @@ export const autoRenewUpcomingSubscriptions = async (daysBeforeExpiry = 7) => {
             subscription.order_id,
           );
 
+          // Reset tokens for renewed subscription
+          const monthlyQuota = await resetTokensForSubscription(
+            subscription.user_id,
+            subscription.Subscription_Price,
+          );
+
           results.push({
             user_id: subscription.user_id,
             action: "proactive_renewal",
             new_subscription_id: newSubscription.user_subscription_id,
+            tokens_reset_to: monthlyQuota,
           });
         }
       } catch (error) {
@@ -621,6 +733,158 @@ export const autoRenewUpcomingSubscriptions = async (daysBeforeExpiry = 7) => {
     console.error("Error in auto-renew upcoming subscriptions:", error);
     throw new Error(
       `Error in auto-renew upcoming subscriptions: ${error.message}`,
+    );
+  }
+};
+
+// Process retroactively expired subscriptions (for old data that wasn't processed)
+export const processExpiredSubscriptionsRetroactively = async () => {
+  try {
+    // Find all subscriptions with status='expired' (already marked as expired)
+    const expiredSubscriptions = await User_Subscription.findAll({
+      where: {
+        status: "expired",
+      },
+      include: [
+        {
+          model: Subscription_Price,
+          attributes: ["billing_type"],
+          include: [
+            {
+              model: Subscription_Plan,
+              attributes: ["code", "monthly_ai_token_quota"],
+            },
+          ],
+        },
+        {
+          model: User,
+          attributes: ["user_id", "user_name"],
+        },
+      ],
+    });
+
+    console.log(
+      `Found ${expiredSubscriptions.length} retroactively expired subscriptions to process`,
+    );
+    const results = [];
+
+    // Get free plan price_id
+    const freePrice = await Subscription_Price.findOne({
+      include: [
+        {
+          model: Subscription_Plan,
+          where: { code: "free" },
+        },
+      ],
+      where: { billing_type: "free" },
+    });
+
+    if (!freePrice) {
+      console.error("[RETROACTIVE] Free plan price not found!");
+      return results;
+    }
+
+    const freePriceId = freePrice.subscription_price_id;
+    const freeQuota = freePrice.Subscription_Plan.monthly_ai_token_quota;
+
+    // Get unique user_ids with status='expired'
+    const uniqueUserIds = new Set(
+      expiredSubscriptions.map((sub) => sub.user_id),
+    );
+
+    for (const userId of uniqueUserIds) {
+      try {
+        // Check if user already has an 'active' subscription (skip if yes)
+        const hasActiveSubscription = await User_Subscription.findOne({
+          where: {
+            user_id: userId,
+            status: "active",
+          },
+        });
+
+        if (hasActiveSubscription) {
+          console.log(
+            `[RETROACTIVE] User ${userId} already has active subscription, skipping...`,
+          );
+          results.push({
+            user_id: userId,
+            action: "skipped",
+            reason: "already_has_active_subscription",
+          });
+          continue;
+        }
+
+        // Step 1: Create NEW subscription for this user (30-day free)
+        const newSubscription = await User_Subscription.create({
+          user_id: userId,
+          subscription_price_id: freePriceId,
+          order_id: null,
+          started_at: new Date(),
+          expired_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // +30 days
+          status: "active",
+        });
+
+        console.log(
+          `[RETROACTIVE] Created NEW subscription (ID: ${newSubscription.user_subscription_id}) for user ${userId}`,
+        );
+
+        // Step 2: Reset tokens in wallet
+        let wallet = await db.User_Token_Wallet.findOne({
+          where: { user_id: userId },
+        });
+
+        if (!wallet) {
+          // Create wallet if missing
+          await db.User_Token_Wallet.create({
+            user_id: userId,
+            token_balance: freeQuota,
+            updated_at: new Date(),
+          });
+          console.log(
+            `[RETROACTIVE] Created wallet for user ${userId} with ${freeQuota} tokens`,
+          );
+        } else {
+          // Reset existing wallet to free quota (exact set, not add)
+          await db.User_Token_Wallet.update(
+            { token_balance: freeQuota, updated_at: new Date() },
+            { where: { user_id: userId } },
+          );
+          console.log(
+            `[RETROACTIVE] Reset wallet for user ${userId} to ${freeQuota} tokens`,
+          );
+        }
+
+        results.push({
+          user_id: userId,
+          action: "renewal_created",
+          new_subscription_id: newSubscription.user_subscription_id,
+          tokens_reset_to: freeQuota,
+        });
+      } catch (error) {
+        console.error(
+          `Error processing retroactive expiry for user ${userId}:`,
+          error,
+        );
+        results.push({
+          user_id: userId,
+          action: "error",
+          error: error.message,
+        });
+      }
+    }
+
+    console.log(
+      `[RETROACTIVE] Processed ${results.length} expired subscriptions`,
+    );
+    return {
+      success: true,
+      message: `Retroactively processed ${results.length} expired subscriptions`,
+      results,
+    };
+  } catch (error) {
+    console.error("Error in retroactive subscription processing:", error);
+    throw new Error(
+      `Error in retroactive subscription processing: ${error.message}`,
     );
   }
 };

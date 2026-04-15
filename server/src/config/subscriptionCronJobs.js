@@ -5,8 +5,26 @@ import * as userSubscriptionService from "../user/services/userSubscriptionServi
  * Initialize subscription-related cron jobs
  * Should be called in server.js after all services are initialized
  */
-export const initSubscriptionCronJobs = () => {
+export const initSubscriptionCronJobs = async () => {
   console.log("🔄 Initializing subscription cron jobs...");
+
+  // On startup: Process any retroactively expired subscriptions (create NEW + reset tokens)
+  try {
+    console.log("[STARTUP] Processing retroactively expired subscriptions...");
+    const retroactiveResult =
+      await userSubscriptionService.processExpiredSubscriptionsRetroactively();
+    if (retroactiveResult && retroactiveResult.length > 0) {
+      console.log(
+        `✅ [STARTUP] Retroactive processing completed: ${retroactiveResult.length} users processed`,
+      );
+      console.log("[STARTUP] Details:", retroactiveResult);
+    }
+  } catch (error) {
+    console.error(
+      "[STARTUP] Error in retroactive processing:",
+      error.message,
+    );
+  }
 
   // Process expired subscriptions daily at 00:00 (midnight)
   cron.schedule("0 0 * * *", async () => {
@@ -60,6 +78,7 @@ export const initSubscriptionCronJobs = () => {
 
   console.log("✅ Subscription cron jobs initialized successfully!");
   console.log("📅 Scheduled tasks:");
+  console.log("   • [STARTUP] Process retroactively expired subscriptions (create NEW + reset tokens)");
   console.log(
     "   • 00:00 daily: Handle expired subscriptions (downgrade/renew)",
   );

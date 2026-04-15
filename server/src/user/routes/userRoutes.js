@@ -71,6 +71,9 @@ import {
 // ===========Subscription Plan Controllers===========
 import { getAllSubscriptionPlans } from "../controllers/subscriptionPlanController.js";
 
+// ===========Subscription Management Controllers===========
+import { triggerRetroactiveExpiredProcessing } from "../../admin/controllers/subscriptionManagementController.js";
+
 // ===========Order Controllers===========
 import {
   getUserOrders,
@@ -356,6 +359,13 @@ const initUserRoutes = (app) => {
     verifyToken,
     requireUser,
     cancelSubscription,
+  );
+  // Process retroactively expired subscriptions (admin only)
+  router.post(
+    "/api/user/subscriptions/process-retroactive",
+    verifyToken,
+    requireAdmin,
+    triggerRetroactiveExpiredProcessing,
   );
 
   // ===========Subscription Plan Routes===========

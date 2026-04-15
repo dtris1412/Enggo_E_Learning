@@ -87,3 +87,97 @@ export const refreshUserFreeTokens = async (req, res) => {
     });
   }
 };
+
+// Refresh free tokens for ALL free plan users (batch)
+export const triggerRefreshAllFreeTokens = async (req, res) => {
+  try {
+    console.log(
+      "Admin triggered refresh all free users tokens at:",
+      new Date().toISOString(),
+    );
+
+    // Get all users with active free subscriptions
+    const activeUsers = await userSubscriptionService.getActiveFreePlanUsers();
+
+    if (!activeUsers || activeUsers.length === 0) {
+      return res.status(200).json({
+        success: true,
+        message: "No active free plan users found",
+        data: { processed: 0, results: [] },
+      });
+    }
+
+    console.log(
+      `Found ${activeUsers.length} active free plan users to refresh`,
+    );
+
+    const results = [];
+
+    // Process each user's free subscription renewal
+    for (const user of activeUsers) {
+      try {
+        const result = await userSubscriptionService.refreshFreeTokensForUser(
+          user.user_id,
+        );
+        results.push({
+          user_id: user.user_id,
+          success: result.success,
+          ...result,
+        });
+        console.log(
+          `Refreshed free tokens for user ${user.user_id}: ${result.message}`,
+        );
+      } catch (error) {
+        console.error(
+          `Error refreshing tokens for user ${user.user_id}:`,
+          error,
+        );
+        results.push({
+          user_id: user.user_id,
+          success: false,
+          error: error.message,
+        });
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      message: `Refreshed tokens for ${activeUsers.length} free plan users`,
+      data: {
+        processed: activeUsers.length,
+        results,
+      },
+    });
+  } catch (error) {
+    console.error("Error refreshing all free tokens:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message || "Error refreshing all free tokens",
+    });
+  }
+};
+
+// Process retroactively expired subscriptions (admin endpoint)
+export const triggerRetroactiveExpiredProcessing = async (req, res) => {
+  try {
+    console.log(
+      "Admin triggered retroactive expired subscriptions processing at:",
+      new Date().toISOString(),
+    );
+
+    const result =
+      await userSubscriptionService.processExpiredSubscriptionsRetroactively();
+
+    res.status(200).json({
+      success: true,
+      message: "Retroactive subscription processing completed",
+      data: result,
+    });
+  } catch (error) {
+    console.error("Error in retroactive subscription processing:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message || "Error in retroactive subscription processing",
+    });
+  }
+};

@@ -315,6 +315,7 @@ import {
   triggerExpiredSubscriptionsHandling,
   triggerUpcomingSubscriptionsRenewal,
   refreshUserFreeTokens,
+  triggerRefreshAllFreeTokens,
 } from "../controllers/subscriptionManagementController.js";
 
 // ===========System AI Quota Controllers===========
@@ -381,6 +382,13 @@ const initAdminRoutes = (app) => {
     verifyToken,
     requireAdmin,
     refreshUserFreeTokens,
+  );
+  // Refresh free tokens for ALL free plan users (batch)
+  router.post(
+    "/api/admin/subscriptions/refresh-all-free-tokens",
+    verifyToken,
+    requireAdmin,
+    triggerRefreshAllFreeTokens,
   );
 
   //===========User Management Routes===========
