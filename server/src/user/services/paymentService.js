@@ -2,6 +2,7 @@ import db from "../../models/index.js";
 import * as userSubscriptionService from "./userSubscriptionService.js";
 import * as userTokenWalletService from "../../admin/services/userTokenWalletService.js";
 import * as userTokenTransactionService from "../../admin/services/userTokenTransactionService.js";
+import { sendInvoiceEmail } from "../../shared/services/emailService.js";
 
 const { Payment, Order, Subscription_Price, Subscription_Plan } = db;
 
@@ -336,6 +337,33 @@ export const processSuccessfulPayment = async (
     }
 
     await transaction.commit();
+
+    // Send invoice email (non-blocking)
+    try {
+      const user = await db.User.findByPk(order.user_id);
+      if (user) {
+        await sendInvoiceEmail({
+          user_email: user.user_email,
+          full_name: user.full_name || user.user_name,
+          order_id: order.order_id,
+          total_amount: order.amount,
+          billing_type: order.Subscription_Price?.billing_type || "monthly",
+          plan_name:
+            order.Subscription_Price?.Subscription_Plan?.name || "Plan",
+          created_at: order.created_at,
+          subscription_expires_at:
+            subscription.expired_at ||
+            new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+        });
+        console.log(`✅ Invoice email sent to ${user.user_email}`);
+      }
+    } catch (emailError) {
+      console.error(
+        `⚠️ Failed to send invoice email for order ${order.order_id}:`,
+        emailError.message,
+      );
+      // Don't block payment process if email fails
+    }
 
     console.log("✅ Payment processed successfully:", {
       orderId: order.order_id,

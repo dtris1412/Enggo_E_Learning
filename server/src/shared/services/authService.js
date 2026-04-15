@@ -5,6 +5,7 @@ import bcrypt from "bcrypt";
 import nodemailer from "nodemailer";
 import dotenv from "dotenv";
 import { createSubscription } from "../../user/services/userSubscriptionService.js";
+import { sendWelcomeEmail } from "./emailService.js";
 dotenv.config();
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -235,6 +236,21 @@ const register = async (
     process.env.JWT_SECRET,
     { expiresIn: "7h" },
   );
+
+  // Send welcome email (non-blocking)
+  try {
+    await sendWelcomeEmail({
+      user_email: newUser.user_email,
+      full_name: newUser.full_name || newUser.user_name,
+    });
+    console.log(`✅ Welcome email sent to ${newUser.user_email}`);
+  } catch (emailError) {
+    console.error(
+      `⚠️ Failed to send welcome email to ${newUser.user_email}:`,
+      emailError.message,
+    );
+    // Don't block registration if email fails
+  }
 
   return {
     success: true,
