@@ -1,4 +1,5 @@
 import * as userSubscriptionService from "../services/userSubscriptionService.js";
+import * as userTokenWalletService from "../services/userTokenWalletService.js";
 import * as adminTokenWalletService from "../../admin/services/userTokenWalletService.js";
 import * as adminTokenTransactionService from "../../admin/services/userTokenTransactionService.js";
 import db from "../../config/connectDB.js";
@@ -143,7 +144,9 @@ export const subscribeToplan = async (req, res) => {
     // Add tokens to wallet based on plan
     const monthlyTokens =
       subscriptionPrice.Subscription_Plan.monthly_ai_token_quota;
-    await adminTokenWalletService.addTokensToWallet(userId, monthlyTokens);
+
+    // Ensure wallet exists and grant tokens
+    await userTokenWalletService.ensureWalletWithTokens(userId, monthlyTokens);
 
     // Create token transaction record
     await adminTokenTransactionService.createTransaction(
@@ -185,13 +188,14 @@ export const cancelSubscription = async (req, res) => {
       });
     }
 
-    const canceledSubscription =
+    const result =
       await userSubscriptionService.cancelSubscription(subscriptionId);
 
     res.status(200).json({
       success: true,
-      message: "Subscription canceled successfully",
-      data: canceledSubscription,
+      message: result.message,
+      data: result.subscription,
+      action: result.action,
     });
   } catch (error) {
     res.status(400).json({

@@ -9,6 +9,7 @@ import initUserRoutes from "./user/routes/userRoutes.js";
 import uploadRoutes from "./shared/routes/uploadRoute.js";
 import connectDB from "./config/connectDB.js";
 import cors from "cors";
+import { initSubscriptionCronJobs } from "./config/subscriptionCronJobs.js";
 // import passport from "./shared/services/passportService.js";
 
 dotenv.config();
@@ -67,4 +68,9 @@ app.listen(port, () => {
   console.log(`Server running on port ${port}`);
   console.log(`Environment: ${process.env.NODE_ENV || "development"}`);
   connectDB();
+
+  // Initialize subscription cron jobs after server starts
+  if (process.env.NODE_ENV !== "test") {
+    initSubscriptionCronJobs();
+  }
 });

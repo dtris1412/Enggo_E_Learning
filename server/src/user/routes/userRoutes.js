@@ -351,7 +351,7 @@ const initUserRoutes = (app) => {
     requireUser,
     subscribeToplan,
   );
-  router.patch(
+  router.put(
     "/api/user/subscriptions/:subscriptionId/cancel",
     verifyToken,
     requireUser,

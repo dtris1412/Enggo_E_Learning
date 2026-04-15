@@ -157,7 +157,7 @@ const register = async (
     updated_at: new Date(),
   });
 
-  // Create free subscription for new user
+  // Create wallet and free subscription for new user - wallet first!
   try {
     // Find free plan's free subscription price
     const freePrice = await db.Subscription_Price.findOne({
@@ -165,21 +165,69 @@ const register = async (
         {
           model: db.Subscription_Plan,
           where: { code: "free" },
+          attributes: [
+            "subscription_plan_id",
+            "code",
+            "monthly_ai_token_quota",
+          ],
         },
       ],
       where: { billing_type: "free" },
     });
 
     if (freePrice) {
+      // Step 1: Create wallet FIRST with tokens
+      const monthlyQuota = freePrice.Subscription_Plan.monthly_ai_token_quota;
+      const wallet = await db.User_Token_Wallet.create({
+        user_id: newUser.user_id,
+        token_balance: monthlyQuota,
+        updated_at: new Date(),
+      });
+      console.log(
+        `Created wallet for user ${newUser.user_id} with ${monthlyQuota} tokens`,
+      );
+
+      // Step 2: Create free subscription
       await createSubscription(
         newUser.user_id,
         freePrice.subscription_price_id,
         null, // No order_id for free plan
       );
+      console.log(
+        `New user ${newUser.user_id} registered with free plan and wallet`,
+      );
+    } else {
+      console.warn("Free subscription price not found in database");
+      // Still create wallet even if subscription price not found
+      const defaultFreeQuota = 100; // Fallback value
+      const wallet = await db.User_Token_Wallet.create({
+        user_id: newUser.user_id,
+        token_balance: defaultFreeQuota,
+        updated_at: new Date(),
+      });
+      console.log(
+        `Created wallet for user ${newUser.user_id} with default ${defaultFreeQuota} tokens`,
+      );
     }
   } catch (subscriptionError) {
-    console.error("Error creating free subscription:", subscriptionError);
-    // Continue even if subscription creation fails
+    console.error(
+      "Error creating free subscription or wallet:",
+      subscriptionError,
+    );
+    // Still try to create wallet even if subscription creation fails
+    const defaultFreeQuota = 100;
+    try {
+      await db.User_Token_Wallet.create({
+        user_id: newUser.user_id,
+        token_balance: defaultFreeQuota,
+        updated_at: new Date(),
+      });
+      console.log(
+        `Fallback: Created wallet for user ${newUser.user_id} with default ${defaultFreeQuota} tokens`,
+      );
+    } catch (walletError) {
+      console.error("Error creating wallet in fallback:", walletError);
+    }
   }
 
   const token = jwt.sign(

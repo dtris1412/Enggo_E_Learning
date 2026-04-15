@@ -132,8 +132,10 @@ const SubscriptionInfo: React.FC = () => {
     );
 
     if (result.success) {
-      alert("Đã hủy gói đăng ký thành công!");
+      // Show success message - use message from backend which includes action details
+      alert(result.message || "Gói đăng ký đã được xử lý thành công!");
       setShowCancelModal(false);
+      // Subscription data is already refreshed by the context
     } else {
       alert(`Lỗi: ${result.message}`);
     }
@@ -453,14 +455,24 @@ const SubscriptionInfo: React.FC = () => {
               </p>
               <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
                 <p className="text-sm text-yellow-800">
-                  ⚠️ Sau khi hủy, bạn vẫn có thể sử dụng gói Premium đến hết
-                  ngày{" "}
-                  <span className="font-semibold">
-                    {new Date(activeSubscription.expired_at).toLocaleDateString(
-                      "vi-VN",
-                    )}
-                  </span>
-                  . Sau đó tài khoản sẽ chuyển về gói Free.
+                  {activeSubscription.expired_at &&
+                  new Date(activeSubscription.expired_at) <= new Date() ? (
+                    <>
+                      ⚠️ Gói của bạn đã hết hạn. Hủy gói sẽ chuyển tài khoản
+                      sang gói Free ngay và cấp token miễn phí.
+                    </>
+                  ) : (
+                    <>
+                      ⚠️ Sau khi hủy, bạn vẫn có thể sử dụng gói Premium đến hết
+                      ngày{" "}
+                      <span className="font-semibold">
+                        {new Date(
+                          activeSubscription.expired_at,
+                        ).toLocaleDateString("vi-VN")}
+                      </span>
+                      . Sau đó tài khoản sẽ chuyển về gói Free.
+                    </>
+                  )}
                 </p>
               </div>
             </div>

@@ -310,6 +310,13 @@ import {
   getRecentSubscriptions,
 } from "../controllers/dashboardController.js";
 
+// ===========Subscription Management Controllers===========
+import {
+  triggerExpiredSubscriptionsHandling,
+  triggerUpcomingSubscriptionsRenewal,
+  refreshUserFreeTokens,
+} from "../controllers/subscriptionManagementController.js";
+
 // ===========System AI Quota Controllers===========
 import {
   getQuota,
@@ -351,6 +358,29 @@ const initAdminRoutes = (app) => {
     verifyToken,
     requireAdmin,
     getRecentSubscriptions,
+  );
+
+  //===========Subscription Management Routes===========
+  // Trigger processing of expired subscriptions
+  router.post(
+    "/api/admin/subscriptions/handle-expired",
+    verifyToken,
+    requireAdmin,
+    triggerExpiredSubscriptionsHandling,
+  );
+  // Trigger proactive renewal of upcoming subscriptions
+  router.post(
+    "/api/admin/subscriptions/renew-upcoming",
+    verifyToken,
+    requireAdmin,
+    triggerUpcomingSubscriptionsRenewal,
+  );
+  // Manually refresh free tokens for a user
+  router.post(
+    "/api/admin/subscriptions/refresh-tokens/:userId",
+    verifyToken,
+    requireAdmin,
+    refreshUserFreeTokens,
   );
 
   //===========User Management Routes===========
