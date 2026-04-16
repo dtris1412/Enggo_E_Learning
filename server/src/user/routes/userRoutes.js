@@ -148,6 +148,7 @@ import {
   getActiveSets,
   getDueNotifications,
   resetFlashcardSetProgress,
+  sendFlashcardReminderNow,
 } from "../controllers/flashcardProgressController.js";
 
 // ===========Exam Controllers===========
@@ -663,6 +664,15 @@ const initUserRoutes = (app) => {
     verifyToken,
     requireUser,
     resetFlashcardSetProgress,
+  );
+
+  // Send immediate flashcard reminder email (auth required)
+  // Sends email notification with card stats for a specific set
+  router.post(
+    "/api/user/flashcard-sets/:flashcard_set_id/send-reminder",
+    verifyToken,
+    requireUser,
+    sendFlashcardReminderNow,
   );
 
   // ===========Exam Routes===========

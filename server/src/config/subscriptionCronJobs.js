@@ -3,6 +3,7 @@ import * as userSubscriptionService from "../user/services/userSubscriptionServi
 import {
   sendRenewalReminderEmail,
   sendSubscriptionExpiredEmail,
+  sendDailyFlashcardReminderEmail,
 } from "../shared/services/emailService.js";
 import db from "../models/index.js";
 
@@ -138,6 +139,94 @@ export const initSubscriptionCronJobs = () => {
     }
   });
 
+  // Send daily flashcard review reminder - runs at 08:00 AM daily
+  // Sends 1 email per user with total due cards count (not per card, not per set - to avoid spam)
+  // This matches how Quizlet/Anki handle spaced repetition reminders
+  cron.schedule("0 8 * * *", async () => {
+    try {
+      console.log(
+        "[CRON] Running: Send Daily Flashcard Review Reminders at",
+        new Date().toISOString(),
+      );
+
+      const now = new Date();
+
+      // Find all users who have at least 1 card due for review
+      // Using raw query for efficient aggregation
+      const usersWithDueCards = await db.sequelize.query(
+        `
+        SELECT 
+          u.user_id,
+          u.user_email,
+          u.full_name,
+          u.user_name,
+          COUNT(DISTINCT ufp.progress_id) as total_due_cards
+        FROM users u
+        INNER JOIN user_flashcard_progress ufp ON u.user_id = ufp.user_id
+        WHERE ufp.next_review_at <= NOW()
+        GROUP BY u.user_id, u.user_email, u.full_name, u.user_name
+        ORDER BY total_due_cards DESC
+      `,
+        { type: db.sequelize.QueryTypes.SELECT },
+      );
+
+      console.log(
+        `[CRON] Found ${usersWithDueCards.length} users with due flashcards`,
+      );
+
+      let emailsSent = 0;
+
+      // Send 1 email per user
+      for (const user of usersWithDueCards) {
+        try {
+          // Get breakdown by sets for this user
+          const dueBySet = await db.sequelize.query(
+            `
+            SELECT 
+              fs.name as set_name,
+              COUNT(DISTINCT ufp.progress_id) as due_count
+            FROM user_flashcard_progress ufp
+            INNER JOIN flashcards f ON ufp.flashcard_id = f.flashcard_id
+            INNER JOIN flashcard_sets fs ON f.flashcard_set_id = fs.flashcard_set_id
+            WHERE ufp.user_id = :user_id
+              AND ufp.next_review_at <= NOW()
+            GROUP BY fs.name
+            ORDER BY due_count DESC
+          `,
+            {
+              replacements: { user_id: user.user_id },
+              type: db.sequelize.QueryTypes.SELECT,
+            },
+          );
+
+          // Send email with aggregated data
+          await sendDailyFlashcardReminderEmail({
+            user_email: user.user_email,
+            full_name: user.full_name || user.user_name,
+            total_due_cards: parseInt(user.total_due_cards),
+            due_sets_summary: dueBySet,
+          });
+
+          emailsSent++;
+          console.log(
+            `✅ [CRON] Daily flashcard reminder sent to ${user.full_name} - ${user.total_due_cards} cards due`,
+          );
+        } catch (emailError) {
+          console.error(
+            `⚠️ [CRON] Failed to send daily reminder for user ${user.user_id}:`,
+            emailError.message,
+          );
+        }
+      }
+
+      console.log(
+        `[CRON] Daily flashcard reminders completed: ${emailsSent} emails sent`,
+      );
+    } catch (error) {
+      console.error("[CRON] Error in daily flashcard reminders:", error);
+    }
+  });
+
   console.log("✅ Subscription cron jobs initialized successfully!");
   console.log("📅 Scheduled tasks:");
   console.log(
@@ -149,5 +238,8 @@ export const initSubscriptionCronJobs = () => {
   console.log("   • 02:00 daily: Send renewal reminder emails (7 days before)");
   console.log(
     "   • 01:30 on 1st of month: Refresh free plan tokens (placeholder)",
+  );
+  console.log(
+    "   • 08:00 daily: Send daily flashcard review reminders (1 email per user with total count)",
   );
 };

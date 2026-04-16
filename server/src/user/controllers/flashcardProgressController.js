@@ -1,4 +1,6 @@
 import userFlashcardProgressService from "../services/userFlashcardProgressService.js";
+import db from "../../models/index.js";
+import { sendFlashcardReminderEmail } from "../../shared/services/emailService.js";
 
 // Bắt đầu học một flashcard set
 const startFlashcardSet = async (req, res) => {
@@ -275,6 +277,145 @@ const resetFlashcardSetProgress = async (req, res) => {
   }
 };
 
+// Send immediate flashcard reminder email for a specific set
+const sendFlashcardReminderNow = async (req, res) => {
+  try {
+    const { flashcard_set_id } = req.params;
+    const user_id = req.user.user_id;
+
+    console.log("[CONTROLLER] sendFlashcardReminderNow - Request:", {
+      user_id,
+      flashcard_set_id,
+    });
+
+    if (!flashcard_set_id || isNaN(Number(flashcard_set_id))) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid flashcard set ID.",
+      });
+    }
+
+    // Get user info
+    const user = await db.User.findByPk(user_id, {
+      attributes: ["user_id", "user_email", "full_name", "user_name"],
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found.",
+      });
+    }
+
+    // Get flashcard set info
+    const flashcardSet = await db.Flashcard_Set.findOne({
+      where: {
+        flashcard_set_id,
+        [db.Sequelize.Op.or]: [{ visibility: "public" }, { user_id }],
+      },
+    });
+
+    if (!flashcardSet) {
+      return res.status(404).json({
+        success: false,
+        message:
+          "Flashcard set not found or you don't have permission to access it.",
+      });
+    }
+
+    // Get all flashcard IDs in this set
+    const flashcardsInSet = await db.Flashcard.findAll({
+      where: { flashcard_set_id },
+      attributes: ["flashcard_id"],
+      raw: true,
+    });
+    const flashcardIds = flashcardsInSet.map((f) => f.flashcard_id);
+
+    if (flashcardIds.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "This flashcard set has no cards.",
+      });
+    }
+
+    // Count due cards in this set
+    const now = new Date();
+    const dueCards = await db.User_Flashcard_Progress.count({
+      where: {
+        user_id,
+        flashcard_id: { [db.Sequelize.Op.in]: flashcardIds },
+        next_review_at: { [db.Sequelize.Op.lte]: now },
+      },
+    });
+
+    if (dueCards === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "You have no cards due for review in this set.",
+      });
+    }
+
+    // Get learning and mastered stats for this set
+    const learningCards = await db.User_Flashcard_Progress.count({
+      where: {
+        user_id,
+        flashcard_id: { [db.Sequelize.Op.in]: flashcardIds },
+        repetition_count: {
+          [db.Sequelize.Op.gt]: 0,
+          [db.Sequelize.Op.lt]: 3,
+        },
+      },
+    });
+
+    const masteredCards = await db.User_Flashcard_Progress.count({
+      where: {
+        user_id,
+        flashcard_id: { [db.Sequelize.Op.in]: flashcardIds },
+        repetition_count: { [db.Sequelize.Op.gte]: 3 },
+      },
+    });
+
+    // Send email
+    try {
+      await sendFlashcardReminderEmail({
+        user_email: user.user_email,
+        full_name: user.full_name || user.user_name,
+        set_name: flashcardSet.name,
+        set_id: flashcardSet.flashcard_set_id,
+        due_count: dueCards,
+        learning_count: learningCards,
+        mastered_count: masteredCards,
+      });
+
+      console.log(
+        "[CONTROLLER] sendFlashcardReminderNow - Email sent successfully",
+      );
+      return res.status(200).json({
+        success: true,
+        message: `Reminder email sent! You have ${dueCards} cards due for review in "${flashcardSet.name}".`,
+        data: {
+          due_count: dueCards,
+          learning_count: learningCards,
+          mastered_count: masteredCards,
+        },
+      });
+    } catch (emailError) {
+      console.error(
+        "[CONTROLLER] sendFlashcardReminderNow - Email failed:",
+        emailError,
+      );
+      return res.status(500).json({
+        success: false,
+        message: "Failed to send reminder email. Please try again.",
+        error: emailError.message,
+      });
+    }
+  } catch (err) {
+    console.error("[CONTROLLER] Error in sendFlashcardReminderNow:", err);
+    res.status(500).json({ success: false, message: "Internal server error." });
+  }
+};
+
 export {
   startFlashcardSet,
   reviewFlashcard,
@@ -284,4 +425,5 @@ export {
   getActiveSets,
   getDueNotifications,
   resetFlashcardSetProgress,
+  sendFlashcardReminderNow,
 };
