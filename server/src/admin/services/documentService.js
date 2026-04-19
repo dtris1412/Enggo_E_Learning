@@ -99,6 +99,7 @@ const getDocumentsPaginated = async (
     where: whereConditions,
     limit: Number(limit),
     offset: Number(offset),
+    order: [["created_at", "DESC"]],
   });
   return {
     success: true,

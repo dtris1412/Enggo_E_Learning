@@ -22,7 +22,7 @@ const DocumentManagement: React.FC = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedDocument, setSelectedDocument] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [itemsPerPage] = useState(2);
+  const [itemsPerPage] = useState(9);
   const [documentTypeFilter, setDocumentTypeFilter] = useState("");
   const [fileTypeFilter, setFileTypeFilter] = useState("");
   const [searchParams, setSearchParams] = useSearchParams();
@@ -275,12 +275,18 @@ const DocumentManagement: React.FC = () => {
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
                         {getFileIcon(doc.file_type)}
-                        <div>
-                          <div className="font-medium text-gray-900">
+                        <div className="min-w-0">
+                          <div
+                            className="font-medium text-gray-900 truncate max-w-xs"
+                            title={doc.document_name}
+                          >
                             {doc.document_name}
                           </div>
                           {doc.document_description && (
-                            <div className="text-sm text-gray-500 truncate max-w-xs">
+                            <div
+                              className="text-sm text-gray-500 truncate max-w-xs"
+                              title={doc.document_description}
+                            >
                               {doc.document_description}
                             </div>
                           )}

@@ -14,7 +14,7 @@ const { User_Subscription, User } = db;
  * Should be called in server.js after all services are initialized
  */
 export const initSubscriptionCronJobs = () => {
-  console.log("🔄 Initializing subscription cron jobs...");
+  console.log("Initializing subscription cron jobs...");
 
   // Process expired subscriptions daily at 00:00 (midnight)
   cron.schedule("0 0 * * *", async () => {
