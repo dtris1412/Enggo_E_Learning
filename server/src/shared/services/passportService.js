@@ -123,21 +123,48 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
 
           // Nếu vẫn chưa có → tạo user mới
           if (!user) {
-            user = await db.User.create({
-              user_name: email,
-              user_email: email,
-              google_id: profile.id,
-              full_name: profile.displayName,
-              user_status: true,
-              user_password: "",
-              role: 2,
-              created_at: new Date(),
-              updated_at: new Date(),
-            });
+            try {
+              user = await db.User.create({
+                user_name: email,
+                user_email: email,
+                google_id: profile.id,
+                full_name: profile.displayName,
+                user_status: true,
+                user_password: "",
+                role: 2,
+                created_at: new Date(),
+                updated_at: new Date(),
+              });
 
-            isNewUser = true;
-
-            console.log("[Google] Created new user:", email);
+              isNewUser = true;
+              console.log("[Google] Created new user:", email);
+            } catch (createError) {
+              // Handle duplicate email error
+              if (
+                createError.name === "SequelizeUniqueConstraintError" &&
+                createError.errors.some((e) => e.path === "user_email")
+              ) {
+                console.log(
+                  "[Google] Email already exists (unique constraint), linking account:",
+                  email,
+                );
+                // Email exists but google_id wasn't found (race condition)
+                // Try to find and link again
+                user = await db.User.findOne({
+                  where: { user_email: email },
+                });
+                if (user && !user.google_id) {
+                  user.google_id = profile.id;
+                  await user.save();
+                  console.log(
+                    "[Google] Successfully linked Google ID to existing user:",
+                    user.user_id,
+                  );
+                }
+              } else {
+                throw createError; // Re-throw other errors
+              }
+            }
           }
 
           if (isNewUser) {
@@ -211,21 +238,48 @@ if (process.env.FB_APP_ID && process.env.FB_APP_SECRET) {
           let isNewUser = false;
 
           if (!user) {
-            user = await db.User.create({
-              user_name: email,
-              user_email: email,
-              facebook_id: profile.id,
-              full_name: profile.displayName,
-              user_status: true,
-              user_password: "",
-              role: 2,
-              created_at: new Date(),
-              updated_at: new Date(),
-            });
+            try {
+              user = await db.User.create({
+                user_name: email,
+                user_email: email,
+                facebook_id: profile.id,
+                full_name: profile.displayName,
+                user_status: true,
+                user_password: "",
+                role: 2,
+                created_at: new Date(),
+                updated_at: new Date(),
+              });
 
-            isNewUser = true;
-
-            console.log("[Facebook] Created new user:", email);
+              isNewUser = true;
+              console.log("[Facebook] Created new user:", email);
+            } catch (createError) {
+              // Handle duplicate email error
+              if (
+                createError.name === "SequelizeUniqueConstraintError" &&
+                createError.errors.some((e) => e.path === "user_email")
+              ) {
+                console.log(
+                  "[Facebook] Email already exists (unique constraint), linking account:",
+                  email,
+                );
+                // Email exists but facebook_id wasn't found (race condition)
+                // Try to find and link again
+                user = await db.User.findOne({
+                  where: { user_email: email },
+                });
+                if (user && !user.facebook_id) {
+                  user.facebook_id = profile.id;
+                  await user.save();
+                  console.log(
+                    "[Facebook] Successfully linked Facebook ID to existing user:",
+                    user.user_id,
+                  );
+                }
+              } else {
+                throw createError; // Re-throw other errors
+              }
+            }
           }
 
           if (isNewUser) {

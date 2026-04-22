@@ -94,7 +94,17 @@ const GlobalAIChatWidget: React.FC<GlobalAIChatWidgetProps> = ({ context }) => {
           setIsLoading(false);
           return;
         }
-        throw new Error("Failed to get AI response");
+        // Get error details from response
+        const errorData = await response.json();
+        const errorMsg = errorData.detail || errorData.error || "Có lỗi xảy ra. Vui lòng thử lại sau.";
+        const errorMessage: Message = {
+          role: "assistant",
+          content: errorMsg,
+          timestamp: new Date(),
+        };
+        setMessages((prev) => [...prev, errorMessage]);
+        setIsLoading(false);
+        return;
       }
 
       const data = await response.json();
@@ -110,7 +120,7 @@ const GlobalAIChatWidget: React.FC<GlobalAIChatWidgetProps> = ({ context }) => {
       console.error("AI chat error:", error);
       const errorMessage: Message = {
         role: "assistant",
-        content: "Xin lỗi, có lỗi xảy ra. Vui lòng thử lại sau.",
+        content: "Có lỗi kết nối. Vui lòng kiểm tra kết nối internet và thử lại.",
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, errorMessage]);

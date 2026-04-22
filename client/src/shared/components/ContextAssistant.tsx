@@ -111,6 +111,8 @@ const ContextAssistant: React.FC<ContextAssistantProps> = ({
         }),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
         if (response.status === 401) {
           // Token invalid or expired
@@ -121,14 +123,18 @@ const ContextAssistant: React.FC<ContextAssistantProps> = ({
           setIsLoading(false);
           return;
         }
-        throw new Error("Failed to get AI response");
+
+        // Display specific error message from server
+        const errorMsg = data.detail || data.error || "Có lỗi xảy ra. Vui lòng thử lại sau.";
+        setResponse(errorMsg);
+        setIsLoading(false);
+        return;
       }
 
-      const data = await response.json();
       setResponse(data.reply);
     } catch (error) {
       console.error("Context assist error:", error);
-      setResponse("Xin lỗi, có lỗi xảy ra. Vui lòng thử lại sau.");
+      setResponse("Có lỗi kết nối. Vui lòng kiểm tra kết nối internet và thử lại.");
     } finally {
       setIsLoading(false);
     }

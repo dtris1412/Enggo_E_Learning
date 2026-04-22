@@ -5,6 +5,95 @@ dotenv.config();
 const apiKey = process.env.OPENAI_API_KEY;
 
 // ─────────────────────────────────────────────
+// Content Safety & Sensitive Words Filter
+// ─────────────────────────────────────────────
+
+/**
+ * Danh sách từ/cụm từ nhạy cảm, tục tiểu, không phù hợp
+ * Bao gồm: từ tục tiểu, thô tục, bạo lực, tình dục, phân biệt, chửi rủa
+ */
+const SENSITIVE_WORDS_PATTERNS = [
+  // Từ tục tiểu, thô tục (tiếng Việt)
+  /\b(đ(?:íu|ẽ|m)|c\.m|đmm|cc|cmn|cơ\.m|thằng ngu|mẹ mụ|tr\.ng|à|ơi|hok|choá|chết tê|chết tiệt)\b/gi,
+  /\b(đại|thằng|con mẹ|lồn|cặc|mẹ kiếp|bồn cặc|trương)\b/gi,
+
+  // Từ tục tiểu tiếng Anh
+  /\b(fuck|shit|damn|bastard|asshole|bitch|crap|fucking|shitty|ass|hell)\b/gi,
+  /\b(piss|cock|dick|pussy|damn|cunt|twat|wank|bollocks)\b/gi,
+
+  // Từ liên quan bạo lực, sát hại
+  /\b(giết|xử tử|tự tử|tự sát|cứt|gây thương tích|đánh đập|bạo lực|bạo hành)\b/gi,
+  /\b(kill|murder|suicide|harm|violence|abuse|assault|beat)\b/gi,
+
+  // Từ tình dục, dâm dục
+  /\b(chịch|địt|đéo|ngoại tình|gán dê|kích dục|tình dục|làm tình|quan hệ)\b/gi,
+  /\b(sex|fuck|rape|porn|pornography|masturbat|orgasm|cum|ejaculat)\b/gi,
+
+  // Từ phân biệt, kỳ thị
+  /\b(đểu|ngu|điên|khùng|dốt|ngu ngốc|chậm hiểu|tật nguyền|teo)\b/gi,
+  /\b(retard|idiot|crazy|stupid|dumb|mentally|disable|handicap|racial slur)\b/gi,
+
+  // Từ chửi rủa, miệt thị
+  /\b(con chó|con lợn|con cặc|con scum|đồ sa tư|thứ sắc|nô lệ)\b/gi,
+  /\b(whore|slut|scumbag|trash|disgusting|vile|abomination)\b/gi,
+];
+
+/**
+ * Kiểm tra nội dung có chứa từ nhạy cảm
+ * @param {string} content - Nội dung cần kiểm tra
+ * @returns {{ hasSensitiveContent: boolean, foundWords: string[], reason: string|null }}
+ */
+export const checkSensitiveContent = (content) => {
+  if (!content || typeof content !== "string") {
+    return { hasSensitiveContent: false, foundWords: [], reason: null };
+  }
+
+  const foundWords = new Set();
+
+  for (const pattern of SENSITIVE_WORDS_PATTERNS) {
+    const matches = content.match(pattern);
+    if (matches) {
+      matches.forEach((word) => foundWords.add(word.toLowerCase()));
+    }
+  }
+
+  if (foundWords.size > 0) {
+    return {
+      hasSensitiveContent: true,
+      foundWords: Array.from(foundWords),
+      reason:
+        "Nội dung của bạn chứa những từ ngữ không phù hợp. Vui lòng sử dụng ngôn ngữ lịch sự. 😊",
+    };
+  }
+
+  return { hasSensitiveContent: false, foundWords: [], reason: null };
+};
+
+/**
+ * Lọc nội dung để loại bỏ hoặc che giấu từ nhạy cảm
+ * @param {string} content - Nội dung cần lọc
+ * @param {boolean} censor - True: che dấu (****), False: loại bỏ
+ * @returns {string} - Nội dung đã lọc
+ */
+export const filterSensitiveContent = (content, censor = true) => {
+  if (!content || typeof content !== "string") return content;
+
+  let filtered = content;
+
+  for (const pattern of SENSITIVE_WORDS_PATTERNS) {
+    if (censor) {
+      // Che dấu từ nhạy cảm bằng ****
+      filtered = filtered.replace(pattern, (match) => "*".repeat(match.length));
+    } else {
+      // Loại bỏ từ nhạy cảm
+      filtered = filtered.replace(pattern, "");
+    }
+  }
+
+  return filtered;
+};
+
+// ─────────────────────────────────────────────
 // Scope Validation - Chỉ trả lời học thuật tiếng Anh
 // ─────────────────────────────────────────────
 
@@ -74,6 +163,12 @@ NGOÀI PHẠM VI (từ chối lịch sự):
 ❌ Câu hỏi cá nhân không liên quan học tập
 ❌ Công thức nấu ăn, giải trí thuần túy
 
+⚠️ QUYẾT ĐỊNH QUAN TRỌNG:
+- KHÔNG bao giờ sử dụng từ tục tiểu, thô tục, bạo lực, hoặc không phù hợp
+- KHÔNG sử dụng từ chửi rủa, miệt thị, hoặc phân biệt
+- Luôn sử dụng ngôn ngữ lịch sự, tôn trọng, thích hợp cho trường học
+- Nếu user sử dụng từ nhạy cảm, hãy từ chối lịch sự và yêu cầu sử dụng ngôn ngữ thích hợp
+
 Nếu câu hỏi NGOÀI phạm vi, hãy trả lời:
 "Xin lỗi, mình chỉ hỗ trợ các câu hỏi liên quan đến học tập tiếng Anh. Bạn có câu hỏi về tiếng Anh nào không? 😊"
 
@@ -90,7 +185,9 @@ QUY TẮC:
 - Đưa ví dụ minh họa nếu cần
 - Giải thích bằng tiếng Việt, giữ nguyên thuật ngữ tiếng Anh quan trọng
 - KHÔNG đề cập thông tin cá nhân của user
-- KHÔNG trả lời câu hỏi ngoài phạm vi giải thích bài thi tiếng Anh`;
+- KHÔNG trả lời câu hỏi ngoài phạm vi giải thích bài thi tiếng Anh
+- KHÔNG sử dụng bất kỳ từ tục tiểu, thô tục, hoặc không phù hợp
+- Luôn sử dụng ngôn ngữ lịch sự và tôn trọng`;
 
 /**
  * Hàm gọi OpenAI, có thể mở rộng cho nhiều nhiệm vụ khác nhau
@@ -109,6 +206,12 @@ export const askOpenAI = async ({
   systemPrompt = null,
   options = {},
 }) => {
+  // ✅ Kiểm tra input có chứa từ nhạy cảm
+  const sensitiveCheck = checkSensitiveContent(message);
+  if (sensitiveCheck.hasSensitiveContent) {
+    throw new Error(sensitiveCheck.reason);
+  }
+
   let prompt = message;
   let resolvedSystemPrompt = systemPrompt;
 
@@ -150,8 +253,11 @@ export const askOpenAI = async ({
       },
     );
 
-    const content = response.data.choices[0].message.content.trim();
+    let content = response.data.choices[0].message.content.trim();
     const usage = response.data.usage;
+
+    // ✅ Lọc output để loại bỏ từ nhạy cảm (che dấu bằng ***)
+    content = filterSensitiveContent(content, true);
 
     // Return both content and usage for token tracking
     return {
@@ -199,6 +305,16 @@ export const generateFlashcardSet = async ({
   difficulty = "medium",
   additionalContext = "",
 }) => {
+  // ✅ Kiểm tra input có chứa từ nhạy cảm
+  const topicCheck = checkSensitiveContent(topic);
+  const contextCheck = checkSensitiveContent(additionalContext);
+
+  if (topicCheck.hasSensitiveContent || contextCheck.hasSensitiveContent) {
+    throw new Error(
+      "Nội dung của bạn chứa những từ không phù hợp. Vui lòng sử dụng ngôn ngữ lịch sự. 😊",
+    );
+  }
+
   // Calculate optimal max_tokens based on card count (tiết kiệm tokens)
   // Mỗi card ~100 tokens, set_info ~50 tokens
   const estimatedTokens = Math.min(cardCount * 100 + 100, 4000);
@@ -251,7 +367,7 @@ ${additionalContext ? `\n💡 Yêu cầu thêm: ${additionalContext}` : ""}
   ]
 }
 
-⚠️ LƯU Ý:
+LƯU Ý:
 - MỖI flashcard PHẢI có example sentence
 - Ưu tiên từ vựng/cụm từ thực tế, thường gặp trong giao tiếp/luyện thi
 - Pronunciation dùng IPA format chuẩn
@@ -266,7 +382,7 @@ ${additionalContext ? `\n💡 Yêu cầu thêm: ${additionalContext}` : ""}
           {
             role: "system",
             content:
-              "You are an expert English language educator and IELTS/TOEIC instructor. Create high-quality flashcards for Vietnamese learners studying English. Focus on practical vocabulary, phrases, idioms, and expressions commonly used in exams and real communication. Always provide Vietnamese explanations and natural English example sentences. Return only valid JSON format.",
+              "You are an expert English language educator and IELTS/TOEIC instructor. Create high-quality flashcards for Vietnamese learners studying English. Focus on practical vocabulary, phrases, idioms, and expressions commonly used in exams and real communication. Always provide Vietnamese explanations and natural English example sentences. Return only valid JSON format. NEVER use profanity, offensive language, or inappropriate content in any responses or suggestions.",
           },
           { role: "user", content: prompt },
         ],
@@ -315,6 +431,16 @@ ${additionalContext ? `\n💡 Yêu cầu thêm: ${additionalContext}` : ""}
       // Validate structure
       if (!parsedData.set_info || !parsedData.flashcards) {
         throw new Error("Invalid response structure from AI");
+      }
+
+      // ✅ Lọc nhạy cảm từ các flashcard
+      if (parsedData.flashcards && Array.isArray(parsedData.flashcards)) {
+        parsedData.flashcards = parsedData.flashcards.map((card) => ({
+          ...card,
+          front_content: filterSensitiveContent(card.front_content, true),
+          back_content: filterSensitiveContent(card.back_content, true),
+          example: filterSensitiveContent(card.example, true),
+        }));
       }
 
       // Return both data and usage for token tracking
@@ -377,6 +503,14 @@ export const gradeIeltsWriting = async ({
   user_content,
   task_type = "task2",
 }) => {
+  // ✅ Kiểm tra input có chứa từ nhạy cảm
+  const userContentCheck = checkSensitiveContent(user_content);
+  if (userContentCheck.hasSensitiveContent) {
+    throw new Error(
+      "Bài viết của bạn chứa những từ không phù hợp. Vui lòng sử dụng ngôn ngữ lịch sự. 😊",
+    );
+  }
+
   const wordCount = user_content.trim().split(/\s+/).filter(Boolean).length;
   const minWords = task_type === "task1" ? 150 : 250;
   const firstCriterion =
@@ -386,6 +520,7 @@ export const gradeIeltsWriting = async ({
 Grade the following ${task_type === "task1" ? "Task 1 (report/graph/chart description)" : "Task 2 (argumentative/discursive essay)"} strictly according to the official IELTS Writing band descriptors.
 
 IMPORTANT: Respond ONLY with valid JSON (no markdown fences, no extra text before or after).
+NEVER use profanity, offensive language, or inappropriate content in feedback or suggestions.
 
 JSON schema:
 {
@@ -463,6 +598,29 @@ JSON schema:
     };
   }
 
+  // ✅ Lọc nhạy cảm từ feedback
+  if (parsed.feedback) {
+    parsed.feedback.overall_comment = filterSensitiveContent(
+      parsed.feedback.overall_comment,
+      true,
+    );
+    if (parsed.feedback.strengths) {
+      parsed.feedback.strengths = parsed.feedback.strengths.map((s) =>
+        filterSensitiveContent(s, true),
+      );
+    }
+    if (parsed.feedback.improvements) {
+      parsed.feedback.improvements = parsed.feedback.improvements.map((i) =>
+        filterSensitiveContent(i, true),
+      );
+    }
+    if (parsed.feedback.tips) {
+      parsed.feedback.tips = parsed.feedback.tips.map((t) =>
+        filterSensitiveContent(t, true),
+      );
+    }
+  }
+
   return {
     ...parsed,
     usage: {
@@ -489,6 +647,16 @@ export const speakingConversationTurn = async ({
   part_context,
   part_type = "part1",
 }) => {
+  // ✅ Kiểm tra messages có chứa từ nhạy cảm
+  for (const msg of messages) {
+    const check = checkSensitiveContent(msg.content);
+    if (check.hasSensitiveContent) {
+      throw new Error(
+        "Bài nói của bạn chứa những từ không phù hợp. Vui lòng sử dụng ngôn ngữ lịch sự. 😊",
+      );
+    }
+  }
+
   const partGuide = {
     part1:
       "Part 1 - Introduction & Interview (about 4-5 minutes): Ask short, friendly questions about familiar topics (family, work, hobbies, hometown). After 3-4 exchanges, wrap up Part 1 naturally.",
@@ -508,7 +676,8 @@ Rules:
 - Do NOT evaluate during the conversation
 - When the part is naturally complete, end your message with exactly: [PART_COMPLETE]
 - Ask only one question at a time
-- Be encouraging but professional`;
+- Be encouraging but professional
+- NEVER use profanity, offensive language, or inappropriate content`;
 
   const aiMessages = [{ role: "system", content: systemPrompt }];
   for (const m of messages) {
@@ -537,7 +706,10 @@ Rules:
   const rawReply = response.data.choices[0].message.content.trim();
   const usage = response.data.usage;
   const is_finished = rawReply.includes("[PART_COMPLETE]");
-  const reply = rawReply.replace("[PART_COMPLETE]", "").trim();
+  let reply = rawReply.replace("[PART_COMPLETE]", "").trim();
+
+  // ✅ Lọc nhạy cảm từ response
+  reply = filterSensitiveContent(reply, true);
 
   return {
     reply,
@@ -557,6 +729,16 @@ Rules:
  * @returns {Promise<{overall_band, criteria_scores, feedback, usage}>}
  */
 export const evaluateIeltsSpeakingAll = async ({ parts }) => {
+  // ✅ Kiểm tra transcript có chứa từ nhạy cảm
+  for (const part of parts) {
+    const check = checkSensitiveContent(part.transcript || "");
+    if (check.hasSensitiveContent) {
+      throw new Error(
+        "Bài nói của bạn chứa những từ không phù hợp. Vui lòng sử dụng ngôn ngữ lịch sự. 😊",
+      );
+    }
+  }
+
   const partsText = parts
     .map(
       (p) =>
@@ -567,6 +749,7 @@ export const evaluateIeltsSpeakingAll = async ({ parts }) => {
   const systemPrompt = `You are an expert IELTS examiner grading a full Speaking test (Parts 1, 2 and/or 3).
 Evaluate ONLY the CANDIDATE's responses across all provided parts.
 Use official IELTS Speaking band descriptors.
+NEVER use profanity, offensive language, or inappropriate content in feedback.
 
 Respond ONLY with valid JSON — no markdown, no code fences:
 {
@@ -628,6 +811,29 @@ Respond ONLY with valid JSON — no markdown, no code fences:
     };
   }
 
+  // ✅ Lọc nhạy cảm từ feedback
+  if (parsed.feedback) {
+    parsed.feedback.overall_comment = filterSensitiveContent(
+      parsed.feedback.overall_comment,
+      true,
+    );
+    if (parsed.feedback.strengths) {
+      parsed.feedback.strengths = parsed.feedback.strengths.map((s) =>
+        filterSensitiveContent(s, true),
+      );
+    }
+    if (parsed.feedback.improvements) {
+      parsed.feedback.improvements = parsed.feedback.improvements.map((i) =>
+        filterSensitiveContent(i, true),
+      );
+    }
+    if (parsed.feedback.tips) {
+      parsed.feedback.tips = parsed.feedback.tips.map((t) =>
+        filterSensitiveContent(t, true),
+      );
+    }
+  }
+
   return {
     ...parsed,
     usage: {
@@ -639,9 +845,18 @@ Respond ONLY with valid JSON — no markdown, no code fences:
 };
 
 export const evaluateIeltsSpeaking = async ({ transcript, part_context }) => {
+  // ✅ Kiểm tra transcript có chứa từ nhạy cảm
+  const check = checkSensitiveContent(transcript);
+  if (check.hasSensitiveContent) {
+    throw new Error(
+      "Bài nói của bạn chứa những từ không phù hợp. Vui lòng sử dụng ngôn ngữ lịch sự. 😊",
+    );
+  }
+
   const systemPrompt = `You are an expert IELTS examiner grading a Speaking test.
 Evaluate the CANDIDATE's responses only (not the examiner's questions).
 Use official IELTS Speaking band descriptors.
+NEVER use profanity, offensive language, or inappropriate content in feedback.
 
 Respond ONLY with valid JSON — no markdown, no code fences:
 {
@@ -701,6 +916,29 @@ Respond ONLY with valid JSON — no markdown, no code fences:
       criteria_scores: {},
       feedback: { overall_comment: raw },
     };
+  }
+
+  // ✅ Lọc nhạy cảm từ feedback
+  if (parsed.feedback) {
+    parsed.feedback.overall_comment = filterSensitiveContent(
+      parsed.feedback.overall_comment,
+      true,
+    );
+    if (parsed.feedback.strengths) {
+      parsed.feedback.strengths = parsed.feedback.strengths.map((s) =>
+        filterSensitiveContent(s, true),
+      );
+    }
+    if (parsed.feedback.improvements) {
+      parsed.feedback.improvements = parsed.feedback.improvements.map((i) =>
+        filterSensitiveContent(i, true),
+      );
+    }
+    if (parsed.feedback.tips) {
+      parsed.feedback.tips = parsed.feedback.tips.map((t) =>
+        filterSensitiveContent(t, true),
+      );
+    }
   }
 
   return {

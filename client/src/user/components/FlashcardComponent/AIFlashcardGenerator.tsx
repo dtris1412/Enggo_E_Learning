@@ -93,7 +93,7 @@ const AIFlashcardGenerator: React.FC = () => {
       if (!response.ok) {
         // Hiển thị error message chi tiết từ server
         const errorMessage =
-          data.details || data.error || "Không thể tạo flashcard set";
+          data.detail || data.error || "Không thể tạo flashcard set";
         throw new Error(errorMessage);
       }
 

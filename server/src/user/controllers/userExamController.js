@@ -249,7 +249,11 @@ const submitAllWriting = async (req, res) => {
     res.status(200).json(result);
   } catch (err) {
     console.error("Error in submitAllWriting:", err);
-    res.status(500).json({ success: false, message: "Internal server error" });
+    res.status(500).json({
+      success: false,
+      message: err.message || "Có lỗi xảy ra khi nộp bài writing",
+      detail: err.message,
+    });
   }
 };
 

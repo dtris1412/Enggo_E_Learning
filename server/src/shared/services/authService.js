@@ -242,6 +242,20 @@ const verifyEmail = async (user_email, otp) => {
       };
     }
 
+    // ✅ Check if email already exists (prevents duplicate accounts)
+    const existingUser = await db.User.findOne({
+      where: { user_email: registrationData.user_email },
+    });
+
+    if (existingUser) {
+      delete otpStore[user_email];
+      return {
+        success: false,
+        message:
+          "Email already registered. Please login instead or use a different email.",
+      };
+    }
+
     // Hash password
     const hashedPassword = await bcrypt.hash(
       registrationData.user_password,
