@@ -69,6 +69,7 @@ export default (sequelize, DataTypes) => {
       user_status: { type: DataTypes.BOOLEAN, allowNull: false },
       google_id: DataTypes.STRING,
       facebook_id: DataTypes.STRING,
+      email_verified_at: DataTypes.DATE,
       created_at: { type: DataTypes.DATE, allowNull: false },
       updated_at: { type: DataTypes.DATE, allowNull: false },
     },

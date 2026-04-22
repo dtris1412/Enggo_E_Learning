@@ -10,6 +10,7 @@ import passport from "../services/passportService.js";
 // ===========Auth Controllers===========
 import {
   register,
+  verifyEmail,
   login,
   refreshToken,
   logout,
@@ -24,6 +25,7 @@ const router = express.Router();
 const initSharedRoutes = (app) => {
   //===========Auth Routes===========
   router.post("/api/auth/register", register);
+  router.post("/api/auth/verify-email", verifyEmail);
   router.post("/api/auth/login", login);
   router.post("/api/auth/refresh-token", refreshToken);
   router.post("/api/auth/logout", logout);

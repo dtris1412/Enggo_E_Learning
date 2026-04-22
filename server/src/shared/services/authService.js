@@ -14,6 +14,33 @@ const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{6,}$/;
 const SALT_ROUDS = 10;
 
 const otpStore = {};
+
+// Helper function to send OTP via email
+const sendOTPEmail = async (user_email, otp) => {
+  try {
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: user_email,
+      subject: "Email Verification OTP - Enggo Learning",
+      html: `<h3>Email Verification</h3>
+             <p>Your OTP code is: <strong>${otp}</strong></p>
+             <p>This code will expire in 5 minutes.</p>
+             <p>Please do not share this code with anyone.</p>`,
+    });
+    return true;
+  } catch (err) {
+    console.error("Error sending OTP email:", err);
+    return false;
+  }
+};
+
 const forgotPassword = async (user_email) => {
   try {
     //Kiểm tra email có tồn tại không
@@ -33,7 +60,7 @@ const forgotPassword = async (user_email) => {
       from: process.env.EMAIL_USER,
       to: user_email,
       subject: "Your OTP Code",
-      text: `Your OTP code is: ${otp}. It will expire in 10 minutes.`,
+      text: `Your OTP code is: ${otp}. It will expire in 5 minutes.`,
     });
     return { success: true, message: "OTP sent successfully" };
   } catch (err) {
@@ -95,6 +122,7 @@ const verifyOTP = async (user_email, otp) => {
   }
 };
 
+// Step 1: Register - Generate OTP and send email (NO DB SAVE)
 const register = async (
   user_name,
   user_email,
@@ -106,197 +134,292 @@ const register = async (
   user_status,
   role,
 ) => {
-  //Kiểm tra dữ liệu bắt buộc
-  if (!user_name || !user_email || !user_password) {
-    return {
-      success: false,
-      message: "Username, email and password are required.",
-    };
-  }
-  //Kiểm tra định dạng email
-  if (!emailRegex.test(user_email)) {
-    return {
-      success: false,
-      message: "Invalid email format.",
-    };
-  }
-  if (!passwordRegex.test(user_password)) {
-    return {
-      success: false,
-      message:
-        "Password must be at least 6 characters long, contain at least one uppercase letter, one lowercase letter, and one digit.",
-    };
-  }
-  //kiểm tra đã tồn tại
-  const existingUser = await db.User.findOne({
-    where: {
-      [Op.or]: [{ user_name }, { user_email }],
-    },
-  });
-
-  if (existingUser) {
-    return {
-      success: false,
-      message: "Username or email already exists.",
-    };
-  }
-  //Mã hóa mật khẩu (hash password)
-  const hashedPassword = await bcrypt.hash(user_password, SALT_ROUDS);
-
-  //Tạo user mới
-  const newUser = await db.User.create({
-    user_name,
-    user_email,
-    user_password: hashedPassword,
-    full_name,
-    user_phone,
-    user_address,
-    avatar: avatar || null,
-    user_status: user_status !== undefined ? user_status : true,
-    role: role || 2,
-    created_at: new Date(),
-    updated_at: new Date(),
-  });
-
-  // Create wallet and free subscription for new user - wallet first!
   try {
-    // Find free plan's free subscription price
-    const freePrice = await db.Subscription_Price.findOne({
-      include: [
-        {
-          model: db.Subscription_Plan,
-          where: { code: "free" },
-          attributes: [
-            "subscription_plan_id",
-            "code",
-            "monthly_ai_token_quota",
-          ],
-        },
-      ],
-      where: { billing_type: "free" },
+    // Validate required fields
+    if (!user_name || !user_email || !user_password) {
+      return {
+        success: false,
+        message: "Username, email and password are required.",
+      };
+    }
+
+    // Validate email format
+    if (!emailRegex.test(user_email)) {
+      return {
+        success: false,
+        message: "Invalid email format.",
+      };
+    }
+
+    // Validate password strength
+    if (!passwordRegex.test(user_password)) {
+      return {
+        success: false,
+        message:
+          "Password must be at least 6 characters long, contain at least one uppercase letter, one lowercase letter, and one digit.",
+      };
+    }
+
+    // Check if username or email already exists
+    const existingUser = await db.User.findOne({
+      where: {
+        [Op.or]: [{ user_name }, { user_email }],
+      },
     });
 
-    if (freePrice) {
-      // Step 1: Create wallet FIRST with tokens
-      const monthlyQuota = freePrice.Subscription_Plan.monthly_ai_token_quota;
-      const wallet = await db.User_Token_Wallet.create({
-        user_id: newUser.user_id,
-        token_balance: monthlyQuota,
-        updated_at: new Date(),
-      });
-      console.log(
-        `Created wallet for user ${newUser.user_id} with ${monthlyQuota} tokens`,
-      );
-
-      // Step 2: Create free subscription
-      await createSubscription(
-        newUser.user_id,
-        freePrice.subscription_price_id,
-        null, // No order_id for free plan
-      );
-      console.log(
-        `New user ${newUser.user_id} registered with free plan and wallet`,
-      );
-    } else {
-      console.warn("Free subscription price not found in database");
-      // Still create wallet even if subscription price not found
-      const defaultFreeQuota = 100; // Fallback value
-      const wallet = await db.User_Token_Wallet.create({
-        user_id: newUser.user_id,
-        token_balance: defaultFreeQuota,
-        updated_at: new Date(),
-      });
-      console.log(
-        `Created wallet for user ${newUser.user_id} with default ${defaultFreeQuota} tokens`,
-      );
+    if (existingUser) {
+      return {
+        success: false,
+        message: "Username or email already exists.",
+      };
     }
-  } catch (subscriptionError) {
-    console.error(
-      "Error creating free subscription or wallet:",
-      subscriptionError,
+
+    // Generate OTP (6 digits)
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+    // Store OTP with 5 minute expiration
+    otpStore[user_email] = { otp, expiresAt: Date.now() + 5 * 60 * 1000 };
+
+    // Send OTP via email
+    const emailSent = await sendOTPEmail(user_email, otp);
+    if (!emailSent) {
+      delete otpStore[user_email];
+      return {
+        success: false,
+        message: "Failed to send OTP email. Please try again.",
+      };
+    }
+
+    // Store registration data temporarily for verification step
+    otpStore[user_email].registrationData = {
+      user_name,
+      user_email,
+      user_password,
+      full_name,
+      user_phone,
+      user_address,
+      avatar,
+      user_status: user_status !== undefined ? user_status : true,
+      role: role || 2,
+    };
+
+    console.log(`OTP sent to ${user_email}`);
+    return {
+      success: true,
+      message: "OTP sent to your email. Please verify within 5 minutes.",
+    };
+  } catch (err) {
+    console.error("Error in register service:", err);
+    return { success: false, message: "Internal server error" };
+  }
+};
+
+// Step 2: Verify Email - Verify OTP and create user
+const verifyEmail = async (user_email, otp) => {
+  try {
+    // Check if OTP exists and is valid
+    const record = otpStore[user_email];
+    if (!record) {
+      return { success: false, message: "No OTP found for this email" };
+    }
+
+    if (record.expiresAt < Date.now()) {
+      delete otpStore[user_email];
+      return { success: false, message: "OTP has expired" };
+    }
+
+    if (record.otp !== otp) {
+      return { success: false, message: "Invalid OTP" };
+    }
+
+    // Get stored registration data
+    const registrationData = record.registrationData;
+    if (!registrationData) {
+      delete otpStore[user_email];
+      return {
+        success: false,
+        message: "Invalid registration data. Please register again.",
+      };
+    }
+
+    // Hash password
+    const hashedPassword = await bcrypt.hash(
+      registrationData.user_password,
+      SALT_ROUDS,
     );
-    // Still try to create wallet even if subscription creation fails
-    const defaultFreeQuota = 100;
+
+    // Create user with email_verified_at
+    const newUser = await db.User.create({
+      user_name: registrationData.user_name,
+      user_email: registrationData.user_email,
+      user_password: hashedPassword,
+      full_name: registrationData.full_name,
+      user_phone: registrationData.user_phone,
+      user_address: registrationData.user_address,
+      avatar: registrationData.avatar || null,
+      user_status: registrationData.user_status,
+      role: registrationData.role,
+      email_verified_at: new Date(),
+      created_at: new Date(),
+      updated_at: new Date(),
+    });
+
+    // Create wallet and free subscription
     try {
-      await db.User_Token_Wallet.create({
-        user_id: newUser.user_id,
-        token_balance: defaultFreeQuota,
-        updated_at: new Date(),
+      const freePrice = await db.Subscription_Price.findOne({
+        include: [
+          {
+            model: db.Subscription_Plan,
+            where: { code: "free" },
+            attributes: [
+              "subscription_plan_id",
+              "code",
+              "monthly_ai_token_quota",
+            ],
+          },
+        ],
+        where: { billing_type: "free" },
       });
-      console.log(
-        `Fallback: Created wallet for user ${newUser.user_id} with default ${defaultFreeQuota} tokens`,
+
+      if (freePrice) {
+        const monthlyQuota = freePrice.Subscription_Plan.monthly_ai_token_quota;
+        await db.User_Token_Wallet.create({
+          user_id: newUser.user_id,
+          token_balance: monthlyQuota,
+          updated_at: new Date(),
+        });
+
+        await createSubscription(
+          newUser.user_id,
+          freePrice.subscription_price_id,
+          null,
+        );
+        console.log(
+          `User ${newUser.user_id} created with free plan and wallet`,
+        );
+      } else {
+        const defaultFreeQuota = 100;
+        await db.User_Token_Wallet.create({
+          user_id: newUser.user_id,
+          token_balance: defaultFreeQuota,
+          updated_at: new Date(),
+        });
+        console.log(
+          `User ${newUser.user_id} created with default wallet (${defaultFreeQuota} tokens)`,
+        );
+      }
+    } catch (subscriptionError) {
+      console.error(
+        "Error creating subscription or wallet:",
+        subscriptionError,
       );
-    } catch (walletError) {
-      console.error("Error creating wallet in fallback:", walletError);
+      const defaultFreeQuota = 100;
+      try {
+        await db.User_Token_Wallet.create({
+          user_id: newUser.user_id,
+          token_balance: defaultFreeQuota,
+          updated_at: new Date(),
+        });
+      } catch (walletError) {
+        console.error("Error creating wallet:", walletError);
+      }
     }
-  }
 
-  const token = jwt.sign(
-    { user_id: newUser.user_id, roles: newUser.role_id },
-    process.env.JWT_SECRET,
-    { expiresIn: "7h" },
-  );
+    // Send welcome email (non-blocking)
+    try {
+      await sendWelcomeEmail({
+        user_email: newUser.user_email,
+        full_name: newUser.full_name || newUser.user_name,
+      });
+      console.log(`Welcome email sent to ${newUser.user_email}`);
+    } catch (emailError) {
+      console.error(
+        `Failed to send welcome email to ${newUser.user_email}:`,
+        emailError.message,
+      );
+    }
 
-  // Send welcome email (non-blocking)
-  try {
-    await sendWelcomeEmail({
-      user_email: newUser.user_email,
-      full_name: newUser.full_name || newUser.user_name,
-    });
-    console.log(`✅ Welcome email sent to ${newUser.user_email}`);
-  } catch (emailError) {
-    console.error(
-      `⚠️ Failed to send welcome email to ${newUser.user_email}:`,
-      emailError.message,
+    // Clean up OTP
+    delete otpStore[user_email];
+
+    // Generate tokens
+    const accessToken = jwt.sign(
+      { user_id: newUser.user_id, role: newUser.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" },
     );
-    // Don't block registration if email fails
-  }
+    const refreshToken = jwt.sign(
+      { user_id: newUser.user_id, role: newUser.role },
+      process.env.JWT_REFRESH_SECRET,
+      { expiresIn: "7d" },
+    );
 
-  return {
-    success: true,
-    message: "User created successfully",
-    user: newUser,
-    token,
-  };
+    return {
+      success: true,
+      message: "Email verified successfully. Welcome to Enggo Learning!",
+      user: newUser,
+      accessToken,
+      refreshToken,
+    };
+  } catch (err) {
+    console.error("Error in verify email service:", err);
+    return { success: false, message: "Internal server error" };
+  }
 };
 
 const login = async (user_name, user_password) => {
-  console.log("AuthService login called with:", user_name);
-  const user = await db.User.findOne({ where: { user_name } });
-  if (!user) return { success: false, message: "User not found" };
-  //Kiểm tra mật khẩu
-  const isMatchPassword = await bcrypt.compare(
-    user_password,
-    user.user_password,
-  );
-  if (!isMatchPassword)
-    return { success: false, message: "Incorrect password" };
-  //Kiểm tra trạng thái user
-  if (!user.user_status) {
-    return {
-      success: false,
-      message: "User account is deactivated. Please contact support.",
-    };
-  }
-  console.log("User found and password is valid:", user.user_name);
+  try {
+    console.log("AuthService login called with:", user_name);
+    const user = await db.User.findOne({ where: { user_name } });
+    if (!user) return { success: false, message: "User not found" };
 
-  const accessToken = jwt.sign(
-    { user_id: user.user_id, role: user.role },
-    process.env.JWT_SECRET,
-    { expiresIn: "1h" },
-  );
-  const refreshToken = jwt.sign(
-    { user_id: user.user_id, role: user.role },
-    process.env.JWT_REFRESH_SECRET,
-    { expiresIn: "7d" },
-  );
-  return {
-    success: true,
-    message: "Login successful",
-    user,
-    accessToken,
-    refreshToken,
-  };
+    // Check if email is verified
+    if (!user.email_verified_at) {
+      return {
+        success: false,
+        message: "Please verify your email before logging in.",
+      };
+    }
+
+    // Check password
+    const isMatchPassword = await bcrypt.compare(
+      user_password,
+      user.user_password,
+    );
+    if (!isMatchPassword)
+      return { success: false, message: "Incorrect password" };
+
+    // Check user status
+    if (!user.user_status) {
+      return {
+        success: false,
+        message: "User account is deactivated. Please contact support.",
+      };
+    }
+
+    console.log("User found and password is valid:", user.user_name);
+
+    const accessToken = jwt.sign(
+      { user_id: user.user_id, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" },
+    );
+    const refreshToken = jwt.sign(
+      { user_id: user.user_id, role: user.role },
+      process.env.JWT_REFRESH_SECRET,
+      { expiresIn: "7d" },
+    );
+    return {
+      success: true,
+      message: "Login successful",
+      user,
+      accessToken,
+      refreshToken,
+    };
+  } catch (err) {
+    console.error("Error in login service:", err);
+    return { success: false, message: "Internal server error" };
+  }
 };
 
 const refreshToken = async (refreshToken) => {
@@ -340,6 +463,7 @@ const logout = async () => {
 };
 export {
   register,
+  verifyEmail,
   login,
   refreshToken,
   logout,

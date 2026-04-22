@@ -42,6 +42,16 @@ interface AuthContextType {
     full_name?: string,
     user_phone?: string,
   ) => Promise<{ success: boolean; message: string }>;
+  verifyEmail: (
+    user_email: string,
+    otp: string,
+  ) => Promise<{
+    success: boolean;
+    message: string;
+    user?: User;
+    accessToken?: string;
+    refreshToken?: string;
+  }>;
   logout: () => Promise<void>;
   forgotPassword: (
     user_email: string,
@@ -175,6 +185,54 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
     } catch (error) {
       console.error("Register error:", error);
+      return { success: false, message: "Có lỗi xảy ra. Vui lòng thử lại!" };
+    }
+  };
+
+  const verifyEmail = async (
+    user_email: string,
+    otp: string,
+  ): Promise<{
+    success: boolean;
+    message: string;
+    user?: User;
+    accessToken?: string;
+    refreshToken?: string;
+  }> => {
+    try {
+      const response = await fetch(`${apiUrl}/auth/verify-email`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ user_email, otp }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        // Set user and token after email verification
+        if (data.user && data.accessToken) {
+          setUser(data.user);
+          localStorage.setItem("user", JSON.stringify(data.user));
+          localStorage.setItem("accessToken", data.accessToken);
+          setupTokenRefreshInterval();
+        }
+        return {
+          success: true,
+          message: data.message || "Xác thực email thành công!",
+          user: data.user,
+          accessToken: data.accessToken,
+          refreshToken: data.refreshToken,
+        };
+      } else {
+        return {
+          success: false,
+          message: data.message || "Xác thực email thất bại!",
+        };
+      }
+    } catch (error) {
+      console.error("Verify email error:", error);
       return { success: false, message: "Có lỗi xảy ra. Vui lòng thử lại!" };
     }
   };
@@ -318,6 +376,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     isLoading,
     login,
     register,
+    verifyEmail,
     logout,
     forgotPassword,
     verifyOTP,

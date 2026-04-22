@@ -1,5 +1,6 @@
 import {
   register as registerService,
+  verifyEmail as verifyEmailService,
   login as loginService,
   refreshToken as refreshTokenService,
   logout as logoutService,
@@ -80,6 +81,20 @@ const register = async (req, res) => {
     res.status(200).json(result);
   } catch (err) {
     console.error("Error in register controller:", err);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+const verifyEmail = async (req, res) => {
+  try {
+    const { user_email, otp } = req.body;
+    const result = await verifyEmailService(user_email, otp);
+    if (!result.success) {
+      return res.status(400).json(result);
+    }
+    res.status(200).json(result);
+  } catch (err) {
+    console.error("Error in verify email controller:", err);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
@@ -174,6 +189,7 @@ const socialLoginCallBack = (req, res) => {
 
 export {
   register,
+  verifyEmail,
   login,
   refreshToken,
   logout,

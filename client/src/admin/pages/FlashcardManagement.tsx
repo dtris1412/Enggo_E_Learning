@@ -34,7 +34,7 @@ const FlashcardManagement: React.FC = () => {
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [selectedSet, setSelectedSet] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [itemsPerPage] = useState(2);
+  const [itemsPerPage] = useState(9);
   const [visibilityFilter, setVisibilityFilter] = useState("");
   const [createdByTypeFilter, setCreatedByTypeFilter] = useState("");
   const [searchParams, setSearchParams] = useSearchParams();
