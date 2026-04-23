@@ -48,9 +48,19 @@ const UpgradeTokenModal: React.FC<UpgradeTokenModalProps> = ({
               ⚠️ Bạn đã hết Token
             </p>
             <p className="text-orange-700 text-sm">
-              Bạn cần <span className="font-bold">{requiredTokens} Token</span>{" "}
-              nhưng chỉ còn{" "}
-              <span className="font-bold">{currentTokens} Token</span>.
+              {requiredTokens > 0 && currentTokens >= 0 ? (
+                <>
+                  Hành động này cần{" "}
+                  <span className="font-bold">{requiredTokens} Token</span>{" "}
+                  nhưng bạn chỉ còn{" "}
+                  <span className="font-bold">{currentTokens} Token</span>.
+                </>
+              ) : (
+                <>
+                  Bạn đã hết <span className="font-bold">Token</span>. Hãy nâng
+                  cấp gói để tiếp tục sử dụng tính năng AI.
+                </>
+              )}
             </p>
           </div>
 

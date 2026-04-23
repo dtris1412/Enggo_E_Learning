@@ -323,9 +323,17 @@ export const analyzeData = async (req, res) => {
       );
     } catch (tokenError) {
       console.error("Token deduction error:", tokenError);
+      // Parse error message to extract token info
+      const tokenMatch = tokenError.message.match(
+        /Required: (\d+), Available: (\d+)/,
+      );
+      const requiredTokens = tokenMatch ? parseInt(tokenMatch[1]) : 0;
+      const availableTokens = tokenMatch ? parseInt(tokenMatch[2]) : 0;
       return res.status(402).json({
         error: "Token quota exceeded",
         detail: tokenError.message,
+        requiredTokens,
+        availableTokens,
       });
     }
 
@@ -372,9 +380,17 @@ export const generateFlashcard = async (req, res) => {
       );
     } catch (tokenError) {
       console.error("Token deduction error:", tokenError);
+      // Parse error message to extract token info
+      const tokenMatch = tokenError.message.match(
+        /Required: (\d+), Available: (\d+)/,
+      );
+      const requiredTokens = tokenMatch ? parseInt(tokenMatch[1]) : 0;
+      const availableTokens = tokenMatch ? parseInt(tokenMatch[2]) : 0;
       return res.status(402).json({
         error: "Token quota exceeded",
         detail: tokenError.message,
+        requiredTokens,
+        availableTokens,
       });
     }
 
@@ -468,9 +484,17 @@ export const generateFlashcardSetController = async (req, res) => {
           );
         } catch (tokenError) {
           console.error("Token deduction error:", tokenError);
+          // Parse error message to extract token info
+          const tokenMatch = tokenError.message.match(
+            /Required: (\d+), Available: (\d+)/,
+          );
+          const requiredTokens = tokenMatch ? parseInt(tokenMatch[1]) : 0;
+          const availableTokens = tokenMatch ? parseInt(tokenMatch[2]) : 0;
           return res.status(402).json({
             error: "Token quota exceeded",
             detail: tokenError.message,
+            requiredTokens,
+            availableTokens,
           });
         }
       }

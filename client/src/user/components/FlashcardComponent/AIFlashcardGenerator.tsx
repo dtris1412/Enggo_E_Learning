@@ -44,6 +44,8 @@ const AIFlashcardGenerator: React.FC = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [requiredTokens, setRequiredTokens] = useState(0);
+  const [availableTokens, setAvailableTokens] = useState(0);
   const [generatedData, setGeneratedData] = useState<GeneratedData | null>(
     null,
   );
@@ -92,6 +94,9 @@ const AIFlashcardGenerator: React.FC = () => {
       }
 
       if (response.status === 402) {
+        const errorData = await response.json();
+        setRequiredTokens(errorData.requiredTokens || 0);
+        setAvailableTokens(errorData.availableTokens || 0);
         setShowUpgradeModal(true);
         setIsGenerating(false);
         return;
@@ -158,6 +163,9 @@ const AIFlashcardGenerator: React.FC = () => {
       }
 
       if (response.status === 402) {
+        const errorData = await response.json();
+        setRequiredTokens(errorData.requiredTokens || 0);
+        setAvailableTokens(errorData.availableTokens || 0);
         setShowUpgradeModal(true);
         setIsSaving(false);
         return;
@@ -235,6 +243,8 @@ const AIFlashcardGenerator: React.FC = () => {
       <UpgradeTokenModal
         isOpen={showUpgradeModal}
         onClose={() => setShowUpgradeModal(false)}
+        currentTokens={availableTokens}
+        requiredTokens={requiredTokens}
       />
       <div className="max-w-5xl mx-auto p-6">
         <div className="bg-white rounded-lg shadow-md p-6">

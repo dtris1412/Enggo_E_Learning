@@ -549,7 +549,7 @@ const ExamResult: React.FC = () => {
                             {feedback?.criteria_scores && (
                               <div className="space-y-2">
                                 <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
-                                  Phân tích tiêu chí
+                                  Criteria Analysis
                                 </p>
                                 {Object.entries(feedback.criteria_scores).map(
                                   ([k, v]: [string, any]) => {
@@ -610,7 +610,7 @@ const ExamResult: React.FC = () => {
                             {comments?.feedback?.overall_comment && (
                               <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
                                 <p className="text-xs font-semibold text-blue-700 uppercase mb-1">
-                                  Nhận xét tổng quát
+                                  Overall Comment
                                 </p>
                                 <p className="text-sm text-blue-900 leading-relaxed">
                                   {comments.feedback.overall_comment}
@@ -623,7 +623,7 @@ const ExamResult: React.FC = () => {
                               0 && (
                               <div className="bg-green-50 rounded-lg p-4 border border-green-200">
                                 <p className="text-xs font-semibold text-green-700 uppercase mb-2">
-                                  ✓ Điểm mạnh
+                                  ✓ Strengths
                                 </p>
                                 <ul className="space-y-1">
                                   {comments.feedback.strengths.map(
@@ -646,7 +646,7 @@ const ExamResult: React.FC = () => {
                               0 && (
                               <div className="bg-amber-50 rounded-lg p-4 border border-amber-200">
                                 <p className="text-xs font-semibold text-amber-700 uppercase mb-2">
-                                  ✗ Cần cải thiện
+                                  ✗ Improvements
                                 </p>
                                 <ul className="space-y-1">
                                   {comments.feedback.improvements.map(
@@ -668,7 +668,7 @@ const ExamResult: React.FC = () => {
                             {(comments?.feedback?.tips?.length ?? 0) > 0 && (
                               <div className="bg-cyan-50 rounded-lg p-4 border border-cyan-200">
                                 <p className="text-xs font-semibold text-cyan-700 uppercase mb-2">
-                                  💡 Gợi ý
+                                  💡 Tips
                                 </p>
                                 <ul className="space-y-1">
                                   {comments.feedback.tips.map(
@@ -691,7 +691,7 @@ const ExamResult: React.FC = () => {
                               0 && (
                               <div className="bg-purple-50 rounded-lg p-4 border border-purple-200">
                                 <p className="text-xs font-semibold text-purple-700 uppercase mb-3">
-                                  ✏ Câu được sửa mẫu
+                                  ✏ Sample Improvements
                                 </p>
                                 <div className="space-y-3">
                                   {comments.sample_improvements.map(
@@ -702,7 +702,7 @@ const ExamResult: React.FC = () => {
                                       return parts.length === 2 ? (
                                         <div key={i} className="space-y-1">
                                           <p className="text-xs text-purple-600 font-medium">
-                                            Câu gốc:
+                                            Original Sentence:
                                           </p>
                                           <p className="text-sm text-purple-900 bg-purple-100 rounded px-3 py-2 line-through opacity-70">
                                             {parts[0].replace(
@@ -711,7 +711,7 @@ const ExamResult: React.FC = () => {
                                             )}
                                           </p>
                                           <p className="text-xs text-purple-600 font-medium">
-                                            Câu tốt hơn:
+                                            Improved Sentence:
                                           </p>
                                           <p className="text-sm text-purple-900 bg-white rounded px-3 py-2 border border-purple-300">
                                             {parts[1].replace(
@@ -737,7 +737,7 @@ const ExamResult: React.FC = () => {
                             {/* User's essay */}
                             <details className="group">
                               <summary className="cursor-pointer text-xs font-semibold text-slate-500 uppercase tracking-wide hover:text-slate-700 select-none">
-                                Bài viết của bạn
+                                Your Essay
                               </summary>
                               <div className="mt-2 p-3 bg-slate-50 rounded-lg border border-slate-200 text-sm text-slate-700 whitespace-pre-wrap leading-relaxed">
                                 {sub.content}
@@ -835,7 +835,7 @@ const ExamResult: React.FC = () => {
                               {fb?.criteria_scores && (
                                 <div className="space-y-2">
                                   <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
-                                    Phân tích tiêu chí
+                                    Criteria Analysis
                                   </p>
                                   {Object.entries(fb.criteria_scores).map(
                                     ([k, v]: [string, any]) => {
@@ -896,7 +896,7 @@ const ExamResult: React.FC = () => {
                               {comments?.feedback?.overall_comment && (
                                 <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
                                   <p className="text-xs font-semibold text-blue-700 uppercase mb-1">
-                                    Nhận xét tổng quát
+                                    Overall Comment
                                   </p>
                                   <p className="text-sm text-blue-900 leading-relaxed">
                                     {comments.feedback.overall_comment}
@@ -909,7 +909,7 @@ const ExamResult: React.FC = () => {
                                 0 && (
                                 <div className="bg-green-50 rounded-lg p-4 border border-green-200">
                                   <p className="text-xs font-semibold text-green-700 uppercase mb-2">
-                                    ✓ Điểm mạnh
+                                    ✓ Strengths
                                   </p>
                                   <ul className="space-y-1">
                                     {comments.feedback.strengths.map(
@@ -932,7 +932,7 @@ const ExamResult: React.FC = () => {
                                 0 && (
                                 <div className="bg-amber-50 rounded-lg p-4 border border-amber-200">
                                   <p className="text-xs font-semibold text-amber-700 uppercase mb-2">
-                                    ✗ Cần cải thiện
+                                    ✗ Improvements
                                   </p>
                                   <ul className="space-y-1">
                                     {comments.feedback.improvements.map(
@@ -955,7 +955,7 @@ const ExamResult: React.FC = () => {
                                 ?.length ?? 0) > 0 && (
                                 <div className="bg-indigo-50 rounded-lg p-4 border border-indigo-200">
                                   <p className="text-xs font-semibold text-indigo-700 uppercase mb-2">
-                                    🗣 Phát âm
+                                    🗣 Pronunciation
                                   </p>
                                   <ul className="space-y-1">
                                     {comments.feedback.pronunciation_notes.map(
@@ -977,7 +977,7 @@ const ExamResult: React.FC = () => {
                               {(comments?.feedback?.tips?.length ?? 0) > 0 && (
                                 <div className="bg-cyan-50 rounded-lg p-4 border border-cyan-200">
                                   <p className="text-xs font-semibold text-cyan-700 uppercase mb-2">
-                                    💡 Gợi ý
+                                    💡 Tips
                                   </p>
                                   <ul className="space-y-1">
                                     {comments.feedback.tips.map(
@@ -999,7 +999,7 @@ const ExamResult: React.FC = () => {
                               {comments?.transcript && (
                                 <details className="group">
                                   <summary className="cursor-pointer text-xs font-semibold text-slate-500 uppercase tracking-wide hover:text-slate-700 select-none">
-                                    Transcript cuộc trò chuyện
+                                    Conversation Transcript
                                   </summary>
                                   <div className="mt-2 p-3 bg-slate-50 rounded-lg border border-slate-200 text-xs text-slate-700 whitespace-pre-wrap leading-relaxed max-h-64 overflow-y-auto">
                                     {comments.transcript}

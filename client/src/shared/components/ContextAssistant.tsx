@@ -23,6 +23,8 @@ const ContextAssistant: React.FC<ContextAssistantProps> = ({
   const [response, setResponse] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [requiredTokens, setRequiredTokens] = useState(0);
+  const [availableTokens, setAvailableTokens] = useState(0);
 
   const quickActions = {
     exam: [
@@ -128,6 +130,8 @@ const ContextAssistant: React.FC<ContextAssistantProps> = ({
 
         if (response.status === 402) {
           // Token quota exceeded
+          setRequiredTokens(data.requiredTokens || 0);
+          setAvailableTokens(data.availableTokens || 0);
           setShowUpgradeModal(true);
           setIsLoading(false);
           return;
@@ -165,6 +169,8 @@ const ContextAssistant: React.FC<ContextAssistantProps> = ({
         <UpgradeTokenModal
           isOpen={showUpgradeModal}
           onClose={() => setShowUpgradeModal(false)}
+          currentTokens={availableTokens}
+          requiredTokens={requiredTokens}
         />
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 my-4">
           <div className="flex items-center gap-2 mb-3">

@@ -31,6 +31,8 @@ const GlobalAIChatWidget: React.FC<GlobalAIChatWidgetProps> = ({ context }) => {
   const [inputMessage, setInputMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [requiredTokens, setRequiredTokens] = useState(0);
+  const [availableTokens, setAvailableTokens] = useState(0);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -99,6 +101,9 @@ const GlobalAIChatWidget: React.FC<GlobalAIChatWidgetProps> = ({ context }) => {
 
         if (response.status === 402) {
           // Token quota exceeded
+          const errorData = await response.json();
+          setRequiredTokens(errorData.requiredTokens || 0);
+          setAvailableTokens(errorData.availableTokens || 0);
           setShowUpgradeModal(true);
           setIsLoading(false);
           return;
@@ -171,6 +176,8 @@ const GlobalAIChatWidget: React.FC<GlobalAIChatWidgetProps> = ({ context }) => {
       <UpgradeTokenModal
         isOpen={showUpgradeModal}
         onClose={() => setShowUpgradeModal(false)}
+        currentTokens={availableTokens}
+        requiredTokens={requiredTokens}
       />
       <div
         className={`fixed bottom-6 right-6 bg-white rounded-lg shadow-2xl z-50 flex flex-col transition-all ${
