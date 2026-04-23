@@ -9,33 +9,35 @@ const apiKey = process.env.OPENAI_API_KEY;
 // ─────────────────────────────────────────────
 
 /**
- * Danh sách từ/cụm từ nhạy cảm, tục tiểu, không phù hợp
- * Bao gồm: từ tục tiểu, thô tục, bạo lực, tình dục, phân biệt, chửi rủa
+ * Danh sách từ/cụm từ nhạy cảm cần chặn: chửi rủa, miệt thị, phân biệt
+ *
+ * LOẠI BỎ: Không chặn các thuật ngữ khoa học (reproductive, puberty, menstruation, v.v)
+ * để cho phép giáo dục về sức khỏe sinh sản
+ *
+ * CHỈ CHẶN:
+ * - Từ chửi rủa, thô tục (không giáo dục)
+ * - Từ miệt thị, phỉ báng
+ * - Từ phân biệt, kỳ thị
  */
 const SENSITIVE_WORDS_PATTERNS = [
-  // Từ tục tiểu, thô tục (tiếng Việt)
-  /\b(đ(?:íu|ẽ|m)|c\.m|đmm|cc|cmn|cơ\.m|thằng ngu|mẹ mụ|tr\.ng|à|ơi|hok|choá|chết tê|chết tiệt)\b/gi,
-  /\b(đại|thằng|con mẹ|lồn|cặc|mẹ kiếp|bồn cặc|trương)\b/gi,
+  // Từ chửi rủa thô tục (tiếng Việt) - không giáo dục
+  /\b(địt|chịch|đéo|c\.m|đmm|cc|cmn|cơ\.m|mẹ mụ|choá|chết tiệt)\b/gi,
+  /\b(con mẹ|lồn|cặc|mẹ kiếp|bồn cặc)\b/gi,
 
-  // Từ tục tiểu tiếng Anh
-  /\b(fuck|shit|damn|bastard|asshole|bitch|crap|fucking|shitty|ass|hell)\b/gi,
-  /\b(piss|cock|dick|pussy|damn|cunt|twat|wank|bollocks)\b/gi,
+  // Từ chửi rủa, thô tục tiếng Anh - không giáo dục
+  /\b(fuck|shit|bastard|asshole|bitch|crap|fucking|shitty|cunt|twat|wank)\b/gi,
 
   // Từ liên quan bạo lực, sát hại
-  /\b(giết|xử tử|tự tử|tự sát|cứt|gây thương tích|đánh đập|bạo lực|bạo hành)\b/gi,
-  /\b(kill|murder|suicide|harm|violence|abuse|assault|beat)\b/gi,
+  /\b(giết|xử tử|tự tử|tự sát|gây thương tích|đánh đập|bạo hành)\b/gi,
+  /\b(murder|suicide|harm|violence|abuse|assault|beat)\b/gi,
 
-  // Từ tình dục, dâm dục
-  /\b(chịch|địt|đéo|ngoại tình|gán dê|kích dục|tình dục|làm tình|quan hệ)\b/gi,
-  /\b(sex|fuck|rape|porn|pornography|masturbat|orgasm|cum|ejaculat)\b/gi,
+  // Từ miệt thị, phỉ báng (không chấp nhận trong bất kỳ ngữ cảnh nào)
+  /\b(thằng ngu|ngu ngốc|con chó|con lợn|con scum|đồ sa tư|thứ sắc|nô lệ|đểu|khùng|chậm hiểu|teo)\b/gi,
+  /\b(retard|idiot|scumbag|trash|disgusting|vile|abomination|whore|slut)\b/gi,
 
-  // Từ phân biệt, kỳ thị
-  /\b(đểu|ngu|điên|khùng|dốt|ngu ngốc|chậm hiểu|tật nguyền|teo)\b/gi,
-  /\b(retard|idiot|crazy|stupid|dumb|mentally|disable|handicap|racial slur)\b/gi,
-
-  // Từ chửi rủa, miệt thị
-  /\b(con chó|con lợn|con cặc|con scum|đồ sa tư|thứ sắc|nô lệ)\b/gi,
-  /\b(whore|slut|scumbag|trash|disgusting|vile|abomination)\b/gi,
+  // Từ phân biệt chủng tộc, tôn giáo
+  /\b(hãm ngại|kỳ thị|phân biệt|chủng tộc|dân tộc)\b/gi,
+  /\b(racial slur|racist|discrimination|bigot)\b/gi,
 ];
 
 /**
@@ -165,7 +167,7 @@ NGOÀI PHẠM VI (từ chối lịch sự):
 
 ⚠️ QUYẾT ĐỊNH QUAN TRỌNG:
 - KHÔNG bao giờ sử dụng từ tục tiểu, thô tục, bạo lực, hoặc không phù hợp
-- KHÔNG sử dụng từ chửi rủa, miệt thị, hoặc phân biệt
+-v
 - Luôn sử dụng ngôn ngữ lịch sự, tôn trọng, thích hợp cho trường học
 - Nếu user sử dụng từ nhạy cảm, hãy từ chối lịch sự và yêu cầu sử dụng ngôn ngữ thích hợp
 

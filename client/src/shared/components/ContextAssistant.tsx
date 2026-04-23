@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Lightbulb, BookOpen, Loader2, X } from "lucide-react";
+import UpgradeTokenModal from "./UpgradeTokenModal";
 
 interface ContextAssistantProps {
   type: "exam" | "flashcard" | "question";
@@ -21,6 +22,7 @@ const ContextAssistant: React.FC<ContextAssistantProps> = ({
   const [message, setMessage] = useState("");
   const [response, setResponse] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
 
   const quickActions = {
     exam: [
@@ -124,8 +126,16 @@ const ContextAssistant: React.FC<ContextAssistantProps> = ({
           return;
         }
 
+        if (response.status === 402) {
+          // Token quota exceeded
+          setShowUpgradeModal(true);
+          setIsLoading(false);
+          return;
+        }
+
         // Display specific error message from server
-        const errorMsg = data.detail || data.error || "Có lỗi xảy ra. Vui lòng thử lại sau.";
+        const errorMsg =
+          data.detail || data.error || "Có lỗi xảy ra. Vui lòng thử lại sau.";
         setResponse(errorMsg);
         setIsLoading(false);
         return;
@@ -134,7 +144,9 @@ const ContextAssistant: React.FC<ContextAssistantProps> = ({
       setResponse(data.reply);
     } catch (error) {
       console.error("Context assist error:", error);
-      setResponse("Có lỗi kết nối. Vui lòng kiểm tra kết nối internet và thử lại.");
+      setResponse(
+        "Có lỗi kết nối. Vui lòng kiểm tra kết nối internet và thử lại.",
+      );
     } finally {
       setIsLoading(false);
     }
@@ -149,81 +161,87 @@ const ContextAssistant: React.FC<ContextAssistantProps> = ({
 
   if (position === "inline") {
     return (
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 my-4">
-        <div className="flex items-center gap-2 mb-3">
-          <Lightbulb className="w-5 h-5 text-blue-600" />
-          <h4 className="font-semibold text-blue-900">AI Trợ Lý</h4>
-        </div>
-
-        {!response && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mb-3">
-            {quickActions[type].map((qa, index) => (
-              <button
-                key={index}
-                onClick={() => handleQuickAction(qa.action)}
-                disabled={isLoading}
-                className="flex items-center gap-2 bg-white hover:bg-blue-100 text-sm px-3 py-2 rounded-lg border border-blue-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <span>{qa.icon}</span>
-                <span className="text-left text-sm">{qa.text}</span>
-              </button>
-            ))}
+      <div>
+        <UpgradeTokenModal
+          isOpen={showUpgradeModal}
+          onClose={() => setShowUpgradeModal(false)}
+        />
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 my-4">
+          <div className="flex items-center gap-2 mb-3">
+            <Lightbulb className="w-5 h-5 text-blue-600" />
+            <h4 className="font-semibold text-blue-900">AI Trợ Lý</h4>
           </div>
-        )}
 
-        {response && (
-          <div className="bg-white border border-blue-200 rounded-lg p-4 mb-3">
-            <div className="flex items-start justify-between mb-2">
-              <div className="flex items-center gap-2">
-                <BookOpen className="w-4 h-4 text-blue-600" />
-                <span className="font-medium text-sm text-blue-900">
-                  Phản hồi từ AI
-                </span>
-              </div>
-              <button
-                onClick={() => setResponse(null)}
-                className="text-gray-400 hover:text-gray-600"
-                aria-label="Close response"
-              >
-                <X className="w-4 h-4" />
-              </button>
+          {!response && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mb-3">
+              {quickActions[type].map((qa, index) => (
+                <button
+                  key={index}
+                  onClick={() => handleQuickAction(qa.action)}
+                  disabled={isLoading}
+                  className="flex items-center gap-2 bg-white hover:bg-blue-100 text-sm px-3 py-2 rounded-lg border border-blue-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <span>{qa.icon}</span>
+                  <span className="text-left text-sm">{qa.text}</span>
+                </button>
+              ))}
             </div>
-            <p className="text-sm text-gray-700 whitespace-pre-wrap">
-              {response}
-            </p>
-          </div>
-        )}
+          )}
 
-        <div className="flex gap-2">
-          <input
-            type="text"
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            onKeyPress={handleKeyPress}
-            placeholder="Hoặc đặt câu hỏi riêng..."
-            className="flex-1 border border-blue-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-            disabled={isLoading}
-          />
-          <button
-            onClick={() => handleSendMessage()}
-            disabled={!message.trim() || isLoading}
-            className="bg-blue-600 text-white rounded-lg px-4 py-2 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
-          >
-            {isLoading ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin" />
-                <span className="text-sm">Đang xử lý...</span>
-              </>
-            ) : (
-              <span className="text-sm">Hỏi AI</span>
-            )}
-          </button>
-        </div>
+          {response && (
+            <div className="bg-white border border-blue-200 rounded-lg p-4 mb-3">
+              <div className="flex items-start justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <BookOpen className="w-4 h-4 text-blue-600" />
+                  <span className="font-medium text-sm text-blue-900">
+                    Phản hồi từ AI
+                  </span>
+                </div>
+                <button
+                  onClick={() => setResponse(null)}
+                  className="text-gray-400 hover:text-gray-600"
+                  aria-label="Close response"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+              <p className="text-sm text-gray-700 whitespace-pre-wrap">
+                {response}
+              </p>
+            </div>
+          )}
+
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              onKeyPress={handleKeyPress}
+              placeholder="Hoặc đặt câu hỏi riêng..."
+              className="flex-1 border border-blue-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+              disabled={isLoading}
+            />
+            <button
+              onClick={() => handleSendMessage()}
+              disabled={!message.trim() || isLoading}
+              className="bg-blue-600 text-white rounded-lg px-4 py-2 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span className="text-sm">Đang xử lý...</span>
+                </>
+              ) : (
+                <span className="text-sm">Hỏi AI</span>
+              )}
+            </button>
+          </div>
+        </div>{" "}
+        {/* ✅ đóng đúng div */}
       </div>
     );
   }
 
-  // Sidebar hoặc modal version có thể thêm sau
   return null;
 };
 
