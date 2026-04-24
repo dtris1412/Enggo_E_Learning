@@ -12,12 +12,14 @@ import {
 
 const addQuestionToContainer = async (req, res) => {
   try {
-    const { container_id, question_id, order, image_url, score } = req.body;
+    const { container_id, question_id, order, image_url, audio_url, score } =
+      req.body;
     const result = await addQuestionToContainerService(
       container_id,
       question_id,
       order,
       image_url,
+      audio_url,
       score,
     );
 
@@ -53,12 +55,13 @@ const removeQuestionFromContainer = async (req, res) => {
 const updateQuestionOrderInContainer = async (req, res) => {
   try {
     const { container_question_id } = req.params;
-    const { order, image_url, score } = req.body;
+    const { order, image_url, audio_url, score } = req.body;
 
     const result = await updateQuestionOrderInContainerService(
       container_question_id,
       order,
       image_url,
+      audio_url,
       score,
     );
 

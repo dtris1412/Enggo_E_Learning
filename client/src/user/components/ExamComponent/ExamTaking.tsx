@@ -503,13 +503,21 @@ const ExamTaking: React.FC = () => {
     return null;
   };
 
-  // Get audio URL from parent or current container
+  // Get audio URL from question, parent, or current container
   const getAudioUrl = () => {
+    // 1. Check individual question audio first (priority: highest)
+    const currentQuestion = getCurrentQuestion();
+    if (currentQuestion?.audio_url) {
+      return currentQuestion.audio_url;
+    }
+
+    // 2. Check parent container audio (for multi-question parts like Part 3, 4)
     const parent = getParentContainer();
     if (parent && parent.audio_url) {
       return parent.audio_url;
     }
 
+    // 3. Check current container audio (default)
     const currentContainer = getCurrentContainer();
     return currentContainer?.audio_url || null;
   };

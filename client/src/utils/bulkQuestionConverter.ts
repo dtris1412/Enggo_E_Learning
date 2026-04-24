@@ -4,11 +4,11 @@
  * Converts CSV data to the JSON format required for bulk question import
  *
  * CSV Format:
- * question_content,explanation,order,image_url,score,option_a,option_b,option_c,option_d,correct_answer
+ * question_content,explanation,order,image_url,audio_url,score,option_a,option_b,option_c,option_d,correct_answer
  *
  * Example CSV:
- * "What is the capital of France?","Paris is the capital","1","","1.0","London","Paris","Berlin","Madrid","B"
- * "Which planet is red?","Mars is the Red Planet","2","","1.0","Venus","Mars","Jupiter","Saturn","B"
+ * "What is the capital of France?","Paris is the capital","1","","","1.0","London","Paris","Berlin","Madrid","B"
+ * "Which planet is red?","Mars is the Red Planet","2","","","1.0","Venus","Mars","Jupiter","Saturn","B"
  */
 
 // Type definitions
@@ -24,6 +24,7 @@ interface Question {
   explanation: string | null;
   order: number;
   image_url: string | null;
+  audio_url: string | null;
   score: number;
   options: QuestionOption[];
 }
@@ -62,6 +63,7 @@ export function csvToBulkQuestions(
       explanation,
       order,
       image_url,
+      audio_url,
       score,
       option_a,
       option_b,
@@ -92,6 +94,7 @@ export function csvToBulkQuestions(
       explanation: explanation.trim() || null,
       order: parseInt(order) || 1,
       image_url: image_url.trim() || null,
+      audio_url: audio_url.trim() || null,
       score: parseFloat(score) || 1.0,
       options,
     };
@@ -151,6 +154,7 @@ export function excelToBulkQuestions(
       explanation,
       order,
       image_url,
+      audio_url,
       score,
       option_a,
       option_b,
@@ -181,6 +185,7 @@ export function excelToBulkQuestions(
       explanation: explanation?.trim() || null,
       order: parseInt(order) || 1,
       image_url: image_url?.trim() || null,
+      audio_url: audio_url?.trim() || null,
       score: parseFloat(score) || 1.0,
       options,
     };
@@ -294,13 +299,13 @@ export async function submitBulkQuestions(
 }
 
 // Example CSV template
-export const CSV_TEMPLATE = `question_content,explanation,order,image_url,score,option_a,option_b,option_c,option_d,correct_answer
-"What is the capital of France?","Paris is the capital and largest city of France.",1,,1.0,London,Paris,Berlin,Madrid,B
-"Which planet is known as the Red Planet?","Mars is called the Red Planet because of its reddish appearance.",2,,1.0,Venus,Mars,Jupiter,Saturn,B
-"What is 2 + 2?","Basic arithmetic: 2 plus 2 equals 4.",3,,1.0,3,4,5,6,B`;
+export const CSV_TEMPLATE = `question_content,explanation,order,image_url,audio_url,score,option_a,option_b,option_c,option_d,correct_answer
+"What is the capital of France?","Paris is the capital and largest city of France.",1,,,1.0,London,Paris,Berlin,Madrid,B
+"Which planet is known as the Red Planet?","Mars is called the Red Planet because of its reddish appearance.",2,,https://example.com/mars.mp3,1.0,Venus,Mars,Jupiter,Saturn,B
+"What is 2 + 2?","Basic arithmetic: 2 plus 2 equals 4.",3,,,1.0,3,4,5,6,B`;
 
 // Example Excel template (tab-separated)
-export const EXCEL_TEMPLATE = `question_content\texplanation\torder\timage_url\tscore\toption_a\toption_b\toption_c\toption_d\tcorrect_answer
-What is the capital of France?\tParis is the capital and largest city of France.\t1\t\t1.0\tLondon\tParis\tBerlin\tMadrid\tB
-Which planet is known as the Red Planet?\tMars is called the Red Planet because of its reddish appearance.\t2\t\t1.0\tVenus\tMars\tJupiter\tSaturn\tB
-What is 2 + 2?\tBasic arithmetic: 2 plus 2 equals 4.\t3\t\t1.0\t3\t4\t5\t6\tB`;
+export const EXCEL_TEMPLATE = `question_content\texplanation\torder\timage_url\taudio_url\tscore\toption_a\toption_b\toption_c\toption_d\tcorrect_answer
+What is the capital of France?\tParis is the capital and largest city of France.\t1\t\t\t1.0\tLondon\tParis\tBerlin\tMadrid\tB
+Which planet is known as the Red Planet?\tMars is called the Red Planet because of its reddish appearance.\t2\t\thttps://example.com/mars.mp3\t1.0\tVenus\tMars\tJupiter\tSaturn\tB
+What is 2 + 2?\tBasic arithmetic: 2 plus 2 equals 4.\t3\t\t\t1.0\t3\t4\t5\t6\tB`;

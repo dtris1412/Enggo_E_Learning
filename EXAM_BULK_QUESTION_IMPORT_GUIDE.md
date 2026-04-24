@@ -23,6 +23,7 @@ Tính năng này cho phép admin thêm nhiều câu hỏi vào một exam contai
       "explanation": "Paris is the capital and largest city of France.",
       "order": 1,
       "image_url": "https://example.com/paris.jpg",
+      "audio_url": "https://example.com/paris-audio.mp3",
       "score": 1.0,
       "options": [
         {
@@ -56,6 +57,7 @@ Tính năng này cho phép admin thêm nhiều câu hỏi vào một exam contai
       "explanation": "Mars is called the Red Planet because of its reddish appearance.",
       "order": 2,
       "image_url": null,
+      "audio_url": null,
       "score": 1.0,
       "options": [
         {
@@ -131,14 +133,15 @@ Tính năng này cho phép admin thêm nhiều câu hỏi vào một exam contai
 
 ### Question Object
 
-| Field              | Type   | Required | Description                    |
-| ------------------ | ------ | -------- | ------------------------------ |
-| `question_content` | string | Yes      | Nội dung câu hỏi               |
-| `explanation`      | string | No       | Giải thích đáp án              |
-| `order`            | number | Yes      | Thứ tự câu hỏi trong container |
-| `image_url`        | string | No       | URL hình ảnh kèm theo câu hỏi  |
-| `score`            | number | No       | Điểm số (mặc định: 1.0)        |
-| `options`          | array  | Yes      | Mảng các đáp án (tối thiểu 1)  |
+| Field              | Type   | Required | Description                          |
+| ------------------ | ------ | -------- | ------------------------------------ |
+| `question_content` | string | Yes      | Nội dung câu hỏi                     |
+| `explanation`      | string | No       | Giải thích đáp án                    |
+| `order`            | number | Yes      | Thứ tự câu hỏi trong container       |
+| `image_url`        | string | No       | URL hình ảnh kèm theo câu hỏi        |
+| `audio_url`        | string | No       | URL âm thanh riêng cho câu hỏi (mới) |
+| `score`            | number | No       | Điểm số (mặc định: 1.0)              |
+| `options`          | array  | Yes      | Mảng các đáp án (tối thiểu 1)        |
 
 ### Option Object
 

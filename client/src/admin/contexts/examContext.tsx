@@ -209,6 +209,7 @@ interface ExamContextType {
 
   // File Upload
   uploadExamAudio: (file: File) => Promise<string | null>;
+  uploadExamAudios: (files: File[]) => Promise<string[] | null>;
   uploadExamImages: (files: File[]) => Promise<string[] | null>;
 }
 
@@ -1006,6 +1007,50 @@ export const ExamProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const uploadExamAudios = async (files: File[]): Promise<string[] | null> => {
+    setLoading(true);
+    setError(null);
+    try {
+      const urls: string[] = [];
+
+      // Upload each audio file sequentially
+      for (const file of files) {
+        const formData = new FormData();
+        formData.append("audio", file);
+
+        const response = await fetch(`${API_URL}/upload/exam/audio`, {
+          method: "POST",
+          headers: getAuthHeaders(),
+          body: formData,
+        });
+
+        const result = await response.json();
+        console.log("Upload audio response:", result);
+
+        if (result.success && result.data && result.data.url) {
+          urls.push(result.data.url);
+        } else {
+          console.error("Failed to upload audio file:", file.name);
+          setError(`Failed to upload audio: ${file.name}`);
+          return null;
+        }
+      }
+
+      if (urls.length === files.length) {
+        return urls;
+      } else {
+        setError(`Only uploaded ${urls.length}/${files.length} audio files`);
+        return null;
+      }
+    } catch (err: any) {
+      setError(err.message || "Failed to upload audios");
+      console.error("Error uploading audios:", err);
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const uploadExamImages = async (files: File[]): Promise<string[] | null> => {
     setLoading(true);
     setError(null);
@@ -1088,6 +1133,7 @@ export const ExamProvider = ({ children }: { children: ReactNode }) => {
         createExamMedia,
         deleteExamMedia,
         uploadExamAudio,
+        uploadExamAudios,
         uploadExamImages,
       }}
     >

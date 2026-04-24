@@ -48,6 +48,7 @@ export default (sequelize, DataTypes) => {
       },
       order: { type: DataTypes.INTEGER, allowNull: false },
       image_url: { type: DataTypes.STRING, allowNull: true },
+      audio_url: { type: DataTypes.STRING, allowNull: true },
       score: {
         type: DataTypes.DECIMAL(5, 2),
         allowNull: true,

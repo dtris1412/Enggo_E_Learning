@@ -39,19 +39,20 @@ Tính năng Bulk Import cho phép admin thêm hàng loạt câu hỏi vào exam 
 | 2   | explanation      | ❌       | "Paris is the capital..."        |
 | 3   | order            | ✅       | 1, 2, 3...                       |
 | 4   | image_url        | ❌       | https://example.com/image.jpg    |
-| 5   | score            | ❌       | 1.0 (default)                    |
-| 6   | option_a         | ✅       | "London"                         |
-| 7   | option_b         | ✅       | "Paris"                          |
-| 8   | option_c         | ✅       | "Berlin"                         |
-| 9   | option_d         | ✅       | "Madrid"                         |
-| 10  | correct_answer   | ✅       | "B"                              |
+| 5   | audio_url        | ❌       | https://example.com/audio.mp3    |
+| 6   | score            | ❌       | 1.0 (default)                    |
+| 7   | option_a         | ✅       | "London"                         |
+| 8   | option_b         | ✅       | "Paris"                          |
+| 9   | option_c         | ✅       | "Berlin"                         |
+| 10  | option_d         | ✅       | "Madrid"                         |
+| 11  | correct_answer   | ✅       | "B"                              |
 
 #### Ví Dụ:
 
 ```csv
-question_content,explanation,order,image_url,score,option_a,option_b,option_c,option_d,correct_answer
-"What is the capital of France?","Paris is the capital and largest city of France.",1,,1.0,London,Paris,Berlin,Madrid,B
-"Which planet is red?","Mars is the Red Planet.",2,,1.0,Venus,Mars,Jupiter,Saturn,B
+question_content,explanation,order,image_url,audio_url,score,option_a,option_b,option_c,option_d,correct_answer
+"What is the capital of France?","Paris is the capital and largest city of France.",1,,,1.0,London,Paris,Berlin,Madrid,B
+"Which planet is red?","Mars is the Red Planet.",2,,https://example.com/mars.mp3,1.0,Venus,Mars,Jupiter,Saturn,B
 ```
 
 ### Bước 6: Copy & Paste
@@ -108,6 +109,19 @@ question_content,explanation,order,image_url,score,option_a,option_b,option_c,op
 
 - Để trống nếu không có hình
 - Nhập full URL: `https://example.com/image.jpg`
+
+### 5.1 Audio URL (Mới)
+
+- **Tùy chọn**: Mỗi câu hỏi có thể có audio riêng
+- Để trống nếu không có audio riêng
+- Khi phát, hệ thống sẽ ưu tiên:
+  1. **Audio của câu hỏi** (nếu có) - dùng cho những câu có người nói khác nhau
+  2. Audio của container (Part) - dùng chung cho tất cả câu trong Part
+  3. Audio của parent container - dùng cho groups (Part 3, 4 conversation)
+- Ví dụ sử dụng:
+  - **TOEIC Part 1**: Mỗi câu khác nhau (1 hình, 1 audio)
+  - **TOEIC Part 3**: 1 audio chung cho 3 câu, không cần audio_url
+  - **IELTS Listening**: Có thể 1 audio per câu nếu cần
 
 ### 6. Score
 

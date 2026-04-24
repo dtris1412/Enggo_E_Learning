@@ -10,6 +10,7 @@ const addQuestionToContainer = async (
   question_id,
   order,
   image_url,
+  audio_url,
   score,
 ) => {
   if (!container_id || !question_id || !order) {
@@ -31,6 +32,7 @@ const addQuestionToContainer = async (
     question_id,
     order,
     image_url: image_url || null,
+    audio_url: audio_url || null,
     score: score || 1.0,
   });
 
@@ -65,6 +67,7 @@ const updateQuestionOrderInContainer = async (
   container_question_id,
   order,
   image_url,
+  audio_url,
   score,
 ) => {
   if (!container_question_id) {
@@ -81,6 +84,7 @@ const updateQuestionOrderInContainer = async (
   const updateData = {};
   if (order !== undefined) updateData.order = order;
   if (image_url !== undefined) updateData.image_url = image_url;
+  if (audio_url !== undefined) updateData.audio_url = audio_url;
   if (score !== undefined) updateData.score = score;
 
   await containerQuestion.update(updateData);
@@ -102,6 +106,7 @@ const updateQuestionOrderInContainer = async (
  *   explanation: "Giải thích",
  *   order: 1,
  *   image_url: "https://...",
+ *   audio_url: "https://..." (optional - audio riêng cho câu hỏi này),
  *   score: 1.0,
  *   options: [
  *     { label: "A", content: "Đáp án A", is_correct: false, order_index: 1 },
@@ -198,6 +203,7 @@ const addMultipleQuestionsToContainer = async (container_id, questionsData) => {
           question_id: question.question_id,
           order: questionData.order,
           image_url: questionData.image_url?.trim() || null,
+          audio_url: questionData.audio_url?.trim() || null,
           score: questionData.score || 1.0,
         },
         { transaction },

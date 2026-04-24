@@ -9,6 +9,7 @@ import {
   CheckCircle2,
   Upload,
   Image as ImageIcon,
+  Volume2,
   HelpCircle,
 } from "lucide-react";
 import { useExam } from "../../contexts/examContext";
@@ -23,6 +24,7 @@ interface BulkQuestion {
   explanation: string;
   order: string;
   image_url: string;
+  audio_url: string;
   score: string;
   option_a: string;
   option_b: string;
@@ -49,7 +51,7 @@ const BulkQuestionImportModal: React.FC<BulkQuestionImportModalProps> = ({
   onImportSuccess,
   examType,
 }) => {
-  const { uploadExamImages } = useExam();
+  const { uploadExamImages, uploadExamAudios } = useExam();
   const questionTypeOptions = getQuestionTypesByExamType(examType);
   const defaultQuestionType =
     questionTypeOptions[0]?.value ?? "reading_multiple_choice";
@@ -61,6 +63,7 @@ const BulkQuestionImportModal: React.FC<BulkQuestionImportModalProps> = ({
       explanation: "",
       order: "1",
       image_url: "",
+      audio_url: "",
       score: "1.0",
       option_a: "",
       option_b: "",
@@ -74,6 +77,7 @@ const BulkQuestionImportModal: React.FC<BulkQuestionImportModalProps> = ({
   const [showPasteHelp, setShowPasteHelp] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [imageFiles, setImageFiles] = useState<Map<string, File>>(new Map());
+  const [audioFiles, setAudioFiles] = useState<Map<string, File>>(new Map());
   const tableRef = useRef<HTMLDivElement>(null);
 
   const addQuestion = () => {
@@ -89,6 +93,7 @@ const BulkQuestionImportModal: React.FC<BulkQuestionImportModalProps> = ({
         explanation: "",
         order: (lastOrder + 1).toString(),
         image_url: "",
+        audio_url: "",
         score: "1.0",
         option_a: "",
         option_b: "",
@@ -112,6 +117,7 @@ const BulkQuestionImportModal: React.FC<BulkQuestionImportModalProps> = ({
       order: (lastOrder + i + 1).toString(),
       question_type: defaultQuestionType,
       image_url: "",
+      audio_url: "",
       score: "1.0",
       option_a: "",
       option_b: "",
@@ -125,10 +131,13 @@ const BulkQuestionImportModal: React.FC<BulkQuestionImportModalProps> = ({
   const removeQuestion = (id: string) => {
     if (questions.length <= 1) return;
     setQuestions(questions.filter((q) => q.id !== id));
-    // Remove associated image file
+    // Remove associated image and audio files
     const newImageFiles = new Map(imageFiles);
     newImageFiles.delete(id);
     setImageFiles(newImageFiles);
+    const newAudioFiles = new Map(audioFiles);
+    newAudioFiles.delete(id);
+    setAudioFiles(newAudioFiles);
   };
 
   const updateQuestion = (
@@ -194,6 +203,67 @@ const BulkQuestionImportModal: React.FC<BulkQuestionImportModalProps> = ({
     updateQuestion(id, "image_url", "");
   };
 
+  const handleAudioUpload = (id: string, file: File) => {
+    console.log(
+      `Selecting audio file for question ${id}:`,
+      file.name,
+      `(${(file.size / 1024).toFixed(1)}KB)`,
+    );
+
+    // Validate file size (10MB limit for Cloudinary free plan)
+    const maxSizeInBytes = 10 * 1024 * 1024; // 10MB (10,485,760 bytes)
+    const fileSizeInMB = (file.size / (1024 * 1024)).toFixed(2);
+    const fileSizeInKB = (file.size / 1024).toFixed(1);
+
+    if (file.size > maxSizeInBytes) {
+      console.error(
+        `File too large: ${file.name} (${file.size} bytes > ${maxSizeInBytes} bytes)`,
+      );
+      alert(
+        `❌ File "${file.name}" quá lớn!\n\nKích thước: ${fileSizeInMB}MB (${file.size.toLocaleString()} bytes)\nTối đa: 10MB (10,485,760 bytes)\n\nVui lòng chọn file nhỏ hơn.`,
+      );
+      // Clear the file input
+      const fileInputs = document.querySelectorAll('input[type="file"]');
+      fileInputs.forEach((input) => {
+        if (input instanceof HTMLInputElement) {
+          input.value = "";
+        }
+      });
+      return;
+    }
+
+    // Validate file type
+    const allowedAudioTypes = [
+      "audio/mpeg",
+      "audio/mp3",
+      "audio/wav",
+      "audio/ogg",
+      "audio/webm",
+      "audio/aac",
+      "audio/m4a",
+    ];
+    if (!allowedAudioTypes.includes(file.type)) {
+      alert(
+        `❌ File "${file.name}" không đúng định dạng!\n\nChỉ chấp nhận: MP3, WAV, OGG, WEBM, AAC, M4A`,
+      );
+      return;
+    }
+
+    console.log(`✅ Audio file size OK: ${fileSizeInKB}KB`);
+
+    const newAudioFiles = new Map(audioFiles);
+    newAudioFiles.set(id, file);
+    setAudioFiles(newAudioFiles);
+  };
+
+  const handleRemoveAudio = (id: string) => {
+    const newAudioFiles = new Map(audioFiles);
+    newAudioFiles.delete(id);
+    setAudioFiles(newAudioFiles);
+    // Also clear the audio_url field
+    updateQuestion(id, "audio_url", "");
+  };
+
   const formatFileSize = (bytes: number): string => {
     if (bytes < 1024) return bytes + " B";
     if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
@@ -221,14 +291,15 @@ const BulkQuestionImportModal: React.FC<BulkQuestionImportModalProps> = ({
           explanation: (cells[1] || "").trim().replace(/^"|"$/g, ""),
           order: (cells[2] || (index + 1).toString()).trim(),
           image_url: (cells[3] || "").trim().replace(/^"|"$/g, ""),
-          score: (cells[4] || "1.0").trim(),
-          option_a: (cells[5] || "").trim().replace(/^"|"$/g, ""),
-          option_b: (cells[6] || "").trim().replace(/^"|"$/g, ""),
-          option_c: (cells[7] || "").trim().replace(/^"|"$/g, ""),
-          option_d: (cells[8] || "").trim().replace(/^"|"$/g, ""),
-          correct_answer: (cells[9] || "").trim().toUpperCase(),
+          audio_url: (cells[4] || "").trim().replace(/^"|"$/g, ""), // NEW: audio_url
+          score: (cells[5] || "1.0").trim(),
+          option_a: (cells[6] || "").trim().replace(/^"|"$/g, ""),
+          option_b: (cells[7] || "").trim().replace(/^"|"$/g, ""),
+          option_c: (cells[8] || "").trim().replace(/^"|"$/g, ""),
+          option_d: (cells[9] || "").trim().replace(/^"|"$/g, ""),
+          correct_answer: (cells[10] || "").trim().toUpperCase(),
           question_type:
-            (cells[10] || defaultQuestionType).trim().replace(/^"|"$/g, "") ||
+            (cells[11] || defaultQuestionType).trim().replace(/^"|"$/g, "") ||
             defaultQuestionType,
         } as BulkQuestion;
       });
@@ -249,10 +320,10 @@ const BulkQuestionImportModal: React.FC<BulkQuestionImportModalProps> = ({
   const downloadTemplate = () => {
     const defaultType =
       questionTypeOptions[0]?.value ?? "reading_multiple_choice";
-    const csvContent = `Question Content,Explanation,Order,Image URL,Score,Option A,Option B,Option C,Option D,Correct Answer,Question Type
-"What is the capital of France?","Paris is the capital and largest city of France.",1,,1.0,London,Paris,Berlin,Madrid,B,${defaultType}
-"Which planet is known as the Red Planet?","Mars is called the Red Planet because of its reddish appearance.",2,,1.0,Venus,Mars,Jupiter,Saturn,B,${defaultType}
-"What is 2 + 2?","Basic arithmetic: 2 plus 2 equals 4.",3,,1.0,3,4,5,6,B,${defaultType}`;
+    const csvContent = `Question Content,Explanation,Order,Image URL,Audio URL,Score,Option A,Option B,Option C,Option D,Correct Answer,Question Type
+"What is the capital of France?","Paris is the capital and largest city of France.",1,,,1.0,London,Paris,Berlin,Madrid,B,${defaultType}
+"Which planet is known as the Red Planet?","Mars is called the Red Planet because of its reddish appearance.",2,,https://example.com/mars.mp3,1.0,Venus,Mars,Jupiter,Saturn,B,${defaultType}
+"What is 2 + 2?","Basic arithmetic: 2 plus 2 equals 4.",3,,,1.0,3,4,5,6,B,${defaultType}`;
 
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const link = document.createElement("a");
@@ -314,7 +385,7 @@ const BulkQuestionImportModal: React.FC<BulkQuestionImportModalProps> = ({
 
     if (!validate()) return;
 
-    // Validate image files before upload
+    // Validate image and audio files before upload
     const maxSizeInBytes = 10 * 1024 * 1024; // 10MB
     const oversizedFiles: string[] = [];
 
@@ -325,9 +396,16 @@ const BulkQuestionImportModal: React.FC<BulkQuestionImportModalProps> = ({
       }
     });
 
+    audioFiles.forEach((file) => {
+      if (file.size > maxSizeInBytes) {
+        const fileSizeInMB = (file.size / (1024 * 1024)).toFixed(2);
+        oversizedFiles.push(`${file.name} (${fileSizeInMB}MB)`);
+      }
+    });
+
     if (oversizedFiles.length > 0) {
       setError(
-        `❌ Các file ảnh sau quá lớn (tối đa 10MB):\n${oversizedFiles.join("\n")}\n\nVui lòng xóa và chọn lại file nhỏ hơn.`,
+        `❌ Các file sau quá lớn (tối đa 10MB):\n${oversizedFiles.join("\n")}\n\nVui lòng xóa và chọn lại file nhỏ hơn.`,
       );
       return;
     }
@@ -375,6 +453,47 @@ const BulkQuestionImportModal: React.FC<BulkQuestionImportModalProps> = ({
         }
       }
 
+      // Upload all audio files
+      const audioUrlMap = new Map<string, string>();
+
+      if (audioFiles.size > 0) {
+        console.log(
+          "Uploading audios:",
+          Array.from(audioFiles.values()).map(
+            (f) => `${f.name} (${(f.size / 1024).toFixed(1)}KB)`,
+          ),
+        );
+        const filesToUpload = Array.from(audioFiles.values());
+
+        console.log("Calling uploadExamAudios...");
+        const uploadedUrls = await uploadExamAudios(filesToUpload);
+        console.log("Audio upload result:", uploadedUrls);
+
+        if (!uploadedUrls || uploadedUrls.length === 0) {
+          console.error("Audio upload failed: received null or empty array");
+          setError(
+            "❌ Lỗi khi upload audio!\n\nCó thể do:\n- File quá lớn (server reject)\n- Lỗi kết nối mạng\n- Token hết hạn\n\nVui lòng:\n1. Kiểm tra Console (F12) để xem lỗi chi tiết\n2. Refresh trang và đăng nhập lại\n3. Thử upload lại",
+          );
+          setLoading(false);
+          return;
+        }
+
+        if (uploadedUrls.length === filesToUpload.length) {
+          // Map question IDs to their uploaded audio URLs
+          let urlIndex = 0;
+          audioFiles.forEach((_, questionId) => {
+            audioUrlMap.set(questionId, uploadedUrls[urlIndex]);
+            urlIndex++;
+          });
+        } else {
+          setError(
+            `Chỉ upload được ${uploadedUrls.length}/${filesToUpload.length} audio. Vui lòng thử lại.`,
+          );
+          setLoading(false);
+          return;
+        }
+      }
+
       // Convert to API format
       const questionsData = questions.map((q) => {
         const options = [];
@@ -416,11 +535,16 @@ const BulkQuestionImportModal: React.FC<BulkQuestionImportModalProps> = ({
         const finalImageUrl =
           imageUrlMap.get(q.id) || q.image_url.trim() || null;
 
+        // Use uploaded audio URL if available, otherwise use the input URL
+        const finalAudioUrl =
+          audioUrlMap.get(q.id) || q.audio_url.trim() || null;
+
         return {
           question_content: q.question_content.trim(),
           explanation: q.explanation.trim() || null,
           order: parseInt(q.order) || 1,
           image_url: finalImageUrl,
+          audio_url: finalAudioUrl,
           score: parseFloat(q.score) || 1.0,
           question_type: q.question_type || defaultQuestionType,
           options,
@@ -532,8 +656,8 @@ const BulkQuestionImportModal: React.FC<BulkQuestionImportModalProps> = ({
                 </li>
                 <li>
                   <strong>Bước 2:</strong> Định dạng: Question | Explanation |
-                  Order | Image URL | Score | Option A | B | C | D | Correct
-                  Answer
+                  Order | Image URL | Audio URL | Score | Option A | B | C | D |
+                  Correct Answer
                 </li>
                 <li>
                   <strong>Bước 3:</strong> Select tất cả cells (không cần
@@ -549,7 +673,12 @@ const BulkQuestionImportModal: React.FC<BulkQuestionImportModalProps> = ({
                 </li>
                 <li>
                   <strong>Hình ảnh:</strong> Kích thước tối đa 10MB, định dạng
-                  JPG/PNG/WEBP
+                  JPG/PNG/WEBP - Có thể upload trực tiếp hoặc paste URL
+                </li>
+                <li>
+                  <strong>Audio:</strong> Kích thước tối đa 10MB, định dạng
+                  MP3/WAV/OGG/WEBM/AAC/M4A - Có thể upload trực tiếp hoặc paste
+                  URL
                 </li>
               </ul>
             </div>
@@ -635,6 +764,14 @@ const BulkQuestionImportModal: React.FC<BulkQuestionImportModalProps> = ({
                         <span>Hình ảnh</span>
                         <span className="text-[10px] font-normal text-gray-500">
                           (Max 10MB)
+                        </span>
+                      </div>
+                    </th>
+                    <th className="border border-gray-300 px-2 py-2 text-left font-semibold text-gray-700 min-w-[150px]">
+                      <div className="flex flex-col">
+                        <span>Audio</span>
+                        <span className="text-[10px] font-normal text-gray-500">
+                          (URL)
                         </span>
                       </div>
                     </th>
@@ -769,6 +906,71 @@ const BulkQuestionImportModal: React.FC<BulkQuestionImportModalProps> = ({
                                 )}
                               </span>
                             </div>
+                          )}
+                        </div>
+                      </td>
+
+                      {/* Audio URL/Upload */}
+                      <td className="border border-gray-300 p-1">
+                        <div className="flex flex-col gap-1">
+                          <label className="cursor-pointer">
+                            <input
+                              type="file"
+                              accept=".mp3,.wav,.ogg,.webm,.aac,.m4a"
+                              onChange={(e) => {
+                                if (e.target.files && e.target.files[0]) {
+                                  handleAudioUpload(
+                                    question.id,
+                                    e.target.files[0],
+                                  );
+                                }
+                              }}
+                              className="hidden"
+                            />
+                            <div className="flex items-center gap-1 px-2 py-1 bg-green-50 hover:bg-green-100 text-green-600 rounded text-xs transition-colors">
+                              <Upload className="w-3 h-3" />
+                              <span>Upload</span>
+                            </div>
+                          </label>
+                          {audioFiles.has(question.id) ? (
+                            <div className="flex flex-col gap-0.5 text-[10px]">
+                              <div className="flex items-center gap-1">
+                                <Volume2 className="w-3 h-3 text-green-600 flex-shrink-0" />
+                                <span
+                                  className="text-green-600 truncate max-w-[80px]"
+                                  title={audioFiles.get(question.id)?.name}
+                                >
+                                  {audioFiles.get(question.id)?.name}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => handleRemoveAudio(question.id)}
+                                  className="text-red-500 hover:text-red-700 ml-auto flex-shrink-0"
+                                  title="Xóa audio"
+                                >
+                                  <X className="w-3 h-3" />
+                                </button>
+                              </div>
+                              <span className="text-gray-500 text-[9px]">
+                                {formatFileSize(
+                                  audioFiles.get(question.id)?.size || 0,
+                                )}
+                              </span>
+                            </div>
+                          ) : (
+                            <input
+                              type="text"
+                              value={question.audio_url}
+                              onChange={(e) =>
+                                updateQuestion(
+                                  question.id,
+                                  "audio_url",
+                                  e.target.value,
+                                )
+                              }
+                              className="w-full px-2 py-1 text-sm border-0 focus:ring-2 focus:ring-green-500 rounded"
+                              placeholder="https://..."
+                            />
                           )}
                         </div>
                       </td>
