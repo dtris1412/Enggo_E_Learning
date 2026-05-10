@@ -61,14 +61,17 @@ const ExamTaking: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSubmitModal, setShowSubmitModal] = useState(false);
   const [showOverviewModal, setShowOverviewModal] = useState(false);
-  const [autoSaveTimer, setAutoSaveTimer] = useState<NodeJS.Timeout | null>(
-    null,
-  );
+  const [autoSaveTimer, setAutoSaveTimer] = useState<ReturnType<
+    typeof setTimeout
+  > | null>(null);
 
   // Audio player ref for persistent playback
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
   const [currentAudioUrl, setCurrentAudioUrl] = useState<string | null>(null);
+  const audioAutoAdvanceTimer = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
 
   // Initialize exam
   useEffect(() => {
@@ -206,27 +209,28 @@ const ExamTaking: React.FC = () => {
     return () => clearInterval(timer);
   }, [userExamId, answers, exam]);
 
-  // Handle audio playback - auto-play when container changes or exam loads
+  // Handle audio playback - auto-play when container/question changes or exam loads
   useEffect(() => {
     const container = getCurrentContainer();
     if (!container) return;
 
     const audioUrl = getAudioUrl();
 
-    // If audio URL changed, update and auto-play
-    if (audioUrl && audioUrl !== currentAudioUrl) {
+    // If audio URL changed OR if we moved to a different question (reset audio even if URL is same)
+    if (audioUrl) {
       setCurrentAudioUrl(audioUrl);
       if (audioRef.current) {
         audioRef.current.src = audioUrl;
         audioRef.current.load();
+        audioRef.current.currentTime = 0; // Reset to beginning
         audioRef.current.play().catch((error) => {
           console.log("Audio autoplay prevented:", error);
           setIsAudioPlaying(false);
         });
         setIsAudioPlaying(true);
       }
-    } else if (!audioUrl && currentAudioUrl) {
-      // No audio for this container
+    } else if (currentAudioUrl) {
+      // No audio for this question/container
       if (audioRef.current) {
         audioRef.current.pause();
         audioRef.current.src = "";
@@ -234,7 +238,35 @@ const ExamTaking: React.FC = () => {
       setCurrentAudioUrl(null);
       setIsAudioPlaying(false);
     }
-  }, [currentContainerIndex, exam]);
+  }, [currentContainerIndex, currentQuestionIndex, exam]);
+
+  // Handle audio end event with auto-advance
+  const handleAudioEnded = () => {
+    setIsAudioPlaying(false);
+
+    const container = getCurrentContainer();
+    if (!container) return;
+
+    // Clear any existing timer
+    if (audioAutoAdvanceTimer.current) {
+      clearTimeout(audioAutoAdvanceTimer.current);
+    }
+
+    // Set new timer for 5 seconds
+    audioAutoAdvanceTimer.current = setTimeout(() => {
+      // For conversation parts (Part 3, 4 with parent_id): move to next container
+      if (container.parent_id != null) {
+        const containers = getFlattenedContainers();
+        if (currentContainerIndex < containers.length - 1) {
+          setCurrentContainerIndex(currentContainerIndex + 1);
+          setCurrentQuestionIndex(0);
+        }
+      } else {
+        // For single-question parts (Part 1, 2, 5): move to next question
+        handleNextQuestion();
+      }
+    }, 5000);
+  };
 
   const handleSubmitAllWriting = async () => {
     if (!userExamId) return;
@@ -374,6 +406,22 @@ const ExamTaking: React.FC = () => {
       (a: any, b: any) => (a.order ?? 0) - (b.order ?? 0),
     );
 
+    console.log(
+      "=== All Containers ===",
+      sortedParents.map((c: any) => ({
+        id: c.container_id,
+        order: c.order,
+        type: c.type,
+        instruction: c.instruction,
+        parentId: c.parent_id,
+        hasChildren: c.children?.length > 0,
+        childrenCount: c.children?.length,
+        hasAudio: !!c.audio_url,
+        audio: c.audio_url?.substring(0, 50),
+        qCount: c.Container_Questions?.length,
+      })),
+    );
+
     const flattened: any[] = [];
     sortedParents.forEach((container: any) => {
       // For parent containers with children, add children only
@@ -387,6 +435,18 @@ const ExamTaking: React.FC = () => {
         flattened.push(container);
       }
     });
+
+    console.log(
+      "=== Flattened Containers ===",
+      flattened.map((c: any, idx: number) => ({
+        index: idx,
+        id: c.container_id,
+        instruction: c.instruction,
+        qCount: c.Container_Questions?.length,
+        firstQAudio: c.Container_Questions?.[0]?.audio_url?.substring(0, 50),
+        containerAudio: c.audio_url?.substring(0, 50),
+      })),
+    );
 
     return flattened;
   };
@@ -404,27 +464,60 @@ const ExamTaking: React.FC = () => {
   };
 
   const handleNextQuestion = () => {
+    // Clear any pending auto-advance timer
+    if (audioAutoAdvanceTimer.current) {
+      clearTimeout(audioAutoAdvanceTimer.current);
+      audioAutoAdvanceTimer.current = null;
+    }
+
     const container = getCurrentContainer();
     const containers = getFlattenedContainers();
     if (!container) return;
 
-    if (currentQuestionIndex < container.Container_Questions.length - 1) {
+    // Always navigate by question first (not by container)
+    // Only move to next container when reaching the last question
+    if (
+      currentQuestionIndex <
+      (container.Container_Questions?.length || 0) - 1
+    ) {
+      // Move to next question within current container
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     } else if (currentContainerIndex < containers.length - 1) {
+      // Move to next container and reset to first question
       setCurrentContainerIndex(currentContainerIndex + 1);
       setCurrentQuestionIndex(0);
     }
   };
 
   const handlePreviousQuestion = () => {
+    // Clear any pending auto-advance timer
+    if (audioAutoAdvanceTimer.current) {
+      clearTimeout(audioAutoAdvanceTimer.current);
+      audioAutoAdvanceTimer.current = null;
+    }
+
     const containers = getFlattenedContainers();
+    const container = getCurrentContainer();
+    if (!container) return;
+
+    // Always navigate by question first
+    // Only move to previous container when reaching the first question
     if (currentQuestionIndex > 0) {
+      // Move to previous question within current container
       setCurrentQuestionIndex(currentQuestionIndex - 1);
     } else if (currentContainerIndex > 0) {
+      // Move to previous container and reset to last question
       setCurrentContainerIndex(currentContainerIndex - 1);
       const prevContainer = containers[currentContainerIndex - 1];
-      setCurrentQuestionIndex(prevContainer.Container_Questions.length - 1);
+      setCurrentQuestionIndex(
+        (prevContainer.Container_Questions?.length || 1) - 1,
+      );
     }
+  };
+
+  // Check if container is a conversation part (has parent_id = is child container of multi-question part like Part 3, 4)
+  const isConversationPart = (container: any) => {
+    return container && container.parent_id != null;
   };
 
   const getTotalQuestionsCount = () => {
@@ -503,23 +596,54 @@ const ExamTaking: React.FC = () => {
     return null;
   };
 
-  // Get audio URL from question, parent, or current container
+  // Get audio URL: priority is question audio, then parent audio (for conversation parts), then container audio
   const getAudioUrl = () => {
-    // 1. Check individual question audio first (priority: highest)
+    const currentContainer = getCurrentContainer();
     const currentQuestion = getCurrentQuestion();
+
+    if (!currentContainer) return null;
+
+    // Debug: log all audio sources with detailed info
+    console.log("=== Audio Debug ===", {
+      containerType: currentContainer?.type,
+      containerId: currentContainer?.container_id,
+      containerParentId: currentContainer?.parent_id,
+      instruction: currentContainer?.instruction,
+      containerHasAudio: !!currentContainer?.audio_url,
+      containerAudio: currentContainer?.audio_url?.substring(0, 50),
+      cqId: currentQuestion?.container_question_id,
+      qIndex: currentQuestionIndex,
+      questionHasAudio: !!currentQuestion?.audio_url,
+      questionAudio: currentQuestion?.audio_url?.substring(0, 50),
+    });
+
+    // 1. Priority: Question/Container_Question audio (each question can have its own audio)
     if (currentQuestion?.audio_url) {
+      console.log(
+        "✓ Using Container_Question audio:",
+        currentQuestion.audio_url,
+      );
       return currentQuestion.audio_url;
     }
 
-    // 2. Check parent container audio (for multi-question parts like Part 3, 4)
-    const parent = getParentContainer();
-    if (parent && parent.audio_url) {
-      return parent.audio_url;
+    // 2. For conversation parts (Part 3, 4, 6, 7): use parent container audio
+    // Only if this container has parent_id (meaning it's a child of a multi-question part)
+    if (currentContainer.parent_id) {
+      const parent = getParentContainer();
+      if (parent?.audio_url) {
+        console.log("✓ Using parent container audio:", parent.audio_url);
+        return parent.audio_url;
+      }
     }
 
-    // 3. Check current container audio (default)
-    const currentContainer = getCurrentContainer();
-    return currentContainer?.audio_url || null;
+    // 3. Fallback: use current container audio (for single-question parts)
+    if (currentContainer.audio_url) {
+      console.log("✓ Using Exam_Container audio:", currentContainer.audio_url);
+      return currentContainer.audio_url;
+    }
+
+    console.log("✗ No audio found");
+    return null;
   };
 
   if (loading) {
@@ -565,7 +689,7 @@ const ExamTaking: React.FC = () => {
         ref={audioRef}
         onPlay={() => setIsAudioPlaying(true)}
         onPause={() => setIsAudioPlaying(false)}
-        onEnded={() => setIsAudioPlaying(false)}
+        onEnded={handleAudioEnded}
       />
 
       {/* Fixed Header */}
@@ -1186,99 +1310,262 @@ const ExamTaking: React.FC = () => {
                 );
               })()}
 
-            {/* ── MCQ (default) ────────────────────────── */}
+            {/* ── MCQ (default & Conversation Parts) ────────────────────────── */}
             {currentContainer?.type !== "writing_task" &&
               currentContainer?.type !== "speaking_part" &&
-              currentQuestion && (
-                <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
-                  {/* Question */}
-                  <div className="mb-6">
-                    <div className="flex items-start gap-4">
-                      <span className="flex-shrink-0 w-9 h-9 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
-                        {currentQuestionNumber}
-                      </span>
-                      <h3 className="flex-1 text-lg font-medium text-slate-900 leading-relaxed">
-                        {currentQuestion.Question.question_content}
-                      </h3>
-                    </div>
-                  </div>
+              (() => {
+                const isConversation = isConversationPart(currentContainer);
 
-                  {/* Answer Options */}
-                  <div className="space-y-3">
-                    {currentQuestion.Question_Options.map((option: any) => {
-                      const isSelected =
-                        answers[currentQuestion.container_question_id] ===
-                        option.question_option_id;
+                if (isConversation) {
+                  // Display ALL questions in conversation part
+                  return (
+                    <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6 space-y-6">
+                      {/* Conversation Header */}
+                      <div className="pb-4 border-b">
+                        <span className="px-3 py-1 bg-blue-50 text-blue-700 text-sm font-semibold rounded uppercase">
+                          {currentContainer.skill || "Section"}
+                        </span>
+                        {currentContainer.instruction && (
+                          <p className="text-base font-medium text-slate-700 mt-2">
+                            {currentContainer.instruction}
+                          </p>
+                        )}
+                      </div>
 
-                      return (
-                        <button
-                          key={option.question_option_id}
-                          onClick={() =>
-                            handleAnswerSelect(
-                              currentQuestion.container_question_id,
-                              option.question_option_id,
-                            )
-                          }
-                          className={`w-full text-left p-4 rounded-lg border-2 transition-all ${
-                            isSelected
-                              ? "border-blue-500 bg-blue-50 shadow-sm"
-                              : "border-slate-200 hover:border-blue-200 hover:bg-slate-50"
-                          }`}
-                        >
-                          <div className="flex items-center gap-3">
-                            <span
-                              className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${
-                                isSelected
-                                  ? "bg-blue-600 text-white"
-                                  : "bg-slate-100 text-slate-700"
-                              }`}
+                      {/* All Questions */}
+                      {currentContainer.Container_Questions.map(
+                        (question: any, qIdx: number) => {
+                          const isAnswered =
+                            answers[question.container_question_id] !== null &&
+                            answers[question.container_question_id] !==
+                              undefined;
+                          const selectedOption = question.Question_Options.find(
+                            (opt: any) =>
+                              opt.question_option_id ===
+                              answers[question.container_question_id],
+                          );
+
+                          return (
+                            <div
+                              key={question.container_question_id}
+                              className="pb-6 border-b last:border-b-0 last:pb-0"
                             >
-                              {option.label}
-                            </span>
-                            <span className="text-slate-800 text-base">
-                              {option.content}
-                            </span>
-                          </div>
+                              {/* Question Number & Content */}
+                              <div className="mb-4">
+                                <div className="flex items-start gap-4">
+                                  <span className="flex-shrink-0 w-9 h-9 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                                    {currentContainerIndex > 0
+                                      ? currentContainerIndex * 10 + qIdx + 1
+                                      : qIdx + 1}
+                                  </span>
+                                  <h3 className="flex-1 text-lg font-medium text-slate-900 leading-relaxed">
+                                    {question.Question.question_content}
+                                  </h3>
+                                </div>
+                              </div>
+
+                              {/* Question Image if exists */}
+                              {question.image_url && (
+                                <div className="mb-4">
+                                  <img
+                                    src={question.image_url}
+                                    alt={`Question ${qIdx + 1}`}
+                                    className="max-w-sm rounded-lg border border-slate-200"
+                                  />
+                                </div>
+                              )}
+
+                              {/* Answer Options */}
+                              <div className="space-y-3 ml-13">
+                                {question.Question_Options.map(
+                                  (option: any) => {
+                                    const isSelected =
+                                      answers[
+                                        question.container_question_id
+                                      ] === option.question_option_id;
+
+                                    return (
+                                      <button
+                                        key={option.question_option_id}
+                                        onClick={() =>
+                                          handleAnswerSelect(
+                                            question.container_question_id,
+                                            option.question_option_id,
+                                          )
+                                        }
+                                        className={`w-full text-left p-4 rounded-lg border-2 transition-all ${
+                                          isSelected
+                                            ? "border-blue-500 bg-blue-50 shadow-sm"
+                                            : "border-slate-200 hover:border-blue-200 hover:bg-slate-50"
+                                        }`}
+                                      >
+                                        <div className="flex items-center gap-3">
+                                          <span
+                                            className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${
+                                              isSelected
+                                                ? "bg-blue-600 text-white"
+                                                : "bg-slate-100 text-slate-700"
+                                            }`}
+                                          >
+                                            {option.label}
+                                          </span>
+                                          <span className="text-slate-800 text-base">
+                                            {option.content}
+                                          </span>
+                                        </div>
+                                      </button>
+                                    );
+                                  },
+                                )}
+                              </div>
+
+                              {/* Answer Status */}
+                              {isAnswered && (
+                                <div className="mt-3 text-sm text-green-600 flex items-center gap-1">
+                                  <CheckCircle className="w-4 h-4" />
+                                  Đáp án: {selectedOption?.label}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        },
+                      )}
+
+                      {/* Navigation Buttons */}
+                      <div className="flex items-center justify-between mt-8 pt-6 border-t">
+                        <button
+                          onClick={handlePreviousQuestion}
+                          disabled={currentContainerIndex === 0}
+                          className="px-6 py-3 border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2 text-sm font-medium text-slate-700"
+                        >
+                          <ChevronLeft className="w-4 h-4" />
+                          Phần trước
                         </button>
-                      );
-                    })}
-                  </div>
 
-                  {/* Navigation Buttons */}
-                  <div className="flex items-center justify-between mt-8 pt-6 border-t">
-                    <button
-                      onClick={handlePreviousQuestion}
-                      disabled={
-                        currentContainerIndex === 0 &&
-                        currentQuestionIndex === 0
-                      }
-                      className="px-6 py-3 border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2 text-sm font-medium text-slate-700"
-                    >
-                      <ChevronLeft className="w-4 h-4" />
-                      Trước
-                    </button>
+                        <div className="text-sm text-slate-500 font-medium">
+                          {Math.round(
+                            (answeredQuestions / totalQuestions) * 100,
+                          )}
+                          %
+                        </div>
 
-                    <div className="text-sm text-slate-500 font-medium">
-                      {Math.round((answeredQuestions / totalQuestions) * 100)}%
+                        <button
+                          onClick={handleNextQuestion}
+                          disabled={
+                            currentContainerIndex ===
+                            getFlattenedContainers().length - 1
+                          }
+                          className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2 text-sm font-medium"
+                        >
+                          Phần tiếp
+                          <ChevronRight className="w-4 h-4" />
+                        </button>
+                      </div>
                     </div>
+                  );
+                } else {
+                  // Single question display (for non-conversation parts)
+                  return (
+                    currentQuestion && (
+                      <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+                        {/* Question */}
+                        <div className="mb-6">
+                          <div className="flex items-start gap-4">
+                            <span className="flex-shrink-0 w-9 h-9 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                              {currentQuestionNumber}
+                            </span>
+                            <h3 className="flex-1 text-lg font-medium text-slate-900 leading-relaxed">
+                              {currentQuestion.Question.question_content}
+                            </h3>
+                          </div>
+                        </div>
 
-                    <button
-                      onClick={handleNextQuestion}
-                      disabled={
-                        currentContainerIndex ===
-                          getFlattenedContainers().length - 1 &&
-                        currentQuestionIndex ===
-                          (currentContainer?.Container_Questions?.length || 0) -
-                            1
-                      }
-                      className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2 text-sm font-medium"
-                    >
-                      Tiếp
-                      <ChevronRight className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-              )}
+                        {/* Answer Options */}
+                        <div className="space-y-3">
+                          {currentQuestion.Question_Options.map(
+                            (option: any) => {
+                              const isSelected =
+                                answers[
+                                  currentQuestion.container_question_id
+                                ] === option.question_option_id;
+
+                              return (
+                                <button
+                                  key={option.question_option_id}
+                                  onClick={() =>
+                                    handleAnswerSelect(
+                                      currentQuestion.container_question_id,
+                                      option.question_option_id,
+                                    )
+                                  }
+                                  className={`w-full text-left p-4 rounded-lg border-2 transition-all ${
+                                    isSelected
+                                      ? "border-blue-500 bg-blue-50 shadow-sm"
+                                      : "border-slate-200 hover:border-blue-200 hover:bg-slate-50"
+                                  }`}
+                                >
+                                  <div className="flex items-center gap-3">
+                                    <span
+                                      className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${
+                                        isSelected
+                                          ? "bg-blue-600 text-white"
+                                          : "bg-slate-100 text-slate-700"
+                                      }`}
+                                    >
+                                      {option.label}
+                                    </span>
+                                    <span className="text-slate-800 text-base">
+                                      {option.content}
+                                    </span>
+                                  </div>
+                                </button>
+                              );
+                            },
+                          )}
+                        </div>
+
+                        {/* Navigation Buttons */}
+                        <div className="flex items-center justify-between mt-8 pt-6 border-t">
+                          <button
+                            onClick={handlePreviousQuestion}
+                            disabled={
+                              currentContainerIndex === 0 &&
+                              currentQuestionIndex === 0
+                            }
+                            className="px-6 py-3 border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2 text-sm font-medium text-slate-700"
+                          >
+                            <ChevronLeft className="w-4 h-4" />
+                            Trước
+                          </button>
+
+                          <div className="text-sm text-slate-500 font-medium">
+                            {Math.round(
+                              (answeredQuestions / totalQuestions) * 100,
+                            )}
+                            %
+                          </div>
+
+                          <button
+                            onClick={handleNextQuestion}
+                            disabled={
+                              currentContainerIndex ===
+                                getFlattenedContainers().length - 1 &&
+                              currentQuestionIndex ===
+                                (currentContainer?.Container_Questions
+                                  ?.length || 0) -
+                                  1
+                            }
+                            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2 text-sm font-medium"
+                          >
+                            Tiếp
+                            <ChevronRight className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                    )
+                  );
+                }
+              })()}
           </div>
         </div>
       </div>

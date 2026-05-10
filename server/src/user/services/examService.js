@@ -221,6 +221,7 @@ export const getExamForTaking = async (exam_id, user_exam_id = null) => {
                   "container_question_id",
                   "order",
                   "image_url",
+                  "audio_url",
                   "score",
                 ],
                 include: [
@@ -250,6 +251,7 @@ export const getExamForTaking = async (exam_id, user_exam_id = null) => {
               "container_question_id",
               "order",
               "image_url",
+              "audio_url",
               "score",
             ],
             include: [
