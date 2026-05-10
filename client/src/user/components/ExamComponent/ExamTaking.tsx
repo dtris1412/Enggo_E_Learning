@@ -406,22 +406,6 @@ const ExamTaking: React.FC = () => {
       (a: any, b: any) => (a.order ?? 0) - (b.order ?? 0),
     );
 
-    console.log(
-      "=== All Containers ===",
-      sortedParents.map((c: any) => ({
-        id: c.container_id,
-        order: c.order,
-        type: c.type,
-        instruction: c.instruction,
-        parentId: c.parent_id,
-        hasChildren: c.children?.length > 0,
-        childrenCount: c.children?.length,
-        hasAudio: !!c.audio_url,
-        audio: c.audio_url?.substring(0, 50),
-        qCount: c.Container_Questions?.length,
-      })),
-    );
-
     const flattened: any[] = [];
     sortedParents.forEach((container: any) => {
       // For parent containers with children, add children only
@@ -435,18 +419,6 @@ const ExamTaking: React.FC = () => {
         flattened.push(container);
       }
     });
-
-    console.log(
-      "=== Flattened Containers ===",
-      flattened.map((c: any, idx: number) => ({
-        index: idx,
-        id: c.container_id,
-        instruction: c.instruction,
-        qCount: c.Container_Questions?.length,
-        firstQAudio: c.Container_Questions?.[0]?.audio_url?.substring(0, 50),
-        containerAudio: c.audio_url?.substring(0, 50),
-      })),
-    );
 
     return flattened;
   };
@@ -603,26 +575,8 @@ const ExamTaking: React.FC = () => {
 
     if (!currentContainer) return null;
 
-    // Debug: log all audio sources with detailed info
-    console.log("=== Audio Debug ===", {
-      containerType: currentContainer?.type,
-      containerId: currentContainer?.container_id,
-      containerParentId: currentContainer?.parent_id,
-      instruction: currentContainer?.instruction,
-      containerHasAudio: !!currentContainer?.audio_url,
-      containerAudio: currentContainer?.audio_url?.substring(0, 50),
-      cqId: currentQuestion?.container_question_id,
-      qIndex: currentQuestionIndex,
-      questionHasAudio: !!currentQuestion?.audio_url,
-      questionAudio: currentQuestion?.audio_url?.substring(0, 50),
-    });
-
     // 1. Priority: Question/Container_Question audio (each question can have its own audio)
     if (currentQuestion?.audio_url) {
-      console.log(
-        "✓ Using Container_Question audio:",
-        currentQuestion.audio_url,
-      );
       return currentQuestion.audio_url;
     }
 
@@ -631,18 +585,15 @@ const ExamTaking: React.FC = () => {
     if (currentContainer.parent_id) {
       const parent = getParentContainer();
       if (parent?.audio_url) {
-        console.log("✓ Using parent container audio:", parent.audio_url);
         return parent.audio_url;
       }
     }
 
     // 3. Fallback: use current container audio (for single-question parts)
     if (currentContainer.audio_url) {
-      console.log("✓ Using Exam_Container audio:", currentContainer.audio_url);
       return currentContainer.audio_url;
     }
 
-    console.log("✗ No audio found");
     return null;
   };
 

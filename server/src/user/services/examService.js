@@ -182,10 +182,8 @@ export const getExamForTaking = async (exam_id, user_exam_id = null) => {
       },
       {
         model: db.Exam_Container,
-        where:
-          selectedParts && !selectedParts.includes("all")
-            ? { parent_id: null, container_id: selectedParts }
-            : { parent_id: null }, // Only get parent containers
+        // Temporarily disable selectedParts filter to debug
+        where: { parent_id: null }, // Only get parent containers
         attributes: [
           "container_id",
           "skill",
