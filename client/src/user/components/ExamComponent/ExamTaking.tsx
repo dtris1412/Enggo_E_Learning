@@ -526,12 +526,9 @@ const ExamTaking: React.FC = () => {
   };
 
   const getCurrentQuestionNumber = () => {
-    const containers = getFlattenedContainers();
-    let count = 0;
-    for (let i = 0; i < currentContainerIndex; i++) {
-      count += containers[i].Container_Questions?.length || 0;
-    }
-    return count + currentQuestionIndex + 1;
+    const currentQuestion = getCurrentQuestion();
+    // Use order directly from container_question (database field)
+    return currentQuestion?.order || 0;
   };
 
   const toggleAudio = () => {
@@ -805,9 +802,7 @@ const ExamTaking: React.FC = () => {
                   {/* Question Image - Enlarged */}
                   {currentQuestion && currentQuestion.image_url && (
                     <div className="mb-5">
-                      <p className="text-sm font-medium text-slate-600 mb-2">
-                        Hình ảnh câu {currentQuestionNumber}:
-                      </p>
+                      <p className="text-sm font-medium text-slate-600 mb-2"></p>
                       <img
                         src={currentQuestion.image_url}
                         alt="Question"
@@ -1305,9 +1300,7 @@ const ExamTaking: React.FC = () => {
                               <div className="mb-4">
                                 <div className="flex items-start gap-4">
                                   <span className="flex-shrink-0 w-9 h-9 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
-                                    {currentContainerIndex > 0
-                                      ? currentContainerIndex * 10 + qIdx + 1
-                                      : qIdx + 1}
+                                    {question.order || qIdx + 1}
                                   </span>
                                   <h3 className="flex-1 text-lg font-medium text-slate-900 leading-relaxed">
                                     {question.Question.question_content}
