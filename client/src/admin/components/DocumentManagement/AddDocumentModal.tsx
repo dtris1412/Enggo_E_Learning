@@ -65,6 +65,7 @@ const AddDocumentModal: React.FC<AddDocumentModalProps> = ({
         ...prev,
         file: "Only PDF, DOCX, DOC, and audio files are allowed",
       }));
+      e.target.value = ""; // Clear input
       return;
     }
 
@@ -74,9 +75,11 @@ const AddDocumentModal: React.FC<AddDocumentModalProps> = ({
         ...prev,
         file: "File size must be less than 50MB",
       }));
+      e.target.value = ""; // ← Quan trọng: Clear input file
       return;
     }
 
+    // Valid file
     setSelectedFile(file);
     setErrors((prev: any) => ({ ...prev, file: "" }));
 
@@ -84,11 +87,10 @@ const AddDocumentModal: React.FC<AddDocumentModalProps> = ({
     if (!formData.document_name) {
       setFormData((prev) => ({
         ...prev,
-        document_name: file.name.replace(/\.[^/.]+$/, ""), // Remove file extension
+        document_name: file.name.replace(/\.[^/.]+$/, ""),
       }));
     }
   };
-
   const validateForm = () => {
     const newErrors: any = {};
 
@@ -250,12 +252,11 @@ const AddDocumentModal: React.FC<AddDocumentModalProps> = ({
               <input
                 type="file"
                 onChange={handleFileChange}
-                accept=".pdf,.doc,.docx,.mp3,.wav,.ogg,.webm"
+                accept=".pdf,.doc,.docx,.mp3,.webm"
                 className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
               />
               <p className="text-xs text-gray-500">
-                Định dạng được hỗ trợ: PDF, DOCX, DOC, MP3, WAV, OGG, WebM (Tối
-                đa 50MB)
+                Định dạng được hỗ trợ: PDF, DOCX, DOC, MP3, WebM (Tối đa 50MB)
               </p>
 
               {selectedFile && (

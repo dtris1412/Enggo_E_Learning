@@ -29,6 +29,8 @@ const EditLessonMediaModal: React.FC<EditLessonMediaModalProps> = ({
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>("");
 
+  const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
+
   useEffect(() => {
     if (isOpen && media) {
       setFormData({
@@ -44,27 +46,79 @@ const EditLessonMediaModal: React.FC<EditLessonMediaModalProps> = ({
     }
   }, [isOpen, media]);
 
+  // Hàm lấy danh sách định dạng cho phép theo loại media
+  const getAllowedTypes = (mediaType: string): string[] => {
+    switch (mediaType) {
+      case "video":
+        return ["video/mp4", "video/webm", "video/ogg"];
+      case "audio":
+        return [
+          "audio/mpeg",
+          "audio/mp3",
+          "audio/wav",
+          "audio/ogg",
+          "audio/webm",
+        ];
+      case "image":
+        return ["image/jpeg", "image/png", "image/gif", "image/webp"];
+      case "text":
+        return [".txt", ".doc", ".docx"]; // text files
+      default:
+        return [];
+    }
+  };
+
+  const validateFile = (file: File, mediaType: string): string | null => {
+    const allowedTypes = getAllowedTypes(mediaType);
+
+    // Kiểm tra định dạng
+    const isValidType =
+      mediaType === "text"
+        ? true // text sẽ kiểm tra extension sau
+        : allowedTypes.includes(file.type);
+
+    if (!isValidType) {
+      return `Chỉ chấp nhận các định dạng: ${allowedTypes.join(", ")}`;
+    }
+
+    // Kiểm tra dung lượng
+    if (file.size > MAX_FILE_SIZE) {
+      return "Dung lượng file không được vượt quá 50MB";
+    }
+
+    return null; // valid
+  };
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const errorMessage = validateFile(file, formData.media_type);
+
+    if (errorMessage) {
+      setErrors((prev) => ({ ...prev, file: errorMessage }));
+      e.target.value = ""; // Clear input file
+      return;
+    }
+
+    // File hợp lệ
+    setSelectedFile(file);
+    setErrors((prev) => ({ ...prev, file: "" }));
+
+    // Tạo preview URL
+    const url = URL.createObjectURL(file);
+    setPreviewUrl(url);
+  };
+
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
 
-    if (!formData.media_url.trim()) {
-      newErrors.media_url = "Media URL/Content is required";
+    if (!formData.media_url.trim() && !selectedFile) {
+      newErrors.media_url = "Vui lòng cung cấp nội dung media";
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  };
-
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    // Store file for later upload
-    setSelectedFile(file);
-
-    // Create local preview URL
-    const url = URL.createObjectURL(file);
-    setPreviewUrl(url);
   };
 
   const handleSubmit = async () => {
@@ -72,14 +126,14 @@ const EditLessonMediaModal: React.FC<EditLessonMediaModalProps> = ({
 
     let uploadedUrl = formData.media_url;
 
-    // Upload new file if selected (all types including text)
     if (selectedFile) {
       uploadedUrl = await uploadFile(
         selectedFile,
         formData.media_type as "video" | "audio" | "image" | "text",
       );
+
       if (!uploadedUrl) {
-        // Upload failed
+        setErrors((prev) => ({ ...prev, file: "Upload file thất bại" }));
         return;
       }
     }
@@ -92,6 +146,14 @@ const EditLessonMediaModal: React.FC<EditLessonMediaModalProps> = ({
     if (success) {
       onSuccess();
       onClose();
+    }
+  };
+
+  const clearFileSelection = () => {
+    setSelectedFile(null);
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+      setPreviewUrl("");
     }
   };
 
@@ -111,7 +173,6 @@ const EditLessonMediaModal: React.FC<EditLessonMediaModalProps> = ({
           </button>
         </div>
 
-        {/* Form */}
         <div className="space-y-4">
           {/* Order Index */}
           <div>
@@ -139,10 +200,8 @@ const EditLessonMediaModal: React.FC<EditLessonMediaModalProps> = ({
             <select
               value={formData.media_type}
               onChange={(e) => {
-                setFormData({
-                  ...formData,
-                  media_type: e.target.value,
-                });
+                setFormData({ ...formData, media_type: e.target.value });
+                clearFileSelection(); // Reset file khi đổi loại
               }}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
@@ -153,7 +212,7 @@ const EditLessonMediaModal: React.FC<EditLessonMediaModalProps> = ({
             </select>
           </div>
 
-          {/* File Upload for All Types */}
+          {/* File Upload */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Upload File mới (tùy chọn)
@@ -162,7 +221,7 @@ const EditLessonMediaModal: React.FC<EditLessonMediaModalProps> = ({
               type="file"
               accept={
                 formData.media_type === "video"
-                  ? "video/*"
+                  ? "video/mp4,video/webm,video/ogg"
                   : formData.media_type === "audio"
                     ? "audio/*"
                     : formData.media_type === "image"
@@ -172,17 +231,23 @@ const EditLessonMediaModal: React.FC<EditLessonMediaModalProps> = ({
               onChange={handleFileUpload}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
+
+            {errors.file && (
+              <p className="text-red-500 text-sm mt-1">{errors.file}</p>
+            )}
+
             {selectedFile && (
               <p className="text-sm text-green-600 mt-1">
-                ✓ Đã chọn file mới: {selectedFile.name} (
+                ✓ Đã chọn: {selectedFile.name} (
                 {(selectedFile.size / 1024 / 1024).toFixed(2)} MB)
               </p>
             )}
-            <p className="text-sm text-gray-500 mt-1">
-              Để trống nếu không muốn thay đổi file
+
+            <p className="text-xs text-gray-500 mt-1">
+              Tối đa 50MB. Để trống nếu không muốn thay đổi.
             </p>
 
-            {/* Preview Section for new file */}
+            {/* Preview new file */}
             {previewUrl && formData.media_type !== "text" && (
               <div className="mt-3 p-3 bg-gray-50 rounded-lg">
                 <p className="text-sm font-medium text-gray-700 mb-2">
@@ -206,13 +271,6 @@ const EditLessonMediaModal: React.FC<EditLessonMediaModalProps> = ({
                   />
                 )}
               </div>
-            )}
-
-            {/* Text file info */}
-            {selectedFile && formData.media_type === "text" && (
-              <p className="text-sm text-gray-600 mt-1">
-                File text mới sẽ thay thế file hiện tại
-              </p>
             )}
 
             {/* Current file preview */}
@@ -246,21 +304,9 @@ const EditLessonMediaModal: React.FC<EditLessonMediaModalProps> = ({
                   )}
                 </div>
               )}
-
-            {/* Current text file info */}
-            {!selectedFile &&
-              formData.media_type === "text" &&
-              formData.media_url && (
-                <p className="text-sm text-gray-600 mt-1">
-                  File text hiện tại: {formData.media_url.split("/").pop()}
-                </p>
-              )}
           </div>
 
-          {/* Media URL - Hidden */}
-          <input type="hidden" value={formData.media_url} />
-
-          {/* Description */}
+          {/* Description & Transcription */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Mô tả (tùy chọn)
@@ -276,7 +322,6 @@ const EditLessonMediaModal: React.FC<EditLessonMediaModalProps> = ({
             />
           </div>
 
-          {/* Transcription for Video/Audio */}
           {["video", "audio"].includes(formData.media_type) && (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -289,13 +334,13 @@ const EditLessonMediaModal: React.FC<EditLessonMediaModalProps> = ({
                 }
                 rows={3}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Nội dung transcript của video/audio..."
+                placeholder="Nội dung transcript..."
               />
             </div>
           )}
         </div>
 
-        {/* Footer Buttons */}
+        {/* Footer */}
         <div className="flex justify-end space-x-2 mt-6">
           <button
             onClick={onClose}
@@ -305,8 +350,8 @@ const EditLessonMediaModal: React.FC<EditLessonMediaModalProps> = ({
           </button>
           <button
             onClick={handleSubmit}
-            disabled={!formData.media_url || uploadingFile}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center space-x-2"
+            disabled={uploadingFile}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:bg-gray-300 flex items-center space-x-2"
           >
             <Save className="h-5 w-5" />
             <span>{uploadingFile ? "Đang upload..." : "Cập nhật"}</span>

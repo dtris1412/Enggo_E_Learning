@@ -29,6 +29,8 @@ const AddLessonMediaModal: React.FC<AddLessonMediaModalProps> = ({
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>("");
 
+  const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
+
   useEffect(() => {
     if (!isOpen) {
       resetForm();
@@ -48,43 +50,103 @@ const AddLessonMediaModal: React.FC<AddLessonMediaModalProps> = ({
     setPreviewUrl("");
   };
 
+  // Danh sách định dạng file được phép theo loại media
+  const getAllowedTypes = (mediaType: string): string[] => {
+    switch (mediaType) {
+      case "video":
+        return ["video/mp4", "video/webm", "video/ogg"];
+      case "audio":
+        return [
+          "audio/mpeg",
+          "audio/mp3",
+          "audio/wav",
+          "audio/ogg",
+          "audio/webm",
+        ];
+      case "image":
+        return ["image/jpeg", "image/png", "image/gif", "image/webp"];
+      case "text":
+        return []; // Sẽ kiểm tra extension riêng
+      default:
+        return [];
+    }
+  };
+
+  const validateFile = (file: File, mediaType: string): string | null => {
+    // Kiểm tra dung lượng
+    if (file.size > MAX_FILE_SIZE) {
+      return "Dung lượng file không được vượt quá 50MB";
+    }
+
+    // Kiểm tra định dạng
+    if (mediaType === "text") {
+      const allowedExt = [".txt", ".doc", ".docx"];
+      const fileExt = "." + file.name.split(".").pop()?.toLowerCase();
+      if (!allowedExt.includes(fileExt)) {
+        return "Chỉ chấp nhận file .txt, .doc, .docx cho loại Text";
+      }
+    } else {
+      const allowedTypes = getAllowedTypes(mediaType);
+      if (!allowedTypes.includes(file.type)) {
+        return `Chỉ chấp nhận các định dạng: ${allowedTypes.join(", ")}`;
+      }
+    }
+
+    return null; // Hợp lệ
+  };
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const errorMessage = validateFile(file, formData.media_type);
+
+    if (errorMessage) {
+      setErrors((prev) => ({ ...prev, file: errorMessage }));
+      e.target.value = ""; // Xóa input file khi không hợp lệ
+      return;
+    }
+
+    // File hợp lệ
+    setSelectedFile(file);
+    setErrors((prev) => ({ ...prev, file: "" }));
+
+    // Tạo preview URL (chỉ cho media không phải text)
+    if (formData.media_type !== "text") {
+      const url = URL.createObjectURL(file);
+      setPreviewUrl(url);
+    } else {
+      setPreviewUrl("");
+    }
+  };
+
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
 
-    // All types now require a file
     if (!selectedFile) {
-      newErrors.media_url = "Vui lòng chọn file";
+      newErrors.file = "Vui lòng chọn file để thêm media";
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    // Store file for later upload
-    setSelectedFile(file);
-
-    // Create local preview URL
-    const url = URL.createObjectURL(file);
-    setPreviewUrl(url);
-  };
-
   const handleSubmit = async () => {
     if (!validateForm()) return;
 
-    let uploadedUrl = formData.media_url;
+    let uploadedUrl = "";
 
-    // Upload file if exists (for all types now including text)
     if (selectedFile) {
       uploadedUrl = await uploadFile(
         selectedFile,
         formData.media_type as "video" | "audio" | "image" | "text",
       );
+
       if (!uploadedUrl) {
-        // Upload failed
+        setErrors((prev) => ({
+          ...prev,
+          file: "Upload file thất bại. Vui lòng thử lại.",
+        }));
         return;
       }
     }
@@ -97,6 +159,14 @@ const AddLessonMediaModal: React.FC<AddLessonMediaModalProps> = ({
     if (success) {
       onSuccess();
       onClose();
+    }
+  };
+
+  const clearFileSelection = () => {
+    setSelectedFile(null);
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+      setPreviewUrl("");
     }
   };
 
@@ -116,7 +186,6 @@ const AddLessonMediaModal: React.FC<AddLessonMediaModalProps> = ({
           </button>
         </div>
 
-        {/* Form */}
         <div className="space-y-4">
           {/* Order Index */}
           <div>
@@ -147,10 +216,8 @@ const AddLessonMediaModal: React.FC<AddLessonMediaModalProps> = ({
                 setFormData({
                   ...formData,
                   media_type: e.target.value,
-                  media_url: "", // Reset URL when changing type
                 });
-                setSelectedFile(null);
-                setPreviewUrl("");
+                clearFileSelection(); // Reset file khi đổi loại
               }}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
@@ -161,7 +228,7 @@ const AddLessonMediaModal: React.FC<AddLessonMediaModalProps> = ({
             </select>
           </div>
 
-          {/* File Upload for All Types */}
+          {/* File Upload */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Upload File <span className="text-red-500">*</span>
@@ -170,24 +237,33 @@ const AddLessonMediaModal: React.FC<AddLessonMediaModalProps> = ({
               type="file"
               accept={
                 formData.media_type === "video"
-                  ? "video/*"
+                  ? "video/mp4,video/webm,video/ogg"
                   : formData.media_type === "audio"
                     ? "audio/*"
                     : formData.media_type === "image"
                       ? "image/*"
-                      : ".txt,.doc,.docx" // text files
+                      : ".txt,.doc,.docx"
               }
               onChange={handleFileUpload}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
+
+            {errors.file && (
+              <p className="text-red-500 text-sm mt-1">{errors.file}</p>
+            )}
+
             {selectedFile && (
               <p className="text-sm text-green-600 mt-1">
-                ✓ Đã chọn file: {selectedFile.name} (
+                ✓ Đã chọn: {selectedFile.name} (
                 {(selectedFile.size / 1024 / 1024).toFixed(2)} MB)
               </p>
             )}
 
-            {/* Preview Section */}
+            <p className="text-xs text-gray-500 mt-1">
+              Tối đa 50MB. Vui lòng chọn file đúng định dạng.
+            </p>
+
+            {/* Preview for non-text */}
             {previewUrl && formData.media_type !== "text" && (
               <div className="mt-3 p-3 bg-gray-50 rounded-lg">
                 <p className="text-sm font-medium text-gray-700 mb-2">
@@ -216,70 +292,63 @@ const AddLessonMediaModal: React.FC<AddLessonMediaModalProps> = ({
             {/* Text file info */}
             {selectedFile && formData.media_type === "text" && (
               <p className="text-sm text-gray-600 mt-1">
-                File text sẽ được upload và hiển thị khi xem bài học
+                File text sẽ được upload và hiển thị trong bài học
               </p>
             )}
           </div>
 
-          {/* Media URL - Hidden, auto-filled */}
-          <input type="hidden" value={formData.media_url} readOnly />
+          {/* Description */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Mô tả (tùy chọn)
+            </label>
+            <textarea
+              value={formData.description}
+              onChange={(e) =>
+                setFormData({ ...formData, description: e.target.value })
+              }
+              rows={2}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Mô tả về media này..."
+            />
+          </div>
 
-          {errors.media_url && (
-            <p className="text-sm text-red-500 mt-1">{errors.media_url}</p>
+          {/* Transcription */}
+          {["video", "audio"].includes(formData.media_type) && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Transcription (tùy chọn)
+              </label>
+              <textarea
+                value={formData.transcription}
+                onChange={(e) =>
+                  setFormData({ ...formData, transcription: e.target.value })
+                }
+                rows={3}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Nội dung transcript của video/audio..."
+              />
+            </div>
           )}
         </div>
 
-        {/* Description */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Mô tả (tùy chọn)
-          </label>
-          <textarea
-            value={formData.description}
-            onChange={(e) =>
-              setFormData({ ...formData, description: e.target.value })
-            }
-            rows={2}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Mô tả về media này..."
-          />
+        {/* Footer Buttons */}
+        <div className="flex justify-end space-x-2 mt-6">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+          >
+            Hủy
+          </button>
+          <button
+            onClick={handleSubmit}
+            disabled={uploadingFile || !selectedFile}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center space-x-2"
+          >
+            <Save className="h-5 w-5" />
+            <span>{uploadingFile ? "Đang upload..." : "Thêm Media"}</span>
+          </button>
         </div>
-
-        {/* Transcription for Video/Audio */}
-        {["video", "audio"].includes(formData.media_type) && (
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Transcription (tùy chọn)
-            </label>
-            <textarea
-              value={formData.transcription}
-              onChange={(e) =>
-                setFormData({ ...formData, transcription: e.target.value })
-              }
-              rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Nội dung transcript của video/audio..."
-            />
-          </div>
-        )}
-      </div>
-
-      {/* Footer Buttons */}
-      <div className="flex justify-end space-x-2 mt-6">
-        <button
-          onClick={onClose}
-          className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
-        >
-          Hủy
-        </button>
-        <button
-          onClick={handleSubmit}
-          disabled={uploadingFile || !selectedFile}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center space-x-2"
-        >
-          <Save className="h-5 w-5" />
-          <span>{uploadingFile ? "Đang upload..." : "Thêm"}</span>
-        </button>
       </div>
     </div>
   );
