@@ -75,7 +75,9 @@ const RecentSubscriptionsList: React.FC<RecentSubscriptionsListProps> = ({
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-gray-900">
-                  {item.User.full_name || item.User.user_name}
+                  {item.User?.full_name ||
+                    item.User?.user_name ||
+                    "Unknown User"}
                 </p>
                 <p className="text-xs text-gray-600">
                   Đăng ký gói {item.Subscription_Price.Subscription_Plan.name} •{" "}

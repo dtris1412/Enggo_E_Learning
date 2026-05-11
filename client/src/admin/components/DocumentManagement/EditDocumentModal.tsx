@@ -24,7 +24,7 @@ const EditDocumentModal: React.FC<EditDocumentModalProps> = ({
     document_url: "",
     document_size: "",
     file_type: "",
-    acess_type: "free",
+    access_type: "free",
   });
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -40,7 +40,7 @@ const EditDocumentModal: React.FC<EditDocumentModalProps> = ({
         document_url: document.document_url || "",
         document_size: document.document_size || "",
         file_type: document.file_type || "",
-        acess_type: document.acess_type || "free",
+        access_type: document.access_type || "free",
       });
     }
   }, [document]);
@@ -154,8 +154,8 @@ const EditDocumentModal: React.FC<EditDocumentModalProps> = ({
         formData.document_description,
         documentUrl,
         documentSize,
-        formData.acess_type,
         fileType,
+        formData.access_type,
       );
 
       if (success) {
@@ -180,7 +180,7 @@ const EditDocumentModal: React.FC<EditDocumentModalProps> = ({
       document_description: "",
       document_url: "",
       document_size: "",
-      acess_type: "free",
+      access_type: "free",
       file_type: "",
     });
     setSelectedFile(null);
@@ -253,13 +253,13 @@ const EditDocumentModal: React.FC<EditDocumentModalProps> = ({
               Loại truy cập <span className="text-red-500">*</span>
             </label>
             <select
-              name="acess_type"
-              value={formData.acess_type}
+              name="access_type"
+              value={formData.access_type}
               onChange={handleInputChange}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="free">Free</option>
-              <option value="pro">Pro</option>
+
               <option value="premium">Premium</option>
             </select>
           </div>

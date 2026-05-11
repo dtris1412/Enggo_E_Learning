@@ -154,8 +154,8 @@ const EditExamModal = ({
                   required
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
-                  <option value="TOEIC">TOEIC (200 câu)</option>
-                  <option value="IELTS">IELTS (40 câu)</option>
+                  <option value="TOEIC">TOEIC</option>
+                  <option value="IELTS">IELTS</option>
                 </select>
               </div>
 

@@ -26,7 +26,7 @@ const createDocument = async (req, res) => {
       document_url,
       document_size,
       file_type,
-      acess_type,
+      access_type,
     );
     if (!result.success) {
       return res.status(400).json(result);
@@ -46,7 +46,9 @@ const updateDocument = async (req, res) => {
       document_type,
       document_description,
       document_url,
-      acess_type,
+      document_size,
+      file_type,
+      access_type,
     } = req.body;
     const result = await updateDocumentService(
       document_id,
@@ -56,9 +58,7 @@ const updateDocument = async (req, res) => {
       document_url,
       document_size,
       file_type,
-      acessment_url,
-      document_size,
-      file_type,
+      access_type,
     );
     if (!result.success) {
       return res.status(400).json(result);

@@ -173,7 +173,7 @@ const OrderDetailsModal = ({
                         #{payment.payment_id} - {payment.transaction_code}
                       </p>
                       <p className="text-xs text-gray-600">
-                        {new Date(payment.created_at).toLocaleString("vi-VN")}
+                        {new Date(payment.payment_date).toLocaleString("vi-VN")}
                       </p>
                     </div>
                     <div className="text-right">

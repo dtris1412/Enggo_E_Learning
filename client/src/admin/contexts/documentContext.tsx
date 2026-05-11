@@ -18,7 +18,7 @@ interface Document {
   file_type: string | null;
   view_count: number;
   download_count: number;
-  acess_type: "free" | "premium";
+  access_type: "free" | "premium";
   created_at: string;
   updated_at: string;
 }
@@ -43,7 +43,7 @@ interface DocumentContextType {
     document_url: string,
     document_size: string,
     file_type: string,
-    acess_type?: string,
+    access_type?: string,
   ) => Promise<boolean>;
   updateDocument: (
     document_id: number,
@@ -53,7 +53,7 @@ interface DocumentContextType {
     document_url: string,
     document_size: string,
     file_type: string,
-    acess_type?: string,
+    access_type?: string,
   ) => Promise<boolean>;
   deleteDocument: (document_id: number) => Promise<boolean>;
   incrementViewCount: (document_id: number) => Promise<boolean>;
@@ -173,7 +173,7 @@ export const DocumentProvider = ({ children }: { children: ReactNode }) => {
     document_url: string,
     document_size: string,
     file_type: string,
-    acess_type?: string,
+    access_type?: string,
   ): Promise<boolean> => {
     setLoading(true);
     setError(null);
@@ -188,7 +188,7 @@ export const DocumentProvider = ({ children }: { children: ReactNode }) => {
           document_url,
           document_size,
           file_type,
-          acess_type,
+          access_type: access_type || "free",
         }),
       });
 
@@ -216,7 +216,7 @@ export const DocumentProvider = ({ children }: { children: ReactNode }) => {
     document_url: string,
     document_size: string,
     file_type: string,
-    acess_type?: string,
+    access_type?: string,
   ): Promise<boolean> => {
     setLoading(true);
     setError(null);
@@ -233,7 +233,7 @@ export const DocumentProvider = ({ children }: { children: ReactNode }) => {
             document_url,
             document_size,
             file_type,
-            acess_type,
+            access_type: access_type || "free",
           }),
         },
       );

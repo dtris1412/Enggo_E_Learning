@@ -48,10 +48,11 @@ const Header = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Fetch Subscription & Token Balance (giữ nguyên logic cũ của bạn)
+  // Fetch Subscription & Token Balance (skip for admin users - role 1)
   useEffect(() => {
     const fetchSubscription = async () => {
-      if (!user) {
+      if (!user || user.role === 1) {
+        // Skip for admin users (role 1) and non-logged-in users
         setUserSubscription("Free");
         return;
       }
@@ -70,7 +71,10 @@ const Header = () => {
     };
 
     const fetchTokenBalance = async () => {
-      if (!user) return;
+      if (!user || user.role === 1) {
+        // Skip for admin users (role 1) and non-logged-in users
+        return;
+      }
       try {
         const token = localStorage.getItem("accessToken");
         if (!token) return;
@@ -85,7 +89,7 @@ const Header = () => {
 
     fetchSubscription();
     fetchTokenBalance();
-  }, [user?.user_id]);
+  }, [user?.user_id, user?.role]);
 
   const navItems = [
     { path: "/", label: "Trang chủ" },

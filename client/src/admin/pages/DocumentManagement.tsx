@@ -301,12 +301,12 @@ const DocumentManagement: React.FC = () => {
                     <td className="px-6 py-4">
                       <span
                         className={`px-2 py-1 text-xs font-medium rounded-full ${
-                          doc.acess_type === "premium"
+                          doc.access_type === "premium"
                             ? "bg-yellow-100 text-yellow-800"
                             : "bg-green-100 text-green-800"
                         }`}
                       >
-                        {doc.acess_type || "free"}
+                        {doc.access_type || "free"}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-600">
