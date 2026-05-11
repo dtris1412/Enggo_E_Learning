@@ -102,10 +102,10 @@ const OrdersTable = ({
                           <User className="h-4 w-4 text-gray-400" />
                           <div>
                             <p className="font-medium text-gray-900">
-                              {order.User?.name || "N/A"}
+                              {order.User?.user_name || "N/A"}
                             </p>
                             <p className="text-xs text-gray-500">
-                              {order.User?.email || "N/A"}
+                              {order.User?.user_email || "N/A"}
                             </p>
                           </div>
                         </div>
@@ -133,7 +133,7 @@ const OrdersTable = ({
                       <td className="px-6 py-4 text-sm text-gray-600">
                         <div className="flex items-center gap-1">
                           <Calendar className="h-4 w-4" />
-                          {new Date(order.created_at).toLocaleDateString(
+                          {new Date(order.order_date).toLocaleDateString(
                             "vi-VN",
                           )}
                         </div>

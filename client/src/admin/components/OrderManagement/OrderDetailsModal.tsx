@@ -1,6 +1,7 @@
 import * as React from "react";
 import { X, Calendar, DollarSign, CreditCard, Package } from "lucide-react";
 import { Order } from "../../contexts/orderPaymentContext";
+import { formatCurrency } from "../../../utils/formatters";
 
 interface OrderDetailsModalProps {
   isOpen: boolean;
@@ -72,13 +73,13 @@ const OrderDetailsModal = ({
               <div>
                 <p className="text-xs text-gray-600">Ngày tạo</p>
                 <p className="text-sm font-medium text-gray-900">
-                  {new Date(order.created_at).toLocaleString("vi-VN")}
+                  {new Date(order.order_date).toLocaleString("vi-VN")}
                 </p>
               </div>
               <div>
                 <p className="text-xs text-gray-600">Cập nhật lần cuối</p>
                 <p className="text-sm font-medium text-gray-900">
-                  {new Date(order.updated_at).toLocaleString("vi-VN")}
+                  {new Date(order.order_date).toLocaleString("vi-VN")}
                 </p>
               </div>
             </div>
@@ -93,13 +94,13 @@ const OrderDetailsModal = ({
               <div>
                 <p className="text-xs text-gray-600">Tên</p>
                 <p className="text-sm font-medium text-gray-900">
-                  {order.User?.name || "N/A"}
+                  {order.User?.full_name || "N/A"}
                 </p>
               </div>
               <div>
                 <p className="text-xs text-gray-600">Email</p>
                 <p className="text-sm font-medium text-gray-900">
-                  {order.User?.email || "N/A"}
+                  {order.User?.user_email || "N/A"}
                 </p>
               </div>
             </div>
@@ -121,15 +122,7 @@ const OrderDetailsModal = ({
                 <div>
                   <p className="text-xs text-gray-600">Thời hạn</p>
                   <p className="text-sm font-medium text-gray-900">
-                    {order.Subscription_Price.duration_months || 0} tháng
-                  </p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-600">Token hàng tháng</p>
-                  <p className="text-sm font-medium text-gray-900">
-                    {order.Subscription_Price.Subscription_Plan?.monthly_ai_token_quota?.toLocaleString(
-                      "vi-VN",
-                    ) || 0}
+                    {order.Subscription_Price?.duration_months || 0} tháng
                   </p>
                 </div>
               </div>
@@ -145,21 +138,19 @@ const OrderDetailsModal = ({
               <div>
                 <p className="text-xs text-gray-600">Giá gốc</p>
                 <p className="text-sm font-medium text-gray-900">
-                  {order.Subscription_Price?.price?.toLocaleString("vi-VN") ||
-                    0}{" "}
-                  VNĐ
+                  {formatCurrency(order.Subscription_Price?.price || 0)}
                 </p>
               </div>
               <div>
                 <p className="text-xs text-gray-600">Giảm giá</p>
                 <p className="text-sm font-medium text-gray-900">
-                  {order.Subscription_Price?.discount || 0}%
+                  {order.Subscription_Price?.discount_percentage || 0}%
                 </p>
               </div>
               <div>
                 <p className="text-xs text-gray-600">Số tiền thanh toán</p>
                 <p className="text-lg font-bold text-blue-600">
-                  {order.amount.toLocaleString("vi-VN")} VNĐ
+                  {formatCurrency(order.amount)}
                 </p>
               </div>
             </div>
@@ -187,7 +178,7 @@ const OrderDetailsModal = ({
                     </div>
                     <div className="text-right">
                       <p className="text-sm font-medium text-gray-900">
-                        {payment.amount.toLocaleString("vi-VN")} VNĐ
+                        {formatCurrency(payment.amount)}
                       </p>
                       <span
                         className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${

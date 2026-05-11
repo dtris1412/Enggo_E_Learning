@@ -1,6 +1,7 @@
 import * as React from "react";
 import { X, Calendar, DollarSign, CreditCard, CheckCircle } from "lucide-react";
 import { Payment } from "../../contexts/orderPaymentContext";
+import { formatCurrency } from "../../../utils/formatters";
 
 interface PaymentDetailsModalProps {
   isOpen: boolean;
@@ -42,9 +43,9 @@ const PaymentDetailsModal = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-lg max-w-2xl w-full">
+      <div className="bg-white rounded-lg shadow-lg max-w-xl w-full max-h-[80vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 flex-shrink-0">
           <h2 className="text-lg font-semibold text-gray-900">
             Chi tiết thanh toán #{payment.payment_id}
           </h2>
@@ -57,7 +58,7 @@ const PaymentDetailsModal = ({
         </div>
 
         {/* Content */}
-        <div className="px-6 py-4 space-y-6">
+        <div className="px-6 py-4 space-y-6 overflow-y-auto flex-1">
           {/* Payment Info */}
           <div>
             <h3 className="text-sm font-semibold text-gray-900 mb-4">
@@ -118,7 +119,7 @@ const PaymentDetailsModal = ({
           <div className="bg-blue-50 rounded-lg p-4">
             <p className="text-xs text-gray-600 mb-2">Số tiền giao dịch</p>
             <p className="text-3xl font-bold text-blue-600">
-              {payment.amount.toLocaleString("vi-VN")} VNĐ
+              {formatCurrency(payment.amount)}
             </p>
           </div>
 
@@ -137,7 +138,7 @@ const PaymentDetailsModal = ({
                 <div>
                   <p className="text-sm font-medium text-gray-900">Tạo</p>
                   <p className="text-xs text-gray-600">
-                    {new Date(payment.created_at).toLocaleString("vi-VN")}
+                    {new Date(payment.payment_date).toLocaleString("vi-VN")}
                   </p>
                 </div>
               </div>
@@ -153,7 +154,7 @@ const PaymentDetailsModal = ({
                       Hoàn thành
                     </p>
                     <p className="text-xs text-gray-600">
-                      {new Date(payment.updated_at).toLocaleString("vi-VN")}
+                      {new Date(payment.payment_date).toLocaleString("vi-VN")}
                     </p>
                   </div>
                 </div>
@@ -178,7 +179,7 @@ const PaymentDetailsModal = ({
                   <div>
                     <p className="text-xs text-gray-600">Số tiền</p>
                     <p className="text-sm font-medium text-gray-900">
-                      {payment.Order.amount?.toLocaleString("vi-VN") || 0} VNĐ
+                      {formatCurrency(payment.Order.amount || 0)}
                     </p>
                   </div>
                   <div className="col-span-2">
@@ -198,7 +199,7 @@ const PaymentDetailsModal = ({
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-gray-200 bg-gray-50 flex justify-end">
+        <div className="px-6 py-4 border-t border-gray-200 bg-gray-50 flex justify-end flex-shrink-0">
           <button
             onClick={onClose}
             className="px-4 py-2 text-gray-600 hover:text-gray-900 font-medium"

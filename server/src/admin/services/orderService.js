@@ -22,6 +22,7 @@ export const getAllOrders = async (
       {
         model: User,
         attributes: ["user_id", "user_name", "full_name", "user_email"],
+        required: false,
       },
       {
         model: Subscription_Price,
@@ -31,10 +32,12 @@ export const getAllOrders = async (
           "price",
           "discount_percentage",
         ],
+        required: false,
         include: [
           {
             model: Subscription_Plan,
             attributes: ["subscription_plan_id", "name", "code"],
+            required: false,
           },
         ],
       },
@@ -48,14 +51,25 @@ export const getAllOrders = async (
           { user_email: { [db.Sequelize.Op.like]: `%${search}%` } },
         ],
       };
+      include[0].required = true; // Only require User if searching
     }
 
     const { count, rows } = await Order.findAndCountAll({
+      attributes: [
+        "order_id",
+        "user_id",
+        "subscription_price_id",
+        "status",
+        "amount",
+        "content",
+        "order_date",
+      ],
       where,
       include,
       offset,
       limit,
       order: [["order_date", "DESC"]],
+      raw: false,
     });
 
     return {

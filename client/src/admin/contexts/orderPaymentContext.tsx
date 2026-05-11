@@ -15,22 +15,24 @@ export interface Order {
   subscription_price_id: number;
   status: "pending" | "completed" | "failed";
   amount: number;
-  created_at: string;
-  updated_at: string;
+  order_date: string;
+  content?: string;
   User?: {
     user_id: number;
-    name: string;
-    email: string;
+    user_name: string;
+    full_name: string;
+    user_email: string;
   };
   Subscription_Price?: {
-    price_id: number;
+    subscription_price_id: number;
     duration_months?: number;
     price: number;
-    discount: number;
+    discount_percentage: number;
+    billing_type: string;
     Subscription_Plan?: {
-      plan_id: number;
+      subscription_plan_id: number;
       name: string;
-      monthly_ai_token_quota: number;
+      code: string;
     };
   };
   Payments?: Payment[];
@@ -39,13 +41,13 @@ export interface Order {
 export interface Payment {
   payment_id: number;
   order_id: number;
-  payment_method: "credit_card" | "paypal" | "bank_transfer";
+  payment_method: "momo" | "vnpay";
   provider: string;
   transaction_code: string;
   amount: number;
   status: "pending" | "completed" | "failed";
-  created_at: string;
-  updated_at: string;
+  payment_date: string;
+  content?: string;
   Order?: Order;
 }
 

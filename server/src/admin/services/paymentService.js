@@ -26,6 +26,16 @@ export const getAllPayments = async (
     }
 
     const { count, rows } = await Payment.findAndCountAll({
+      attributes: [
+        "payment_id",
+        "order_id",
+        "payment_method",
+        "provider",
+        "transaction_code",
+        "amount",
+        "status",
+        "payment_date",
+      ],
       where,
       include: [
         {
@@ -37,6 +47,7 @@ export const getAllPayments = async (
             "status",
             "amount",
             "content",
+            "order_date",
           ],
           include: [
             {

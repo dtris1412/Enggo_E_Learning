@@ -131,7 +131,7 @@ const PaymentsTable = ({
                       <td className="px-6 py-4 text-sm text-gray-600">
                         <div className="flex items-center gap-1">
                           <Calendar className="h-4 w-4" />
-                          {new Date(payment.created_at).toLocaleDateString(
+                          {new Date(payment.payment_date).toLocaleDateString(
                             "vi-VN",
                           )}
                         </div>
