@@ -156,7 +156,7 @@ const register = async (
       return {
         success: false,
         message:
-          "Password must be at least 6 characters long, contain at least one uppercase letter, one lowercase letter, and one digit.",
+          "Mật khẩu phải có ít nhất 6 ký tự, chứa ít nhất một chữ hoa, một chữ thường và một chữ số.",
       };
     }
 
@@ -170,7 +170,7 @@ const register = async (
     if (existingUser) {
       return {
         success: false,
-        message: "Username or email already exists.",
+        message: "Email hoặc tên người dùng đã tồn tại.",
       };
     }
 
@@ -186,7 +186,7 @@ const register = async (
       delete otpStore[user_email];
       return {
         success: false,
-        message: "Failed to send OTP email. Please try again.",
+        message: "Lỗi gửi email OTP. Vui lòng thử lại sau.",
       };
     }
 
@@ -206,7 +206,8 @@ const register = async (
     console.log(`OTP sent to ${user_email}`);
     return {
       success: true,
-      message: "OTP sent to your email. Please verify within 5 minutes.",
+      message:
+        "OTP đã được gửi đến email của bạn. Vui lòng xác minh trong vòng 5 phút.",
     };
   } catch (err) {
     console.error("Error in register service:", err);
@@ -220,16 +221,16 @@ const verifyEmail = async (user_email, otp) => {
     // Check if OTP exists and is valid
     const record = otpStore[user_email];
     if (!record) {
-      return { success: false, message: "No OTP found for this email" };
+      return { success: false, message: "Không tìm thấy OTP cho email này" };
     }
 
     if (record.expiresAt < Date.now()) {
       delete otpStore[user_email];
-      return { success: false, message: "OTP has expired" };
+      return { success: false, message: "OTP đã hết hạn" };
     }
 
     if (record.otp !== otp) {
-      return { success: false, message: "Invalid OTP" };
+      return { success: false, message: "OTP không hợp lệ" };
     }
 
     // Get stored registration data
@@ -238,7 +239,7 @@ const verifyEmail = async (user_email, otp) => {
       delete otpStore[user_email];
       return {
         success: false,
-        message: "Invalid registration data. Please register again.",
+        message: "Dữ liệu đăng ký không hợp lệ. Vui lòng đăng ký lại.",
       };
     }
 
@@ -252,7 +253,7 @@ const verifyEmail = async (user_email, otp) => {
       return {
         success: false,
         message:
-          "Email already registered. Please login instead or use a different email.",
+          "Email đã được đăng ký. Vui lòng đăng nhập hoặc sử dụng email khác.",
       };
     }
 
@@ -370,7 +371,7 @@ const verifyEmail = async (user_email, otp) => {
 
     return {
       success: true,
-      message: "Email verified successfully. Welcome to Enggo Learning!",
+      message: "Email đã được xác minh và tài khoản đã được tạo thành công.",
       user: newUser,
       accessToken,
       refreshToken,
@@ -385,13 +386,13 @@ const login = async (user_name, user_password) => {
   try {
     console.log("AuthService login called with:", user_name);
     const user = await db.User.findOne({ where: { user_name } });
-    if (!user) return { success: false, message: "User not found" };
+    if (!user) return { success: false, message: "Người dùng không tồn tại" };
 
     // Check if email is verified
     if (!user.email_verified_at) {
       return {
         success: false,
-        message: "Please verify your email before logging in.",
+        message: "Vui lòng xác minh email của bạn trước khi đăng nhập.",
       };
     }
 
@@ -400,14 +401,14 @@ const login = async (user_name, user_password) => {
       user_password,
       user.user_password,
     );
-    if (!isMatchPassword)
-      return { success: false, message: "Incorrect password" };
+    if (!isMatchPassword) return { success: false, message: "Sai mật khẩu" };
 
     // Check user status
     if (!user.user_status) {
       return {
         success: false,
-        message: "User account is deactivated. Please contact support.",
+        message:
+          "Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ hỗ trợ.",
       };
     }
 
@@ -425,7 +426,7 @@ const login = async (user_name, user_password) => {
     );
     return {
       success: true,
-      message: "Login successful",
+      message: "Đăng nhập thành công",
       user,
       accessToken,
       refreshToken,
@@ -468,7 +469,10 @@ const refreshToken = async (refreshToken) => {
     return { success: true, accessToken: newAccessToken };
   } catch (error) {
     console.error("Refresh token error:", error);
-    return { success: false, message: "Invalid or expired refresh token" };
+    return {
+      success: false,
+      message: "Token làm mới không hợp lệ hoặc đã hết hạn",
+    };
   }
 };
 

@@ -18,6 +18,8 @@ import {
   verifyOTP,
   resetPassword,
   socialLoginCallBack,
+  checkUsernameAvailability,
+  checkEmailAvailability,
 } from "../controllers/authController.js";
 
 const router = express.Router();
@@ -32,6 +34,8 @@ const initSharedRoutes = (app) => {
   router.post("/api/auth/forgot-password", forgotPassword);
   router.post("/api/auth/verify-otp", verifyOTP);
   router.post("/api/auth/reset-password", resetPassword);
+  router.get("/api/auth/check-username", checkUsernameAvailability);
+  router.get("/api/auth/check-email", checkEmailAvailability);
   // Social Auth Routes - Google
   router.get(
     "/api/auth/google",

@@ -9,6 +9,7 @@ import {
   verifyOTP as verifyOTPService,
 } from "../services/authService.js";
 import jwt from "jsonwebtoken";
+import db from "../../models/index.js";
 const forgotPassword = async (req, res) => {
   try {
     const { user_email } = req.body;
@@ -187,6 +188,68 @@ const socialLoginCallBack = (req, res) => {
   }
 };
 
+const checkUsernameAvailability = async (req, res) => {
+  try {
+    const { username } = req.query;
+
+    if (!username) {
+      return res.status(400).json({
+        success: false,
+        available: false,
+        message: "Username is required",
+      });
+    }
+
+    const result = await db.User.findOne({
+      where: { user_name: username },
+      attributes: ["user_id"],
+    });
+
+    res.status(200).json({
+      success: true,
+      available: !result,
+    });
+  } catch (err) {
+    console.error("Error in check username availability controller:", err);
+    res.status(500).json({
+      success: false,
+      available: false,
+      message: "Internal server error",
+    });
+  }
+};
+
+const checkEmailAvailability = async (req, res) => {
+  try {
+    const { email } = req.query;
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        available: false,
+        message: "Email is required",
+      });
+    }
+
+    const result = await db.User.findOne({
+      where: { user_email: email },
+      attributes: ["user_id"],
+    });
+
+    res.status(200).json({
+      success: true,
+      available: !result,
+    });
+  } catch (err) {
+    console.error("Error in check email availability controller:", err);
+    res.status(500).json({
+      success: false,
+      available: false,
+      message: "Internal server error",
+    });
+  }
+};
+
 export {
   register,
   verifyEmail,
@@ -197,4 +260,6 @@ export {
   verifyOTP,
   resetPassword,
   socialLoginCallBack,
+  checkUsernameAvailability,
+  checkEmailAvailability,
 };
