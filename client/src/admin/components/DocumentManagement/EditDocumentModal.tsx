@@ -209,7 +209,7 @@ const EditDocumentModal: React.FC<EditDocumentModalProps> = ({
         <div className="flex items-center justify-between p-6 border-b border-gray-200 sticky top-0 bg-white">
           <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
             <FileText className="w-6 h-6 text-blue-600" />
-            Edit Document
+            Chỉnh sửa tài liệu
           </h2>
           <button
             onClick={handleClose}
@@ -224,7 +224,7 @@ const EditDocumentModal: React.FC<EditDocumentModalProps> = ({
           {/* Document Type */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Document Type <span className="text-red-500">*</span>
+              Loại tài liệu <span className="text-red-500">*</span>
             </label>
             <select
               name="document_type"
@@ -234,11 +234,11 @@ const EditDocumentModal: React.FC<EditDocumentModalProps> = ({
                 errors.document_type ? "border-red-500" : "border-gray-300"
               }`}
             >
-              <option value="">Select type</option>
-              <option value="learning">Learning Material</option>
-              <option value="reference">Reference</option>
-              <option value="guideline">Guideline</option>
-              <option value="other">Other</option>
+              <option value="">Chọn loại</option>
+              <option value="learning">Tài liệu học tập</option>
+              <option value="reference">Tài liệu tham khảo</option>
+              <option value="guideline">Hướng dẫn</option>
+              <option value="other">Khác</option>
             </select>
             {errors.document_type && (
               <p className="text-red-500 text-sm mt-1">
@@ -250,7 +250,7 @@ const EditDocumentModal: React.FC<EditDocumentModalProps> = ({
           {/* Access Type */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Access Type <span className="text-red-500">*</span>
+              Loại truy cập <span className="text-red-500">*</span>
             </label>
             <select
               name="acess_type"
@@ -259,6 +259,7 @@ const EditDocumentModal: React.FC<EditDocumentModalProps> = ({
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="free">Free</option>
+              <option value="pro">Pro</option>
               <option value="premium">Premium</option>
             </select>
           </div>
@@ -268,7 +269,7 @@ const EditDocumentModal: React.FC<EditDocumentModalProps> = ({
           {/* Current File Info */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Current File
+              Tệp hiện tại
             </label>
             <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
               <div className="flex items-center justify-between">
@@ -292,7 +293,7 @@ const EditDocumentModal: React.FC<EditDocumentModalProps> = ({
                   className="text-blue-600 hover:text-blue-700 flex items-center gap-1"
                 >
                   <ExternalLink className="w-4 h-4" />
-                  <span className="text-sm">View</span>
+                  <span className="text-sm">Xem</span>
                 </a>
               </div>
             </div>
@@ -301,7 +302,7 @@ const EditDocumentModal: React.FC<EditDocumentModalProps> = ({
           {/* Replace File */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Replace File (Optional)
+              Thay thế tệp (Tùy chọn)
             </label>
             <div className="space-y-3">
               <input
@@ -311,8 +312,8 @@ const EditDocumentModal: React.FC<EditDocumentModalProps> = ({
                 className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
               />
               <p className="text-xs text-gray-500">
-                Supported formats: PDF, DOCX, DOC, MP3, WAV, OGG, WebM (Max
-                50MB)
+                Định dạng được hỗ trợ: PDF, DOCX, DOC, MP3, WAV, OGG, WebM (Tối
+                đa 50MB)
               </p>
 
               {selectedFile && (
@@ -341,14 +342,14 @@ const EditDocumentModal: React.FC<EditDocumentModalProps> = ({
           {/* Document Name */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Document Name <span className="text-red-500">*</span>
+              Tên tài liệu <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
               name="document_name"
               value={formData.document_name}
               onChange={handleInputChange}
-              placeholder="Enter document name"
+              placeholder="Nhập tên tài liệu"
               className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                 errors.document_name ? "border-red-500" : "border-gray-300"
               }`}
@@ -363,13 +364,13 @@ const EditDocumentModal: React.FC<EditDocumentModalProps> = ({
           {/* Description */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Description
+              Mô tả tài liệu
             </label>
             <textarea
               name="document_description"
               value={formData.document_description}
               onChange={handleInputChange}
-              placeholder="Enter document description (optional)"
+              placeholder="Nhập mô tả tài liệu (tùy chọn)"
               rows={4}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
@@ -382,7 +383,7 @@ const EditDocumentModal: React.FC<EditDocumentModalProps> = ({
               onClick={handleClose}
               className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
             >
-              Cancel
+              Hủy
             </button>
             <button
               type="submit"
@@ -392,10 +393,10 @@ const EditDocumentModal: React.FC<EditDocumentModalProps> = ({
               {isSubmitting ? (
                 <>
                   <Loader className="w-4 h-4 animate-spin" />
-                  Updating...
+                  Đang cập nhật...
                 </>
               ) : (
-                "Update Document"
+                "Cập nhật Tài liệu"
               )}
             </button>
           </div>

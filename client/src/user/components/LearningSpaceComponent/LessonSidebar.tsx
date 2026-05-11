@@ -51,132 +51,149 @@ const LessonSidebar: React.FC = () => {
 
       {/* Modules & Lessons List */}
       <div className="p-3">
-        {course.Modules?.sort((a, b) => a.order_index - b.order_index).map(
-          (module, moduleIndex) => (
-            <div key={module.module_id} className="mb-3">
-              {/* Module Header */}
-              <div className="flex items-start gap-2 mb-2 p-2 bg-slate-50 rounded-lg">
-                <span className="flex-shrink-0 w-6 h-6 bg-violet-600 text-white rounded-full flex items-center justify-center text-xs font-semibold">
-                  {moduleIndex + 1}
-                </span>
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-slate-900 text-xs mb-0.5">
-                    {module.module_title}
-                  </h3>
-                  <p className="text-xs text-slate-600">
-                    {module.Module_Lessons?.length || 0} bài học •{" "}
-                    {module.estimated_time} phút
-                  </p>
-                </div>
+        {course.Modules?.sort(
+          (a: any, b: any) => a.order_index - b.order_index,
+        ).map((module: any, moduleIndex: number) => (
+          <div key={module.module_id} className="mb-3">
+            {/* Module Header */}
+            <div className="flex items-start gap-2 mb-2 p-2 bg-slate-50 rounded-lg">
+              <span className="flex-shrink-0 w-6 h-6 bg-violet-600 text-white rounded-full flex items-center justify-center text-xs font-semibold">
+                {moduleIndex + 1}
+              </span>
+              <div className="flex-1 min-w-0">
+                <h3 className="font-semibold text-slate-900 text-xs mb-0.5">
+                  {module.module_title}
+                </h3>
+                <p className="text-xs text-slate-600">
+                  {module.Module_Lessons?.length || 0} bài học •{" "}
+                  {module.estimated_time} phút
+                </p>
               </div>
-
-              {/* Lessons in Module */}
-              {module.Module_Lessons?.sort(
-                (a, b) => a.order_index - b.order_index,
-              ).map((moduleLesson, lessonIndex) => {
-                const isActive =
-                  currentModuleLesson?.module_lesson_id ===
-                  moduleLesson.module_lesson_id;
-                const isCompleted = moduleLesson.status;
-
-                return (
-                  <button
-                    key={moduleLesson.module_lesson_id}
-                    onClick={() => selectLesson(moduleLesson.module_lesson_id)}
-                    className={`w-full flex items-center gap-2 p-2 rounded-lg transition-all mb-1.5 text-left group ${
-                      isActive
-                        ? "bg-violet-600 text-white shadow-md"
-                        : "hover:bg-slate-100"
-                    }`}
-                  >
-                    {/* Lesson Icon */}
-                    <div className="flex-shrink-0">
-                      {isCompleted ? (
-                        <CheckCircle
-                          className={`h-4 w-4 ${
-                            isActive ? "text-white" : "text-green-500"
-                          }`}
-                        />
-                      ) : (
-                        <Circle
-                          className={`h-4 w-4 ${
-                            isActive ? "text-white" : "text-slate-400"
-                          }`}
-                        />
-                      )}
-                    </div>
-
-                    {/* Lesson Content */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-1.5 mb-0.5">
-                        {getLessonIcon(moduleLesson.Lesson.lesson_type)}
-                        <span
-                          className={`text-xs font-medium ${
-                            isActive ? "text-white" : "text-slate-500"
-                          }`}
-                        >
-                          Bài {lessonIndex + 1}
-                        </span>
-                      </div>
-                      <h4
-                        className={`text-xs font-medium ${
-                          isActive ? "text-white" : "text-slate-900"
-                        } truncate`}
-                      >
-                        {moduleLesson.Lesson.lesson_title}
-                      </h4>
-                      <p
-                        className={`text-xs ${
-                          isActive ? "text-violet-100" : "text-slate-500"
-                        } mt-0.5`}
-                      >
-                        {moduleLesson.Lesson.estimated_time} phút
-                      </p>
-                    </div>
-
-                    {/* Arrow indicator */}
-                    {isActive && (
-                      <ChevronRight className="h-4 w-4 text-white flex-shrink-0" />
-                    )}
-                  </button>
-                );
-              })}
             </div>
-          ),
-        )}
+
+            {/* Lessons in Module */}
+            {module.Module_Lessons?.sort(
+              (a: any, b: any) => a.order_index - b.order_index,
+            ).map((moduleLesson: any, lessonIndex: number) => {
+              const isActive =
+                currentModuleLesson?.module_lesson_id ===
+                moduleLesson.module_lesson_id;
+              // Check if user completed the lesson - handle both boolean and 0/1 from DB
+              const userProgress =
+                moduleLesson.Lesson?.User_Lesson_Progress?.[0];
+              const isCompleted =
+                userProgress &&
+                (userProgress.is_completed === true ||
+                  userProgress.is_completed === 1);
+
+              return (
+                <button
+                  key={moduleLesson.module_lesson_id}
+                  onClick={() => selectLesson(moduleLesson.module_lesson_id)}
+                  className={`w-full flex items-center gap-2 p-2 rounded-lg transition-all mb-1.5 text-left group ${
+                    isActive
+                      ? "bg-violet-600 text-white shadow-md"
+                      : "hover:bg-slate-100"
+                  }`}
+                >
+                  {/* Lesson Icon */}
+                  <div className="flex-shrink-0">
+                    {isCompleted ? (
+                      <CheckCircle
+                        className={`h-4 w-4 ${
+                          isActive ? "text-white" : "text-green-500"
+                        }`}
+                      />
+                    ) : (
+                      <Circle
+                        className={`h-4 w-4 ${
+                          isActive ? "text-white" : "text-slate-400"
+                        }`}
+                      />
+                    )}
+                  </div>
+
+                  {/* Lesson Content */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1.5 mb-0.5">
+                      {getLessonIcon(moduleLesson.Lesson.lesson_type)}
+                      <span
+                        className={`text-xs font-medium ${
+                          isActive ? "text-white" : "text-slate-500"
+                        }`}
+                      >
+                        Bài {lessonIndex + 1}
+                      </span>
+                    </div>
+                    <h4
+                      className={`text-xs font-medium ${
+                        isActive ? "text-white" : "text-slate-900"
+                      } truncate`}
+                    >
+                      {moduleLesson.Lesson.lesson_title}
+                    </h4>
+                    <p
+                      className={`text-xs ${
+                        isActive ? "text-violet-100" : "text-slate-500"
+                      } mt-0.5`}
+                    >
+                      {moduleLesson.Lesson.estimated_time} phút
+                    </p>
+                  </div>
+
+                  {/* Arrow indicator */}
+                  {isActive && (
+                    <ChevronRight className="h-4 w-4 text-white flex-shrink-0" />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        ))}
       </div>
 
       {/* Progress Summary */}
       <div className="p-3 border-t border-slate-200 bg-slate-50">
         <div className="text-xs text-slate-600">
           <p className="font-medium text-slate-900 mb-1.5">Tiến độ khóa học</p>
-          <div className="w-full bg-slate-200 rounded-full h-2 mb-2">
-            <div
-              className="bg-violet-600 h-2 rounded-full transition-all duration-300"
-              style={{
-                width: `${
-                  course.Modules?.reduce((acc, m) => {
-                    const completed =
-                      m.Module_Lessons?.filter((ml) => ml.status).length || 0;
-                    return acc + completed;
-                  }, 0) || 0
-                }%`,
-              }}
-            />
-          </div>
-          <p className="text-xs text-slate-500">
-            {course.Modules?.reduce((acc, m) => {
-              const completed =
-                m.Module_Lessons?.filter((ml) => ml.status).length || 0;
-              return acc + completed;
-            }, 0) || 0}{" "}
-            /{" "}
-            {course.Modules?.reduce(
-              (acc, m) => acc + (m.Module_Lessons?.length || 0),
-              0,
-            ) || 0}{" "}
-            bài học hoàn thành
-          </p>
+          {(() => {
+            const totalCompleted =
+              course.Modules?.reduce((acc: number, m: any) => {
+                const completed =
+                  m.Module_Lessons?.filter((ml: any) => {
+                    const progress = ml.Lesson?.User_Lesson_Progress?.[0];
+                    return (
+                      progress &&
+                      (progress.is_completed === true ||
+                        progress.is_completed === 1)
+                    );
+                  }).length || 0;
+                return acc + completed;
+              }, 0) || 0;
+            const totalLessons =
+              course.Modules?.reduce(
+                (acc: number, m: any) => acc + (m.Module_Lessons?.length || 0),
+                0,
+              ) || 0;
+            const progressPercentage =
+              totalLessons > 0 ? (totalCompleted / totalLessons) * 100 : 0;
+
+            return (
+              <>
+                <div className="w-full bg-slate-200 rounded-full h-2 mb-2">
+                  <div
+                    className="bg-violet-600 h-2 rounded-full transition-all duration-300"
+                    style={{
+                      width: `${progressPercentage}%`,
+                    }}
+                  />
+                </div>
+                <p className="text-xs text-slate-500">
+                  {totalCompleted} / {totalLessons} bài học hoàn thành
+                </p>
+              </>
+            );
+          })()}
         </div>
       </div>
     </div>

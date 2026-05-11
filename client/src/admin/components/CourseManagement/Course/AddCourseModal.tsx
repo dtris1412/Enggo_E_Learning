@@ -149,9 +149,9 @@ const AddCourseModal: React.FC<AddCourseModalProps> = ({
               }
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             >
-              <option value="Beginner">Cơ bản</option>
-              <option value="Intermediate">Trung cấp</option>
-              <option value="Advanced">Nâng cao</option>
+              <option value="Beginner">Beginner</option>
+              <option value="Intermediate">Intermediate</option>
+              <option value="Advanced">Advanced</option>
             </select>
           </div>
 

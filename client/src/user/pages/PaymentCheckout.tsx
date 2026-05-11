@@ -214,66 +214,6 @@ const PaymentCheckout = () => {
               </div>
             </div>
 
-            {/* VNPay */}
-            <div
-              onClick={() => setSelectedMethod("vnpay")}
-              className={`bg-slate-800 border-2 rounded-xl p-6 cursor-pointer transition-all ${
-                selectedMethod === "vnpay"
-                  ? "border-blue-500 shadow-lg shadow-blue-500/20"
-                  : "border-slate-700 hover:border-slate-600"
-              }`}
-            >
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-16 h-16 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <Building2 className="w-8 h-8 text-blue-600" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-white">VNPay</h3>
-                  <p className="text-sm text-slate-400">
-                    Thanh toán qua thẻ ATM/Visa/Mastercard
-                  </p>
-                </div>
-                {selectedMethod === "vnpay" && (
-                  <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
-                    <svg
-                      className="w-4 h-4 text-white"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                  </div>
-                )}
-              </div>
-
-              {/* Bank Selection */}
-              {selectedMethod === "vnpay" && (
-                <div className="mt-4 pt-4 border-t border-slate-700">
-                  <label className="block text-sm font-medium text-slate-300 mb-2">
-                    Chọn ngân hàng (tùy chọn)
-                  </label>
-                  <select
-                    value={selectedBank}
-                    onChange={(e) => setSelectedBank(e.target.value)}
-                    className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500"
-                  >
-                    <option value="">Tất cả phương thức</option>
-                    <option value="NCB">Ngân hàng NCB</option>
-                    <option value="BIDV">Ngân hàng BIDV</option>
-                    <option value="VIETCOMBANK">Vietcombank</option>
-                    <option value="TECHCOMBANK">Techcombank</option>
-                    <option value="VNPAYQR">Thanh toán QR</option>
-                  </select>
-                </div>
-              )}
-            </div>
-
             {/* Credit Card (Coming Soon) */}
             <div className="bg-slate-800 border-2 border-slate-700 rounded-xl p-6 opacity-50 cursor-not-allowed">
               <div className="flex items-center gap-4">

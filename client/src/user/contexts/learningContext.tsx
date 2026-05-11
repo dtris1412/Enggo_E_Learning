@@ -38,6 +38,19 @@ interface Lesson {
   is_exam_format: boolean;
   Lesson_Media?: LessonMedia[];
   Lesson_Questions?: LessonQuestion[];
+  User_Lesson_Progress?: LessonProgress[];
+}
+
+interface LessonProgress {
+  user_lesson_progress_id?: number;
+  user_id?: number;
+  lesson_id: number;
+  started_at?: string | null;
+  completed_at?: string | null;
+  progress_percentage: number;
+  is_completed: boolean;
+  created_at?: string;
+  updated_at?: string;
 }
 
 interface ModuleLesson {
@@ -67,18 +80,6 @@ interface Course {
   tag: string;
   access_type: "free" | "premium";
   Modules?: Module[];
-}
-
-interface LessonProgress {
-  user_lesson_progress_id?: number;
-  user_id?: number;
-  lesson_id: number;
-  started_at?: string | null;
-  completed_at?: string | null;
-  progress_percentage: number;
-  is_completed: boolean;
-  created_at?: string;
-  updated_at?: string;
 }
 
 interface LearningContextType {

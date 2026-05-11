@@ -149,7 +149,7 @@ const FlashcardListModal: React.FC<FlashcardListModalProps> = ({
               {flashcardSet?.title}
             </h2>
             <p className="text-sm text-gray-500 mt-1">
-              Manage flashcards ({flashcards.length} cards)
+              Quản lý flashcards ({flashcards.length} cards)
             </p>
           </div>
           <button
@@ -169,7 +169,7 @@ const FlashcardListModal: React.FC<FlashcardListModalProps> = ({
               className="mb-4 flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
               <Plus className="w-5 h-5" />
-              Add New Flashcard
+              Thêm Flashcard Mới
             </button>
           )}
 
@@ -180,12 +180,12 @@ const FlashcardListModal: React.FC<FlashcardListModalProps> = ({
               className="mb-6 p-4 border-2 border-blue-300 rounded-lg bg-blue-50"
             >
               <h3 className="text-lg font-semibold mb-4 text-gray-800">
-                Add New Flashcard
+                Thêm Flashcard Mới
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Front Content <span className="text-red-500">*</span>
+                    Mặt trước <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -199,7 +199,7 @@ const FlashcardListModal: React.FC<FlashcardListModalProps> = ({
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Back Content <span className="text-red-500">*</span>
+                    Mặt sau <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -213,7 +213,7 @@ const FlashcardListModal: React.FC<FlashcardListModalProps> = ({
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Pronunciation
+                    Phát âm
                   </label>
                   <input
                     type="text"
@@ -226,7 +226,7 @@ const FlashcardListModal: React.FC<FlashcardListModalProps> = ({
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Difficulty Level
+                    Mức độ khó
                   </label>
                   <select
                     value={newCard.difficulty_level}
@@ -245,7 +245,7 @@ const FlashcardListModal: React.FC<FlashcardListModalProps> = ({
                 </div>
                 <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Example
+                    Ví dụ
                   </label>
                   <textarea
                     value={newCard.example}
@@ -275,7 +275,7 @@ const FlashcardListModal: React.FC<FlashcardListModalProps> = ({
                   }}
                   className="px-4 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300"
                 >
-                  Cancel
+                  Hủy
                 </button>
                 <button
                   type="submit"
@@ -285,12 +285,12 @@ const FlashcardListModal: React.FC<FlashcardListModalProps> = ({
                   {loading ? (
                     <>
                       <Loader2 className="w-5 h-5 animate-spin" />
-                      Adding...
+                      Đang thêm...
                     </>
                   ) : (
                     <>
                       <Plus className="w-5 h-5" />
-                      Add Card
+                      Thêm Card
                     </>
                   )}
                 </button>
@@ -320,7 +320,7 @@ const FlashcardListModal: React.FC<FlashcardListModalProps> = ({
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Front Content
+                            Mặt trước
                           </label>
                           <input
                             type="text"
@@ -336,7 +336,7 @@ const FlashcardListModal: React.FC<FlashcardListModalProps> = ({
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Back Content
+                            Mặt sau
                           </label>
                           <input
                             type="text"
@@ -352,7 +352,7 @@ const FlashcardListModal: React.FC<FlashcardListModalProps> = ({
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Pronunciation
+                            Phát âm
                           </label>
                           <input
                             type="text"
@@ -368,7 +368,7 @@ const FlashcardListModal: React.FC<FlashcardListModalProps> = ({
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Difficulty Level
+                            Mức độ khó
                           </label>
                           <select
                             value={editCard.difficulty_level}
@@ -387,7 +387,7 @@ const FlashcardListModal: React.FC<FlashcardListModalProps> = ({
                         </div>
                         <div className="md:col-span-2">
                           <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Example
+                            Ví dụ
                           </label>
                           <textarea
                             value={editCard.example}
@@ -407,14 +407,14 @@ const FlashcardListModal: React.FC<FlashcardListModalProps> = ({
                           onClick={cancelEdit}
                           className="px-3 py-1 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300"
                         >
-                          Cancel
+                          Hủy
                         </button>
                         <button
                           onClick={() => handleEditCard(card.flashcard_id)}
                           className="px-3 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
                         >
                           <Save className="w-4 h-4" />
-                          Save
+                          Lưu
                         </button>
                       </div>
                     </div>
@@ -485,7 +485,7 @@ const FlashcardListModal: React.FC<FlashcardListModalProps> = ({
             onClick={onClose}
             className="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
           >
-            Close
+            Đóng
           </button>
         </div>
       </div>

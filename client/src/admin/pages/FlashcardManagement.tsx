@@ -153,11 +153,8 @@ const FlashcardManagement: React.FC = () => {
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-gray-800 mb-2">
-          Flashcard Management
+          Quản lý Flashcard
         </h1>
-        <p className="text-gray-600">
-          Manage and organize your flashcard sets and cards
-        </p>
       </div>
 
       {/* Search and Filters */}
@@ -170,7 +167,7 @@ const FlashcardManagement: React.FC = () => {
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <input
                   type="text"
-                  placeholder="Search flashcard sets..."
+                  placeholder="Tìm kiếm bộ flashcard..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -185,7 +182,7 @@ const FlashcardManagement: React.FC = () => {
                 onChange={(e) => setVisibilityFilter(e.target.value)}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
-                <option value="">All Visibility</option>
+                <option value="">Tất cả</option>
                 <option value="public">Public</option>
                 <option value="private">Private</option>
                 <option value="shared">Shared</option>
@@ -199,7 +196,7 @@ const FlashcardManagement: React.FC = () => {
                 onChange={(e) => setCreatedByTypeFilter(e.target.value)}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
-                <option value="">All Sources</option>
+                <option value="">Tất cả</option>
                 <option value="admin">Admin</option>
                 <option value="user">User</option>
                 <option value="AI">AI</option>
@@ -213,7 +210,7 @@ const FlashcardManagement: React.FC = () => {
               className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
               <Plus className="w-5 h-5" />
-              Add Set
+              Thêm Bộ
             </button>
           </div>
         </form>
@@ -244,25 +241,25 @@ const FlashcardManagement: React.FC = () => {
                     ID
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Title
+                    Tiêu đề
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Description
+                    Mô tả
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Cards
+                    Thẻ
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Learners
+                    Số người học
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Visibility
+                    Chế độ
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Created By
+                    Tạo bởi
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Actions
+                    Thao tác
                   </th>
                 </tr>
               </thead>
@@ -273,10 +270,10 @@ const FlashcardManagement: React.FC = () => {
                       <div className="flex flex-col items-center justify-center text-gray-500">
                         <BookOpen className="w-12 h-12 mb-2 text-gray-400" />
                         <p className="text-lg font-medium">
-                          No flashcard sets found
+                          Không có flashcard nào
                         </p>
                         <p className="text-sm">
-                          Create your first flashcard set to get started
+                          Tạo bộ flashcard đầu tiên của bạn để bắt đầu
                         </p>
                       </div>
                     </td>

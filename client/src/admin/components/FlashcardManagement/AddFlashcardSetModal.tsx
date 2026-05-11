@@ -112,7 +112,7 @@ const AddFlashcardSetModal: React.FC<AddFlashcardSetModalProps> = ({
           {/* Title */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Title <span className="text-red-500">*</span>
+              Tiêu đề <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -120,7 +120,7 @@ const AddFlashcardSetModal: React.FC<AddFlashcardSetModalProps> = ({
               value={formData.title}
               onChange={handleChange}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="Enter flashcard set title"
+              placeholder="Nhập tiêu đề bộ flashcard"
               required
             />
           </div>
@@ -128,7 +128,7 @@ const AddFlashcardSetModal: React.FC<AddFlashcardSetModalProps> = ({
           {/* Description */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Description
+              Mô tả
             </label>
             <textarea
               name="description"
@@ -136,14 +136,14 @@ const AddFlashcardSetModal: React.FC<AddFlashcardSetModalProps> = ({
               onChange={handleChange}
               rows={3}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="Enter flashcard set description"
+              placeholder="Nhập mô tả bộ flashcard"
             />
           </div>
 
           {/* Source Type */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Creation Method
+              Phương pháp tạo
             </label>
             <select
               name="source_type"
@@ -151,13 +151,13 @@ const AddFlashcardSetModal: React.FC<AddFlashcardSetModalProps> = ({
               onChange={handleChange}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
-              <option value="manual">Manual (Create Empty Set)</option>
-              <option value="exam">From Exam (AI Generated)</option>
+              <option value="manual">Tạo thủ công</option>
+              <option value="exam">Từ bài thi (được tạo bởi AI)</option>
             </select>
             {formData.source_type === "exam" && (
               <p className="text-xs text-blue-600 mt-1 flex items-center gap-1">
                 <Sparkles className="w-3 h-3" />
-                AI will automatically generate flashcards from selected exam
+                Chọn bài thi để AI tự động tạo flashcard cho bạn!
               </p>
             )}
           </div>
@@ -166,7 +166,7 @@ const AddFlashcardSetModal: React.FC<AddFlashcardSetModalProps> = ({
           {formData.source_type === "exam" && (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Select Exam <span className="text-red-500">*</span>
+                Chọn bài thi <span className="text-red-500">*</span>
               </label>
               <select
                 name="exam_id"
@@ -175,9 +175,9 @@ const AddFlashcardSetModal: React.FC<AddFlashcardSetModalProps> = ({
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 required
               >
-                <option value="">-- Choose an exam --</option>
+                <option value="">-- Chọn bài thi --</option>
                 {examsLoading ? (
-                  <option disabled>Loading exams...</option>
+                  <option disabled>Đang tải...</option>
                 ) : (
                   exams?.map((exam) => (
                     <option key={exam.exam_id} value={exam.exam_id}>
@@ -192,7 +192,7 @@ const AddFlashcardSetModal: React.FC<AddFlashcardSetModalProps> = ({
           {/* Visibility */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Visibility
+              Quyền truy cập
             </label>
             <select
               name="visibility"
@@ -210,7 +210,7 @@ const AddFlashcardSetModal: React.FC<AddFlashcardSetModalProps> = ({
           {formData.source_type === "manual" && (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Assign to User ID (Optional)
+                Gán cho người dùng (User ID)
               </label>
               <input
                 type="number"
@@ -218,11 +218,11 @@ const AddFlashcardSetModal: React.FC<AddFlashcardSetModalProps> = ({
                 value={formData.user_id}
                 onChange={handleChange}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Leave empty to assign to yourself"
+                placeholder="Nhập User ID (để trống nếu tạo cho chính bạn)"
               />
               <p className="text-xs text-gray-500 mt-1">
-                Leave empty to create for yourself. Only admins can assign to
-                other users.
+                Chỉ áp dụng khi tạo thủ công. Để trống nếu bạn muốn tạo cho
+                chính mình.
               </p>
             </div>
           )}
@@ -235,7 +235,7 @@ const AddFlashcardSetModal: React.FC<AddFlashcardSetModalProps> = ({
               className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
               disabled={loading}
             >
-              Cancel
+              Hủy
             </button>
             <button
               type="submit"
@@ -245,10 +245,10 @@ const AddFlashcardSetModal: React.FC<AddFlashcardSetModalProps> = ({
               {loading ? (
                 <>
                   <Loader2 className="w-5 h-5 animate-spin" />
-                  Creating...
+                  Đang tạo...
                 </>
               ) : (
-                "Create Set"
+                "Tạo Bộ"
               )}
             </button>
           </div>

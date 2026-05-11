@@ -153,7 +153,7 @@ const CompareSubscriptions = () => {
         <div className="mt-12 max-w-4xl mx-auto">
           <div className="bg-gradient-to-r from-blue-900/50 to-purple-900/50 backdrop-blur-sm rounded-lg p-6 border border-blue-700/50">
             <h3 className="text-xl font-semibold text-white mb-4">
-              💡 Gợi ý chọn gói
+              Gợi ý chọn gói
             </h3>
             <div className="grid md:grid-cols-3 gap-4 text-sm text-slate-300">
               <div>
@@ -163,13 +163,13 @@ const CompareSubscriptions = () => {
                 </p>
               </div>
               <div>
-                <span className="font-semibold text-purple-400">Standard:</span>
+                <span className="font-semibold text-purple-400">Pro:</span>
                 <p className="mt-1">
                   Tốt cho người học cá nhân muốn nâng cao kỹ năng
                 </p>
               </div>
               <div>
-                <span className="font-semibold text-yellow-400">Pro:</span>
+                <span className="font-semibold text-yellow-400">Premium:</span>
                 <p className="mt-1">
                   Hoàn hảo cho người học chuyên nghiệp và AI credits cao
                 </p>

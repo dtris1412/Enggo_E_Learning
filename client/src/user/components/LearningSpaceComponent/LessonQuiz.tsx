@@ -176,7 +176,7 @@ export const LessonQuiz = ({ questions, onComplete }: LessonQuizProps) => {
   return (
     <div className="mt-6 border-t pt-6">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-bold">✏️ Kiểm tra kiến thức</h2>
+        <h2 className="text-xl font-bold">Kiểm tra kiến thức</h2>
         <span className="text-slate-600">{questions.length} câu hỏi</span>
       </div>
 

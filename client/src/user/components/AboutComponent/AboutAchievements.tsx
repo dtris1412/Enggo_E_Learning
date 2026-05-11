@@ -25,7 +25,6 @@ const AboutAchievements: React.FC = () => {
               key={index}
               className="bg-white/10 backdrop-blur-sm p-8 rounded-2xl border border-white/20 hover:bg-white/20 transition-all duration-300"
             >
-              <div className="text-4xl mb-4">{item.emoji}</div>
               <h3 className="text-xl font-black mb-2">{item.title}</h3>
               <p className="text-blue-100 text-sm leading-relaxed">
                 {item.description}

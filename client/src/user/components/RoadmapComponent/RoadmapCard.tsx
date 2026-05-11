@@ -42,13 +42,13 @@ const RoadmapCard: React.FC<RoadmapCardProps> = ({ roadmap }) => {
   const getLevelIcon = (level: string) => {
     switch (level.toLowerCase()) {
       case "beginner":
-        return "🌱";
+        return "";
       case "intermediate":
-        return "🚀";
+        return "";
       case "advanced":
-        return "⭐";
+        return "";
       default:
-        return "📚";
+        return "";
     }
   };
 

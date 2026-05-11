@@ -86,6 +86,19 @@ const formatUsersData = async (filters = {}) => {
     whereClause.user_status = filters.user_status;
   }
 
+  // Add date range filter
+  if (filters.from_date || filters.to_date) {
+    whereClause.created_at = {};
+    if (filters.from_date) {
+      whereClause.created_at[Op.gte] = new Date(filters.from_date);
+    }
+    if (filters.to_date) {
+      const toDate = new Date(filters.to_date);
+      toDate.setHours(23, 59, 59, 999);
+      whereClause.created_at[Op.lte] = toDate;
+    }
+  }
+
   const users = await db.User.findAll({
     where: whereClause,
     order: [["created_at", "DESC"]],
@@ -119,6 +132,19 @@ const formatCoursesData = async (filters = {}) => {
     whereClause.course_status = filters.course_status;
   }
 
+  // Add date range filter
+  if (filters.from_date || filters.to_date) {
+    whereClause.created_at = {};
+    if (filters.from_date) {
+      whereClause.created_at[Op.gte] = new Date(filters.from_date);
+    }
+    if (filters.to_date) {
+      const toDate = new Date(filters.to_date);
+      toDate.setHours(23, 59, 59, 999);
+      whereClause.created_at[Op.lte] = toDate;
+    }
+  }
+
   const courses = await db.Course.findAll({
     where: whereClause,
     order: [["created_at", "DESC"]],
@@ -150,6 +176,19 @@ const formatLessonsData = async (filters = {}) => {
 
   if (filters.lesson_status !== undefined) {
     whereClause.lesson_status = filters.lesson_status;
+  }
+
+  // Add date range filter
+  if (filters.from_date || filters.to_date) {
+    whereClause.created_at = {};
+    if (filters.from_date) {
+      whereClause.created_at[Op.gte] = new Date(filters.from_date);
+    }
+    if (filters.to_date) {
+      const toDate = new Date(filters.to_date);
+      toDate.setHours(23, 59, 59, 999);
+      whereClause.created_at[Op.lte] = toDate;
+    }
   }
 
   const lessons = await db.Lesson.findAll({
@@ -193,6 +232,19 @@ const formatExamsData = async (filters = {}) => {
     whereClause.exam_type = filters.exam_type;
   }
 
+  // Add date range filter
+  if (filters.from_date || filters.to_date) {
+    whereClause.created_at = {};
+    if (filters.from_date) {
+      whereClause.created_at[Op.gte] = new Date(filters.from_date);
+    }
+    if (filters.to_date) {
+      const toDate = new Date(filters.to_date);
+      toDate.setHours(23, 59, 59, 999);
+      whereClause.created_at[Op.lte] = toDate;
+    }
+  }
+
   const exams = await db.Exam.findAll({
     where: whereClause,
     include: [
@@ -230,6 +282,19 @@ const formatBlogsData = async (filters = {}) => {
 
   if (filters.blog_status) {
     whereClause.blog_status = filters.blog_status;
+  }
+
+  // Add date range filter
+  if (filters.from_date || filters.to_date) {
+    whereClause.created_at = {};
+    if (filters.from_date) {
+      whereClause.created_at[Op.gte] = new Date(filters.from_date);
+    }
+    if (filters.to_date) {
+      const toDate = new Date(filters.to_date);
+      toDate.setHours(23, 59, 59, 999);
+      whereClause.created_at[Op.lte] = toDate;
+    }
   }
 
   const blogs = await db.Blog.findAll({
@@ -278,6 +343,19 @@ const formatDocumentsData = async (filters = {}) => {
 
   if (filters.document_type) {
     whereClause.document_type = filters.document_type;
+  }
+
+  // Add date range filter
+  if (filters.from_date || filters.to_date) {
+    whereClause.created_at = {};
+    if (filters.from_date) {
+      whereClause.created_at[Op.gte] = new Date(filters.from_date);
+    }
+    if (filters.to_date) {
+      const toDate = new Date(filters.to_date);
+      toDate.setHours(23, 59, 59, 999);
+      whereClause.created_at[Op.lte] = toDate;
+    }
   }
 
   const documents = await db.Document.findAll({

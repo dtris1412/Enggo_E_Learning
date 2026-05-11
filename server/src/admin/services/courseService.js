@@ -149,7 +149,7 @@ const getCoursePaginated = async (
     where: whereConditions,
     limit: Number(limit),
     offset,
-    order: [["course_id", "ASC"]],
+    order: [["course_id", "DESC"]],
     attributes: {
       include: [
         [

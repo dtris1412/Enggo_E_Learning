@@ -86,7 +86,7 @@ const EditFlashcardSetModal: React.FC<EditFlashcardSetModalProps> = ({
         <div className="flex justify-between items-center p-6 border-b border-gray-200">
           <div>
             <h2 className="text-2xl font-bold text-gray-800">
-              Edit Flashcard Set
+              Chỉnh sửa bộ flashcard
             </h2>
             <p className="text-sm text-gray-500 mt-1">
               ID: #{flashcardSet?.flashcard_set_id}
@@ -105,7 +105,7 @@ const EditFlashcardSetModal: React.FC<EditFlashcardSetModalProps> = ({
           {/* Title */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Title <span className="text-red-500">*</span>
+              Tiêu đề <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -113,7 +113,7 @@ const EditFlashcardSetModal: React.FC<EditFlashcardSetModalProps> = ({
               value={formData.title}
               onChange={handleChange}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="Enter flashcard set title"
+              placeholder="Nhập tiêu đề bộ flashcard"
               required
             />
           </div>
@@ -121,7 +121,7 @@ const EditFlashcardSetModal: React.FC<EditFlashcardSetModalProps> = ({
           {/* Description */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Description
+              Mô tả
             </label>
             <textarea
               name="description"
@@ -129,14 +129,14 @@ const EditFlashcardSetModal: React.FC<EditFlashcardSetModalProps> = ({
               onChange={handleChange}
               rows={3}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="Enter flashcard set description"
+              placeholder="Nhập mô tả bộ flashcard"
             />
           </div>
 
           {/* Source Type */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Source Type
+              Loại nguồn
             </label>
             <select
               name="source_type"
@@ -144,11 +144,11 @@ const EditFlashcardSetModal: React.FC<EditFlashcardSetModalProps> = ({
               onChange={handleChange}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
-              <option value="manual">Manual</option>
-              <option value="lesson">Lesson</option>
-              <option value="exam">Exam</option>
-              <option value="document">Document</option>
-              <option value="AI">AI Generated</option>
+              <option value="manual">Thủ công</option>
+              <option value="lesson">Bài học</option>
+              <option value="exam">Kỳ thi</option>
+              <option value="document">Tài liệu</option>
+              <option value="AI">Tạo bởi AI</option>
             </select>
           </div>
 
@@ -172,7 +172,7 @@ const EditFlashcardSetModal: React.FC<EditFlashcardSetModalProps> = ({
           {/* Visibility */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Visibility
+              Tính khả dụng
             </label>
             <select
               name="visibility"
@@ -189,29 +189,29 @@ const EditFlashcardSetModal: React.FC<EditFlashcardSetModalProps> = ({
           {/* Metadata Info (Read-only) */}
           <div className="bg-gray-50 p-4 rounded-lg space-y-2">
             <h3 className="text-sm font-medium text-gray-700 mb-2">
-              Metadata (Read-only)
+              Thông tin bộ flashcard
             </h3>
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
-                <span className="text-gray-600">Owner User ID:</span>
+                <span className="text-gray-600">ID chủ sở hữu:</span>
                 <span className="ml-2 font-semibold text-gray-900">
                   {flashcardSet?.user_id || "-"}
                 </span>
               </div>
               <div>
-                <span className="text-gray-600">Created By:</span>
+                <span className="text-gray-600">Tạo bởi:</span>
                 <span className="ml-2 font-semibold text-gray-900">
                   {flashcardSet?.created_by_type || "-"}
                 </span>
               </div>
               <div>
-                <span className="text-gray-600">Total Cards:</span>
+                <span className="text-gray-600">Tổng số thẻ:</span>
                 <span className="ml-2 font-semibold text-gray-900">
                   {flashcardSet?.total_cards || 0}
                 </span>
               </div>
               <div>
-                <span className="text-gray-600">Created:</span>
+                <span className="text-gray-600">Tạo vào:</span>
                 <span className="ml-2 font-semibold text-gray-900">
                   {flashcardSet?.created_at
                     ? new Date(flashcardSet.created_at).toLocaleDateString()
@@ -229,7 +229,7 @@ const EditFlashcardSetModal: React.FC<EditFlashcardSetModalProps> = ({
               className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
               disabled={loading}
             >
-              Cancel
+              Hủy
             </button>
             <button
               type="submit"
@@ -239,10 +239,10 @@ const EditFlashcardSetModal: React.FC<EditFlashcardSetModalProps> = ({
               {loading ? (
                 <>
                   <Loader2 className="w-5 h-5 animate-spin" />
-                  Updating...
+                  Đang cập nhật...
                 </>
               ) : (
-                "Update Set"
+                "Cập nhật Bộ thẻ"
               )}
             </button>
           </div>

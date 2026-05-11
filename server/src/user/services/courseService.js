@@ -68,7 +68,7 @@ const getCoursesPaginated = async (
   };
 };
 
-const getCourseById = async (course_id) => {
+const getCourseById = async (course_id, user_id = null) => {
   if (!course_id) {
     return { success: false, message: "Course ID is required." };
   }
@@ -107,6 +107,22 @@ const getCourseById = async (course_id) => {
                   "difficulty_level",
                   "is_exam_format",
                 ],
+                ...(user_id
+                  ? {
+                      include: [
+                        {
+                          model: db.User_Lesson_Progress,
+                          attributes: [
+                            "user_lesson_progress_id",
+                            "user_id",
+                            "is_completed",
+                            "progress_percentage",
+                          ],
+                          required: false,
+                        },
+                      ],
+                    }
+                  : {}),
               },
             ],
           },
@@ -121,6 +137,22 @@ const getCourseById = async (course_id) => {
 
   if (!course) {
     return { success: false, message: "Course not found." };
+  }
+
+  // Filter user progress at application level
+  if (user_id && course.Modules) {
+    course.Modules.forEach((module) => {
+      if (module.Module_Lessons) {
+        module.Module_Lessons.forEach((ml) => {
+          if (ml.Lesson && ml.Lesson.User_Lesson_Progress) {
+            ml.Lesson.User_Lesson_Progress =
+              ml.Lesson.User_Lesson_Progress.filter(
+                (p) => p.user_id === user_id,
+              );
+          }
+        });
+      }
+    });
   }
 
   return { success: true, data: course };

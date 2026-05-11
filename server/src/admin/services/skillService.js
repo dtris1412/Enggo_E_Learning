@@ -67,7 +67,7 @@ const getSkillsPaginated = async (search, limit = 10, page = 1) => {
     ],
     limit: Number(limit),
     offset,
-    order: [["created_at", "ASC"]],
+    order: [["created_at", "DESC"]],
   });
   return {
     success: true,

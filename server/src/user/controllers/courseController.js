@@ -41,8 +41,9 @@ const getCoursesPaginated = async (req, res) => {
 const getCourseById = async (req, res) => {
   try {
     const { course_id } = req.params;
+    const user_id = req.user?.user_id; // Get user_id from auth token
 
-    const result = await getCourseByIdService(course_id);
+    const result = await getCourseByIdService(course_id, user_id);
 
     if (!result.success) {
       return res.status(404).json(result);

@@ -128,10 +128,10 @@ const DocumentManagement: React.FC = () => {
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-gray-800 mb-2">
-          Document Management
+          Quản lý tài liệu
         </h1>
         <p className="text-gray-600">
-          Manage and organize your documents, files, and resources
+          Quản lý tất cả tài liệu học tập, bao gồm thêm mới, chỉnh sửa, xóa và
         </p>
       </div>
 
@@ -145,7 +145,7 @@ const DocumentManagement: React.FC = () => {
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <input
                   type="text"
-                  placeholder="Search documents..."
+                  placeholder="Tìm kiếm tài liệu..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -160,11 +160,11 @@ const DocumentManagement: React.FC = () => {
                 onChange={(e) => setDocumentTypeFilter(e.target.value)}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
-                <option value="">All Types</option>
-                <option value="learning">Learning Material</option>
-                <option value="reference">Reference</option>
-                <option value="guideline">Guideline</option>
-                <option value="other">Other</option>
+                <option value="">Tất cả</option>
+                <option value="learning">Tài liệu học tập</option>
+                <option value="reference">Tài liệu tham khảo</option>
+                <option value="guideline">Hướng dẫn</option>
+                <option value="other">Khác</option>
               </select>
             </div>
 
@@ -175,7 +175,7 @@ const DocumentManagement: React.FC = () => {
                 onChange={(e) => setFileTypeFilter(e.target.value)}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
-                <option value="">All Files</option>
+                <option value="">Tất cả</option>
                 <option value="pdf">PDF</option>
                 <option value="docx">DOCX</option>
                 <option value="audio">Audio</option>
@@ -198,7 +198,7 @@ const DocumentManagement: React.FC = () => {
                 className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 whitespace-nowrap"
               >
                 <Plus className="w-5 h-5" />
-                Add Document
+                Thêm Tài Liệu
               </button>
             </div>
           </div>
@@ -219,31 +219,31 @@ const DocumentManagement: React.FC = () => {
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Document
+                  Tài liệu
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Type
+                  Loại
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Access
+                  Truy cập
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  File Type
+                  Loại Tập tin
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Size
+                  Kích thước
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Views
+                  Lượt xem
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Downloads
+                  Lượt tải
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Created
+                  Ngày tạo
                 </th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
+                  Thao tác
                 </th>
               </tr>
             </thead>
@@ -263,7 +263,7 @@ const DocumentManagement: React.FC = () => {
                     className="px-6 py-12 text-center text-gray-500"
                   >
                     <FileText className="w-12 h-12 mx-auto mb-2 text-gray-300" />
-                    <p>No documents found</p>
+                    <p>Không có tài liệu nào</p>
                   </td>
                 </tr>
               ) : (

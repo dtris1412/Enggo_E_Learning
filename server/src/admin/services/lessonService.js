@@ -9,7 +9,7 @@ const createLesson = async (
   is_exam_format,
   estimated_time,
   skill_id,
-  lesson_status
+  lesson_status,
 ) => {
   if (!lesson_title || !lesson_type || !difficulty_level || !skill_id) {
     return { success: false, message: "Required fields are missing." };
@@ -46,7 +46,7 @@ const updateLessonById = async (
   lesson_content,
   is_exam_format,
   estimated_time,
-  skill_id
+  skill_id,
 ) => {
   const lesson = await db.Lesson.findByPk(lesson_id);
   if (!lesson) {
@@ -77,7 +77,7 @@ const getLessonsPaginated = async (
   lesson_type,
   difficulty_level,
   is_exam_format,
-  lesson_status
+  lesson_status,
 ) => {
   const Op = db.Sequelize.Op;
   const offset = (Number(page) - 1) * Number(limit);
@@ -111,7 +111,7 @@ const getLessonsPaginated = async (
 
     limit: Number(limit),
     offset,
-    order: [["created_at", "ASC"]],
+    order: [["created_at", "DESC"]],
   });
   return {
     success: true,

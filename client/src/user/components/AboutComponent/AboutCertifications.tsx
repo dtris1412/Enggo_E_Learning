@@ -23,7 +23,6 @@ const AboutCertifications: React.FC = () => {
               key={index}
               className="group bg-white rounded-2xl border border-slate-200 p-8 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 text-center"
             >
-              <div className="text-5xl mb-4">{cert.emoji}</div>
               <h3 className="text-2xl font-black text-slate-900 mb-3">
                 {cert.name}
               </h3>

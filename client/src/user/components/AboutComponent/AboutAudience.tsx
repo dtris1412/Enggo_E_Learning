@@ -26,7 +26,6 @@ const AboutAudience: React.FC = () => {
                 key={index}
                 className="group bg-white rounded-2xl border border-slate-200 p-6 text-center hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
               >
-                <div className="text-4xl mb-3">{item.emoji}</div>
                 <div className="font-black text-slate-900">{item.title}</div>
                 <p className="text-sm text-slate-500 mt-1">
                   {item.description}

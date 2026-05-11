@@ -154,8 +154,8 @@ const getUsersPaginated = async (
     limit: Number(limit),
     offset,
     order: [
-      ["role", "ASC"],
-      ["user_id", "ASC"],
+      ["role", "DESC"],
+      ["user_id", "DESC"],
     ],
   });
 
