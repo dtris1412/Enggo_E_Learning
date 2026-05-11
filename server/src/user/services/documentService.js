@@ -98,7 +98,7 @@ const incrementDownloadCount = async (document_id, user_id) => {
     const activeSubscription = await db.User_Subscription.findOne({
       where: {
         user_id: user_id,
-        status: "active",
+        status: ["active", "canceled"],
       },
       include: [
         {

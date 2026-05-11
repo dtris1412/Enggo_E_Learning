@@ -16,7 +16,7 @@ export const getUserSubscriptionPlan = async (userId) => {
     const subscription = await User_Subscription.findOne({
       where: {
         user_id: userId,
-        status: "active",
+        status: ["active", "canceled"],
       },
       include: [
         {
@@ -102,7 +102,7 @@ export const getUserSubscriptionInfo = async (userId) => {
     const subscription = await User_Subscription.findOne({
       where: {
         user_id: userId,
-        status: "active",
+        status: ["active", "canceled"],
       },
       include: [
         {

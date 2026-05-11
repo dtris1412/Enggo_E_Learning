@@ -289,10 +289,20 @@ const SubscriptionInfo: React.FC = () => {
                 Trạng thái
               </span>
               {isPremium ? (
-                <span className="px-3 py-1 bg-white/20 rounded-full text-xs font-medium">
+                <span
+                  className={`px-3 py-1 rounded-full text-xs font-medium ${
+                    activeSubscription.status === "active"
+                      ? "bg-green-100/30 text-white"
+                      : activeSubscription.status === "canceled"
+                        ? "bg-slate-100/30 text-white"
+                        : "bg-red-100/30 text-white"
+                  }`}
+                >
                   {activeSubscription.status === "active"
                     ? "Đang hoạt động"
-                    : "Hết hạn"}
+                    : activeSubscription.status === "canceled"
+                      ? "Đã hủy"
+                      : "Hết hạn"}
                 </span>
               ) : (
                 getStatusBadge(activeSubscription.status)
@@ -315,24 +325,32 @@ const SubscriptionInfo: React.FC = () => {
             </div>
 
             {/* Days Remaining */}
-            {activeSubscription.status === "active" && (
-              <div
-                className={`text-center py-3 rounded-lg ${
-                  isPremium ? "bg-white/10" : "bg-violet-50"
-                }`}
-              >
+            {(activeSubscription.status === "active" ||
+              activeSubscription.status === "canceled") &&
+              daysRemaining > 0 && (
                 <div
-                  className={`text-2xl font-bold ${isPremium ? "text-white" : "text-violet-600"}`}
+                  className={`text-center py-3 rounded-lg ${
+                    isPremium ? "bg-white/10" : "bg-violet-50"
+                  }`}
                 >
-                  {daysRemaining}
+                  <div
+                    className={`text-2xl font-bold ${
+                      isPremium ? "text-white" : "text-violet-600"
+                    }`}
+                  >
+                    {daysRemaining}
+                  </div>
+                  <div
+                    className={`text-xs ${
+                      isPremium ? "text-white/80" : "text-slate-600"
+                    }`}
+                  >
+                    {activeSubscription.status === "canceled"
+                      ? "ngày còn sử dụng"
+                      : "ngày còn lại"}
+                  </div>
                 </div>
-                <div
-                  className={`text-xs ${isPremium ? "text-white/80" : "text-slate-600"}`}
-                >
-                  ngày còn lại
-                </div>
-              </div>
-            )}
+              )}
           </div>
 
           {/* Action Buttons */}
@@ -455,8 +473,19 @@ const SubscriptionInfo: React.FC = () => {
               </p>
               <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
                 <p className="text-sm text-yellow-800">
-                  {activeSubscription.expired_at &&
-                  new Date(activeSubscription.expired_at) <= new Date() ? (
+                  {activeSubscription.status === "canceled" ? (
+                    <>
+                      ℹ️ Gói của bạn đã bị hủy. Bạn vẫn có thể sử dụng tính năng
+                      Premium đến hết ngày{" "}
+                      <span className="font-semibold">
+                        {new Date(
+                          activeSubscription.expired_at,
+                        ).toLocaleDateString("vi-VN")}
+                      </span>
+                      . Sau đó tài khoản sẽ chuyển về gói Free.
+                    </>
+                  ) : activeSubscription.expired_at &&
+                    new Date(activeSubscription.expired_at) <= new Date() ? (
                     <>
                       ⚠️ Gói của bạn đã hết hạn. Hủy gói sẽ chuyển tài khoản
                       sang gói Free ngay và cấp token miễn phí.
@@ -645,7 +674,9 @@ const SubscriptionInfo: React.FC = () => {
                           • Trạng thái:{" "}
                           {activeSubscription.status === "active"
                             ? "Đang hoạt động"
-                            : "Hết hạn"}
+                            : activeSubscription.status === "canceled"
+                              ? "Đã hủy"
+                              : "Hết hạn"}
                         </p>
                       </div>
                     </div>

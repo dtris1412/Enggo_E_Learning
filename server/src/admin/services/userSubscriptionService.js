@@ -8,7 +8,7 @@ export const getUserActiveSubscription = async (userId) => {
     const subscription = await User_Subscription.findOne({
       where: {
         user_id: userId,
-        status: "active",
+        status: ["active", "canceled"],
       },
       include: [
         {
@@ -287,15 +287,10 @@ export const updateExpiredSubscriptions = async () => {
 
     const expiredSubscriptions = await User_Subscription.findAll({
       where: {
-        status: "active",
+        status: ["active", "canceled"],
         expired_at: { [db.sequelize.Op.lt]: now },
       },
     });
-
-    for (const subscription of expiredSubscriptions) {
-      subscription.status = "expired";
-      await subscription.save();
-    }
 
     return {
       updatedCount: expiredSubscriptions.length,

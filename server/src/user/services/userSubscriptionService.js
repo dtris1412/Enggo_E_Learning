@@ -10,7 +10,7 @@ export const getUserActiveSubscription = async (userId) => {
     const subscription = await User_Subscription.findOne({
       where: {
         user_id: userId,
-        status: "active",
+        status: ["active", "canceled"],
       },
       attributes: [
         "user_subscription_id",
@@ -519,10 +519,10 @@ export const handleExpiredSubscriptions = async () => {
   try {
     const now = new Date();
 
-    // Find all active subscriptions that have expired
+    // Find all active or canceled subscriptions that have expired
     const expiredSubscriptions = await User_Subscription.findAll({
       where: {
-        status: "active",
+        status: ["active", "canceled"],
         expired_at: { [Op.lte]: now },
       },
       include: [

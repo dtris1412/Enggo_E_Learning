@@ -60,7 +60,7 @@ export const initSubscriptionCronJobs = () => {
       const { Op } = await import("sequelize");
       const upcomingSubscriptions = await User_Subscription.findAll({
         where: {
-          status: "active",
+          status: ["active", "canceled"],
           expired_at: {
             [Op.gt]: now,
             [Op.lte]: sevenDaysLater,
