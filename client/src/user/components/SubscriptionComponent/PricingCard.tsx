@@ -53,20 +53,24 @@ const PricingCard = ({
     navigate(`/payment/checkout?plan=${price.subscription_price_id}`);
   };
 
-  // Calculate original price if there's a discount
-  const getOriginalPrice = () => {
-    if (!price || !price.discount_percentage) return null;
-    return Math.round(price.price / (1 - price.discount_percentage / 100));
-  };
+  // Calculate discounted price (price is base price in DB)
+  const discountedPrice = (() => {
+    if (!price) return null;
+    if (!price.discount_percentage || price.discount_percentage === 0) {
+      return price.price; // No discount, return base price
+    }
+    const discount = (price.price * price.discount_percentage) / 100;
+    return Math.round(price.price - discount);
+  })();
 
   // Get renewal price (same as current price for monthly, different calculation for yearly)
-  const getRenewalPrice = () => {
-    if (!price) return null;
+  const renewalPrice = (() => {
+    if (!discountedPrice) return null;
     if (billingType === "yearly") {
-      return Math.round(price.price / 12); // Monthly equivalent
+      return Math.round(discountedPrice / 12); // Monthly equivalent
     }
-    return price.price;
-  };
+    return discountedPrice;
+  })();
 
   // Card styling based on plan
   const getCardStyle = () => {
@@ -81,9 +85,6 @@ const PricingCard = ({
         return "bg-gradient-to-br from-slate-900 to-slate-800 border-slate-700";
     }
   };
-
-  const originalPrice = getOriginalPrice();
-  const renewalPrice = getRenewalPrice();
 
   return (
     <div
@@ -131,7 +132,7 @@ const PricingCard = ({
           <>
             <div className="mb-1.5">
               <span className="text-3xl font-bold text-white">
-                {formatCurrency(price.price, { showCurrency: false })}
+                {formatCurrency(discountedPrice, { showCurrency: false })}
               </span>
               <span className="text-xs text-slate-400 ml-1">
                 VNĐ/{" "}
@@ -143,9 +144,9 @@ const PricingCard = ({
               </span>
             </div>
 
-            {originalPrice && (
+            {price.discount_percentage > 0 && (
               <div className="text-slate-400 line-through text-xs mb-1">
-                {formatCurrency(originalPrice)}
+                {formatCurrency(price.price)}
               </div>
             )}
 

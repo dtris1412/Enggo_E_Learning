@@ -115,25 +115,26 @@ const SubscriptionPlans = () => {
 
         {/* Pricing Cards Grid */}
         {!loading && !error && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mt-8 max-w-5xl mx-auto">
+          <div className="flex flex-wrap justify-center gap-5 mt-8">
             {plans.map((plan) => {
               // Get the first price for the selected billing type
-              const price = plan.Subscription_Prices[0];
+              const price = plan.Subscription_Prices?.[0];
 
               // Determine if this is the popular plan (usually "Pro")
               const isPopular = plan.code === "pro";
 
               return (
-                <PricingCard
-                  key={plan.subscription_plan_id}
-                  name={plan.name}
-                  code={plan.code}
-                  price={price}
-                  features={plan.features}
-                  monthlyTokens={plan.monthly_ai_token_quota}
-                  isPopular={isPopular}
-                  billingType={billingType}
-                />
+                <div key={plan.subscription_plan_id} className="w-full sm:w-80">
+                  <PricingCard
+                    name={plan.name}
+                    code={plan.code}
+                    price={price}
+                    features={plan.features}
+                    monthlyTokens={plan.monthly_ai_token_quota}
+                    isPopular={isPopular}
+                    billingType={billingType}
+                  />
+                </div>
               );
             })}
           </div>

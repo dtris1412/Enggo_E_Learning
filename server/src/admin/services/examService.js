@@ -12,9 +12,35 @@ const generateExamCode = (exam_type) => {
   return `${prefix}${randomSuffix}`;
 };
 
-// Helper: Lấy số câu hỏi mặc định theo loại đề
-const getDefaultTotalQuestions = (exam_type) => {
-  return exam_type === "TOEIC" ? 200 : 40; // TOEIC: 200 câu, IELTS: 40 câu
+// Helper: Tính tổng số câu hỏi từ các container của một đề thi
+const calculateTotalQuestions = async (exam_id) => {
+  const exam = await db.Exam.findByPk(exam_id, {
+    include: [
+      {
+        model: db.Exam_Container,
+        attributes: ["container_id"],
+        include: [
+          {
+            model: db.Container_Question,
+            attributes: ["container_question_id"],
+          },
+        ],
+      },
+    ],
+  });
+
+  if (!exam) return 0;
+
+  let totalQuestions = 0;
+  if (exam.Exam_Containers) {
+    exam.Exam_Containers.forEach((container) => {
+      if (container.Container_Questions) {
+        totalQuestions += container.Container_Questions.length;
+      }
+    });
+  }
+
+  return totalQuestions;
 };
 
 const createExam = async (examData) => {
@@ -64,9 +90,9 @@ const createExam = async (examData) => {
   // Auto-generate year nếu không được cung cấp
   const finalYear = year || new Date().getFullYear();
 
-  // Auto-generate total_questions dựa vào exam_type nếu không được cung cấp
-  const finalTotalQuestions =
-    total_questions || getDefaultTotalQuestions(exam_type);
+  // total_questions sẽ được tính dựa trên các container/câu hỏi
+  // Nếu chưa có container, mặc định là 0
+  const finalTotalQuestions = total_questions || 0;
 
   const newExam = await db.Exam.create({
     exam_title,
@@ -99,6 +125,16 @@ const getExamById = async (exam_id) => {
         model: db.Exam_Media,
         attributes: ["media_id", "audio_url", "duration"],
       },
+      {
+        model: db.Exam_Container,
+        attributes: ["container_id"],
+        include: [
+          {
+            model: db.Container_Question,
+            attributes: ["container_question_id"],
+          },
+        ],
+      },
     ],
   });
 
@@ -106,10 +142,22 @@ const getExamById = async (exam_id) => {
     return { success: false, message: "Exam not found." };
   }
 
+  // Tính tổng số câu từ các container
+  const examData = exam.toJSON();
+  let totalQuestions = 0;
+  if (examData.Exam_Containers) {
+    examData.Exam_Containers.forEach((container) => {
+      if (container.Container_Questions) {
+        totalQuestions += container.Container_Questions.length;
+      }
+    });
+  }
+  examData.total_questions = totalQuestions;
+
   return {
     success: true,
     message: "Exam retrieved successfully",
-    data: exam,
+    data: examData,
   };
 };
 
@@ -152,17 +200,42 @@ const getExamsPaginated = async (
         model: db.Certificate,
         attributes: ["certificate_id", "certificate_name"],
       },
+      {
+        model: db.Exam_Container,
+        attributes: ["container_id"],
+        include: [
+          {
+            model: db.Container_Question,
+            attributes: ["container_question_id"],
+          },
+        ],
+      },
     ],
     limit: Number(limit),
     offset,
     order: [["created_at", "DESC"]],
   });
 
+  // Tính tổng số câu từ các container cho mỗi exam
+  const examsWithTotalQuestions = rows.map((exam) => {
+    const examData = exam.toJSON();
+    let totalQuestions = 0;
+    if (examData.Exam_Containers) {
+      examData.Exam_Containers.forEach((container) => {
+        if (container.Container_Questions) {
+          totalQuestions += container.Container_Questions.length;
+        }
+      });
+    }
+    examData.total_questions = totalQuestions;
+    return examData;
+  });
+
   return {
     success: true,
     message: "Exams retrieved successfully",
     data: {
-      exams: rows,
+      exams: examsWithTotalQuestions,
       pagination: {
         total: count,
         page: Number(page),
@@ -196,8 +269,6 @@ const updateExamById = async (exam_id, examData) => {
 
   if (examData.exam_type !== undefined) {
     updateFields.exam_type = examData.exam_type;
-    // Auto-update total_questions when exam_type changes
-    updateFields.total_questions = getDefaultTotalQuestions(examData.exam_type);
   }
 
   if (examData.certificate_id !== undefined) {
@@ -288,10 +359,14 @@ const getExamWithDetails = async (exam_id) => {
 
   // Sort containers and questions by order field (Sequelize nested include order is unreliable with joins)
   const examData = exam.toJSON();
+
+  // Tính tổng số câu từ các container
+  let totalQuestions = 0;
   if (examData.Exam_Containers) {
     examData.Exam_Containers.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
     examData.Exam_Containers.forEach((container) => {
       if (container.Container_Questions) {
+        totalQuestions += container.Container_Questions.length;
         container.Container_Questions.sort(
           (a, b) => (a.order ?? 0) - (b.order ?? 0),
         );
@@ -305,6 +380,9 @@ const getExamWithDetails = async (exam_id) => {
       }
     });
   }
+
+  // Cập nhật total_questions dựa trên tính toán từ containers
+  examData.total_questions = totalQuestions;
 
   return {
     success: true,
