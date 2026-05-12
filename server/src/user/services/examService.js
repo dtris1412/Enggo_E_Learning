@@ -170,6 +170,14 @@ export const getExamForTaking = async (exam_id, user_exam_id = null) => {
     }
   }
 
+  // Build container where clause based on selectedParts
+  const containerWhere = { parent_id: null }; // Only get parent containers
+  if (selectedParts && !selectedParts.includes("all")) {
+    // Convert string IDs to numbers for comparison
+    const selectedIds = selectedParts.map(id => parseInt(id));
+    containerWhere.container_id = { [db.Sequelize.Op.in]: selectedIds };
+  }
+
   const examQuery = {
     include: [
       {
@@ -182,8 +190,7 @@ export const getExamForTaking = async (exam_id, user_exam_id = null) => {
       },
       {
         model: db.Exam_Container,
-        // Temporarily disable selectedParts filter to debug
-        where: { parent_id: null }, // Only get parent containers
+        where: containerWhere,
         attributes: [
           "container_id",
           "skill",

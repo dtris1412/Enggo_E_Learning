@@ -166,7 +166,78 @@ const ExamResult: React.FC = () => {
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
             {/* Score Card */}
-            {result.skill_bands ? (
+            {result.exam.exam_type === "TOEIC" ? (
+              // ── TOEIC Score Card ──────────────────────────────────────────
+              <div className="bg-gradient-to-br from-emerald-900 to-emerald-700 rounded-2xl shadow-xl p-8 text-white">
+                <div className="text-center mb-8">
+                  <p className="text-emerald-200 text-sm font-semibold uppercase tracking-widest mb-2">
+                    TOEIC Listening & Reading
+                  </p>
+                  <div className="inline-flex items-center justify-center w-32 h-32 rounded-full bg-white/15 border-4 border-white/40 mb-3">
+                    <span className="text-6xl font-black text-white">
+                      {result.total_score || "—"}
+                    </span>
+                  </div>
+                  <p className="text-emerald-200 text-xs mt-1">
+                    Tổng điểm (Max 990)
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                  {/* Listening */}
+                  <div className="bg-white/10 rounded-xl p-4 flex flex-col items-center gap-2">
+                    <Headphones className="w-7 h-7 text-cyan-300" />
+                    <p className="text-xs font-semibold text-emerald-200 uppercase">
+                      Listening
+                    </p>
+                    <p className="text-4xl font-black text-white">
+                      {result.listening_score || "—"}
+                    </p>
+                    {result.listening_correct !== undefined && (
+                      <p className="text-xs text-emerald-200">
+                        {result.listening_correct} câu đúng / 100
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Reading */}
+                  <div className="bg-white/10 rounded-xl p-4 flex flex-col items-center gap-2">
+                    <BookOpen className="w-7 h-7 text-emerald-300" />
+                    <p className="text-xs font-semibold text-emerald-200 uppercase">
+                      Reading
+                    </p>
+                    <p className="text-4xl font-black text-white">
+                      {result.reading_score || "—"}
+                    </p>
+                    {result.reading_correct !== undefined && (
+                      <p className="text-xs text-emerald-200">
+                        {result.reading_correct} câu đúng / 100
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="bg-white/10 rounded-lg p-4 text-center border border-white/20">
+                  <p className="text-xs font-semibold text-emerald-200 uppercase mb-2">
+                    Thống kê tổng
+                  </p>
+                  <div className="grid grid-cols-2 gap-3 text-sm">
+                    <div>
+                      <p className="text-emerald-200">
+                        {result.statistics.correct_answers}
+                      </p>
+                      <p className="text-xs text-emerald-300">Câu đúng</p>
+                    </div>
+                    <div>
+                      <p className="text-emerald-200">
+                        {result.statistics.total_questions}
+                      </p>
+                      <p className="text-xs text-emerald-300">Tổng câu</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : result.skill_bands ? (
               // ── IELTS Band Score Card ─────────────────────────────────────
               <div className="bg-gradient-to-br from-blue-900 to-blue-700 rounded-2xl shadow-xl p-8 text-white">
                 <div className="text-center mb-8">
@@ -283,41 +354,89 @@ const ExamResult: React.FC = () => {
             )}
 
             {/* Statistics */}
-            <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
-              <h3 className="text-xl font-bold text-slate-900 mb-4">
-                Tổng quan kết quả
-              </h3>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="text-center p-4 bg-blue-50 rounded-lg">
-                  <FileText className="w-8 h-8 text-blue-600 mx-auto mb-2" />
-                  <p className="text-2xl font-bold text-slate-900">
-                    {result.statistics.total_questions}
-                  </p>
-                  <p className="text-sm text-slate-600">Tổng câu hỏi</p>
-                </div>
-                <div className="text-center p-4 bg-green-50 rounded-lg">
-                  <CheckCircle className="w-8 h-8 text-green-600 mx-auto mb-2" />
-                  <p className="text-2xl font-bold text-slate-900">
-                    {result.statistics.correct_answers}
-                  </p>
-                  <p className="text-sm text-slate-600">Câu đúng (L+R)</p>
-                </div>
-                <div className="text-center p-4 bg-red-50 rounded-lg">
-                  <XCircle className="w-8 h-8 text-red-600 mx-auto mb-2" />
-                  <p className="text-2xl font-bold text-slate-900">
-                    {result.statistics.incorrect_answers}
-                  </p>
-                  <p className="text-sm text-slate-600">Câu sai</p>
-                </div>
-                <div className="text-center p-4 bg-purple-50 rounded-lg">
-                  <Award className="w-8 h-8 text-purple-600 mx-auto mb-2" />
-                  <p className="text-2xl font-bold text-slate-900">
-                    {result.total_score}
-                  </p>
-                  <p className="text-sm text-slate-600">Điểm số (L+R)</p>
+            {result.exam.exam_type === "TOEIC" ? (
+              <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+                <h3 className="text-xl font-bold text-slate-900 mb-4">
+                  Chi tiết điểm TOEIC
+                </h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="text-center p-4 bg-cyan-50 rounded-lg border border-cyan-200">
+                    <Headphones className="w-8 h-8 text-cyan-600 mx-auto mb-2" />
+                    <p className="text-2xl font-bold text-slate-900">
+                      {result.listening_score}
+                    </p>
+                    <p className="text-sm text-slate-600">Listening</p>
+                    <p className="text-xs text-slate-500 mt-1">
+                      {result.listening_correct}/100 đúng
+                    </p>
+                  </div>
+                  <div className="text-center p-4 bg-emerald-50 rounded-lg border border-emerald-200">
+                    <BookOpen className="w-8 h-8 text-emerald-600 mx-auto mb-2" />
+                    <p className="text-2xl font-bold text-slate-900">
+                      {result.reading_score}
+                    </p>
+                    <p className="text-sm text-slate-600">Reading</p>
+                    <p className="text-xs text-slate-500 mt-1">
+                      {result.reading_correct}/100 đúng
+                    </p>
+                  </div>
+                  <div className="text-center p-4 bg-purple-50 rounded-lg border border-purple-200">
+                    <Award className="w-8 h-8 text-purple-600 mx-auto mb-2" />
+                    <p className="text-2xl font-bold text-slate-900">
+                      {result.total_score}
+                    </p>
+                    <p className="text-sm text-slate-600">Tổng điểm</p>
+                    <p className="text-xs text-slate-500 mt-1">Max 990</p>
+                  </div>
+                  <div className="text-center p-4 bg-blue-50 rounded-lg border border-blue-200">
+                    <FileText className="w-8 h-8 text-blue-600 mx-auto mb-2" />
+                    <p className="text-2xl font-bold text-slate-900">
+                      {result.statistics.correct_answers}
+                    </p>
+                    <p className="text-sm text-slate-600">Câu đúng</p>
+                    <p className="text-xs text-slate-500 mt-1">
+                      {result.statistics.total_questions} câu
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
+            ) : (
+              <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+                <h3 className="text-xl font-bold text-slate-900 mb-4">
+                  Tổng quan kết quả
+                </h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="text-center p-4 bg-blue-50 rounded-lg">
+                    <FileText className="w-8 h-8 text-blue-600 mx-auto mb-2" />
+                    <p className="text-2xl font-bold text-slate-900">
+                      {result.statistics.total_questions}
+                    </p>
+                    <p className="text-sm text-slate-600">Tổng câu hỏi</p>
+                  </div>
+                  <div className="text-center p-4 bg-green-50 rounded-lg">
+                    <CheckCircle className="w-8 h-8 text-green-600 mx-auto mb-2" />
+                    <p className="text-2xl font-bold text-slate-900">
+                      {result.statistics.correct_answers}
+                    </p>
+                    <p className="text-sm text-slate-600">Câu đúng (L+R)</p>
+                  </div>
+                  <div className="text-center p-4 bg-red-50 rounded-lg">
+                    <XCircle className="w-8 h-8 text-red-600 mx-auto mb-2" />
+                    <p className="text-2xl font-bold text-slate-900">
+                      {result.statistics.incorrect_answers}
+                    </p>
+                    <p className="text-sm text-slate-600">Câu sai</p>
+                  </div>
+                  <div className="text-center p-4 bg-purple-50 rounded-lg">
+                    <Award className="w-8 h-8 text-purple-600 mx-auto mb-2" />
+                    <p className="text-2xl font-bold text-slate-900">
+                      {result.total_score}
+                    </p>
+                    <p className="text-sm text-slate-600">Điểm số (L+R)</p>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Detailed Answers */}
             <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">

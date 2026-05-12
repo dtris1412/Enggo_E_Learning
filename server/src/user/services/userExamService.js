@@ -19,6 +19,53 @@ import {
  * Quản lý quá trình thi thử online của user: bắt đầu bài thi, lưu câu trả lời, submit, xem kết quả
  */
 
+/**
+ * TOEIC Score Conversion (ETS Official)
+ * Convert raw score (correct answers) to scaled score (5-495 per section, max 990 total)
+ * Bảng quy đổi điểm TOEIC chuẩn theo ETS
+ * Quy tắc: Không trừ điểm câu sai, số câu đúng càng nhiều điểm càng cao
+ */
+
+/**
+ * Hàm quy đổi số câu đúng thành TOEIC scaled score
+ * Số câu đúng (0-100) → Điểm quy đổi (5-495)
+ *
+ * Ranges according to ETS conversion:
+ * 0-24 correct → 5-95
+ * 25-49 correct → 100-245
+ * 50-74 correct → 250-370
+ * 75-89 correct → 375-445
+ * 90-99 correct → 450-490
+ * 100 correct → 495
+ */
+const getTOEICScaledScore = (correctCount) => {
+  const count = Math.min(Math.max(correctCount, 0), 100);
+
+  // Exact mapping for boundary values
+  if (count === 0) return 5;
+  if (count === 100) return 495;
+
+  // Interpolate within ranges
+  if (count < 25) {
+    // 0-24 → 5-95 (range: 90 points over 25 values)
+    return Math.round(5 + (count / 24) * 90);
+  } else if (count < 50) {
+    // 25-49 → 100-245 (range: 145 points over 25 values)
+    return Math.round(100 + ((count - 25) / 24) * 145);
+  } else if (count < 75) {
+    // 50-74 → 250-370 (range: 120 points over 25 values)
+    return Math.round(250 + ((count - 50) / 24) * 120);
+  } else if (count < 90) {
+    // 75-89 → 375-445 (range: 70 points over 15 values)
+    return Math.round(375 + ((count - 75) / 14) * 70);
+  } else if (count < 100) {
+    // 90-99 → 450-490 (range: 40 points over 10 values)
+    return Math.round(450 + ((count - 90) / 9) * 40);
+  }
+
+  return 495;
+};
+
 // Bắt đầu bài thi mới
 export const startExam = async (user_id, exam_id, selected_parts = []) => {
   if (!user_id || !exam_id) {
@@ -128,12 +175,15 @@ export const submitExam = async (user_exam_id) => {
     include: [
       {
         model: db.Exam,
+        attributes: ["exam_id", "exam_type", "total_questions"],
         include: [
           {
             model: db.Exam_Container,
+            attributes: ["container_id", "skill"],
             include: [
               {
                 model: db.Container_Question,
+                attributes: ["container_question_id", "score"],
                 include: [
                   {
                     model: db.Question_Option,
@@ -157,7 +207,12 @@ export const submitExam = async (user_exam_id) => {
     include: [
       {
         model: db.Container_Question,
+        attributes: ["container_question_id", "score"],
         include: [
+          {
+            model: db.Exam_Container,
+            attributes: ["container_id", "skill"],
+          },
           {
             model: db.Question_Option,
           },
@@ -173,6 +228,9 @@ export const submitExam = async (user_exam_id) => {
   let totalScore = 0;
   let totalQuestions = 0;
   let correctAnswers = 0;
+  let listeningCorrect = 0;
+  let readingCorrect = 0;
+  const isTOEIC = userExam.Exam?.exam_type === "TOEIC";
 
   for (const userAnswer of userAnswers) {
     const containerQuestion = userAnswer.Container_Question;
@@ -201,8 +259,25 @@ export const submitExam = async (user_exam_id) => {
 
     if (isCorrect) {
       correctAnswers++;
-      totalScore += Number(containerQuestion.score || 1);
+      // Nếu TOEIC, đếm riêng listening/reading
+      if (isTOEIC) {
+        const skill = containerQuestion.Exam_Container?.skill;
+        if (skill === "listening") {
+          listeningCorrect++;
+        } else if (skill === "reading") {
+          readingCorrect++;
+        }
+      } else {
+        totalScore += Number(containerQuestion.score || 1);
+      }
     }
+  }
+
+  // Tính điểm TOEIC theo conversion table
+  if (isTOEIC) {
+    const listeningScaled = getTOEICScaledScore(listeningCorrect);
+    const readingScaled = getTOEICScaledScore(readingCorrect);
+    totalScore = listeningScaled + readingScaled;
   }
 
   // Cập nhật user_exam với submitted_at và total_score
@@ -220,17 +295,29 @@ export const submitExam = async (user_exam_id) => {
     computeAndSaveExamQuestionStats(user_exam_id),
   ]).catch((err) => console.error("[submitExam] Error computing stats:", err));
 
+  const responseData = {
+    user_exam_id,
+    total_score: totalScore,
+    total_questions: totalQuestions,
+    correct_answers: correctAnswers,
+    percentage:
+      totalQuestions > 0 ? (correctAnswers / totalQuestions) * 100 : 0,
+  };
+
+  // Thêm thông tin TOEIC nếu là bài thi TOEIC
+  if (isTOEIC) {
+    const listeningScaled = getTOEICScaledScore(listeningCorrect);
+    const readingScaled = getTOEICScaledScore(readingCorrect);
+    responseData.listening_score = listeningScaled;
+    responseData.reading_score = readingScaled;
+    responseData.listening_correct = listeningCorrect;
+    responseData.reading_correct = readingCorrect;
+  }
+
   return {
     success: true,
     message: "Exam submitted and graded successfully",
-    data: {
-      user_exam_id,
-      total_score: totalScore,
-      total_questions: totalQuestions,
-      correct_answers: correctAnswers,
-      percentage:
-        totalQuestions > 0 ? (correctAnswers / totalQuestions) * 100 : 0,
-    },
+    data: responseData,
   };
 };
 
@@ -431,6 +518,31 @@ export const getExamResult = async (user_exam_id, user_id) => {
     };
   }
 
+  // TOEIC score calculation
+  let listeningScore = null;
+  let readingScore = null;
+  let listeningCorrectCount = 0;
+  let readingCorrectCount = 0;
+
+  const isTOEIC = userExam.Exam?.exam_type === "TOEIC";
+  if (isTOEIC) {
+    const bySkill = { listening: [], reading: [] };
+    (userExam.User_Answers || []).forEach((ans) => {
+      const skill =
+        ans.Container_Question?.Exam_Container?.skill?.toLowerCase();
+      if (skill === "listening") bySkill.listening.push(ans);
+      else if (skill === "reading") bySkill.reading.push(ans);
+    });
+
+    listeningCorrectCount = bySkill.listening.filter(
+      (a) => a.is_correct,
+    ).length;
+    readingCorrectCount = bySkill.reading.filter((a) => a.is_correct).length;
+
+    listeningScore = getTOEICScaledScore(listeningCorrectCount);
+    readingScore = getTOEICScaledScore(readingCorrectCount);
+  }
+
   return {
     success: true,
     message: "Exam result retrieved successfully",
@@ -441,6 +553,10 @@ export const getExamResult = async (user_exam_id, user_id) => {
       submitted_at: userExam.submitted_at,
       status: userExam.status,
       total_score: userExam.total_score,
+      listening_score: listeningScore,
+      reading_score: readingScore,
+      listening_correct: listeningCorrectCount,
+      reading_correct: readingCorrectCount,
       statistics: {
         total_questions: totalQuestions,
         correct_answers: correctAnswers,
